@@ -39,6 +39,8 @@ CREATE TABLE IF NOT EXISTS positions (template TEXT NOT NULL, pos INTEGER NOT NU
     filler TEXT NOT NULL, n INTEGER NOT NULL, PRIMARY KEY (template, pos, filler));
 CREATE TABLE IF NOT EXISTS aliases (word TEXT NOT NULL, name TEXT NOT NULL,
     hits REAL NOT NULL, found INTEGER NOT NULL, PRIMARY KEY (word, name));
+CREATE TABLE IF NOT EXISTS agreement (name TEXT NOT NULL, pronoun TEXT NOT NULL,
+    n INTEGER NOT NULL, PRIMARY KEY (name, pronoun));
 CREATE TABLE IF NOT EXISTS boundaries (turn INTEGER PRIMARY KEY);
 CREATE TABLE IF NOT EXISTS contexts (word TEXT PRIMARY KEY, names TEXT NOT NULL,
     heard INTEGER NOT NULL);
@@ -49,12 +51,15 @@ CARRIED = ("learnt", "positions")
 # every extraction kept across runs: the parser is deterministic, and the version is in
 # the key so a change to what is extracted re-reads every sentence
 CACHE = Path(__file__).resolve().parents[2] / "state" / "parses.sqlite"
-VERSION = "graph-6"
+VERSION = "graph-7"
 
 # a clause's links that are not arguments
 SKIP = {"punct", "det", "aux", "auxpass", "cc", "mark", "neg", "intj", "case", "dep",
         "advmod", "prt", "predet", "preconj", "expl", "attr_of"}
 PRONOUNS = {"it", "they", "them", "its", "their", "he", "she", "him", "her", "his"}
+# each pronoun's form as a subject: what agreement is counted by
+PERSON = {"him": "he", "his": "he", "her": "she", "them": "they", "their": "they",
+          "its": "it"}
 
 _NLP: dict = {}
 
@@ -137,7 +142,11 @@ def extract(doc) -> list[dict]:
         if tok.i in index:
             return f"e:{index[tok.i]}"
         if tok.lower_ in PRONOUNS:
-            return f"n:{phrase(first)}" if first is not None else None
+            # one with nothing to refer to in its own sentence is resolved when heard,
+            # against the episode
+            if first is not None:
+                return f"n:{phrase(first)}"
+            return f"p:{PERSON.get(tok.lower_, tok.lower_)}"
         if tok.pos_ in ("NOUN", "PROPN", "NUM", "ADJ") or tok.like_num:
             return f"n:{phrase(tok)}"
         return None
@@ -225,8 +234,6 @@ class GraphArm:
         self._steps: dict = {}
         # steps looked at by the question being answered, or None outside answering
         self.spent: int | None = None
-        # the first event of the episode a question is answered within, or None for all
-        self.floor: int | None = None
 
     # -- reading ---------------------------------------------------------------
 
@@ -291,6 +298,8 @@ class GraphArm:
             self.db.commit()
             return
         events = self.read(text)
+        resolved = {t: self.referent(t[2:]) for ev in events for _, t in ev["edges"]
+                    if t.startswith("p:")}
         ids = []
         for ev in events:
             cur = self.db.execute("INSERT INTO events (turn, lemma, heard, mood) VALUES "
@@ -298,9 +307,35 @@ class GraphArm:
             ids.append(cur.lastrowid)
         for ev, eid in zip(events, ids):
             for label, t in ev["edges"]:
-                node = f"e:{ids[int(t[2:])]}" if t.startswith("e:") else t
+                node = f"e:{ids[int(t[2:])]}" if t.startswith("e:") else resolved.get(t, t)
+                if node is None:
+                    continue
                 self.db.execute("INSERT INTO edges VALUES (?, ?, ?)", (eid, label, node))
+        for t, node in resolved.items():
+            if node is not None:
+                self.db.execute("INSERT INTO agreement VALUES (?, ?, 1) ON CONFLICT(name, "
+                                "pronoun) DO UPDATE SET n = n + 1", (node, t[2:]))
         self.db.commit()
+
+    def referent(self, pronoun: str) -> str | None:
+        """What a pronoun refers to, from this episode, as centering theory has it: the
+        latest subject for 'he', 'she' and 'they', the latest thing that was not a subject
+        for 'it'. A name that has been called something else and never this is passed
+        over, so agreement is learnt from what pronouns have been resolved to."""
+        want = "nsubj" if pronoun != "it" else None
+        for node, label in self.db.execute(
+                "SELECT edges.node, edges.label FROM edges JOIN events ON events.id = "
+                "edges.event WHERE events.turn > ? AND edges.node LIKE 'n:%' "
+                "ORDER BY edges.event DESC LIMIT 200", (self.episode(),)):
+            if (want and not label.startswith(want)) or (not want and (
+                    label.startswith("nsubj") or label == "self")):
+                continue
+            called = dict(self.db.execute("SELECT pronoun, n FROM agreement WHERE name = ?",
+                                          (node,)).fetchall())
+            if called and pronoun not in called and max(called.values()) >= 2:
+                continue
+            return node
+        return None
 
     # -- the graph -------------------------------------------------------------
 
@@ -329,10 +364,7 @@ class GraphArm:
         steps = self._steps.get(node)
         if steps is None:
             steps = self._steps[node] = self._around(node)
-        if self.floor is None:
-            return steps
-        # working memory: only what this episode told
-        return [s for s in steps if not s[2].startswith("e:") or int(s[2][2:]) >= self.floor]
+        return steps
 
     def _around(self, node: str) -> list[tuple[str, int, str]]:
         if node.startswith("e:"):
@@ -1129,29 +1161,21 @@ class GraphArm:
         self.heard_in(question.text)
         put = self.unaliased(question.text)
         said, self.spent = None, 0
-        # working memory first, the episode since the last break; then everything
-        first = self.db.execute("SELECT MIN(id) FROM events WHERE turn > ?",
-                                (self.episode(),)).fetchone()[0]
-        floors = [first, None] if self.episode() >= 0 and first is not None else [None]
         try:
-            for self.floor in floors:
-                said = next((self.latest(found) for text in dict.fromkeys((put, question.text))
-                             if (found := self.answers(*self.shape(text), text,
-                                                       borrow=False))), None)
-                if said is None:
-                    said = self.answered(put)
-                # a pin is used only where the question as heard finds nothing: frame
-                # words a question's names keep company with agree across hearings too
-                # ('What is the number of X in the cellar?' pinned 'number'), and they
-                # broke answers found
-                again = self.unaliased(question.text, heard=True) if said is None else put
-                if again != put:
-                    said = self.answered(again)
-                if said is not None:
-                    break
+            said = next((self.latest(found) for text in dict.fromkeys((put, question.text))
+                         if (found := self.answers(*self.shape(text), text, borrow=False))),
+                        None)
+            if said is None:
+                said = self.answered(put)
+            # a pin is used only where the question as heard finds nothing: frame words a
+            # question's names keep company with agree across hearings too ('What is the
+            # number of X in the cellar?' pinned 'number'), and they broke answers found
+            again = self.unaliased(question.text, heard=True) if said is None else put
+            if again != put:
+                said = self.answered(again)
         except Spent:
             pass
-        given_up, self.spent, self.floor = self.spent > EFFORT, None, None
+        given_up, self.spent = self.spent > EFFORT, None
         # what the plans found from outside focus is another conversation's, as often as
         # not; what is in focus and fits the asked slot comes first
         if said is None or not self.in_focus(said):
@@ -1479,8 +1503,8 @@ class GraphArm:
             return said
         # a reaction is about the answer, not the world: no event in it has a named
         # subject ('it's the shed', 'that's right'), where a telling has ('Ada keeps...')
-        about_world = any(label.startswith("nsubj") for ev in self.read(text)
-                          for label, _ in ev["edges"])
+        about_world = any(label.startswith("nsubj") and t.startswith("n:")
+                           for ev in self.read(text) for label, t in ev["edges"])
         if self.pending is not None and not about_world:
             question, said = self.pending
             self.pending = None

@@ -224,14 +224,12 @@ def test_a_blank_is_filled_from_what_is_in_focus(tmp_path):
     assert a.answer(q("Then Lily threw what again?")) == "ball"
 
 
-def test_a_plan_answers_from_this_episode_before_the_rest(tmp_path):
+def test_a_pronoun_is_resolved_against_the_episode(tmp_path):
     a = arm(tmp_path)
-    a.hear(0, "Lily kept the ball in the box.")
-    a.teach("Where did Lily keep the ball?", "box")
-    a.hear(1, "***")
-    a.hear(2, "Tom kept the kite in the shed.")
-    # this episode holds Tom's kite and nothing of Lily's ball, so memory beyond it answers
-    assert a.answer(q("Where did Lily keep the ball?")) == "box"
-    a.hear(3, "Lily kept the ball in the bag.")
-    assert a.answer(q("Where did Lily keep the ball?")) == "bag"
-    assert a.floor is None
+    a.hear(0, "Tom found a red ball.")
+    a.hear(1, "He threw it over the fence.")
+    edges = set(a.db.execute(
+        "SELECT edges.label, edges.node FROM edges JOIN events ON events.id = edges.event "
+        "WHERE events.lemma = 'throw'").fetchall())
+    assert ("nsubj", "n:tom") in edges and ("dobj", "n:red ball") in edges
+    assert not any(n.startswith("p:") for _, n in edges)

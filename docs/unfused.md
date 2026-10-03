@@ -97,9 +97,15 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
        questions it is heard in; the graph does the same (`heard_in`). Kinds are not the
        lever for it: even the true kind leaves three or four candidates after one
        hearing (`readings/context-oracle-*`). Kinds by link labels stay item 4's, where
-       a wrong kind is the fault. OPEN, for John: whether that ceiling meets DECIDED's
-       trigger for MiniLM as a vote at a word's first hearing.
-       Once the graph's intersection and a form of kinds have landed, the curve is
+       a wrong kind is the fault.
+       - Next: MiniLM's word vectors as one vote at a word's first hearing (John's,
+         2026-10-03, DECIDED's trigger met by that ceiling). A word's candidates from
+         the intersection are ranked by cosine to the word, as `scripts/unheard.py`'s
+         fitted arm does, and the intersection takes over as hearings add up. The
+         reading is oblique without carried aliases, against 0.517 0.605 0.547.
+         Refuted if oblique does not rise on any seed, or another form falls.
+       - Then item 4's kinds, before items 2 to 6.
+       Once MiniLM's vote and item 4's kinds have landed, the curve is
        compared with the language models' in-context learning (John's, 2026-10-03): the
        house's synonyms swapped for made-up words in an instrument copy, so a model's
        prior cannot say what they mean, and each model asked what the word names after
@@ -207,7 +213,10 @@ commit.
     trigger: the 0.8B's in-context curve above the system's at every hearing (THE ORDER,
     item 1), or the system's curve no higher at five hearings than at three once kinds
     have landed. `scripts/unheard.py` picked the right name 33 times in 40 on seed 1 with
-    MiniLM fitted to the rest of the question.
+    MiniLM fitted to the rest of the question. Met (John's, 2026-10-03) by a ceiling read
+    sooner: the true kind still leaves three or four names after one hearing
+    (`readings/context-oracle-*`). MiniLM is a vote at a word's first hearing; the
+    meaning learnt from hearings decides once there are enough of them.
 - **bAbI is the second world, and the house stays the target.** bAbI checks that the house is
   a fair test. It is small and templated enough to be won by building to it, so a score there
   is never the objective.

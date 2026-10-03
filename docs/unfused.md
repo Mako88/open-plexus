@@ -196,6 +196,12 @@ commit.
   and concepts are formed from shared properties (formal concept analysis). Identities match
   exactly and meanings match by overlap. What everyone knows comes from the faculty, asked
   once and kept; what only this conversation knows is learnt from it.
+  - **Reopened on a condition** (John's, 2026-10-03): learnt meaning gets a fair shot, and
+    MiniLM's word vectors come in as a vote beside the intersection if it stalls. The
+    trigger: the 0.8B's in-context curve above the system's at every hearing (THE ORDER,
+    item 1), or the system's curve no higher at five hearings than at three once kinds
+    have landed. `scripts/unheard.py` picked the right name 33 times in 40 on seed 1 with
+    MiniLM fitted to the rest of the question.
 - **bAbI is the second world, and the house stays the target.** bAbI checks that the house is
   a fair test. It is small and templated enough to be won by building to it, so a score there
   is never the objective.

@@ -136,7 +136,8 @@ def _stream(arm, stories, reopen_every, rows, sizes) -> int:
                          "refused": "don't know" in (said or "").lower(),
                          "seconds": round(seconds, 3),
                          "gave_up": "(gave up)" in getattr(getattr(arm, "arm", None),
-                                                          "last_notes", [])})
+                                                          "last_notes", []),
+                         "notes": list(getattr(getattr(arm, "arm", None), "last_notes", []))})
         for text in s.after:
             arm.tell(turn, text)
             turn += 1

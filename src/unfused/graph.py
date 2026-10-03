@@ -1187,10 +1187,13 @@ class GraphArm:
         given_up, self.spent = self.spent > EFFORT, None
         # what the plans found from outside focus is another conversation's, as often as
         # not; what is in focus and fits the asked slot comes first
+        planned, fit = said, self.focused(question.text)
         if said is None or not self.in_focus(said):
-            said = self.focused(question.text) or said
+            said = fit or said
         self.last_notes = (["(gave up)"] if given_up else []) + (
-            ["(nothing)"] if said is None else ["(found)"])
+            ["(nothing)"] if said is None else ["(found)"]) + [
+            f"plans:{planned}", f"focus:{fit}", "by:" + (
+                "none" if said is None else "plans" if said == planned else "focus")]
         return "I don't know." if said is None else said
 
     def now(self) -> int:

@@ -44,3 +44,6 @@ corpora/*.txt
 # bAbI, somebody else's data; scripts/fetch_babi.sh fetches it.
 data/babi/*.jsonl
 data/babi/README.md
+
+# TinyStories, somebody else's data; src/unfused/exam/stories.py says where it is fetched from.
+data/tinystories/

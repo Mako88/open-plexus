@@ -43,6 +43,26 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
 - ~~**Phase 3 — Ears.**~~ Struck 2026-09-29 under the strict scorer, which wants each gold
   filler in a slot of its own: Qwen3.5-2B at 0.96 recall and 1.00 precision. The ear was
   deleted 2026-10-02, when the parse graph replaced it.
+- **The stream, first.** John's, 2026-10-03. The target is the TinyStories stream (THE
+  STREAM, below); the houses and bAbI are regression checks, and their items further down
+  wait behind these. In order:
+  1. Read what breaks. The graphed arm as it is, on 300 stories and then 1,000, each
+     wrong answer traced; the faults found become this list's next items, ahead of any
+     guessed. Expected among them: pronouns across sentences, adjectives folded into
+     names ('the red ball' is one name, so a colour is never a node), the edges `SKIP`
+     drops, and walking a graph of hundreds of thousands of edges.
+  2. Kinds as the fixed point of relations and things (John's, 2026-10-03). Two things
+     are of a kind where they take part in alike relations with things of alike kinds,
+     and two relations are alike where they join alike kinds. Each starts as its own
+     class and both are refined in turn until nothing moves, as colour refinement
+     (Weisfeiler-Lehman), SimRank and co-clustering do. A shape's kind is the class its
+     answers fall in, so shapes need no grouping of their own. Built on the stream, where
+     a word has hundreds of contexts, rather than the house's three to five. A recursive
+     structure is wanted for scale as well (John's). Refuted if it separates the house's
+     true kinds no better than labels as a set did (`kinds` at `55ebec4d`), or the
+     stream's curve does not rise with it.
+  3. Retention and knowledge across stories: early questions asked again late, and
+     questions only many stories answer ('What colour can a ball be?').
 - **The models are a milestone check, not a baseline.** John's, 2026-10-02: the system is
   compared with its own last version on every change, and with `blind` (seconds, no GPU);
   the language models given everything are run with `scripts/baselines.sh` now and then,
@@ -160,10 +180,9 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
      commit that says so): the labels a shape's lessons' answers were held by, as a
      set, on the shape's own plans, which is where most wrong kinds come from. Colours
      are told 'painted in X' as well, so a colour shares `prep:in` with every room.
-     Next: the same kind as a distribution of labels, a name kept where it is nearer
-     its shape's pooled answers than other kinds' (`scripts/kinds.py` reads its
-     ceiling with the true kinds as classes). What is open is what the other kinds
-     are, since the system has shapes and not kinds, and many shapes ask one kind.
+     Next: kinds as the fixed point of relations and things, on the stream (the
+     stream's item 2); `scripts/kinds.py` reads the ceiling on the house with the true
+     kinds as classes.
   5. Pronouns across sentences, and size. A pronoun is bound to the entity in focus as
      Phase 5 has it, and the first house is read at 3,000 and 30,000 turns, a size the
      house already has, for seconds a question as well as score (`tests/pushback.py`).
@@ -220,9 +239,19 @@ commit.
     sooner: the true kind still leaves three or four names after one hearing
     (`readings/context-oracle-*`). MiniLM is a vote at a word's first hearing; the
     meaning learnt from hearings decides once there are enough of them.
-- **bAbI is the second world, and the house stays the target.** bAbI checks that the house is
-  a fair test. It is small and templated enough to be won by building to it, so a score there
-  is never the objective.
+- **The TinyStories stream is the target; the houses and bAbI are regression checks.**
+  John's, 2026-10-03, replacing the house as target. The house has about fifty words and
+  three or four frames a kind, so it runs out of things to learn, and work fitted to it
+  bent the system to its templates. bAbI is small and templated the same way. A score on
+  either is never the objective.
+- **A continual learner is judged by how well it keeps learning.** John's, 2026-10-03.
+  Three readings along one stream, weightiest first: whether it still gets more right as it
+  hears more, whether it keeps what it had (early material asked late), and what an answer
+  costs in seconds and memory as it grows. How much it learns from nothing on a first
+  encounter, a house at a time with nothing carried, is the second measure.
+- **Nothing memorised in one world is read back as a score in another.** John's,
+  2026-10-03. Aliases are never carried from practice houses, since every house draws on one
+  synonym table, and no reading is called "as deployed".
 - **bAbI's milestone is transfer** (John's, 2026-10-03). A system that learns as it goes is
   judged after teaching, as a model is judged after training rather than at its first
   weights. The milestone reading is bAbI after a general curriculum (the primer fork) with no
@@ -270,7 +299,27 @@ commit.
 
 ---
 
-## THE EXAM
+## THE STREAM
+
+TinyStories (Eldan and Li, 2023): short stories in a three- or four-year-old's vocabulary,
+about two million of them, in free sentence structure. The validation split's 22,000 are
+read first (`data/tinystories/`, fetched; `src/unfused/exam/stories.py`). One system hears
+them in a fixed order and is never restarted between them.
+
+Each story is told sentence by sentence. One later sentence naming something the story told
+before, by name or as 'the X' or 'his X', is held back and asked with that phrase blanked,
+as the Children's Book Test asks ('Finally, the butterfly landed on what?'). The teacher
+reacts as a lesson's teacher does, then the held-back sentence and the rest are told.
+
+- **The curve** is the share right by stories heard, in buckets 0-10, 10-30, 30-100 and on
+  by about threefold, each with seconds a question and the graph's size.
+- **Baselines.** `blind` says the commonest answer of the questions before it and reads no
+  story; `frequent` says the noun the story has named most so far. The second is the bar a
+  memory has to clear.
+- **Refutes the target's bet:** the graphed arm's curve flat from the start, so nothing it
+  learns on one story helps on the next.
+
+## THE HOUSE (regression)
 
 A generated house: invented people, rooms and objects, told once each as ordinary sentences
 among filler, across 300 turns. Every question is asked at delays from 1 to 150 turns, in eight

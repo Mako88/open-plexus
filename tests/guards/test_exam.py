@@ -92,3 +92,17 @@ def test_a_number_is_matched_in_either_form_and_whole():
     assert judge(q("two"), "2")["correct"] and judge(q("2"), "There are two.")["correct"]
     assert not judge(q("12"), "2")["correct"] and not judge(q("one"), "none")["correct"]
 
+
+
+def test_a_story_is_asked_about_what_it_told_before():
+    import spacy
+
+    from unfused.exam.stories import make, right, sentences
+
+    text = ("Tom had a red ball. Mr. Brown lived next door. Tom threw the ball over the "
+            "fence. Mr. Brown was not happy. Then Tom found the ball under the big tree.")
+    assert sentences(text)[1] == "Mr. Brown lived next door."
+    s = make(text, 0, spacy.load("en_core_web_sm"))
+    assert s.answer in ("ball", "tree", "tom") and "what" in s.question.lower() + "who"
+    assert s.answer not in s.question.lower().split()
+    assert right(s.answers, f"It was the {s.answer}.") and not right(s.answers, "the moon")

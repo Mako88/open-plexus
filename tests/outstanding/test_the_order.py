@@ -159,3 +159,27 @@ def test_the_second_house_scores_at_least_half_the_first():
             held.setdefault(key[0], set()).add(house["seed"])
     most = max((len(s & {1, 2, 3}) for s in held.values()), default=0)
     assert most >= 3, f"one configuration holds half its first-house score on {most} of 3 seeds"
+
+
+def test_the_stream_keeps_learning():
+    """The target (John's, 2026-10-03): on 1,000 stories or more of the TinyStories stream,
+    the graphed arm's latest reading scores higher in its last bucket than in 30-100, and
+    higher there than `frequent` on the same stream."""
+    latest: dict[str, dict] = {}
+    for path in READINGS.glob("stories-*.json"):
+        d = json.loads(path.read_text(encoding="utf-8"))
+        if d["stream"]["stories"] < 1000:
+            continue
+        if d["arm"] not in latest or d["taken_at"] > latest[d["arm"]]["taken_at"]:
+            latest[d["arm"]] = d
+    assert "graphed" in latest, "no reading of the graphed arm on 1,000 stories"
+    g = latest["graphed"]
+    f = next((d for path in READINGS.glob("stories-frequent-*.json")
+              if (d := json.loads(path.read_text(encoding="utf-8")))["stream"]["fingerprint"]
+              == g["stream"]["fingerprint"]), None)
+    assert f is not None, "no frequent reading on the graphed arm's stream"
+    last = list(g["curve"])[-1]
+    early, late, bar = (g["curve"].get("30-100", {}).get("score", 1.0),
+                        g["curve"][last]["score"], f["curve"].get(last, {}).get("score", 1.0))
+    assert late > early and late > bar, (
+        f"graphed {last}: {late}, against itself at 30-100 {early} and frequent {bar}")

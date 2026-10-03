@@ -100,6 +100,7 @@ llama-server -m <Qwen_Qwen3.5-9B-Q6_K_L.gguf> -ngl 99 -c 8192 --parallel 1 --jin
 uv run python scripts/exam.py --faculty served --served Qwen3.5-2B-Q8_0 --port 8094   --arms blind,full,linked --seed 1 --note "..."
 uv run python scripts/exam.py --arms graphed --teach 5 --world first --seed 1 --note "..."
 uv run python scripts/babi.py --tasks 1,2,3,7 --stories 20 --arms graphed --teach 20 --note "..."
+uv run python scripts/stories.py --stories 1000 --arms frequent,blind,graphed --note "..."   # the target
 bash scripts/baselines.sh "what changed the house"   # after any change to the house: ~1h45m GPU
 ```
 
@@ -124,8 +125,10 @@ src/unfused/arms.py    text-memory arms: blind, full context, recall
 src/unfused/linked.py  linked recall
 src/unfused/graph.py   the system: the conversation as its parse, plans as paths in it
 src/unfused/exam/      the house and the runner
+src/unfused/exam/stories.py  the TinyStories stream: the target
 scripts/exam.py        runs arms and writes readings
 scripts/babi.py        runs arms on bAbI and writes readings
+scripts/stories.py     runs arms on the TinyStories stream and writes readings
 tests/guards           fast structural tests
 tests/outstanding      the red set
 tests/pushback.py      standing objections

@@ -233,6 +233,8 @@ class GraphArm:
         # for the same node's steps thousands of times. A sentence drops only the nodes it
         # gives a new step, so what was loaded stays loaded
         self._steps: dict = {}
+        # every event's lemma, turn and mood, kept for good: what was heard never changes
+        self._events: dict = {}
         # steps looked at by the question being answered, or None outside answering
         self.spent: int | None = None
 
@@ -380,9 +382,15 @@ class GraphArm:
             "SELECT event, label FROM edges WHERE node = ? ORDER BY event DESC", (node,))]
         return out
 
+    def _event(self, node: str) -> tuple[str, int, str]:
+        got = self._events.get(node)
+        if got is None:
+            got = self._events[node] = self.db.execute(
+                "SELECT lemma, turn, mood FROM events WHERE id = ?", (int(node[2:]),)).fetchone()
+        return got
+
     def event(self, node: str) -> tuple[str, int]:
-        lemma, turn = self.db.execute("SELECT lemma, turn FROM events WHERE id = ?",
-                                      (int(node[2:]),)).fetchone()
+        lemma, turn, _ = self._event(node)
         return lemma, turn
 
     def replaced(self, node: str) -> int:
@@ -413,8 +421,7 @@ class GraphArm:
         return self._replaced[node]
 
     def mood(self, node: str) -> str:
-        return self.db.execute("SELECT mood FROM events WHERE id = ?",
-                               (int(node[2:]),)).fetchone()[0]
+        return self._event(node)[2]
 
     def paths(self, start: str, goal: str, limit: int = 8,
               avoid: set | None = None) -> list[list]:

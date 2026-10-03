@@ -150,7 +150,11 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
      comparison MUST NOT reject the right one for being like X. The case it is for:
      'the stuff X keeps in the nursery' answered 'coach house', which is like the
      nursery and unlike any colour (`f827f42e` tried kinds on borrowed ends, before
-     plans were relations).
+     plans were relations). A third shape is refuted (`a9dfa7c2`): the kind taken from
+     the question's shape when the answer is filtered, which is not the plan that found
+     it for counts, joins and borrowed shapes. Next: the kind from the plan that found
+     the answer, and names compared with a kind pooled by link labels rather than with
+     each name, so 'slate colour' is a colour.
   5. Pronouns across sentences, and size. A pronoun is bound to the entity in focus as
      Phase 5 has it, and the first house is read at 3,000 and 30,000 turns, a size the
      house already has, for seconds a question as well as score (`tests/pushback.py`).

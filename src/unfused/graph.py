@@ -42,6 +42,8 @@ CREATE TABLE IF NOT EXISTS aliases (word TEXT NOT NULL, name TEXT NOT NULL,
 CREATE TABLE IF NOT EXISTS agreement (name TEXT NOT NULL, pronoun TEXT NOT NULL,
     n INTEGER NOT NULL, PRIMARY KEY (name, pronoun));
 CREATE TABLE IF NOT EXISTS boundaries (turn INTEGER PRIMARY KEY);
+CREATE TABLE IF NOT EXISTS asks (wh TEXT NOT NULL, mark TEXT NOT NULL, n INTEGER NOT NULL,
+    PRIMARY KEY (wh, mark));
 CREATE TABLE IF NOT EXISTS contexts (word TEXT PRIMARY KEY, names TEXT NOT NULL,
     heard INTEGER NOT NULL);
 """
@@ -869,6 +871,10 @@ class GraphArm:
 
     def teach(self, question: str, answer: str) -> None:
         want = answer.lower()
+        # what the question's wh-word asked for, by the mark the answer is heard with
+        if (wh := wh_word(question)) and (mark := self.mark(want)):
+            self.db.execute("INSERT INTO asks VALUES (?, ?, 1) ON CONFLICT(wh, mark) DO "
+                            "UPDATE SET n = n + 1", (wh, mark))
         # where each word sat is counted as heard, so a word held in its place is frame
         self.heard_at(question)
         put = self.alias(question, want)
@@ -1256,9 +1262,32 @@ class GraphArm:
             link = sum(n for lab, _, n in rows if lab == slot[1])
             return here / (total or 1) + 0.1 * (link + 0.5) / (total + 0.5 * labels)
 
-        scored = [(a * fit(n), n) for n, a in act.items()
+        asks = dict(self.db.execute("SELECT mark, n FROM asks WHERE wh = ?",
+                                    (wh_word(question),)).fetchall())
+
+        def asked_for(name: str) -> float:
+            # how often this wh-word's answers bore the name's mark, as lessons have it
+            mark = self.mark(name)
+            return 0.5 if mark is None else (asks.get(mark, 0) + 1) / (sum(asks.values()) + 2)
+
+        scored = [(a * fit(n) * asked_for(n), n) for n, a in act.items()
                   if not said_in(n, question) and n not in ("what", "who")]
         return max(scored)[1] if scored else None
+
+    def mark(self, name: str) -> str | None:
+        """How a name is written where it is heard: 'capital' where its last word is
+        capitalised every time ('Lily', even at a sentence's start), 'lower' where it is
+        not, None where no sentence heard spells it out."""
+        word = name.split()[-1] if name.strip() else ""
+        if not word:
+            return None
+        seen = [m.group(0) for (heard,) in self.db.execute(
+                    "SELECT DISTINCT events.heard FROM edges JOIN events ON events.id = "
+                    "edges.event WHERE edges.node = ? LIMIT 20", (f"n:{name}",))
+                for m in re.finditer(rf"\b{re.escape(word)}\b", heard, re.IGNORECASE)]
+        if not seen:
+            return None
+        return "capital" if all(w[:1].isupper() for w in seen) else "lower"
 
     def answered(self, text: str, depth: int = 0) -> str | None:
         """An answer from the plans of the question's shape, or, where they find nothing,
@@ -1600,6 +1629,12 @@ def numeral(text: str) -> int | None:
     if t.isdigit():
         return int(t)
     return WORDS.index(t) if t in WORDS else None
+
+
+def wh_word(question: str) -> str:
+    """The question's first wh-word, or '' where it has none."""
+    found = re.search(r"\b(who|whom|whose|what|which|where|when|how)\b", question.lower())
+    return found.group(1) if found else ""
 
 
 def said_in(answer: str, question: str) -> bool:

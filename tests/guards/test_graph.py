@@ -232,6 +232,20 @@ def test_a_blank_is_filled_by_what_filled_the_verb(tmp_path):
     assert a.answer(q("Lily ate what again?")) == "cake"
 
 
+def test_what_a_wh_word_asks_for_is_learnt_from_lessons(tmp_path):
+    a = arm(tmp_path)
+    a.hear(0, "Tom had a cup.")
+    a.hear(1, "Ann saw the cup.")
+    a.teach("Tom had what?", "cup")
+    a.teach("Who saw the cup?", "Ann")
+    a.hear(2, "***")
+    for i, text in enumerate(["Lily had a ball.", "Max saw the ball.", "Lily saw Max."], 3):
+        a.hear(i, text)
+    # both were seen, and Max the later; lessons said 'what' is answered with a word
+    # written small, so what is in focus for it is the ball
+    assert a.focused("Then Lily saw what again?") == "ball"
+
+
 def test_a_pronoun_is_resolved_against_the_episode(tmp_path):
     a = arm(tmp_path)
     a.hear(0, "Tom found a red ball.")

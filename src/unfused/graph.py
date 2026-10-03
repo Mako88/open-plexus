@@ -187,6 +187,10 @@ class GraphArm:
         # taught shapes' signatures, rebuilt after a lesson; questions' parses
         self._sigs: list | None = None
         self._tokens: dict = {}
+        # what each set of shapes answers anywhere, by the graph's size when found, and
+        # what each name is known by, cleared whenever something is heard
+        self._answering: dict = {}
+        self._profiles: dict = {}
 
     # -- reading ---------------------------------------------------------------
 
@@ -243,6 +247,7 @@ class GraphArm:
 
     def hear(self, turn: int, text: str) -> None:
         self._replaced = {}
+        self._profiles = {}
         events = self.read(text)
         ids = []
         for ev in events:
@@ -1048,7 +1053,8 @@ class GraphArm:
         self.heard_in(question.text)
         put = self.unaliased(question.text)
         said = next((self.latest(found) for text in dict.fromkeys((put, question.text))
-                     if (found := self.answers(*self.shape(text), text, borrow=False))),
+                     if (found := self.fitting(
+                         self.answers(*self.shape(text), text, borrow=False), text))),
                     None)
         if said is None:
             said = self.answered(put)
@@ -1067,12 +1073,12 @@ class GraphArm:
         place, and what is left asked again. Plans are whole paths and do not compose; a
         question's grammar does."""
         shape, fillers = self.shape(text)
-        found = self.answers(shape, fillers, text, borrow=False)
+        found = self.fitting(self.answers(shape, fillers, text, borrow=False), text)
         if found:
             return self.latest(found)
         if depth < 3 and (said := self.joined(text, depth)) is not None:
             return said
-        found = self.answers(shape, fillers, text)
+        found = self.fitting(self.answers(shape, fillers, text), text)
         if found:
             return max(found, key=lambda f: f[1])[0]
         # borrowed before taken apart, by the first house: taking 'X's lanterns' apart
@@ -1080,11 +1086,86 @@ class GraphArm:
         if depth >= 3 or not all(self.known(f) for f in fillers):
             return None
         said = self.apart(text, depth)
-        if said is None and depth == 0 and (found := self.reaching(text, shape)):
+        if said is None and depth == 0 and (
+                found := self.fitting(self.reaching(text, shape), text)):
             said = self.latest(found)
-        if said is None and depth == 0 and (found := self.kinded(text, shape, fillers)):
+        if said is None and depth == 0 and (
+                found := self.fitting(self.kinded(text, shape, fillers), text)):
             said = self.latest(found)
         return said
+
+    def profile(self, name: str) -> set[str]:
+        """What a name is known by, in labels only so a new verb still fits: each link it
+        is held by, and each link beside it in the events that hold it."""
+        if name in self._profiles:
+            return self._profiles[name]
+        out = set()
+        for e, label in self.db.execute("SELECT event, label FROM edges WHERE node = ?",
+                                        (f"n:{name}",)):
+            out.add(f"by:{label}")
+            out |= {f"with:{label}|{l2}" for l2, n2 in self.db.execute(
+                "SELECT label, node FROM edges WHERE event = ?", (e,)) if n2 != f"n:{name}"}
+        self._profiles[name] = out
+        return out
+
+    def answering(self, text: str) -> set[str]:
+        """The names the plans of a question's shape, or the nearest taught shapes where
+        it has none, answer anywhere in the graph: the kind of thing it asks for."""
+        shape, fillers = self.shape(text)
+        shapes = [shape] if self.db.execute(
+            "SELECT 1 FROM learnt WHERE shape = ? AND hits > misses", (shape,)).fetchone() \
+            else self.nearest(text, fillers)[1]
+        size = self.db.execute("SELECT COUNT(*) FROM edges").fetchone()[0]
+        key = (tuple(shapes), size)
+        if key not in self._answering:
+            out: set[str] = set()
+            for sh in shapes:
+                for (raw,) in self.db.execute(
+                        "SELECT plan FROM learnt WHERE shape = ? AND hits > misses", (sh,)):
+                    plan = json.loads(raw)
+                    if not plan.get("count") and plan["steps"]:
+                        out |= self.ends(plan["steps"])
+            self._answering[key] = out
+        return self._answering[key]
+
+    def ends(self, steps: list) -> set[str]:
+        """Every name a plan's path reaches from any name, its steps followed across the
+        whole graph at once and its hooks and moods left out: more than the plan answers,
+        and of the same kind."""
+        at: set[str] | None = None  # every name, before the first step
+        for label, direction in steps:
+            rows = self.db.execute("SELECT event, node FROM edges WHERE label = ?",
+                                   (label,)).fetchall()
+            if direction == -1:
+                at = {f"e:{e}" for e, n in rows
+                      if (n.startswith("n:") if at is None else n in at)}
+            else:
+                at = {n for e, n in rows if at is not None and f"e:{e}" in at}
+        return {n[2:] for n in at or () if n.startswith("n:")}
+
+    def fitting(self, found: list, text: str) -> list:
+        """The answers found that are of the kind the question asks for: among what its
+        plans answer elsewhere, or more like those than like the other names by what
+        each is known by, so a fact told with a verb no plan holds still answers."""
+        if not found:
+            return found
+        kind = self.answering(text)
+        if not kind:
+            return found
+        others = [n for n in self.names() if n not in kind]
+
+        def like(a: set, b: set) -> float:
+            return len(a & b) / len(a | b) if a | b else 0.0
+
+        def fits(name: str) -> bool:
+            if name in kind:
+                return True
+            mine = self.profile(name)
+            near = sum(like(mine, self.profile(k)) for k in kind) / len(kind)
+            far = sum(like(mine, self.profile(o)) for o in others) / max(1, len(others))
+            return near > far
+
+        return [f for f in found if fits(f[0])]
 
     @staticmethod
     def latest(found: list) -> str:

@@ -62,7 +62,7 @@ _NLP: dict = {}
 MARGIN = 0.08
 # how far back focus reaches, in turns, and how fast a hearing fades within it (ACT-R's
 # base-level decay)
-FOCUS, DECAY = 200, 0.5
+FOCUS, DECAY = 30, 0.5
 # how many of a node's steps of one label a walk follows, the latest first
 REACH = 100
 # how many nodes' steps one question may look at before its plans give up

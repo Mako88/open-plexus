@@ -46,11 +46,20 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
 - **The stream, first.** John's, 2026-10-03. The target is the TinyStories stream (THE
   STREAM, below); the houses and bAbI are regression checks, and their items further down
   wait behind these. In order:
-  1. Read what breaks. The graphed arm as it is, on 300 stories and then 1,000, each
-     wrong answer traced; the faults found become this list's next items, ahead of any
-     guessed. Expected among them: pronouns across sentences, adjectives folded into
-     names ('the red ball' is one name, so a colour is never a node), the edges `SKIP`
-     drops, and walking a graph of hundreds of thousands of edges.
+  1. What broke first, traced on 300 stories (each fault's reading is in its commit):
+     - Focus. Every story is one world to the system, so most wrong answers named
+       something from another story. Focus (`73808c1e`) is recency times slot fit; how
+       far it reaches is a fixed number of turns for now. The mechanism it stands in for
+       is event segmentation: a boundary where what is heard stops being predicted by
+       what was, so an episode is found rather than set.
+     - Identity. Every Lily in every story is one node. An episode-scoped name
+       ('lily' in this story) with a link to the shared word is what memory of many
+       stories needs.
+     - Still expected and not yet traced: pronouns across sentences, adjectives folded
+       into names ('the red ball' is one name, so a colour is never a node), and the
+       edges `SKIP` drops.
+     - The plans learn one shape per wording, and a cloze is a wording of its own, so
+       plans rarely answer here and the slot fit carries the learning.
   2. Kinds as the fixed point of relations and things (John's, 2026-10-03). Two things
      are of a kind where they take part in alike relations with things of alike kinds,
      and two relations are alike where they join alike kinds. Each starts as its own

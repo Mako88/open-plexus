@@ -60,6 +60,8 @@ _NLP: dict = {}
 # gaps sat at 0.14 to 0.21 and wrong ones' at 0.02 to 0.06 (readings/unheard-*)
 MARGIN = 0.08
 _VECTORS: dict = {}
+# the encoder apart from the words, or a story about a model reads the encoder as a vector
+_ENCODER: dict = {}
 
 
 def nlp(model: str):
@@ -73,13 +75,13 @@ def nlp(model: str):
 def vectors(texts: list[str]):
     """MiniLM's vector for each text, each encoded once a process: a word's vector never
     changes, so it is what everyone knows about the word, read once and kept."""
-    if "model" not in _VECTORS:
+    if "model" not in _ENCODER:
         from unfused.store import MiniLmEmbedder
 
-        _VECTORS["model"] = MiniLmEmbedder()
+        _ENCODER["model"] = MiniLmEmbedder()
     new = [t for t in dict.fromkeys(texts) if t not in _VECTORS]
     if new:
-        for t, v in zip(new, _VECTORS["model"].encode(new)):
+        for t, v in zip(new, _ENCODER["model"].encode(new)):
             _VECTORS[t] = v
     return [_VECTORS[t] for t in texts]
 

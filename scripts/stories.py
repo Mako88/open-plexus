@@ -99,6 +99,22 @@ class Graphed:
 def run(arm, stories, reopen_every: int = 100) -> dict:
     rows, turn, sizes = [], 0, {}
     started = time.perf_counter()
+    crashed = None
+    try:
+        turn = _stream(arm, stories, reopen_every, rows, sizes)
+    except Exception:
+        # the reading so far is kept and says where it stopped; the run still fails
+        import traceback
+
+        crashed = traceback.format_exc()
+    out = _summary(arm, rows, sizes, turn, started)
+    if crashed:
+        out["crashed"] = crashed
+    return out
+
+
+def _stream(arm, stories, reopen_every, rows, sizes) -> int:
+    turn = 0
     for s in stories:
         if s.index and s.index % reopen_every == 0 and hasattr(arm, "reopen"):
             arm.reopen()
@@ -119,6 +135,10 @@ def run(arm, stories, reopen_every: int = 100) -> dict:
             turn += 1
         if (b := bucket(s.index)) != bucket(s.index + 1):
             sizes[b] = arm.dials()
+    return turn
+
+
+def _summary(arm, rows, sizes, turn, started) -> dict:
     dials = arm.dials()
     arm.close()
     by = defaultdict(list)
@@ -163,6 +183,9 @@ def main() -> None:
         curve = "  ".join(f"{b}:{c['score']}" for b, c in out["curve"].items())
         print(f"{name:9} score {out['score']}  {curve}  {out['seconds']}s -> {path.name}",
               flush=True)
+        if "crashed" in out:
+            print(out["crashed"], flush=True)
+            return 1
 
 
 if __name__ == "__main__":

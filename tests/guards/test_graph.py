@@ -200,3 +200,10 @@ def test_a_compound_whose_first_word_is_a_known_name_is_two_names(tmp_path):
     a.teach("Who is Ada cousins with?", "Bren")
     a.teach("Who is Bren cousins with?", "Ada")
     assert a.answer(q("Who is Cal cousins with?")) == "dot"
+
+
+def test_a_word_spelt_like_the_encoder_key_is_a_vector():
+    from unfused.graph import vectors
+
+    w, m = vectors(["boat", "model"])
+    assert w.shape == m.shape

@@ -1,0 +1,3413 @@
+{
+ "kind": "stories",
+ "taken_at": "20261003T192616Z",
+ "note": "control: memory starts empty at story 100. Interference is refuted if 100-300 scores no higher than the full stream's 0.293",
+ "stream": {
+  "source": "TinyStories-valid",
+  "seed": 0,
+  "stories": 300,
+  "skip": 100,
+  "questions": 198,
+  "fingerprint": "49437b305761"
+ },
+ "arm": "graphed",
+ "dials": {
+  "model": "en_core_web_trf",
+  "version": "graph-7",
+  "events": 8498,
+  "edges": 16571,
+  "shapes": 97,
+  "parsed": 3
+ },
+ "turns": 3732,
+ "seconds": 269.2,
+ "score": 0.308,
+ "curve": {
+  "100-300": {
+   "score": 0.308,
+   "n": 198,
+   "refused": 0.035,
+   "seconds_per_question": 1.005,
+   "size": {
+    "model": "en_core_web_trf",
+    "version": "graph-7",
+    "events": 8498,
+    "edges": 16571,
+    "shapes": 97,
+    "parsed": 3
+   }
+  }
+ },
+ "rows": [
+  {
+   "story": 100,
+   "bucket": "100-300",
+   "question": "What was sad and cold?",
+   "answer": "cat",
+   "said": "cat",
+   "correct": true,
+   "refused": false,
+   "seconds": 0.005,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:None",
+    "focus:cat",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 101,
+   "bucket": "100-300",
+   "question": "And so, the little red ball rolled down what, ready for its next big adventure?",
+   "answer": "hill",
+   "said": "strong",
+   "correct": false,
+   "refused": false,
+   "seconds": 9.368,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:None",
+    "focus:strong",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 102,
+   "bucket": "100-300",
+   "question": "He learned that making a mess could end what?",
+   "answer": "day",
+   "said": "sauce",
+   "correct": false,
+   "refused": false,
+   "seconds": 6.571,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:None",
+    "focus:sauce",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 103,
+   "bucket": "100-300",
+   "question": "Who smiled to himself as he felt a sense of satisfaction?",
+   "answer": "jack",
+   "said": "jack",
+   "correct": true,
+   "refused": false,
+   "seconds": 0.846,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:sauce",
+    "focus:jack",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 104,
+   "bucket": "100-300",
+   "question": "She felt happy and what didn't hurt anymore?",
+   "answer": "knee",
+   "said": "lily",
+   "correct": false,
+   "refused": false,
+   "seconds": 0.031,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:None",
+    "focus:lily",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 105,
+   "bucket": "100-300",
+   "question": "Who wasn't scared of butterflies?",
+   "answer": "jack",
+   "said": "jack",
+   "correct": true,
+   "refused": false,
+   "seconds": 0.82,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:hill",
+    "focus:jack",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 106,
+   "bucket": "100-300",
+   "question": "Being different can bring something extra special and extraordinary to what?",
+   "answer": "world",
+   "said": "people",
+   "correct": false,
+   "refused": false,
+   "seconds": 0.032,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:None",
+    "focus:people",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 107,
+   "bucket": "100-300",
+   "question": "She was so happy and thankful for what who gave her such a wonderful and enormous pillow?",
+   "answer": "parents",
+   "said": "parents",
+   "correct": true,
+   "refused": false,
+   "seconds": 0.117,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:None",
+    "focus:parents",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 108,
+   "bucket": "100-300",
+   "question": "You wasted what?",
+   "answer": "fuel",
+   "said": "fuel",
+   "correct": true,
+   "refused": false,
+   "seconds": 0.01,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:None",
+    "focus:fuel",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 109,
+   "bucket": "100-300",
+   "question": "From that day on, what learned to be kind and not to scare the little animals?",
+   "answer": "cat",
+   "said": "cat",
+   "correct": true,
+   "refused": false,
+   "seconds": 0.128,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:None",
+    "focus:cat",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 110,
+   "bucket": "100-300",
+   "question": "The moral of the story is that even the strongest need what sometimes, and it's important to be a good friend?",
+   "answer": "help",
+   "said": "bird",
+   "correct": false,
+   "refused": false,
+   "seconds": 0.044,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:None",
+    "focus:bird",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 111,
+   "bucket": "100-300",
+   "question": "What was stuck and lost forever?",
+   "answer": "tire",
+   "said": "tire",
+   "correct": true,
+   "refused": false,
+   "seconds": 0.048,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:None",
+    "focus:tire",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 112,
+   "bucket": "100-300",
+   "question": "He was what around?",
+   "answer": "cat",
+   "said": "jasper",
+   "correct": false,
+   "refused": false,
+   "seconds": 0.035,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:None",
+    "focus:jasper",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 113,
+   "bucket": "100-300",
+   "question": "They laughed and had a great time together on what?",
+   "answer": "porch",
+   "said": "porch",
+   "correct": true,
+   "refused": false,
+   "seconds": 0.093,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:fire",
+    "focus:porch",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 114,
+   "bucket": "100-300",
+   "question": "They say thank you and give him back what?",
+   "answer": "key",
+   "said": "man",
+   "correct": false,
+   "refused": false,
+   "seconds": 0.041,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:None",
+    "focus:man",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 115,
+   "bucket": "100-300",
+   "question": "What was now a fun place for everyone?",
+   "answer": "land",
+   "said": "I don't know.",
+   "correct": false,
+   "refused": true,
+   "seconds": 0.882,
+   "gave_up": false,
+   "notes": [
+    "(nothing)",
+    "plans:None",
+    "focus:None",
+    "by:none"
+   ]
+  },
+  {
+   "story": 116,
+   "bucket": "100-300",
+   "question": "They all waved goodbye as they left what and went back home?",
+   "answer": "park",
+   "said": "little boy",
+   "correct": false,
+   "refused": false,
+   "seconds": 0.053,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:None",
+    "focus:little boy",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 117,
+   "bucket": "100-300",
+   "question": "He knew it was a sad ending but he also knew better than to try and find what again?",
+   "answer": "bird",
+   "said": "pigeon",
+   "correct": false,
+   "refused": false,
+   "seconds": 0.091,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:None",
+    "focus:pigeon",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 118,
+   "bucket": "100-300",
+   "question": "They made what a happier place?",
+   "answer": "castle",
+   "said": "yellow bird",
+   "correct": false,
+   "refused": false,
+   "seconds": 0.05,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:None",
+    "focus:yellow bird",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 119,
+   "bucket": "100-300",
+   "question": "He was a small rabbit, but with the help of what, he was able to become the winner?",
+   "answer": "fan",
+   "said": "fan",
+   "correct": true,
+   "refused": false,
+   "seconds": 0.12,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:None",
+    "focus:fan",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 120,
+   "bucket": "100-300",
+   "question": "She never wanted to see what again?",
+   "answer": "boy",
+   "said": "little girl",
+   "correct": false,
+   "refused": false,
+   "seconds": 0.015,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:None",
+    "focus:little girl",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 121,
+   "bucket": "100-300",
+   "question": "From that day on, who learned to ask questions when she was troubled or unsure about something?",
+   "answer": "lily",
+   "said": "lily",
+   "correct": true,
+   "refused": false,
+   "seconds": 0.06,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:teacher",
+    "focus:lily",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 122,
+   "bucket": "100-300",
+   "question": "He loved going to the park with his mom and holding what tight?",
+   "answer": "hand",
+   "said": "timmy",
+   "correct": false,
+   "refused": false,
+   "seconds": 0.055,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:None",
+    "focus:timmy",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 123,
+   "bucket": "100-300",
+   "question": "From that day forward, Mia never broke what while swinging?",
+   "answer": "cord",
+   "said": "cord",
+   "correct": true,
+   "refused": false,
+   "seconds": 0.042,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:teacher",
+    "focus:cord",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 124,
+   "bucket": "100-300",
+   "question": "Mark smiled back in relief and enjoyed the rest of the party with what of rice and all his friends?",
+   "answer": "pot",
+   "said": "maggie",
+   "correct": false,
+   "refused": false,
+   "seconds": 0.263,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:None",
+    "focus:maggie",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 125,
+   "bucket": "100-300",
+   "question": "When it was time to go home, Lily packed her doll and the blanket back into what?",
+   "answer": "bag",
+   "said": "snack",
+   "correct": false,
+   "refused": false,
+   "seconds": 0.368,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:porch",
+    "focus:snack",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 126,
+   "bucket": "100-300",
+   "question": "You are what?",
+   "answer": "friends",
+   "said": "I don't know.",
+   "correct": false,
+   "refused": true,
+   "seconds": 0.011,
+   "gave_up": false,
+   "notes": [
+    "(nothing)",
+    "plans:None",
+    "focus:None",
+    "by:none"
+   ]
+  },
+  {
+   "story": 127,
+   "bucket": "100-300",
+   "question": "We should always keep what and streets tidy, no matter how small the effort?",
+   "answer": "parks",
+   "said": "boy",
+   "correct": false,
+   "refused": false,
+   "seconds": 0.059,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:None",
+    "focus:boy",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 128,
+   "bucket": "100-300",
+   "question": "His day was full of fun and joy - all thanks to the puppy and what?",
+   "answer": "bucket",
+   "said": "john",
+   "correct": false,
+   "refused": false,
+   "seconds": 1.588,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:None",
+    "focus:john",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 130,
+   "bucket": "100-300",
+   "question": "And every time she wore her pretty bow, she remembered the day she helped what and the fun they had together?",
+   "answer": "boy",
+   "said": "dad",
+   "correct": false,
+   "refused": false,
+   "seconds": 49.967,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:porch",
+    "focus:dad",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 131,
+   "bucket": "100-300",
+   "question": "They wouldn't let him go to what again?",
+   "answer": "university",
+   "said": "billy",
+   "correct": false,
+   "refused": false,
+   "seconds": 0.005,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:None",
+    "focus:billy",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 133,
+   "bucket": "100-300",
+   "question": "I'm sorry I put cheese under what?",
+   "answer": "microphone",
+   "said": "microphone",
+   "correct": true,
+   "refused": false,
+   "seconds": 0.066,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:man",
+    "focus:microphone",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 134,
+   "bucket": "100-300",
+   "question": "Everyone was so happy and they loved what very much?",
+   "answer": "woman",
+   "said": "woman",
+   "correct": true,
+   "refused": false,
+   "seconds": 0.016,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:None",
+    "focus:woman",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 135,
+   "bucket": "100-300",
+   "question": "Johnny was so happy and he thanked what for his help?",
+   "answer": "man",
+   "said": "kind man",
+   "correct": true,
+   "refused": false,
+   "seconds": 0.016,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:kind man",
+    "focus:beautiful music",
+    "by:plans"
+   ]
+  },
+  {
+   "story": 136,
+   "bucket": "100-300",
+   "question": "The bunny smiled as he hopped away, and what stood tall in their gray bark?",
+   "answer": "trees",
+   "said": "other tree",
+   "correct": true,
+   "refused": false,
+   "seconds": 0.049,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:shiny pin",
+    "focus:other tree",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 137,
+   "bucket": "100-300",
+   "question": "He even wrote a lovely song about what, which he called 'The Guitar I Love'?",
+   "answer": "guitar",
+   "said": "boy",
+   "correct": false,
+   "refused": false,
+   "seconds": 10.745,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:None",
+    "focus:boy",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 138,
+   "bucket": "100-300",
+   "question": "So the little girl sang and sang, making what come alive with music?",
+   "answer": "park",
+   "said": "train",
+   "correct": false,
+   "refused": false,
+   "seconds": 0.042,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:bug",
+    "focus:train",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 139,
+   "bucket": "100-300",
+   "question": "From then on, what became a very active university with lots of fun activities?",
+   "answer": "university",
+   "said": "students",
+   "correct": false,
+   "refused": false,
+   "seconds": 2.225,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:billy",
+    "focus:students",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 140,
+   "bucket": "100-300",
+   "question": "From that day on, the little duck knew that it could always count on what to help when it was lost or scared?",
+   "answer": "friends",
+   "said": "way",
+   "correct": false,
+   "refused": false,
+   "seconds": 0.054,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:boy",
+    "focus:way",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 141,
+   "bucket": "100-300",
+   "question": "Who was sad to see it go, but he knew that it was on a new adventure?",
+   "answer": "sammy",
+   "said": "rabbit",
+   "correct": false,
+   "refused": false,
+   "seconds": 0.016,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:None",
+    "focus:rabbit",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 142,
+   "bucket": "100-300",
+   "question": "What to have a special playday had gone wrong?",
+   "answer": "plan",
+   "said": "grandma",
+   "correct": false,
+   "refused": false,
+   "seconds": 0.032,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:None",
+    "focus:grandma",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 143,
+   "bucket": "100-300",
+   "question": "Timmy felt happy too because he knew that he was doing the right thing by cleaning what and being honest in school?",
+   "answer": "room",
+   "said": "teacher",
+   "correct": false,
+   "refused": false,
+   "seconds": 0.121,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:teacher",
+    "focus:mom",
+    "by:plans"
+   ]
+  },
+  {
+   "story": 144,
+   "bucket": "100-300",
+   "question": "She sat down and read what?",
+   "answer": "novel",
+   "said": "grandpa",
+   "correct": false,
+   "refused": false,
+   "seconds": 0.049,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:None",
+    "focus:grandpa",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 145,
+   "bucket": "100-300",
+   "question": "He couldn't wait to show what to all his friends?",
+   "answer": "toy",
+   "said": "jack",
+   "correct": false,
+   "refused": false,
+   "seconds": 0.028,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:tom",
+    "focus:jack",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 146,
+   "bucket": "100-300",
+   "question": "Who was so proud and happy, she showed it to her friends, who all agreed: it was super cool?",
+   "answer": "kayla",
+   "said": "kayla",
+   "correct": true,
+   "refused": false,
+   "seconds": 0.019,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:new toy",
+    "focus:kayla",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 147,
+   "bucket": "100-300",
+   "question": "And that is the moral of the story: be brave and strong like what?",
+   "answer": "tree",
+   "said": "wind",
+   "correct": false,
+   "refused": false,
+   "seconds": 0.086,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:None",
+    "focus:wind",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 148,
+   "bucket": "100-300",
+   "question": "Tom was so happy and he hugged who?",
+   "answer": "poppy",
+   "said": "coin",
+   "correct": false,
+   "refused": false,
+   "seconds": 0.024,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:sue",
+    "focus:coin",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 149,
+   "bucket": "100-300",
+   "question": "What is not empty anymore?",
+   "answer": "room",
+   "said": "ben",
+   "correct": false,
+   "refused": false,
+   "seconds": 0.011,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:None",
+    "focus:ben",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 150,
+   "bucket": "100-300",
+   "question": "From then on, the bird never forgot about the history of what and always made sure to check for open doors before flying inside?",
+   "answer": "family",
+   "said": "cage",
+   "correct": false,
+   "refused": false,
+   "seconds": 0.166,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:None",
+    "focus:cage",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 151,
+   "bucket": "100-300",
+   "question": "What was very happy?",
+   "answer": "fish",
+   "said": "whale",
+   "correct": false,
+   "refused": false,
+   "seconds": 0.005,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:None",
+    "focus:whale",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 152,
+   "bucket": "100-300",
+   "question": "They run to what again?",
+   "answer": "slide",
+   "said": "ben",
+   "correct": false,
+   "refused": false,
+   "seconds": 0.005,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:None",
+    "focus:ben",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 153,
+   "bucket": "100-300",
+   "question": "And what rocked back and forth until it was time for bed?",
+   "answer": "pepper",
+   "said": "little boy",
+   "correct": false,
+   "refused": false,
+   "seconds": 0.063,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:people",
+    "focus:little boy",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 154,
+   "bucket": "100-300",
+   "question": "She hopes what will be fixed soon, but she also hopes they will keep playing like this?",
+   "answer": "television",
+   "said": "sam",
+   "correct": false,
+   "refused": false,
+   "seconds": 0.01,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:None",
+    "focus:sam",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 155,
+   "bucket": "100-300",
+   "question": "Timmy felt fit and strong for helping the other boy and for being brave on what?",
+   "answer": "subway",
+   "said": "mommy",
+   "correct": false,
+   "refused": false,
+   "seconds": 0.038,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:bottles",
+    "focus:mommy",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 156,
+   "bucket": "100-300",
+   "question": "That way, she could always stay dry and enjoy what?",
+   "answer": "sunshine",
+   "said": "shade",
+   "correct": false,
+   "refused": false,
+   "seconds": 0.043,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:kindling",
+    "focus:shade",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 157,
+   "bucket": "100-300",
+   "question": "And so, who learned a lesson that day?",
+   "answer": "jack",
+   "said": "jack",
+   "correct": true,
+   "refused": false,
+   "seconds": 0.035,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:boy",
+    "focus:jack",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 158,
+   "bucket": "100-300",
+   "question": "The man took Timmy's hand and brought him back to what?",
+   "answer": "mommy",
+   "said": "head",
+   "correct": false,
+   "refused": false,
+   "seconds": 1.022,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:head",
+    "focus:water",
+    "by:plans"
+   ]
+  },
+  {
+   "story": 159,
+   "bucket": "100-300",
+   "question": "She was very happy that she discovered what and went off to take a nap in her comfy bear cave?",
+   "answer": "flower",
+   "said": "bee",
+   "correct": false,
+   "refused": false,
+   "seconds": 0.116,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:None",
+    "focus:bee",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 160,
+   "bucket": "100-300",
+   "question": "At the end of the day, Tom was very proud of himself for doing what well and keeping everyone safe?",
+   "answer": "job",
+   "said": "people",
+   "correct": false,
+   "refused": false,
+   "seconds": 2.077,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:poppy",
+    "focus:people",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 161,
+   "bucket": "100-300",
+   "question": "Jimmy smiled, proud that what had been recognized?",
+   "answer": "choice",
+   "said": "model",
+   "correct": false,
+   "refused": false,
+   "seconds": 0.051,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:model",
+    "focus:model",
+    "by:plans"
+   ]
+  },
+  {
+   "story": 162,
+   "bucket": "100-300",
+   "question": "The girl smiled, knowing she had been thoughtful and been able to fix what?",
+   "answer": "car",
+   "said": "friend",
+   "correct": false,
+   "refused": false,
+   "seconds": 0.031,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:friend",
+    "focus:parents",
+    "by:plans"
+   ]
+  },
+  {
+   "story": 163,
+   "bucket": "100-300",
+   "question": "Sammy was so excited and happy to meet what?",
+   "answer": "ambulance",
+   "said": "driver",
+   "correct": false,
+   "refused": false,
+   "seconds": 0.016,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:driver",
+    "focus:goodbye",
+    "by:plans"
+   ]
+  },
+  {
+   "story": 164,
+   "bucket": "100-300",
+   "question": "They enjoyed what, and laughed happily?",
+   "answer": "blackberries",
+   "said": "julie",
+   "correct": false,
+   "refused": false,
+   "seconds": 0.062,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:None",
+    "focus:julie",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 165,
+   "bucket": "100-300",
+   "question": "She knew she had done a good job and had earned what?",
+   "answer": "medal",
+   "said": "hairy dog",
+   "correct": false,
+   "refused": false,
+   "seconds": 0.073,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:smart choice",
+    "focus:hairy dog",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 166,
+   "bucket": "100-300",
+   "question": "Who smiled at her good luck, and then quickly made her way back home whistling all the way?",
+   "answer": "lucy",
+   "said": "lucy",
+   "correct": true,
+   "refused": false,
+   "seconds": 5.836,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:None",
+    "focus:lucy",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 167,
+   "bucket": "100-300",
+   "question": "From that day on, who knew he could be brave whenever he needed to be?",
+   "answer": "spot",
+   "said": "spot",
+   "correct": true,
+   "refused": false,
+   "seconds": 0.057,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:lola",
+    "focus:spot",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 168,
+   "bucket": "100-300",
+   "question": "What had a happy dinner and everyone was satisfied?",
+   "answer": "family",
+   "said": "dad",
+   "correct": false,
+   "refused": false,
+   "seconds": 0.153,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:None",
+    "focus:dad",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 169,
+   "bucket": "100-300",
+   "question": "They had fixed what together?",
+   "answer": "paper",
+   "said": "paper",
+   "correct": true,
+   "refused": false,
+   "seconds": 0.024,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:None",
+    "focus:paper",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 170,
+   "bucket": "100-300",
+   "question": "Agreeing to be more careful, Jimmy and his friends said goodbye to what and headed home?",
+   "answer": "guard",
+   "said": "guard",
+   "correct": true,
+   "refused": false,
+   "seconds": 0.021,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:toy hook",
+    "focus:guard",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 171,
+   "bucket": "100-300",
+   "question": "In the end, Tom and what had a great time?",
+   "answer": "mom",
+   "said": "fog",
+   "correct": false,
+   "refused": false,
+   "seconds": 0.368,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:None",
+    "focus:fog",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 172,
+   "bucket": "100-300",
+   "question": "They jumped around and played match until it was time for who to go home?",
+   "answer": "emma",
+   "said": "emma",
+   "correct": true,
+   "refused": false,
+   "seconds": 10.894,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:dad",
+    "focus:emma",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 173,
+   "bucket": "100-300",
+   "question": "Finally, what found a perfect place to live, all by himself?",
+   "answer": "tiger",
+   "said": "tiger",
+   "correct": true,
+   "refused": false,
+   "seconds": 0.131,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:None",
+    "focus:tiger",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 174,
+   "bucket": "100-300",
+   "question": "He felt happy and excited about what?",
+   "answer": "event",
+   "said": "other people",
+   "correct": false,
+   "refused": false,
+   "seconds": 0.029,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:None",
+    "focus:other people",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 175,
+   "bucket": "100-300",
+   "question": "The little girl understood and said \u2018Ok, mummy.\u2019 She gave what a big hug and went off to play?",
+   "answer": "mummy",
+   "said": "grape",
+   "correct": false,
+   "refused": false,
+   "seconds": 0.262,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:None",
+    "focus:grape",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 176,
+   "bucket": "100-300",
+   "question": "The kids learned to be kind to what, and they all played happily ever after?",
+   "answer": "toys",
+   "said": "nail",
+   "correct": false,
+   "refused": false,
+   "seconds": 0.022,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:jack",
+    "focus:nail",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 177,
+   "bucket": "100-300",
+   "question": "Then, they went to play in what?",
+   "answer": "park",
+   "said": "band",
+   "correct": false,
+   "refused": false,
+   "seconds": 0.01,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:None",
+    "focus:band",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 178,
+   "bucket": "100-300",
+   "question": "She went back to reading her magazine and sipping on what, feeling content and happy?",
+   "answer": "milk",
+   "said": "mommy",
+   "correct": false,
+   "refused": false,
+   "seconds": 0.335,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:None",
+    "focus:mommy",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 179,
+   "bucket": "100-300",
+   "question": "The moral of the story is to be patient and help what?",
+   "answer": "friends",
+   "said": "robby",
+   "correct": false,
+   "refused": false,
+   "seconds": 0.012,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:big tree",
+    "focus:robby",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 180,
+   "bucket": "100-300",
+   "question": "And just like that, Sally had made it through what?",
+   "answer": "jungle",
+   "said": "time",
+   "correct": false,
+   "refused": false,
+   "seconds": 0.033,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:time",
+    "focus:jungle",
+    "by:plans"
+   ]
+  },
+  {
+   "story": 181,
+   "bucket": "100-300",
+   "question": "She thanked the old man and went back to playing with her toy car and what?",
+   "answer": "cup",
+   "said": "shiny silver cup",
+   "correct": true,
+   "refused": false,
+   "seconds": 5.865,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:shiny silver cup",
+    "focus:cup",
+    "by:plans"
+   ]
+  },
+  {
+   "story": 182,
+   "bucket": "100-300",
+   "question": "The eye was happy too, it had helped what and made a new friend?",
+   "answer": "truck",
+   "said": "thing",
+   "correct": false,
+   "refused": false,
+   "seconds": 0.017,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:thing",
+    "focus:truck",
+    "by:plans"
+   ]
+  },
+  {
+   "story": 183,
+   "bucket": "100-300",
+   "question": "The bird was happy and who felt happy too?",
+   "answer": "lily",
+   "said": "lily",
+   "correct": true,
+   "refused": false,
+   "seconds": 0.017,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:water",
+    "focus:lily",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 184,
+   "bucket": "100-300",
+   "question": "She told her mommy and daddy all about her adventure in the wet garden and what?",
+   "answer": "chamber",
+   "said": "clothes",
+   "correct": false,
+   "refused": false,
+   "seconds": 12.298,
+   "gave_up": true,
+   "notes": [
+    "(gave up)",
+    "(found)",
+    "plans:None",
+    "focus:clothes",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 185,
+   "bucket": "100-300",
+   "question": "She learned that being a good friend was more important than going fast or having what?",
+   "answer": "toys",
+   "said": "lily",
+   "correct": false,
+   "refused": false,
+   "seconds": 0.02,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:moral",
+    "focus:lily",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 186,
+   "bucket": "100-300",
+   "question": "He loved how the cord had made what so serious and powerful?",
+   "answer": "sky",
+   "said": "energy",
+   "correct": false,
+   "refused": false,
+   "seconds": 0.031,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:energy",
+    "focus:bob",
+    "by:plans"
+   ]
+  },
+  {
+   "story": 187,
+   "bucket": "100-300",
+   "question": "From that day on, Lily was more careful and never fell in what again?",
+   "answer": "drain",
+   "said": "drain",
+   "correct": true,
+   "refused": false,
+   "seconds": 0.019,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:lola",
+    "focus:drain",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 188,
+   "bucket": "100-300",
+   "question": "What waved back, smiling?",
+   "answer": "boy",
+   "said": "jane",
+   "correct": false,
+   "refused": false,
+   "seconds": 0.007,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:None",
+    "focus:jane",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 189,
+   "bucket": "100-300",
+   "question": "She sings what?",
+   "answer": "song",
+   "said": "studio",
+   "correct": false,
+   "refused": false,
+   "seconds": 0.008,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:None",
+    "focus:studio",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 190,
+   "bucket": "100-300",
+   "question": "From that day on, the rat and the cat always played together at what?",
+   "answer": "park",
+   "said": "good friends",
+   "correct": false,
+   "refused": false,
+   "seconds": 0.015,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:right thing",
+    "focus:good friends",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 191,
+   "bucket": "100-300",
+   "question": "They had so much fun together and Lily was happy to have what with her?",
+   "answer": "backpack",
+   "said": "backpack",
+   "correct": true,
+   "refused": false,
+   "seconds": 0.034,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:backpack",
+    "focus:backpack",
+    "by:plans"
+   ]
+  },
+  {
+   "story": 192,
+   "bucket": "100-300",
+   "question": "They had fun like the ducks, but they were safe on what?",
+   "answer": "branch",
+   "said": "branch",
+   "correct": true,
+   "refused": false,
+   "seconds": 0.17,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:None",
+    "focus:branch",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 193,
+   "bucket": "100-300",
+   "question": "And now who was gone?",
+   "answer": "lily",
+   "said": "snake",
+   "correct": false,
+   "refused": false,
+   "seconds": 0.009,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:None",
+    "focus:snake",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 194,
+   "bucket": "100-300",
+   "question": "He felt so proud of himself holding what?",
+   "answer": "medal",
+   "said": "tim",
+   "correct": false,
+   "refused": false,
+   "seconds": 0.023,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:None",
+    "focus:tim",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 195,
+   "bucket": "100-300",
+   "question": "They played together for hours, rolling what back and forth and having lots of fun?",
+   "answer": "hoop",
+   "said": "little",
+   "correct": false,
+   "refused": false,
+   "seconds": 1.691,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:None",
+    "focus:little",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 196,
+   "bucket": "100-300",
+   "question": "They knew they should have listened to Tim and given what back?",
+   "answer": "passport",
+   "said": "tom",
+   "correct": false,
+   "refused": false,
+   "seconds": 0.029,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:brothers",
+    "focus:tom",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 197,
+   "bucket": "100-300",
+   "question": "On the way home, Sam told his mommy how much he had enjoyed his day at what?",
+   "answer": "restaurant",
+   "said": "restaurant",
+   "correct": true,
+   "refused": false,
+   "seconds": 0.065,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:None",
+    "focus:restaurant",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 198,
+   "bucket": "100-300",
+   "question": "You're what ever?",
+   "answer": "fireman",
+   "said": "I don't know.",
+   "correct": false,
+   "refused": true,
+   "seconds": 0.002,
+   "gave_up": false,
+   "notes": [
+    "(nothing)",
+    "plans:None",
+    "focus:None",
+    "by:none"
+   ]
+  },
+  {
+   "story": 199,
+   "bucket": "100-300",
+   "question": "The bird thanked what, and they both happily went on their way?",
+   "answer": "friend",
+   "said": "fun",
+   "correct": false,
+   "refused": false,
+   "seconds": 0.169,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:sly fox",
+    "focus:fun",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 200,
+   "bucket": "100-300",
+   "question": "Jack felt so happy and content from his journey that he gave what a big hug and thanked her for the generous experience?",
+   "answer": "mommy",
+   "said": "train",
+   "correct": false,
+   "refused": false,
+   "seconds": 0.364,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:julie",
+    "focus:train",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 201,
+   "bucket": "100-300",
+   "question": "Lily felt happy because she made what feel better?",
+   "answer": "neighbor",
+   "said": "neighbor",
+   "correct": true,
+   "refused": false,
+   "seconds": 0.079,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:right thing",
+    "focus:neighbor",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 202,
+   "bucket": "100-300",
+   "question": "So the sailor and what sailed away into the sunset?",
+   "answer": "seagull",
+   "said": "seagull",
+   "correct": true,
+   "refused": false,
+   "seconds": 0.488,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:little rat",
+    "focus:seagull",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 203,
+   "bucket": "100-300",
+   "question": "From then on, who learned that sometimes it's good to move and try new things, because you might just find a new friend?",
+   "answer": "bubbles",
+   "said": "bubbles",
+   "correct": true,
+   "refused": false,
+   "seconds": 0.027,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:cookies",
+    "focus:bubbles",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 204,
+   "bucket": "100-300",
+   "question": "Jimmy had found the most unusual thing in what and he was so excited he ran to show it to his mom?",
+   "answer": "park",
+   "said": "park",
+   "correct": true,
+   "refused": false,
+   "seconds": 0.055,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:neighbor",
+    "focus:park",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 205,
+   "bucket": "100-300",
+   "question": "He realized that he should have listened to what and not watched so much TV?",
+   "answer": "mom",
+   "said": "timmy",
+   "correct": false,
+   "refused": false,
+   "seconds": 0.025,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:None",
+    "focus:timmy",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 206,
+   "bucket": "100-300",
+   "question": "They ate what and smiled?",
+   "answer": "apples",
+   "said": "apples",
+   "correct": true,
+   "refused": false,
+   "seconds": 0.008,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:None",
+    "focus:apples",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 207,
+   "bucket": "100-300",
+   "question": "From that day on, who learned a valuable lesson?",
+   "answer": "jim",
+   "said": "jim",
+   "correct": true,
+   "refused": false,
+   "seconds": 0.017,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:right thing",
+    "focus:jim",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 208,
+   "bucket": "100-300",
+   "question": "Jo and what were the happiest they could be?",
+   "answer": "horse",
+   "said": "cookies",
+   "correct": false,
+   "refused": false,
+   "seconds": 0.015,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:cookies",
+    "focus:None",
+    "by:plans"
+   ]
+  },
+  {
+   "story": 209,
+   "bucket": "100-300",
+   "question": "Who was so scared and ran away?",
+   "answer": "mary",
+   "said": "mary",
+   "correct": true,
+   "refused": false,
+   "seconds": 0.008,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:None",
+    "focus:mary",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 210,
+   "bucket": "100-300",
+   "question": "He picks up what and sings a song?",
+   "answer": "guitar",
+   "said": "tom",
+   "correct": false,
+   "refused": false,
+   "seconds": 0.036,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:neighbor",
+    "focus:tom",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 211,
+   "bucket": "100-300",
+   "question": "The boy was sad, but he knew that what had been serious?",
+   "answer": "judge",
+   "said": "judge",
+   "correct": true,
+   "refused": false,
+   "seconds": 0.018,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:timmy",
+    "focus:judge",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 212,
+   "bucket": "100-300",
+   "question": "They had a fun day at what?",
+   "answer": "beach",
+   "said": "dolphin",
+   "correct": false,
+   "refused": false,
+   "seconds": 0.049,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:favorite toy",
+    "focus:dolphin",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 213,
+   "bucket": "100-300",
+   "question": "They slept well and dreamed of more adventures in what?",
+   "answer": "valley",
+   "said": "woman",
+   "correct": false,
+   "refused": false,
+   "seconds": 0.03,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:sam",
+    "focus:woman",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 214,
+   "bucket": "100-300",
+   "question": "What had chosen him, and he was in control?",
+   "answer": "jewelry",
+   "said": "powerful wizard",
+   "correct": false,
+   "refused": false,
+   "seconds": 0.485,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:None",
+    "focus:powerful wizard",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 215,
+   "bucket": "100-300",
+   "question": "From that day on, who felt more independent and he stood up for himself?",
+   "answer": "timmy",
+   "said": "timmy",
+   "correct": true,
+   "refused": false,
+   "seconds": 0.014,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:right thing",
+    "focus:timmy",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 216,
+   "bucket": "100-300",
+   "question": "In the end, Tina and who had a wonderful trip filled with laughter, new experiences, and lots of good memories?",
+   "answer": "jamie",
+   "said": "airline staff",
+   "correct": false,
+   "refused": false,
+   "seconds": 30.473,
+   "gave_up": true,
+   "notes": [
+    "(gave up)",
+    "(found)",
+    "plans:None",
+    "focus:airline staff",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 217,
+   "bucket": "100-300",
+   "question": "What knew that it didn't need to be upset anymore because it had learned an important lesson?",
+   "answer": "train",
+   "said": "train",
+   "correct": true,
+   "refused": false,
+   "seconds": 0.296,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:None",
+    "focus:train",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 218,
+   "bucket": "100-300",
+   "question": "The little girl was sad she didn't have what anymore?",
+   "answer": "blanket",
+   "said": "blanket",
+   "correct": true,
+   "refused": false,
+   "seconds": 0.04,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:cup",
+    "focus:blanket",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 219,
+   "bucket": "100-300",
+   "question": "What is that if we work hard, it can make us feel better?",
+   "answer": "moral",
+   "said": "I don't know.",
+   "correct": false,
+   "refused": true,
+   "seconds": 0.009,
+   "gave_up": false,
+   "notes": [
+    "(nothing)",
+    "plans:None",
+    "focus:None",
+    "by:none"
+   ]
+  },
+  {
+   "story": 220,
+   "bucket": "100-300",
+   "question": "From that day on, the king was more careful with what and never lost it again?",
+   "answer": "sword",
+   "said": "queen",
+   "correct": false,
+   "refused": false,
+   "seconds": 0.018,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:little girl",
+    "focus:queen",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 221,
+   "bucket": "100-300",
+   "question": "Timmy was so happy to find what and he played with it all day?",
+   "answer": "truck",
+   "said": "mom",
+   "correct": false,
+   "refused": false,
+   "seconds": 0.054,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:right thing",
+    "focus:mom",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 222,
+   "bucket": "100-300",
+   "question": "She said, Thank you who?",
+   "answer": "joe",
+   "said": "liza",
+   "correct": false,
+   "refused": false,
+   "seconds": 0.007,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:None",
+    "focus:liza",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 223,
+   "bucket": "100-300",
+   "question": "They said goodbye to what and walked happily back home?",
+   "answer": "door",
+   "said": "dad",
+   "correct": false,
+   "refused": false,
+   "seconds": 0.015,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:liza",
+    "focus:dad",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 224,
+   "bucket": "100-300",
+   "question": "Despite being embarrassed, Daisy felt happy that she saw what that night?",
+   "answer": "sky",
+   "said": "house",
+   "correct": false,
+   "refused": false,
+   "seconds": 0.231,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:day",
+    "focus:house",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 225,
+   "bucket": "100-300",
+   "question": "At the end of what everyone said bye?",
+   "answer": "class",
+   "said": "fun",
+   "correct": false,
+   "refused": false,
+   "seconds": 0.017,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:train ride",
+    "focus:fun",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 226,
+   "bucket": "100-300",
+   "question": "Lily, who and spider had a tea party?",
+   "answer": "anna",
+   "said": "I don't know.",
+   "correct": false,
+   "refused": true,
+   "seconds": 0.384,
+   "gave_up": false,
+   "notes": [
+    "(nothing)",
+    "plans:None",
+    "focus:None",
+    "by:none"
+   ]
+  },
+  {
+   "story": 227,
+   "bucket": "100-300",
+   "question": "It was what that ever happened to them?",
+   "answer": "thing",
+   "said": "things",
+   "correct": false,
+   "refused": false,
+   "seconds": 0.009,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:None",
+    "focus:things",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 228,
+   "bucket": "100-300",
+   "question": "The prince was very happy and decided that he would always be stubborn, but if anyone ever tried to argue with him he would simply tap what and they would know that he was the king?",
+   "answer": "crown",
+   "said": "crown",
+   "correct": true,
+   "refused": false,
+   "seconds": 0.022,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:water",
+    "focus:crown",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 229,
+   "bucket": "100-300",
+   "question": "They eat what and enjoy it?",
+   "answer": "cake",
+   "said": "dad",
+   "correct": false,
+   "refused": false,
+   "seconds": 0.009,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:None",
+    "focus:dad",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 230,
+   "bucket": "100-300",
+   "question": "From that day on, Lily never opened what in a taxi again?",
+   "answer": "window",
+   "said": "others",
+   "correct": false,
+   "refused": false,
+   "seconds": 0.019,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:right thing",
+    "focus:others",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 231,
+   "bucket": "100-300",
+   "question": "And from that day on, Tim and who became the best of friends?",
+   "answer": "lily",
+   "said": "car",
+   "correct": false,
+   "refused": false,
+   "seconds": 0.057,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:right thing",
+    "focus:car",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 232,
+   "bucket": "100-300",
+   "question": "They dreamed of the rabbit and what?",
+   "answer": "dog",
+   "said": "dog",
+   "correct": true,
+   "refused": false,
+   "seconds": 0.042,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:dog",
+    "focus:dad",
+    "by:plans"
+   ]
+  },
+  {
+   "story": 233,
+   "bucket": "100-300",
+   "question": "From that day on, the elephant and what were best friends?",
+   "answer": "bird",
+   "said": "I don't know.",
+   "correct": false,
+   "refused": true,
+   "seconds": 0.063,
+   "gave_up": false,
+   "notes": [
+    "(nothing)",
+    "plans:None",
+    "focus:None",
+    "by:none"
+   ]
+  },
+  {
+   "story": 234,
+   "bucket": "100-300",
+   "question": "From that day on, she always listened to what and never went outside without being ready?",
+   "answer": "mom",
+   "said": "princess",
+   "correct": false,
+   "refused": false,
+   "seconds": 0.018,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:joe",
+    "focus:princess",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 235,
+   "bucket": "100-300",
+   "question": "Who felt bad, but he learned an important lesson?",
+   "answer": "timmy",
+   "said": "timmy",
+   "correct": true,
+   "refused": false,
+   "seconds": 0.031,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:train",
+    "focus:timmy",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 236,
+   "bucket": "100-300",
+   "question": "She felt happy to be in what?",
+   "answer": "cabin",
+   "said": "cabin",
+   "correct": true,
+   "refused": false,
+   "seconds": 0.007,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:None",
+    "focus:cabin",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 237,
+   "bucket": "100-300",
+   "question": "She was glad that her mom helped her understand that pushing what was not something to feel guilty about?",
+   "answer": "button",
+   "said": "right thing",
+   "correct": false,
+   "refused": false,
+   "seconds": 0.031,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:right thing",
+    "focus:None",
+    "by:plans"
+   ]
+  },
+  {
+   "story": 238,
+   "bucket": "100-300",
+   "question": "The coat always felt safe and mighty with what by its side?",
+   "answer": "bear",
+   "said": "bear",
+   "correct": true,
+   "refused": false,
+   "seconds": 0.216,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:None",
+    "focus:bear",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 239,
+   "bucket": "100-300",
+   "question": "From that day on, Timmy was no longer scared of the kitchen and he and who had many more adventures together?",
+   "answer": "sammy",
+   "said": "sammy",
+   "correct": true,
+   "refused": false,
+   "seconds": 0.026,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:right thing",
+    "focus:sammy",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 240,
+   "bucket": "100-300",
+   "question": "Then, what huffed and he puffed and he went on his way?",
+   "answer": "bear",
+   "said": "time",
+   "correct": false,
+   "refused": false,
+   "seconds": 0.012,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:time",
+    "focus:delicious feast",
+    "by:plans"
+   ]
+  },
+  {
+   "story": 241,
+   "bucket": "100-300",
+   "question": "What was happy she was able to support another in need?",
+   "answer": "lady",
+   "said": "old man",
+   "correct": false,
+   "refused": false,
+   "seconds": 0.034,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:None",
+    "focus:old man",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 242,
+   "bucket": "100-300",
+   "question": "She hoped that what was flying high up in the sky with its friends, eating cereal and having fun?",
+   "answer": "bird",
+   "said": "lily",
+   "correct": false,
+   "refused": false,
+   "seconds": 0.235,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:None",
+    "focus:lily",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 243,
+   "bucket": "100-300",
+   "question": "The caterpillar couldn't wait to wear his new hat and proudly went out to show it off to what?",
+   "answer": "friends",
+   "said": "other caterpillar",
+   "correct": false,
+   "refused": false,
+   "seconds": 0.202,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:None",
+    "focus:other caterpillar",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 244,
+   "bucket": "100-300",
+   "question": "What hugged each other with joy?",
+   "answer": "brothers",
+   "said": "joe",
+   "correct": false,
+   "refused": false,
+   "seconds": 0.028,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:good thing",
+    "focus:joe",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 245,
+   "bucket": "100-300",
+   "question": "From that day on, when Sally played outside, she took what with her?",
+   "answer": "sunflower",
+   "said": "new friend",
+   "correct": false,
+   "refused": false,
+   "seconds": 0.02,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:mom",
+    "focus:new friend",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 246,
+   "bucket": "100-300",
+   "question": "Her mum gave her a squeeze and said \u2018I'll always be here to comfort you.\u2019 who smiled and knew she was safe and loved?",
+   "answer": "emma",
+   "said": "emma",
+   "correct": true,
+   "refused": false,
+   "seconds": 0.079,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:special place",
+    "focus:emma",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 247,
+   "bucket": "100-300",
+   "question": "From that day on, Timmy always made sure to count his pencils and keep them safe in what?",
+   "answer": "backpack",
+   "said": "teacher",
+   "correct": false,
+   "refused": false,
+   "seconds": 0.03,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:right thing",
+    "focus:teacher",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 248,
+   "bucket": "100-300",
+   "question": "After a few days, Timmy's knee started to heal and he was able to play outside with what again?",
+   "answer": "friends",
+   "said": "band aid",
+   "correct": false,
+   "refused": false,
+   "seconds": 1.109,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:None",
+    "focus:band aid",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 249,
+   "bucket": "100-300",
+   "question": "They both laughed and made what look much better?",
+   "answer": "office",
+   "said": "bob",
+   "correct": false,
+   "refused": false,
+   "seconds": 0.006,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:None",
+    "focus:bob",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 250,
+   "bucket": "100-300",
+   "question": "From then on, the monster and what were the best of friends?",
+   "answer": "girl",
+   "said": "right thing",
+   "correct": false,
+   "refused": false,
+   "seconds": 0.015,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:right thing",
+    "focus:None",
+    "by:plans"
+   ]
+  },
+  {
+   "story": 251,
+   "bucket": "100-300",
+   "question": "But every now and then, she would use what, so she could go at her own pace?",
+   "answer": "subway",
+   "said": "special one",
+   "correct": false,
+   "refused": false,
+   "seconds": 0.236,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:None",
+    "focus:special one",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 252,
+   "bucket": "100-300",
+   "question": "What watched her until she was out of sight and he smiled, knowing that he had just done something kind?",
+   "answer": "man",
+   "said": "girl",
+   "correct": false,
+   "refused": false,
+   "seconds": 0.097,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:None",
+    "focus:girl",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 253,
+   "bucket": "100-300",
+   "question": "She was happy and clean, and she was very proud of what?",
+   "answer": "dress",
+   "said": "face",
+   "correct": false,
+   "refused": false,
+   "seconds": 0.01,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:None",
+    "focus:face",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 254,
+   "bucket": "100-300",
+   "question": "He eventually made so many trips to the serious place that what filled up his room?",
+   "answer": "things",
+   "said": "little boy",
+   "correct": false,
+   "refused": false,
+   "seconds": 0.112,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:mommy",
+    "focus:little boy",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 255,
+   "bucket": "100-300",
+   "question": "He had won something and he kept it safe from who?",
+   "answer": "dog",
+   "said": "big dog",
+   "correct": true,
+   "refused": false,
+   "seconds": 0.009,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:None",
+    "focus:big dog",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 256,
+   "bucket": "100-300",
+   "question": "Who never wanted to go back there again?",
+   "answer": "jimmy",
+   "said": "jimmy",
+   "correct": true,
+   "refused": false,
+   "seconds": 0.008,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:None",
+    "focus:jimmy",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 257,
+   "bucket": "100-300",
+   "question": "He smiled and thanked what for buying it?",
+   "answer": "woman",
+   "said": "paper",
+   "correct": false,
+   "refused": false,
+   "seconds": 0.01,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:None",
+    "focus:paper",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 258,
+   "bucket": "100-300",
+   "question": "Eventually, who couldn't swim anymore and he died?",
+   "answer": "nemo",
+   "said": "nemo",
+   "correct": true,
+   "refused": false,
+   "seconds": 0.036,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:None",
+    "focus:nemo",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 259,
+   "bucket": "100-300",
+   "question": "He knew that what had been looking out for him and kept him safe?",
+   "answer": "dad",
+   "said": "boy",
+   "correct": false,
+   "refused": false,
+   "seconds": 0.01,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:None",
+    "focus:boy",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 260,
+   "bucket": "100-300",
+   "question": "Tim laughed and gave what a big hug?",
+   "answer": "dad",
+   "said": "dad",
+   "correct": true,
+   "refused": false,
+   "seconds": 0.022,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:other",
+    "focus:dad",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 261,
+   "bucket": "100-300",
+   "question": "From that day on, Jack and Jill always knew to find a fit spot for what?",
+   "answer": "parades",
+   "said": "parade",
+   "correct": true,
+   "refused": false,
+   "seconds": 0.08,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:None",
+    "focus:parade",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 262,
+   "bucket": "100-300",
+   "question": "For the first time, what felt loved?",
+   "answer": "horse",
+   "said": "horse",
+   "correct": true,
+   "refused": false,
+   "seconds": 0.024,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:songs",
+    "focus:horse",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 263,
+   "bucket": "100-300",
+   "question": "He smiled and cooed, knowing that what would always take good care of him?",
+   "answer": "mommy",
+   "said": "timmy",
+   "correct": false,
+   "refused": false,
+   "seconds": 0.13,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:None",
+    "focus:timmy",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 264,
+   "bucket": "100-300",
+   "question": "They both played together in what, happy and content?",
+   "answer": "trees",
+   "said": "benny",
+   "correct": false,
+   "refused": false,
+   "seconds": 0.007,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:None",
+    "focus:benny",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 265,
+   "bucket": "100-300",
+   "question": "From that day on, Cocoa danced and made what smile?",
+   "answer": "kids",
+   "said": "sally",
+   "correct": false,
+   "refused": false,
+   "seconds": 0.009,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:sally",
+    "focus:None",
+    "by:plans"
+   ]
+  },
+  {
+   "story": 266,
+   "bucket": "100-300",
+   "question": "This would be a lesson who would remember for a long time?",
+   "answer": "john",
+   "said": "john",
+   "correct": true,
+   "refused": false,
+   "seconds": 12.636,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:lily",
+    "focus:john",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 267,
+   "bucket": "100-300",
+   "question": "They love Anna and who?",
+   "answer": "ben",
+   "said": "grandpa",
+   "correct": false,
+   "refused": false,
+   "seconds": 0.02,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:right thing",
+    "focus:grandpa",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 268,
+   "bucket": "100-300",
+   "question": "He had conquered his fear and won what?",
+   "answer": "slide",
+   "said": "jack",
+   "correct": false,
+   "refused": false,
+   "seconds": 0.033,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:None",
+    "focus:jack",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 269,
+   "bucket": "100-300",
+   "question": "Spike thanked the animals and continued with what?",
+   "answer": "walk",
+   "said": "friendly animals",
+   "correct": false,
+   "refused": false,
+   "seconds": 0.389,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:None",
+    "focus:friendly animals",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 270,
+   "bucket": "100-300",
+   "question": "They grabbed the necklace and ran home together, excited and proud of what?",
+   "answer": "adventure",
+   "said": "jane",
+   "correct": false,
+   "refused": false,
+   "seconds": 0.562,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:None",
+    "focus:jane",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 271,
+   "bucket": "100-300",
+   "question": "They were so happy to complete what together?",
+   "answer": "cookies",
+   "said": "mommy",
+   "correct": false,
+   "refused": false,
+   "seconds": 0.012,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:None",
+    "focus:mommy",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 272,
+   "bucket": "100-300",
+   "question": "She was so happy and thanked her daddy for what?",
+   "answer": "surprise",
+   "said": "surprise",
+   "correct": true,
+   "refused": false,
+   "seconds": 0.015,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:lily",
+    "focus:surprise",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 273,
+   "bucket": "100-300",
+   "question": "And his mom and dad always encouraged him to keep drawing and using what?",
+   "answer": "stamp",
+   "said": "tim",
+   "correct": false,
+   "refused": false,
+   "seconds": 11.059,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:scared",
+    "focus:tim",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 274,
+   "bucket": "100-300",
+   "question": "Once the girl was done with what she always felt clean, refreshed, and just a little bit more honest?",
+   "answer": "bath",
+   "said": "bath",
+   "correct": true,
+   "refused": false,
+   "seconds": 0.049,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:toy car",
+    "focus:bath",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 275,
+   "bucket": "100-300",
+   "question": "The rock kept glowing, and from then on, the rock always looked to what for its light?",
+   "answer": "fireflies",
+   "said": "fireflies",
+   "correct": true,
+   "refused": false,
+   "seconds": 0.218,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:None",
+    "focus:fireflies",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 276,
+   "bucket": "100-300",
+   "question": "When he finally escaped, he said goodbye to what?",
+   "answer": "duck",
+   "said": "ant",
+   "correct": false,
+   "refused": false,
+   "seconds": 0.015,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:door",
+    "focus:ant",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 277,
+   "bucket": "100-300",
+   "question": "They looked closely at all the rocks on what?",
+   "answer": "cliff",
+   "said": "mommy",
+   "correct": false,
+   "refused": false,
+   "seconds": 0.035,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:bed",
+    "focus:mommy",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 278,
+   "bucket": "100-300",
+   "question": "He gave the people happiness and joy with what?",
+   "answer": "lightning",
+   "said": "man",
+   "correct": false,
+   "refused": false,
+   "seconds": 0.278,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:None",
+    "focus:man",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 279,
+   "bucket": "100-300",
+   "question": "From that day on, Lily always remembered to hold onto what tightly and not forget it again?",
+   "answer": "muffin",
+   "said": "lady",
+   "correct": false,
+   "refused": false,
+   "seconds": 0.022,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:lady",
+    "focus:muffin",
+    "by:plans"
+   ]
+  },
+  {
+   "story": 280,
+   "bucket": "100-300",
+   "question": "She stepped into what and was immediately engulfed in a glowing light?",
+   "answer": "lake",
+   "said": "explorer",
+   "correct": false,
+   "refused": false,
+   "seconds": 0.044,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:oysters",
+    "focus:explorer",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 281,
+   "bucket": "100-300",
+   "question": "Who smiled and felt so lucky to have a daddy who could build her dreams?",
+   "answer": "lily",
+   "said": "lily",
+   "correct": true,
+   "refused": false,
+   "seconds": 2.727,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:hole",
+    "focus:lily",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 282,
+   "bucket": "100-300",
+   "question": "She was happy to help her mommy and make what clean and tidy?",
+   "answer": "gym",
+   "said": "lily",
+   "correct": false,
+   "refused": false,
+   "seconds": 0.02,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:button",
+    "focus:lily",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 283,
+   "bucket": "100-300",
+   "question": "From that day on, what knew that it was strong enough to pull anything that needed moving?",
+   "answer": "truck",
+   "said": "man",
+   "correct": false,
+   "refused": false,
+   "seconds": 0.019,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:paper",
+    "focus:man",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 284,
+   "bucket": "100-300",
+   "question": "He had made so many friends, he was what of all?",
+   "answer": "gorilla",
+   "said": "duck",
+   "correct": false,
+   "refused": false,
+   "seconds": 0.014,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:duck",
+    "focus:None",
+    "by:plans"
+   ]
+  },
+  {
+   "story": 285,
+   "bucket": "100-300",
+   "question": "She missed what very much and wished she could have it back?",
+   "answer": "umbrella",
+   "said": "lily",
+   "correct": false,
+   "refused": false,
+   "seconds": 0.009,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:None",
+    "focus:lily",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 286,
+   "bucket": "100-300",
+   "question": "The kingdom was relieved and what vowed to never hide again?",
+   "answer": "king",
+   "said": "king",
+   "correct": true,
+   "refused": false,
+   "seconds": 0.048,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:king",
+    "focus:king",
+    "by:plans"
+   ]
+  },
+  {
+   "story": 287,
+   "bucket": "100-300",
+   "question": "They eat what?",
+   "answer": "salad",
+   "said": "salad",
+   "correct": true,
+   "refused": false,
+   "seconds": 0.017,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:None",
+    "focus:salad",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 288,
+   "bucket": "100-300",
+   "question": "When she was done, what was nice and clean?",
+   "answer": "shelf",
+   "said": "little girl",
+   "correct": false,
+   "refused": false,
+   "seconds": 0.007,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:None",
+    "focus:little girl",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 289,
+   "bucket": "100-300",
+   "question": "They are what?",
+   "answer": "friends",
+   "said": "I don't know.",
+   "correct": false,
+   "refused": true,
+   "seconds": 0.001,
+   "gave_up": false,
+   "notes": [
+    "(nothing)",
+    "plans:None",
+    "focus:None",
+    "by:none"
+   ]
+  },
+  {
+   "story": 290,
+   "bucket": "100-300",
+   "question": "When they got to the other side, they got off what and went on their way?",
+   "answer": "raft",
+   "said": "raft",
+   "correct": true,
+   "refused": false,
+   "seconds": 0.02,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:trees",
+    "focus:raft",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 291,
+   "bucket": "100-300",
+   "question": "Everyone needs some space and privacy to take what, and it's important to respect that?",
+   "answer": "nap",
+   "said": "bird",
+   "correct": false,
+   "refused": false,
+   "seconds": 0.135,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:None",
+    "focus:bird",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 292,
+   "bucket": "100-300",
+   "question": "He ran out of what and escaped?",
+   "answer": "door",
+   "said": "bunny",
+   "correct": false,
+   "refused": false,
+   "seconds": 0.007,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:None",
+    "focus:bunny",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 293,
+   "bucket": "100-300",
+   "question": "Mommy and Daddy took their little girl home and she dreamed of the fun she had at what?",
+   "answer": "park",
+   "said": "cart",
+   "correct": false,
+   "refused": false,
+   "seconds": 3.711,
+   "gave_up": true,
+   "notes": [
+    "(gave up)",
+    "(found)",
+    "plans:None",
+    "focus:cart",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 294,
+   "bucket": "100-300",
+   "question": "They eat what together?",
+   "answer": "half",
+   "said": "nut",
+   "correct": false,
+   "refused": false,
+   "seconds": 0.013,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:None",
+    "focus:nut",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 295,
+   "bucket": "100-300",
+   "question": "And just as Inny thought, the shiny red ball brought something special - it brought all of what closer together?",
+   "answer": "friends",
+   "said": "fun",
+   "correct": false,
+   "refused": false,
+   "seconds": 0.046,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:right thing",
+    "focus:fun",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 296,
+   "bucket": "100-300",
+   "question": "Whenever Alice traveled a new place, she would always remember to bring a book for what to read?",
+   "answer": "friend",
+   "said": "much fun",
+   "correct": false,
+   "refused": false,
+   "seconds": 0.283,
+   "gave_up": true,
+   "notes": [
+    "(gave up)",
+    "(found)",
+    "plans:None",
+    "focus:much fun",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 297,
+   "bucket": "100-300",
+   "question": "And this is why Amy is still remembered in the town as what who made a difference?",
+   "answer": "girl",
+   "said": "people",
+   "correct": false,
+   "refused": false,
+   "seconds": 0.043,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:many pencils",
+    "focus:people",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 298,
+   "bucket": "100-300",
+   "question": "The rescue of what became a wonderful memory they would always remember?",
+   "answer": "dog",
+   "said": "little girl",
+   "correct": false,
+   "refused": false,
+   "seconds": 2.108,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:sharp claws",
+    "focus:little girl",
+    "by:focus"
+   ]
+  },
+  {
+   "story": 299,
+   "bucket": "100-300",
+   "question": "They leave the club on the grass and run to what?",
+   "answer": "swings",
+   "said": "ben",
+   "correct": false,
+   "refused": false,
+   "seconds": 0.028,
+   "gave_up": false,
+   "notes": [
+    "(found)",
+    "plans:more adventures",
+    "focus:ben",
+    "by:focus"
+   ]
+  }
+ ]
+}

@@ -63,9 +63,8 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
      - Identity. Every Lily in every story is one node. An episode-scoped name
        ('lily' in this story) with a link to the shared word is what memory of many
        stories needs.
-     - Still expected and not yet traced: pronouns across sentences, adjectives folded
-       into names ('the red ball' is one name, so a colour is never a node), and the
-       edges `SKIP` drops.
+     - Still expected and not yet traced: adjectives folded into names ('the red ball'
+       is one name, so a colour is never a node), and the edges `SKIP` drops.
      - The plans learn one shape per wording, and a cloze is a wording of its own, so
        plans rarely answer here and the slot fit carries the learning.
   2. Kinds as the fixed point of relations and things (John's, 2026-10-03). Two things

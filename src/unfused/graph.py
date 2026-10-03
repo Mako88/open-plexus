@@ -229,8 +229,9 @@ class GraphArm:
         # taught shapes' signatures, rebuilt after a lesson; questions' parses
         self._sigs: list | None = None
         self._tokens: dict = {}
-        # every node's steps, kept until the graph next changes: a walk over a hub asks
-        # for the same node's steps thousands of times
+        # every node's steps, kept across sentences and questions: a walk over a hub asks
+        # for the same node's steps thousands of times. A sentence drops only the nodes it
+        # gives a new step, so what was loaded stays loaded
         self._steps: dict = {}
         # steps looked at by the question being answered, or None outside answering
         self.spent: int | None = None
@@ -290,7 +291,6 @@ class GraphArm:
 
     def hear(self, turn: int, text: str) -> None:
         self._replaced = {}
-        self._steps = {}
         # a turn holding no words is a break in the text ('***', a new page): what is
         # heard after it is another episode
         if not any(ch.isalnum() for ch in text):
@@ -311,6 +311,8 @@ class GraphArm:
                 if node is None:
                     continue
                 self.db.execute("INSERT INTO edges VALUES (?, ?, ?)", (eid, label, node))
+                self._steps.pop(node, None)
+                self._steps.pop(f"e:{eid}", None)
         for t, node in resolved.items():
             if node is not None:
                 self.db.execute("INSERT INTO agreement VALUES (?, ?, 1) ON CONFLICT(name, "

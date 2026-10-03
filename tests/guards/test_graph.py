@@ -233,3 +233,15 @@ def test_a_pronoun_is_resolved_against_the_episode(tmp_path):
         "WHERE events.lemma = 'throw'").fetchall())
     assert ("nsubj", "n:tom") in edges and ("dobj", "n:red ball") in edges
     assert not any(n.startswith("p:") for _, n in edges)
+
+
+def test_steps_stay_loaded_across_sentences_and_never_go_stale(tmp_path):
+    a = arm(tmp_path)
+    a.hear(0, "Ada keeps the kettle in the shed.")
+    a.hear(1, "Bren keeps the rope in the attic.")
+    for node in ("n:ada", "n:bren", "n:shed", "n:attic", "e:1", "e:2"):
+        a.around(node)
+    a.hear(2, "Ada keeps the kettle in the attic.")
+    assert "n:bren" in a._steps
+    assert all(steps == a._around(node) for node, steps in a._steps.items())
+    assert "n:attic" not in a._steps or len(a._steps["n:attic"]) == 2

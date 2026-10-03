@@ -1,0 +1,251 @@
+{
+ "kind": "context",
+ "taken_at": "20261003T022007Z",
+ "note": "typed, kept within NEAR=0.5 of the likest",
+ "question": "how many hearings pin a word the house never told, by its contexts alone",
+ "seeds": [
+  {
+   "seed": 1,
+   "fingerprint": "2459218b160297bb",
+   "by_hearing": {
+    "1": {
+     "pinned": 0.125,
+     "wrong": 0,
+     "lost": 0,
+     "mean_left": 7.3,
+     "of": 16
+    },
+    "2": {
+     "pinned": 0.188,
+     "wrong": 0,
+     "lost": 0,
+     "mean_left": 6.8,
+     "of": 16
+    },
+    "3": {
+     "pinned": 0.214,
+     "wrong": 0,
+     "lost": 0,
+     "mean_left": 5.4,
+     "of": 14
+    },
+    "4": {
+     "pinned": 0.273,
+     "wrong": 0,
+     "lost": 0,
+     "mean_left": 4.7,
+     "of": 11
+    },
+    "5": {
+     "pinned": 0.3,
+     "wrong": 0,
+     "lost": 0,
+     "mean_left": 3.9,
+     "of": 10
+    }
+   },
+   "typed": {
+    "1": {
+     "pinned": 0.125,
+     "wrong": 0,
+     "lost": 3,
+     "mean_left": 4.2,
+     "of": 16
+    },
+    "2": {
+     "pinned": 0.188,
+     "wrong": 0,
+     "lost": 2,
+     "mean_left": 4.1,
+     "of": 16
+    },
+    "3": {
+     "pinned": 0.214,
+     "wrong": 0,
+     "lost": 0,
+     "mean_left": 3.7,
+     "of": 14
+    },
+    "4": {
+     "pinned": 0.273,
+     "wrong": 0,
+     "lost": 0,
+     "mean_left": 3.4,
+     "of": 11
+    },
+    "5": {
+     "pinned": 0.3,
+     "wrong": 0,
+     "lost": 0,
+     "mean_left": 3.2,
+     "of": 10
+    }
+   },
+   "answerable": 0.255,
+   "questions": 55,
+   "names": 68
+  },
+  {
+   "seed": 2,
+   "fingerprint": "2cfd6c6ea7d7a665",
+   "by_hearing": {
+    "1": {
+     "pinned": 0.105,
+     "wrong": 0,
+     "lost": 0,
+     "mean_left": 8.4,
+     "of": 19
+    },
+    "2": {
+     "pinned": 0.105,
+     "wrong": 0,
+     "lost": 0,
+     "mean_left": 7.5,
+     "of": 19
+    },
+    "3": {
+     "pinned": 0.25,
+     "wrong": 0,
+     "lost": 0,
+     "mean_left": 6.2,
+     "of": 16
+    },
+    "4": {
+     "pinned": 0.375,
+     "wrong": 0,
+     "lost": 0,
+     "mean_left": 5.4,
+     "of": 8
+    },
+    "5": {
+     "pinned": 0.6,
+     "wrong": 0,
+     "lost": 0,
+     "mean_left": 4.0,
+     "of": 5
+    }
+   },
+   "typed": {
+    "1": {
+     "pinned": 0.211,
+     "wrong": 0,
+     "lost": 1,
+     "mean_left": 4.6,
+     "of": 19
+    },
+    "2": {
+     "pinned": 0.158,
+     "wrong": 0,
+     "lost": 1,
+     "mean_left": 4.9,
+     "of": 19
+    },
+    "3": {
+     "pinned": 0.312,
+     "wrong": 0,
+     "lost": 1,
+     "mean_left": 4.2,
+     "of": 16
+    },
+    "4": {
+     "pinned": 0.375,
+     "wrong": 0,
+     "lost": 1,
+     "mean_left": 3.8,
+     "of": 8
+    },
+    "5": {
+     "pinned": 0.6,
+     "wrong": 0,
+     "lost": 1,
+     "mean_left": 2.8,
+     "of": 5
+    }
+   },
+   "answerable": 0.3,
+   "questions": 50,
+   "names": 72
+  },
+  {
+   "seed": 3,
+   "fingerprint": "43ee0c5deeb443ec",
+   "by_hearing": {
+    "1": {
+     "pinned": 0.062,
+     "wrong": 0,
+     "lost": 0,
+     "mean_left": 5.7,
+     "of": 16
+    },
+    "2": {
+     "pinned": 0.062,
+     "wrong": 0,
+     "lost": 0,
+     "mean_left": 5.5,
+     "of": 16
+    },
+    "3": {
+     "pinned": 0.4,
+     "wrong": 0,
+     "lost": 0,
+     "mean_left": 3.8,
+     "of": 15
+    },
+    "4": {
+     "pinned": 0.545,
+     "wrong": 0,
+     "lost": 0,
+     "mean_left": 2.3,
+     "of": 11
+    },
+    "5": {
+     "pinned": 0.571,
+     "wrong": 0,
+     "lost": 0,
+     "mean_left": 2.6,
+     "of": 7
+    }
+   },
+   "typed": {
+    "1": {
+     "pinned": 0.188,
+     "wrong": 1,
+     "lost": 2,
+     "mean_left": 3.2,
+     "of": 16
+    },
+    "2": {
+     "pinned": 0.188,
+     "wrong": 2,
+     "lost": 3,
+     "mean_left": 3.0,
+     "of": 16
+    },
+    "3": {
+     "pinned": 0.467,
+     "wrong": 0,
+     "lost": 0,
+     "mean_left": 2.3,
+     "of": 15
+    },
+    "4": {
+     "pinned": 0.636,
+     "wrong": 0,
+     "lost": 0,
+     "mean_left": 1.5,
+     "of": 11
+    },
+    "5": {
+     "pinned": 0.714,
+     "wrong": 0,
+     "lost": 0,
+     "mean_left": 1.6,
+     "of": 7
+    }
+   },
+   "answerable": 0.356,
+   "questions": 59,
+   "names": 72
+  }
+ ]
+}

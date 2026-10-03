@@ -68,13 +68,10 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
      fact told in a shape no lesson's fact was told in reads 0.571 0.629 0.514 against
      `direct`'s 0.880 0.893 0.905, so the mouth would voice answers to tellings the
      system cannot read. Three things are missing, one diagnosis apiece.
-     - A telling of a new shape. A new verb on the taught edges is read, since a loose
-       walk ignores the lemma; a new shape is not ('has the plates tucked away in', 'sit
-       the hooks that X owns', 'counts A as a cousin'), since nothing ignores a path's
-       labels or length. A candidate that is also item 4's kind check: where no plan
-       reaches, the shortest path from the question's name to a node of the answer's
-       kind, a name's kind being the events it takes part in. Refuted if `novel` does not
-       rise or any taught form falls by more than a seed's spread.
+     - A telling of a new shape. `kinded` (`4a9efac4`) reads one where nothing else
+       answers. What `novel` still misses is a wrong kind from a borrowed or loose plan
+       ('Where would I find X's jars?' answered '15'), which is item 4, and 'shares a
+       grandmother with B; they're cousins', where the relation is a clause apart.
      - A synonym taught inside one conversation. With the practice houses' aliases left
        behind, oblique reads 0.494 0.558 0.523, against about 0.85 with them, so the
        alias gain was memory of the table every house shares and a conversation's own
@@ -118,9 +115,15 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
      plan holds. Joining before walking loosely was refuted (see the commit that says
      so): the join's free variable took a thing where a person was asked. Both faults
      are a wrong kind, so the next arm is a kind check on a join's free variable and a
-     loose end, a name's kind being the events it takes part in, as DECIDED's meaning
-     section has it (`f827f42e` tried kinds on borrowed ends, before plans were
-     relations).
+     loose end. Two shapes of kind are refuted, each in its commit: the link the answer
+     hangs by at the end of the shape's plans (too narrow: a right answer told another
+     way hangs by another link), and every verb and link the graph holds the answer by
+     (too fine: 'Dov sells apples' no longer answers a trade taught on 'keeps bees', a
+     guard). A kind has to generalise across verbs as the loose walk does, so what is
+     left is likeness of names by overlap, as DECIDED's meaning section has it: a
+     candidate is of the answers' kind where it shares more of what is known about it
+     with them than with the question's other names (`f827f42e` tried kinds on borrowed
+     ends, before plans were relations).
   5. Pronouns across sentences, and size. A pronoun is bound to the entity in focus as
      Phase 5 has it, and the first house is read at 3,000 and 30,000 turns, a size the
      house already has, for seconds a question as well as score (`tests/pushback.py`).

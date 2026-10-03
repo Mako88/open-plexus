@@ -97,6 +97,13 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
        questions it is heard in. Next, the intersection moves into the graph and is read
        as oblique, since it never pinned a word wrongly. Kinds by parse slots wait: per
        name they were refuted twice, and pooled they separate weakly (see the commits).
+       Once the graph's intersection and a form of kinds have landed, the curve is
+       compared with the language models' in-context learning (John's, 2026-10-03): the
+       house's synonyms swapped for made-up words in an instrument copy, so a model's
+       prior cannot say what they mean, and each model asked what the word names after
+       each hearing, read as right and as wrong-but-confident beside the system's curve.
+       Refuted if the 0.8B is above the system's curve at every hearing. Not before
+       then, since a loss expected while the mechanism is unfinished decides nothing.
   2. A mouth of the system's own, after item 1 (conversation before counts, John's,
      2026-10-02). An answer is one node of the graph or "I don't know."; it cannot say
      yes or no, list, or say what it is sure of. The mouth renders the answer's path

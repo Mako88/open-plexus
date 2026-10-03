@@ -237,6 +237,8 @@ class GraphArm:
         self._steps: dict = {}
         # every event's lemma, turn and mood, kept for good: what was heard never changes
         self._events: dict = {}
+        # every name's mark, dropped only for names a sentence names
+        self._marks: dict = {}
         # steps looked at by the question being answered, or None outside answering
         self.spent: int | None = None
 
@@ -317,6 +319,7 @@ class GraphArm:
                 self.db.execute("INSERT INTO edges VALUES (?, ?, ?)", (eid, label, node))
                 self._steps.pop(node, None)
                 self._steps.pop(f"e:{eid}", None)
+                self._marks.pop(node[2:], None)
         for t, node in resolved.items():
             if node is not None:
                 self.db.execute("INSERT INTO agreement VALUES (?, ?, 1) ON CONFLICT(name, "
@@ -1278,6 +1281,11 @@ class GraphArm:
         """How a name is written where it is heard: 'capital' where its last word is
         capitalised every time ('Lily', even at a sentence's start), 'lower' where it is
         not, None where no sentence heard spells it out."""
+        if name not in self._marks:
+            self._marks[name] = self._mark(name)
+        return self._marks[name]
+
+    def _mark(self, name: str) -> str | None:
         word = name.split()[-1] if name.strip() else ""
         if not word:
             return None

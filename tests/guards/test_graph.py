@@ -177,6 +177,17 @@ def test_a_word_never_heard_is_narrowed_over_the_questions_it_is_heard_in(tmp_pa
     assert a.pinned("pots") == "jars"
 
 
+def test_a_word_never_heard_is_voted_for_at_its_first_hearing(tmp_path):
+    """One hearing allows the jars and the rope; 'pots' is far nearer the jars, so that
+    one hearing answers, where the hearings alone would wait for a second."""
+    a = arm(tmp_path)
+    a.hear(0, "Ada keeps the jars in the cellar.")
+    a.hear(1, "Ada keeps the rope in the attic.")
+    a.teach("Where does Ada keep the rope?", "attic")
+    assert a.answer(q("Where does Ada keep the pots?")) == "cellar"
+    assert a.pinned("pots") is None and a.voted("pots") == "jars"
+
+
 def test_a_compound_whose_first_word_is_a_known_name_is_two_names(tmp_path):
     """'Who is Ada cousins with?' is parsed as one compound, 'Ada cousins'. Cut whole
     to its known ending, Ada stayed in the frame and every person was a shape of their

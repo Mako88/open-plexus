@@ -98,14 +98,12 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
        lever for it: even the true kind leaves three or four candidates after one
        hearing (`readings/context-oracle-*`). Kinds by link labels stay item 4's, where
        a wrong kind is the fault.
-       - Next: MiniLM's word vectors as one vote at a word's first hearing (John's,
-         2026-10-03, DECIDED's trigger met by that ceiling). A word's candidates from
-         the intersection are ranked by cosine to the word, as `scripts/unheard.py`'s
-         fitted arm does, and the intersection takes over as hearings add up. The
-         reading is oblique without carried aliases, against 0.517 0.605 0.547.
-         Refuted if oblique does not rise on any seed, or another form falls.
-       - Then item 4's kinds, before items 2 to 6.
-       Once MiniLM's vote and item 4's kinds have landed, the curve is
+       - MiniLM ranks what the intersection allows (`voted`, John's, 2026-10-03). Oblique
+         reads what the language already knows and made-up words read what is learnt, so
+         a gain on oblique is never read as the learner's.
+       - Next: item 4's kinds, before items 2 to 6. Most wrong oblique answers are now
+         of a wrong kind ('What shade are the lamps?' answered 'coach house').
+       Once item 4's kinds have landed, the curve is
        compared with the language models' in-context learning (John's, 2026-10-03): the
        house's synonyms swapped for made-up words in an instrument copy, so a model's
        prior cannot say what they mean, and each model asked what the word names after

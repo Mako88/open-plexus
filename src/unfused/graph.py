@@ -56,6 +56,11 @@ PRONOUNS = {"it", "they", "them", "its", "their", "he", "she", "him", "her", "hi
 
 _NLP: dict = {}
 
+# how much nearer a word's likest candidate must be than the next for a vote: right picks'
+# gaps sat at 0.14 to 0.21 and wrong ones' at 0.02 to 0.06 (readings/unheard-*)
+MARGIN = 0.08
+_VECTORS: dict = {}
+
 
 def nlp(model: str):
     if model not in _NLP:
@@ -63,6 +68,20 @@ def nlp(model: str):
 
         _NLP[model] = spacy.load(model)
     return _NLP[model]
+
+
+def vectors(texts: list[str]):
+    """MiniLM's vector for each text, each encoded once a process: a word's vector never
+    changes, so it is what everyone knows about the word, read once and kept."""
+    if "model" not in _VECTORS:
+        from unfused.store import MiniLmEmbedder
+
+        _VECTORS["model"] = MiniLmEmbedder()
+    new = [t for t in dict.fromkeys(texts) if t not in _VECTORS]
+    if new:
+        for t, v in zip(new, _VECTORS["model"].encode(new)):
+            _VECTORS[t] = v
+    return [_VECTORS[t] for t in texts]
 
 
 def phrase(tok) -> str:
@@ -906,7 +925,7 @@ class GraphArm:
     def unaliased(self, question: str, heard: bool = False) -> str:
         """The question with each word never heard put as the name it stood for, where
         lessons settled one and that name is heard here, and with `heard` where this
-        conversation's hearings of it pinned one."""
+        conversation's hearings of it pinned one or MiniLM voted for one."""
         out, at = "", 0
         for a, b, w in self.unheard(question):
             # by its longest ending lessons settled: 'chipped dishes' before 'dishes'. A
@@ -922,7 +941,7 @@ class GraphArm:
                     break
             else:
                 # no lesson settled it: what this conversation's hearings of it left
-                name = self.pinned(w) if heard else None
+                name = (self.pinned(w) or self.voted(w)) if heard else None
                 if name is not None and self.known(name) and not said_in(
                         name, out + question[at:]):
                     out += question[at:a] + name
@@ -996,6 +1015,21 @@ class GraphArm:
                               (word,)).fetchone()
         left = json.loads(row[0]) if row else []
         return left[0] if len(left) == 1 and row[1] >= 2 else None
+
+    def voted(self, word: str) -> str | None:
+        """Of the names a word's hearings still allow, the one MiniLM puts it nearest,
+        where that is nearer than the next by `MARGIN`: what everyone knows of a word
+        decides at its first hearing, and the hearings decide once they leave one name. A
+        word of the frame ('shade') is about as near every name it allows, so it is never
+        voted for any."""
+        row = self.db.execute("SELECT names FROM contexts WHERE word = ?",
+                              (word,)).fetchone()
+        left = json.loads(row[0]) if row else []
+        if len(left) < 2:
+            return None
+        w, *vs = vectors([word, *left])
+        near = sorted(((float(w @ v), n) for v, n in zip(vs, left)), reverse=True)
+        return near[0][1] if near[0][0] - near[1][0] >= MARGIN else None
 
     def alias(self, question: str, want: str) -> str:
         """A lesson naming words never heard: each is read as a slot of the nearest

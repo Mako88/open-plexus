@@ -1002,11 +1002,64 @@ class GraphArm:
         said = self.apart(text, depth)
         if said is None and depth == 0 and (found := self.reaching(text, shape)):
             said = self.latest(found)
+        if said is None and depth == 0 and (found := self.kinded(text, shape, fillers)):
+            said = self.latest(found)
         return said
 
     @staticmethod
     def latest(found: list) -> str:
         return max(found, key=lambda f: f[1])[0]
+
+    def roles(self, shapes: list[str]) -> set[str]:
+        """The links an answer hangs by at the end of these shapes' plans: 'prep:in' for
+        where a thing is kept, 'nummod' for how many. A name's kind is the links it is
+        held by, so an answer held by none of these is of another kind."""
+        out = set()
+        for shape in shapes:
+            for (p,) in self.db.execute(
+                    "SELECT plan FROM learnt WHERE shape = ? AND hits > misses", (shape,)):
+                plan = json.loads(p)
+                if plan["steps"] and not plan.get("count") and plan["steps"][-1][1] == 1:
+                    out.add(plan["steps"][-1][0])
+        return out
+
+    def kinded(self, text: str, shape: str, fillers: list[str],
+               limit: int = 6) -> list[tuple[str, tuple]]:
+        """Where no plan reaches, a fact told in a shape no lesson's fact was: the
+        shortest path from the question's first name to a name in the role the answer
+        plays at the end of the shape's plans, through nothing that did not happen, with
+        each other name of the question two steps or fewer from the path. 'Gopaiff has the
+        fishing floats tucked away in the dairy' has the dairy at the end of a 'prep:in'
+        as 'keeps the floats in the dairy' has, by a longer way."""
+        if not fillers:
+            return []
+        roles = self.roles([shape]) or self.roles(self.nearest(text, fillers)[1])
+        if not roles:
+            return []
+        start = f"n:{fillers[0]}"
+        frontier, seen, found = [[start]], {start}, []
+        for _ in range(limit):
+            nxt = []
+            for path in frontier:
+                for label, direction, node in self.around(path[-1]):
+                    if node in seen:
+                        continue
+                    if node.startswith("e:") and self.mood(node):
+                        continue
+                    way = path + [(label, direction), node]
+                    if (node.startswith("n:") and direction == 1 and label in roles
+                            and not said_in(node[2:], text) and all(
+                                any(self.paths(n, f"n:{f}", limit=2) for n in way[::2]
+                                    if n.startswith("e:")) for f in fillers[1:])):
+                        turns = [self.event(n)[1] for n in way[::2] if n.startswith("e:")]
+                        found.append((node[2:], (max(turns, default=0),)))
+                    nxt.append(way)
+            if found:
+                return found
+            for way in nxt:
+                seen.add(way[-1])
+            frontier = nxt[:2000]
+        return []
 
     def joined(self, text: str, depth: int) -> str | None:
         """A question holding a clause about something ('the things X keeps in the

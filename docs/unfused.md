@@ -67,6 +67,11 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
        is one name, so a colour is never a node), and the edges `SKIP` drops.
      - The plans learn one shape per wording, and a cloze is a wording of its own, so
        plans rarely answer here and the slot fit carries the learning.
+     - A wrong kind is most of what is left ('thanked what?' answered 'guitar'). It
+       is not mostly new words: late, an answer heard in an earlier story is missed
+       nearly as often as one never heard (the handoff that added this line). Next:
+       for each late miss, where the right answer ranked in focus and which factor
+       sank it (recency, the verb's fit, the wh-word's mark), before another kind.
   2. Kinds as the fixed point of relations and things (John's, 2026-10-03). Two things
      are of a kind where they take part in alike relations with things of alike kinds,
      and two relations are alike where they join alike kinds. Each starts as its own
@@ -76,7 +81,10 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
      a word has hundreds of contexts, rather than the house's three to five. A recursive
      structure is wanted for scale as well (John's). Refuted if it separates the house's
      true kinds no better than labels as a set did (`kinds` at `55ebec4d`), or the
-     stream's curve does not rise with it.
+     stream's curve does not rise with it. On the stream, the graded fixed point (walks
+     through names sharing verb slots, `6aaf8dcf`) tied the verb's fit, and a slot's
+     kind by its fillers' case, part of speech or pronoun agreement lost (`e470b64f`,
+     `d7ab6e68`).
   3. Retention and knowledge across stories: early questions asked again late, and
      questions only many stories answer ('What colour can a ball be?').
 - **The models are a milestone check, not a baseline.** John's, 2026-10-02: the system is

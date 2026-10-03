@@ -52,6 +52,14 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
        far it reaches is a fixed number of turns for now. The mechanism it stands in for
        is event segmentation: a boundary where what is heard stops being predicted by
        what was, so an episode is found rather than set.
+       OPEN, John's to decide: the stream tells stories back to back on one clock, so
+       nothing but their words separates them. Real conversations are separated by
+       time, and the turn index is the system's clock, so the stream could advance it
+       between stories, as a night passing. That adds time the real world has rather
+       than removing difficulty, and it is still a change to the world made because the
+       machine did badly, which the rules forbid unless he says otherwise. Without it,
+       the boundary has to be found from the words, where TinyStories' shared
+       vocabulary (every story has a Lily and a park) makes overlap a weak signal.
      - Identity. Every Lily in every story is one node. An episode-scoped name
        ('lily' in this story) with a link to the shared word is what memory of many
        stories needs.

@@ -207,3 +207,15 @@ def test_a_word_spelt_like_the_encoder_key_is_a_vector():
 
     w, m = vectors(["boat", "model"])
     assert w.shape == m.shape
+
+
+def test_a_blank_is_filled_from_what_is_in_focus(tmp_path):
+    a = arm(tmp_path)
+    for i, text in enumerate(["Max had a kite.", "Max flew the kite in the park.",
+                              "The kite went up high."]):
+        a.hear(i, text)
+    for i, text in enumerate(["Lily had a ball.", "Lily threw the ball to her dog.",
+                              "The dog ran fast."], start=300):
+        a.hear(i, text)
+    # the kite is a story ago; the ball and the dog are in focus, and a ball is thrown
+    assert a.answer(q("Then Lily threw what again?")) == "ball"

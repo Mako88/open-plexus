@@ -129,7 +129,9 @@ def _stream(arm, stories, reopen_every, rows, sizes) -> int:
             rows.append({"story": s.index, "bucket": bucket(s.index), "question": s.question,
                          "answer": s.answer, "said": said, "correct": right(s.answers, said),
                          "refused": "don't know" in (said or "").lower(),
-                         "seconds": round(seconds, 3)})
+                         "seconds": round(seconds, 3),
+                         "gave_up": "(gave up)" in getattr(getattr(arm, "arm", None),
+                                                          "last_notes", [])})
         for text in s.after:
             arm.tell(turn, text)
             turn += 1

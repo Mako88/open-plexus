@@ -122,8 +122,13 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
      guard). A kind has to generalise across verbs as the loose walk does, so what is
      left is likeness of names by overlap, as DECIDED's meaning section has it: a
      candidate is of the answers' kind where it shares more of what is known about it
-     with them than with the question's other names (`f827f42e` tried kinds on borrowed
-     ends, before plans were relations).
+     with them than with the question's other names, by link labels so a new verb still
+     fits. A name of the question that is itself of the answers' kind is not evidence
+     against: 'Who is X cousins with?' asks for a person about a person, and the
+     comparison MUST NOT reject the right one for being like X. The case it is for:
+     'the stuff X keeps in the nursery' answered 'coach house', which is like the
+     nursery and unlike any colour (`f827f42e` tried kinds on borrowed ends, before
+     plans were relations).
   5. Pronouns across sentences, and size. A pronoun is bound to the entity in focus as
      Phase 5 has it, and the first house is read at 3,000 and 30,000 turns, a size the
      house already has, for seconds a question as well as score (`tests/pushback.py`).

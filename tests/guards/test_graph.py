@@ -160,6 +160,23 @@ def test_a_word_never_heard_is_learnt_as_the_name_it_stood_for(tmp_path):
     assert "edda" not in {n for _, _, n in a.unheard("Where does Edda keep the pots?")}
 
 
+def test_a_word_never_heard_is_narrowed_over_the_questions_it_is_heard_in(tmp_path):
+    """No lesson says what 'pots' stands for. Each question it is heard in allows the
+    things its other names keep, and two hearings leave only what both allow."""
+    a = arm(tmp_path)
+    a.hear(0, "Ada keeps the jars in the cellar.")
+    a.hear(1, "Ada keeps the rope in the attic.")
+    a.hear(2, "Bren keeps the jars in the shed.")
+    a.hear(3, "Bren keeps the kettle in the barn.")
+    a.teach("Where does Ada keep the rope?", "attic")
+    a.teach("Where does Bren keep the kettle?", "barn")
+    a.answer(q("Where does Ada keep the pots?"))
+    # one hearing cannot show a word names something rather than being frame
+    assert a.pinned("pots") is None
+    assert a.answer(q("Where does Bren keep the pots?")) == "shed"
+    assert a.pinned("pots") == "jars"
+
+
 def test_a_compound_whose_first_word_is_a_known_name_is_two_names(tmp_path):
     """'Who is Ada cousins with?' is parsed as one compound, 'Ada cousins'. Cut whole
     to its known ending, Ada stayed in the frame and every person was a shape of their

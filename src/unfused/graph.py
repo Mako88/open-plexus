@@ -38,6 +38,8 @@ CREATE TABLE IF NOT EXISTS positions (template TEXT NOT NULL, pos INTEGER NOT NU
     filler TEXT NOT NULL, n INTEGER NOT NULL, PRIMARY KEY (template, pos, filler));
 CREATE TABLE IF NOT EXISTS aliases (word TEXT NOT NULL, name TEXT NOT NULL,
     hits REAL NOT NULL, found INTEGER NOT NULL, PRIMARY KEY (word, name));
+CREATE TABLE IF NOT EXISTS contexts (word TEXT PRIMARY KEY, names TEXT NOT NULL,
+    heard INTEGER NOT NULL);
 """
 # what a taught arm carries to the next conversation: no facts, only how to read and ask
 CARRIED = ("learnt", "positions", "aliases")
@@ -260,6 +262,10 @@ class GraphArm:
         return [n for (n,) in self.db.execute(
             "SELECT DISTINCT node FROM edges WHERE node LIKE ?", (f"n:%{word}%",))
             if said_in(word, n[2:])]
+
+    def names(self) -> list[str]:
+        return [n[2:] for (n,) in self.db.execute(
+            "SELECT DISTINCT node FROM edges WHERE node LIKE 'n:%'")]
 
     def known(self, name: str) -> bool:
         return self.db.execute("SELECT 1 FROM edges WHERE node = ? LIMIT 1",
@@ -897,9 +903,10 @@ class GraphArm:
         second = rows[1][1] if len(rows) > 1 else 0
         return [name] if hits >= 2 and hits >= 2 * second and 2 * found > tried else []
 
-    def unaliased(self, question: str) -> str:
+    def unaliased(self, question: str, heard: bool = False) -> str:
         """The question with each word never heard put as the name it stood for, where
-        lessons settled one and that name is heard here."""
+        lessons settled one and that name is heard here, and with `heard` where this
+        conversation's hearings of it pinned one."""
         out, at = "", 0
         for a, b, w in self.unheard(question):
             # by its longest ending lessons settled: 'chipped dishes' before 'dishes'. A
@@ -913,7 +920,82 @@ class GraphArm:
                     out += question[at:b - len(tail)] + name
                     at = b
                     break
+            else:
+                # no lesson settled it: what this conversation's hearings of it left
+                name = self.pinned(w) if heard else None
+                if name is not None and self.known(name) and not said_in(
+                        name, out + question[at:]):
+                    out += question[at:a] + name
+                    at = b
         return out + question[at:]
+
+    def readings(self, question: str, spans: list) -> list[tuple[float, tuple, list]]:
+        """Every reading of a question holding words never heard, each name a slot or
+        frame and the slots in any order, nearest taught shapes with each. A slot left
+        unbound claims less than one bound, so the readings with fewest unbound slots go
+        first, nearest within that; each word is counted by the first reading whose
+        solving finds anything for it, as borrowing reads a question."""
+        from itertools import combinations, permutations
+
+        names = [n for _, _, n in self.template(question)[1]][:4]
+        out = []
+        for k in range(1, len(names) + 1):
+            for chosen in combinations(names, k):
+                if not any(w in chosen for _, _, w in spans):
+                    continue
+                for order in permutations(chosen):
+                    near, shapes = self.nearest(question, list(order))
+                    if shapes:
+                        out.append((near, order, shapes))
+        out.sort(key=lambda r: (sum(not self.known(n) for n in r[1]), -r[0]))
+        return out
+
+    def heard_in(self, question: str) -> None:
+        """A question holding a word never heard is one context of it, answered or not:
+        the names its slot could take given the question's other names, by the plans of
+        the nearest taught shape with the answer left free. Each hearing keeps only the
+        names every earlier one allowed, as a child narrows a new word over the
+        situations it is heard in."""
+        spans = self.unheard(question)
+        if not spans:
+            return
+        names = [n for _, _, n in self.template(question)[1]][:4]
+        unheard = {u for _, _, u in spans}
+        done: set[str] = set()
+        for _, order, shapes in self.readings(question, spans):
+            plans = [p for sh in shapes for (raw,) in self.db.execute(
+                "SELECT plan FROM learnt WHERE shape = ? AND hits > misses", (sh,))
+                if not (p := json.loads(raw)).get("count")]
+            for free, w in enumerate(order):
+                if w not in unheard or w in done:
+                    continue
+                bound = {i: n for i, n in enumerate(order) if i != free and self.known(n)}
+                if bound:
+                    here = {e for p in plans for e, _ in self.solve(p, bound, free)}
+                else:
+                    here = {n for n in self.names()
+                            if any(self.solve(p, {free: n}, "a") for p in plans)}
+                here -= set(names)
+                if not here:
+                    continue
+                done.add(w)
+                row = self.db.execute("SELECT names, heard FROM contexts WHERE word = ?",
+                                      (w,)).fetchone()
+                if row:
+                    here &= set(json.loads(row[0]))
+                self.db.execute("INSERT OR REPLACE INTO contexts VALUES (?, ?, ?)",
+                                (w, json.dumps(sorted(here)), (row[1] if row else 0) + 1))
+        self.db.commit()
+
+    def pinned(self, word: str) -> str | None:
+        """The one name every hearing of a word left, where two or more agreed: one
+        hearing cannot show a word names something rather than being frame, as one fact
+        cannot settle an alias. Hearings that left nothing in common mark a word of the
+        frame ('shade', 'a wage'), which names nothing and is never pinned."""
+        row = self.db.execute("SELECT names, heard FROM contexts WHERE word = ?",
+                              (word,)).fetchone()
+        left = json.loads(row[0]) if row else []
+        return left[0] if len(left) == 1 and row[1] >= 2 else None
 
     def alias(self, question: str, want: str) -> str:
         """A lesson naming words never heard: each is read as a slot of the nearest
@@ -922,29 +1004,14 @@ class GraphArm:
         name found counts a share of one, and a lesson that many names fit says little.
         A lesson that found other names counts against one. The question comes back
         with whatever lessons have settled put in."""
-        from itertools import combinations, permutations
-
         spans = self.unheard(question)
         goals = self.holding(want)[:1]
         if not spans or not goals:
             return question
         names = [n for _, _, n in self.template(question)[1]][:4]
-        readings = []
-        for k in range(1, len(names) + 1):
-            for chosen in combinations(names, k):
-                if not any(w in chosen for _, _, w in spans):
-                    continue
-                for order in permutations(chosen):
-                    near, shapes = self.nearest(question, list(order))
-                    if shapes:
-                        readings.append((near, order, shapes))
-        # a slot left unbound claims less than one bound, so the readings with fewest
-        # unbound slots go first, nearest within that; each word is counted by the first
-        # reading whose solving finds anything for it, as borrowing reads a question
         unheard = {u for _, _, u in spans}
-        readings.sort(key=lambda r: (sum(not self.known(n) for n in r[1]), -r[0]))
         found: dict[str, set] = {}
-        for near, order, shapes in readings:
+        for near, order, shapes in self.readings(question, spans):
             plans = [json.loads(p) for sh in shapes for (p,) in self.db.execute(
                 "SELECT plan FROM learnt WHERE shape = ? AND hits > misses", (sh,))]
             for free, w in enumerate(order):
@@ -978,12 +1045,18 @@ class GraphArm:
     def answer(self, question) -> str:
         # what the plans of either wording's own shape find comes before anything
         # borrowed or joined: a wording taught before an alias settled holds the lessons
+        self.heard_in(question.text)
         put = self.unaliased(question.text)
         said = next((self.latest(found) for text in dict.fromkeys((put, question.text))
                      if (found := self.answers(*self.shape(text), text, borrow=False))),
                     None)
         if said is None:
             said = self.answered(put)
+        # a pin is used only where the question as heard finds nothing: frame words a
+        # question's names keep company with agree across hearings too ('What is the
+        # number of X in the cellar?' pinned 'number'), and they broke answers found
+        if said is None and (again := self.unaliased(question.text, heard=True)) != put:
+            said = self.answered(again)
         self.last_notes = ["(nothing)"] if said is None else ["(found)"]
         return "I don't know." if said is None else said
 

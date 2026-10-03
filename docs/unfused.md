@@ -156,9 +156,14 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
      nursery and unlike any colour (`f827f42e` tried kinds on borrowed ends, before
      plans were relations). A third shape is refuted (`a9dfa7c2`): the kind taken from
      the question's shape when the answer is filtered, which is not the plan that found
-     it for counts, joins and borrowed shapes. Next: the kind from the plan that found
-     the answer, and names compared with a kind pooled by link labels rather than with
-     each name, so 'slate colour' is a colour.
+     it for counts, joins and borrowed shapes. A fourth is refuted (`kinds` in the
+     commit that says so): the labels a shape's lessons' answers were held by, as a
+     set, on the shape's own plans, which is where most wrong kinds come from. Colours
+     are told 'painted in X' as well, so a colour shares `prep:in` with every room.
+     Next: the same kind as a distribution of labels, a name kept where it is nearer
+     its shape's pooled answers than other kinds' (`scripts/kinds.py` reads its
+     ceiling with the true kinds as classes). What is open is what the other kinds
+     are, since the system has shapes and not kinds, and many shapes ask one kind.
   5. Pronouns across sentences, and size. A pronoun is bound to the entity in focus as
      Phase 5 has it, and the first house is read at 3,000 and 30,000 turns, a size the
      house already has, for seconds a question as well as score (`tests/pushback.py`).

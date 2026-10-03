@@ -1,0 +1,47 @@
+{
+ "kind": "kinds",
+ "taken_at": "20261003T084024Z",
+ "note": "Item 4's ceiling by link labels, true kinds as classes. Refuted for distributions if nearest is right no more often than the commonest kind's share.",
+ "question": "do the links a name is held by tell its kind",
+ "seeds": [
+  {
+   "seed": 1,
+   "names": 55,
+   "nearest_right": 51,
+   "commonest_share": 0.382,
+   "set_lets_through": 52,
+   "set_pairs": 220,
+   "nearest_wrong": {
+    "colour->room": 2,
+    "person->colour": 2
+   }
+  },
+  {
+   "seed": 2,
+   "names": 59,
+   "nearest_right": 54,
+   "commonest_share": 0.356,
+   "set_lets_through": 60,
+   "set_pairs": 236,
+   "nearest_wrong": {
+    "colour->room": 2,
+    "person->colour": 2,
+    "colour->person": 1
+   }
+  },
+  {
+   "seed": 3,
+   "names": 54,
+   "nearest_right": 48,
+   "commonest_share": 0.389,
+   "set_lets_through": 50,
+   "set_pairs": 216,
+   "nearest_wrong": {
+    "colour->room": 1,
+    "colour->person": 1,
+    "person->colour": 3,
+    "room->person": 1
+   }
+  }
+ ]
+}

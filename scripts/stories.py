@@ -169,9 +169,12 @@ def main() -> None:
     p.add_argument("--seed", type=int, default=0)
     p.add_argument("--arms", default="frequent,blind,graphed")
     p.add_argument("--note", default="")
+    # a control: memory starts empty at this story, so a late bucket is read without
+    # everything heard before it
+    p.add_argument("--skip", type=int, default=0)
     args = p.parse_args()
 
-    stories = stream(args.stories, args.seed)
+    stories = [s for s in stream(args.stories, args.seed) if s.index >= args.skip]
     asked = sum(s.question is not None for s in stories)
     print(f"{len(stories)} stories, {asked} questions", flush=True)
     stamp = datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")
@@ -183,10 +186,12 @@ def main() -> None:
         shutil.rmtree(work, ignore_errors=True)
         reading = {"kind": "stories", "taken_at": stamp, "note": args.note,
                    "stream": {"source": "TinyStories-valid", "seed": args.seed,
-                              "stories": args.stories, "questions": asked,
+                              "stories": args.stories, "skip": args.skip,
+                              "questions": asked,
                               "fingerprint": fingerprint(stories)},
                    **out}
-        path = ROOT / "readings" / f"stories-{name}-s{args.seed}-n{args.stories}-{stamp}.json"
+        skip = f"-k{args.skip}" if args.skip else ""
+        path = ROOT / "readings" / f"stories-{name}-s{args.seed}-n{args.stories}{skip}-{stamp}.json"
         path.write_text(json.dumps(reading, indent=1), encoding="utf-8")
         curve = "  ".join(f"{b}:{c['score']}" for b, c in out["curve"].items())
         print(f"{name:9} score {out['score']}  {curve}  {out['seconds']}s -> {path.name}",

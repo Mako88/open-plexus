@@ -94,10 +94,9 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
        in the question. A synonym said only in its question is one context, which is
        why the graph version of this, solving with the word's slot free, was refuted.
        The reading is `scripts/context.py`: a word's candidates are intersected over the
-       questions it is heard in. Next, kinds formed by pooling the parse slots of told
-       names (concept formation), so a word heard once is compared with a kind rather
-       than with each name; comparing with each name was refuted twice (see the commit
-       that says so). Then the intersection moves into the graph and is read as oblique.
+       questions it is heard in. Next, the intersection moves into the graph and is read
+       as oblique, since it never pinned a word wrongly. Kinds by parse slots wait: per
+       name they were refuted twice, and pooled they separate weakly (see the commits).
   2. A mouth of the system's own, after item 1 (conversation before counts, John's,
      2026-10-02). An answer is one node of the graph or "I don't know."; it cannot say
      yes or no, list, or say what it is sure of. The mouth renders the answer's path

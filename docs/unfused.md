@@ -68,10 +68,15 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
      - The plans learn one shape per wording, and a cloze is a wording of its own, so
        plans rarely answer here and the slot fit carries the learning.
      - A wrong kind is most of what is left ('thanked what?' answered 'guitar'). It
-       is not mostly new words: late, an answer heard in an earlier story is missed
-       nearly as often as one never heard (the handoff that added this line). Next:
-       for each late miss, where the right answer ranked in focus and which factor
-       sank it (recency, the verb's fit, the wh-word's mark), before another kind.
+       is not mostly new words, and no one of focus's factors sinks the answer: it is
+       in focus for most late misses, often second or third (`scripts/autopsy.py`,
+       `e3b3647d`).
+     - No stream question meets a shape a plan was learnt for, and half have a path
+       from their names to the answer (`e3b3647d`). Plans are kept by wording, so
+       they never reach the stream. Next, after the comprehension form: a question
+       read as its own pattern ('Lily ate what?' is an 'eat' event with Lily as its
+       subject and its object free), matched against the episode, as `solve` matches
+       a plan, so the question needs no lesson in its wording.
   2. Kinds as the fixed point of relations and things (John's, 2026-10-03). Two things
      are of a kind where they take part in alike relations with things of alike kinds,
      and two relations are alike where they join alike kinds. Each starts as its own
@@ -340,6 +345,12 @@ reacts as a lesson's teacher does, then the held-back sentence and the rest are 
 - **Baselines.** `blind` says the commonest answer of the questions before it and reads no
   story; `frequent` says the noun the story has named most so far. The second is the bar a
   memory has to clear.
+- **Comprehension questions**, beside the cloze (John's, 2026-10-03). A cloze asks about a
+  sentence before it is told, so it measures prediction. A comprehension question asks
+  about one already told, a few sentences on, as a parent checks that a child followed:
+  'Where did Lily put the ball?'. Its answer is in the graph, so it measures what the
+  system kept and can find. Each story keeps its cloze and adds these, read as their own
+  curve. Not built yet.
 - **Refutes the target's bet:** the graphed arm's curve flat from the start, so nothing it
   learns on one story helps on the next.
 

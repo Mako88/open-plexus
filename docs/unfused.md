@@ -525,6 +525,10 @@ the store merges by id. Kill a third of the nodes mid-exam.
 - `k` hits per query and the number of recall hops.
 - The store's fusion weights: `rrf_k`, importance weight, recency weight and half-life.
 - The linked arm's shortlist size, spreading width and decay.
+- RAM against speed (John's, 2026-10-03): how much of the graph is kept in memory. Every
+  name an input touches is loaded before it is walked, so a walk runs in memory wherever
+  the dial allows. The intelligence is the same at every setting; only the hardware it
+  fits and what an answer costs change.
 
 ---
 
@@ -564,3 +568,6 @@ the store merges by id. Kill a third of the nodes mid-exam.
   prediction fails, so Phase 6's surprise signal is the likely trigger.
 - **Idle-time inference**: the system composes and writes derived assertions when no input is
   arriving, so a chain is found once rather than per question.
+- **A retryable buffer of saves.** John's, 2026-10-03, for stability at scale. Writes
+  gather in memory and go to disk in batches that are retried until they land, sized by
+  the RAM-against-speed dial, so a crash costs at most one buffer.

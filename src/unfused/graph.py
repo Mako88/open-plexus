@@ -428,30 +428,41 @@ class GraphArm:
     def mood(self, node: str) -> str:
         return self._event(node)[2]
 
-    def paths(self, start: str, goal: str, limit: int = 8,
-              avoid: set | None = None) -> list[list]:
+    def paths(self, start: str, goal: str, limit: int = 8, avoid: set | None = None,
+              most: int | None = None) -> list[list]:
         """The shortest paths from one node to another, each a list of nodes and steps
-        alternating, at most `limit` steps."""
-        found, frontier, best = [], deque([[start]]), None
-        seen = {start: 0}
-        while frontier:
-            path = frontier.popleft()
-            steps = (len(path) - 1) // 2
-            if best is not None and steps >= best:
-                continue
-            if steps >= limit:
-                continue
+        alternating, at most `limit` steps, the first `most` of them in the order the
+        nodes' steps are kept. Distances come first, from a search that copies no path;
+        then only the ways along which each node is at its distance are followed, so a
+        hub that joins every story costs its steps once, not once a path through it."""
+        dist, layer, best = {start: 0}, [start], None
+        for depth in range(1, limit + 1):
+            nxt_layer = []
+            for node in layer:
+                for _, _, nxt in self.around(node):
+                    if nxt == goal:
+                        best = depth
+                    elif nxt not in dist and not (avoid and nxt in avoid):
+                        dist[nxt] = depth
+                        nxt_layer.append(nxt)
+            if best is not None or not nxt_layer:
+                break
+            layer = nxt_layer
+        if best is None:
+            return []
+        found: list[list] = []
+
+        def walk(path: list, depth: int) -> None:
             for label, direction, nxt in self.around(path[-1]):
-                if nxt in path[::2] or (avoid and nxt in avoid and nxt != goal):
-                    continue
+                if most is not None and len(found) >= most:
+                    return
                 if nxt == goal:
-                    best = steps + 1
-                    found.append(path + [(label, direction), nxt])
-                    continue
-                if seen.get(nxt, 99) < steps + 1:
-                    continue
-                seen[nxt] = steps + 1
-                frontier.append(path + [(label, direction), nxt])
+                    if depth + 1 == best:
+                        found.append(path + [(label, direction), nxt])
+                elif depth + 1 < best and dist.get(nxt) == depth + 1:
+                    walk(path + [(label, direction), nxt], depth + 1)
+
+        walk([start], 0)
         return found
 
     # -- plans -----------------------------------------------------------------
@@ -547,7 +558,8 @@ class GraphArm:
             # path from the sticks to their number
             hook = None
             for i, node in enumerate(nodes):
-                for way in self.paths(node, f"n:{name}", limit=3, avoid=set(nodes)):
+                for way in self.paths(node, f"n:{name}", limit=3, avoid=set(nodes),
+                                      most=1):
                     if hook is None or len(way) < len(hook[2]) * 2 + 1:
                         hook = [k + 1, i, [list(st) for st in way[1::2]]]
             if hook is None:
@@ -937,7 +949,8 @@ class GraphArm:
         if not fillers:
             self.db.commit()
             return
-        found = [p for g in goals[:5] for p in self.paths(f"n:{fillers[0]}", g)]
+        # only the first twenty of the shortest are ever made plans
+        found = [p for g in goals[:5] for p in self.paths(f"n:{fillers[0]}", g, most=20)]
         shortest = min((len(p) for p in found), default=0)
         plans = [self.plan_of(p, fillers[1:]) for p in found if len(p) == shortest][:20]
         if not any(plans) and numeral(want) is not None:
@@ -1366,7 +1379,7 @@ class GraphArm:
                     way = path + [(label, direction), node]
                     if (node.startswith("n:") and direction == 1 and label in roles
                             and not said_in(node[2:], text) and all(
-                                any(self.paths(n, f"n:{f}", limit=2) for n in way[::2]
+                                any(self.paths(n, f"n:{f}", limit=2, most=1) for n in way[::2]
                                     if n.startswith("e:")) for f in fillers[1:])):
                         turns = [self.event(n)[1] for n in way[::2] if n.startswith("e:")]
                         found.append((node[2:], (max(turns, default=0),)))

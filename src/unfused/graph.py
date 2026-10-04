@@ -22,8 +22,10 @@ import hashlib
 import json
 import re
 import sqlite3
-from collections import deque
+from collections import Counter, deque
 from pathlib import Path
+
+from unfused.kinds import kinds
 
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS events (id INTEGER PRIMARY KEY, turn INTEGER NOT NULL,
@@ -91,6 +93,8 @@ DECAY = 0.5
 REACH = 100
 # how many nodes' steps one question may look at before its plans give up
 EFFORT = 200_000
+# how many hearings a kind's fit is worth beside a name's own (a Dirichlet prior's weight)
+PRIOR = 2.0
 
 
 class Spent(Exception):
@@ -386,6 +390,9 @@ class GraphArm:
         self._nodes: dict = {}
         # steps looked at by the question being answered, or None outside answering
         self.spent: int | None = None
+        # the kinds last read off the graph, and when: (episode, events then, kinds,
+        # slots each kind filled, everything each kind filled)
+        self._kinds: tuple | None = None
 
     # -- reading ---------------------------------------------------------------
 
@@ -638,6 +645,32 @@ class GraphArm:
         that finds it, so a walk from 'lily' does not come back through a Lily."""
         return node in nodes or (node.startswith("i:") and (
             f"n:{self.label(node)}" in nodes or f"n:{self.describe(node)}" in nodes))
+
+    # -- concepts ---------------------------------------------------------------
+
+    def concepts(self) -> tuple[dict, Counter, Counter]:
+        """Each label's kind (`kinds`), with what each kind filled: by (kind, verb, link)
+        and in all. Kinds are what everyone knows, so they are read again once the
+        graph has grown by a quarter, not with each episode."""
+        events = self.db.execute("SELECT COUNT(*) FROM events").fetchone()[0]
+        got = self._kinds
+        if got is None or events > got[1] * 1.25:
+            rows = [(e, lemma, link, self.label(n)) for e, lemma, link, n in self.db.execute(
+                "SELECT edges.event, events.lemma, edges.label, edges.node FROM edges JOIN "
+                "events ON events.id = edges.event WHERE edges.node NOT LIKE 'e:%' AND "
+                "edges.node NOT LIKE 'f:%'")]
+            kind = kinds(rows)
+            slots, filled = Counter(), Counter()
+            for _, lemma, link, label in rows:
+                slots[(kind[label], lemma, link)] += 1
+                filled[kind[label]] += 1
+            got = self._kinds = (self.episode(), events, kind, slots, filled)
+        return got[2], got[3], got[4]
+
+    def kind_of(self, word: str) -> int | None:
+        """The kind a label is of, learnt from how it connects; None for one never
+        heard."""
+        return self.concepts()[0].get(word)
 
     def in_mind(self, name: str, mods=()) -> str | None:
         """The individual a mention joins: the one with this label, opened in this
@@ -1689,11 +1722,16 @@ class GraphArm:
                 "edges.event WHERE edges.node NOT LIKE 'e:%' AND edges.node NOT LIKE 'f:%' "
                 "AND events.turn > ?", (self.episode(),)):
             act[node] = act.get(node, 0.0) + (now - turn + 1) ** -DECAY
-        labels = self.db.execute("SELECT COUNT(DISTINCT label) FROM edges").fetchone()[0] or 1
+        labels = self.db.execute("SELECT COUNT(DISTINCT label) FROM edges WHERE node NOT "
+                                 "LIKE 'f:%'").fetchone()[0] or 1
+        kind, slots, filled = self.concepts()
 
         def fit(name: str) -> float:
             # a share of what the name filled: in the asked verb's slot, and, much less,
-            # by the link alone, so a slot no one here filled still ranks
+            # by the link alone, so a slot no one here filled still ranks. A name heard
+            # little fits as its kind does until its own hearings decide
+            k = kind.get(name)
+            prior = slots[(k, *slot)] / filled[k] if filled[k] else 0.0
             held = self.nodes(name)
             rows = self.db.execute(
                 "SELECT edges.label, events.lemma = ?, COUNT(*) FROM edges JOIN events ON "
@@ -1702,7 +1740,8 @@ class GraphArm:
             total = sum(n for _, _, n in rows)
             here = sum(n for lab, verb, n in rows if lab == slot[1] and verb)
             link = sum(n for lab, _, n in rows if lab == slot[1])
-            return here / (total or 1) + 0.1 * (link + 0.5) / (total + 0.5 * labels)
+            return ((here + PRIOR * prior) / (total + PRIOR)
+                    + 0.1 * (link + 0.5) / (total + 0.5 * labels))
 
         asks = dict(self.db.execute("SELECT mark, n FROM asks WHERE wh = ?",
                                     (wh_word(question),)).fetchall())

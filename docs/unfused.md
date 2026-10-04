@@ -49,7 +49,13 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
   (`test_foundations.py`) is the list. In order:
   1. Individuals (DECIDED, three layers). What joins two mentions into one is the hard
      part: the parse's own marks first, learnt later. With them, adjectives come out of
-     names, and the house's rooms stay apart.
+     names, and the house's rooms stay apart. The first rule, from what a Universal
+     Dependencies parse marks in any language: an indefinite mention opens an
+     individual; a definite one (the `Definite` feature) joins the most active
+     individual with its label whose attributes its modifiers do not contradict, else
+     opens one; a proper name joins its namesake in the episode. Across episodes, nothing
+     joins until it is learnt. Fit and kinds count by label (what everyone knows);
+     focus, `matched` and pronouns work on individuals (what this story is about).
   2. Nothing the parse gives dropped: function words as links to their own kind of node
      (walks skip them), negation, modals and particles as links rather than parts of the
      lemma, pronouns kept beside what they resolve to.

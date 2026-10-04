@@ -1,14 +1,15 @@
 """Red until the system stands on what it needs (John's, 2026-10-04): every part of what
-the parser gives kept, nothing of one language held by hand, a thing apart from the
-words said of it, and kinds learnt from how words connect. THE ORDER's foundation item
-(the three layers: labels, concepts, individuals) says what each is for."""
+the parser gives kept, nothing of one language held by hand, and kinds learnt from how
+words connect. THE ORDER's foundation item (the three layers: labels, concepts,
+individuals) says what each is for. A thing apart from the words said of it held, and
+is in `tests/guards/test_individuals.py`."""
 
 import ast
 from pathlib import Path
 
 from unfused.graph import GraphArm, extract, nlp
 
-MODEL = "en_core_web_sm"
+MODEL = "en_core_web_trf"  # what every run reads with, so a test is red for the system
 SOURCE = Path(__file__).resolve().parents[2] / "src" / "unfused" / "graph.py"
 
 # words of one language that rules in the system have named: pronouns, wh-words, the
@@ -56,26 +57,6 @@ def test_nothing_the_parse_gives_is_dropped():
                     if t.startswith("n:") and len(t[2:].split()) > 1)
     assert not missing and not glued and not folded, (
         f"dropped {missing}, lemmas glued {glued}, adjectives folded into {folded}")
-
-
-def test_a_thing_is_its_own_node_apart_from_its_words(tmp_path):
-    """The individual layer: each thing an identity of its own, the words said of it
-    attached and free to change. Two stories' Lilys are two girls who share a name; the
-    still room and the sitting room are two rooms; a red ball painted blue is still the
-    one ball; 'a ball' then 'the ball' is one ball."""
-    a = arm(tmp_path)
-    for turn, text in enumerate([
-            "Lily found a ball.", "***", "Lily found a ball.", "***",
-            "Ada keeps hooks in the still room.", "Ada keeps jars in the sitting room.", "***",
-            "Tom had a red ball.", "Tom painted the ball blue.", "Tom threw the ball."]):
-        a.hear(turn, text)
-    assert hasattr(a, "individuals"), "the graph keeps no individuals apart from words"
-    assert len(a.individuals("lily")) == 2, "two stories' Lilys are two girls"
-    rooms = a.individuals("room")
-    assert len(rooms) == 2, f"the still room and the sitting room are two rooms, not {rooms}"
-    balls = a.individuals("ball", episode=True)
-    assert len(balls) == 1, f"the painted ball is one ball, not {balls}"
-    assert "blue" in a.said_of(balls[0]), "what was said of the ball last holds"
 
 
 def test_kinds_are_learnt_from_how_words_connect(tmp_path):

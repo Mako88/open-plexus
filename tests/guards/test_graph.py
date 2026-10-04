@@ -259,7 +259,7 @@ def test_a_pronoun_is_resolved_against_the_episode(tmp_path):
     assert not any(n.startswith("p:") for _, n in edges)
     # onto the individuals already heard, not new ones of the same name
     assert ("nsubj", a.individuals("tom")[0]) in edges
-    assert ("dobj", a.individuals("red ball")[0]) in edges
+    assert ("dobj", a.individuals("ball")[0]) in edges and "red" in a.said_of(a.individuals("ball")[0])
 
 
 def test_a_mention_opens_or_joins_an_individual_by_what_the_parse_marks(tmp_path):

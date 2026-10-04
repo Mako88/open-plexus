@@ -56,7 +56,7 @@ CARRIED = ("learnt", "positions")
 # every extraction kept across runs: the parser is deterministic, and the version is in
 # the key so a change to what is extracted re-reads every sentence
 CACHE = Path(__file__).resolve().parents[2] / "state" / "parses.sqlite"
-VERSION = "graph-9"
+VERSION = "graph-10"
 # every text MiniLM has encoded, by its text
 VECTORS = Path(__file__).resolve().parents[2] / "state" / "vectors.sqlite"
 # every text the parser has read, as its reading, by model and text
@@ -173,31 +173,47 @@ def vectors(texts: list[str]):
 
 
 def phrase(tok) -> str:
-    """A noun's name: its compounds and adjectives with it, no determiner or number."""
+    """A noun as described: its compounds and adjectives with it, no determiner or
+    number. What a question or a reaction names, and what finds an individual."""
     keep = [t for t in tok.children if t.dep_ in ("compound", "amod") and t.i < tok.i] + [tok]
     return " ".join(t.text for t in sorted(keep, key=lambda t: t.i)).lower()
+
+
+def called_by(tok) -> str:
+    """A noun's label: the noun alone. What its adjectives and compounds say ('the
+    still room', 'the sitting room') is said of the thing, as links of their own, so
+    two rooms are two rooms and both are rooms."""
+    return tok.lower_
+
+
+# the links by which a noun's own words describe it, as the parse names them
+DESCRIBE = ("amod", "compound")
 
 
 def extract(doc) -> list[dict]:
     """A sentence as events: [{"lemma", "edges": [[label, target], ...]}], a target being
     "n:<name>" or "e:<index into this list>". "it" and "they" are the sentence's first
-    subject that is not a pronoun."""
+    subject that is not a pronoun. Each edge to a thing has its mention beside it, in
+    "mentions" (the token's index, or None), and "things" holds each mention's label,
+    whether it opens an individual, and what its adjectives say of it."""
     first = next((t for t in doc if t.dep_ in ("nsubj", "nsubjpass") and t.pos_ != "PRON"
                   and t.lower_ not in PRONOUNS), None)
     events: list[dict] = []
     index: dict[int, int] = {}
-    # each name that is a thing, by whether a mention of it opens an individual of its
-    # own: one marked indefinite ('a ball') does, by the feature the parse marks in any
-    # language; any other joins one already in mind
-    things: dict[str, bool] = {}
+    # each mention of a thing, by its token: its label, whether it opens an individual
+    # of its own, and its adjectives. One marked indefinite ('a ball') opens one, by the
+    # feature the parse marks in any language; any other joins one already in mind
+    things: dict[int, list] = {}
 
     def thing(tok) -> str:
-        name = f"n:{phrase(tok)}"
-        if tok.pos_ in ("NOUN", "PROPN"):
-            opens = any("Ind" in c.morph.get("Definite") for c in tok.children
-                        if c.dep_ == "det")
-            things[name] = things.get(name, False) or opens
-        return name
+        if tok.pos_ not in ("NOUN", "PROPN"):
+            return f"n:{phrase(tok)}"
+        opens = any("Ind" in c.morph.get("Definite") for c in tok.children
+                    if c.dep_ == "det")
+        mods = [[c.dep_, c.lower_] for c in tok.children if c.dep_ in DESCRIBE]
+        things[tok.i] = [called_by(tok), opens, mods]
+        # the mention rides with the target until the events are written out
+        return f"n:{called_by(tok)}\x1f{tok.i}"
 
     def heads(tok) -> bool:
         # by structure, not by tag: 'Dethol shoes horses' is tagged a noun and has a
@@ -272,6 +288,13 @@ def extract(doc) -> list[dict]:
             for label, t in events[index[tok.head.i]]["edges"]:
                 if label.startswith("nsubj"):
                     ev["edges"].append([label, t])
+    # an adjective is said of its thing, as a link of its own: 'the red ball' tells the
+    # ball and that it is red, so 'red' is a node, and the ball painted blue stays one
+    # ball. The link's name is the one the parse gives it, in the order heard
+    for i, (_, _, mods) in sorted(things.items()):
+        for link, m in mods:
+            events.append({"lemma": link, "mood": "", "edges": [
+                ["self", f"n:{called_by(doc[i])}\x1f{i}"], [link, f"n:{m}"]]})
     # an event left with no edges goes, and every reference to the rest is renumbered
     kept = [i for i, e in enumerate(events) if e["edges"]]
     renumber = {f"e:{old}": f"e:{new}" for new, old in enumerate(kept)}
@@ -279,8 +302,11 @@ def extract(doc) -> list[dict]:
     for i in kept:
         edges = [[label, renumber.get(t, t)] for label, t in events[i]["edges"]
                  if not t.startswith("e:") or t in renumber]
-        out.append({"lemma": events[i]["lemma"], "mood": events[i]["mood"], "edges": edges,
-                    "things": {t: things[t] for _, t in edges if t in things}})
+        mentions = [int(t.split("\x1f")[1]) if "\x1f" in t else None for _, t in edges]
+        out.append({"lemma": events[i]["lemma"], "mood": events[i]["mood"],
+                    "edges": [[label, t.split("\x1f")[0]] for label, t in edges],
+                    "mentions": mentions,
+                    "things": {str(m): things[m] for m in mentions if m is not None}})
     return out
 
 
@@ -325,8 +351,9 @@ class GraphArm:
         self._events: dict = {}
         # every name's mark, dropped only for names a sentence names
         self._marks: dict = {}
-        # each individual's label, and each label's individuals
+        # each individual's label and how it is said, and each name's individuals
         self._labels: dict = {}
+        self._described: dict = {}
         self._nodes: dict = {}
         # steps looked at by the question being answered, or None outside answering
         self.spent: int | None = None
@@ -399,35 +426,53 @@ class GraphArm:
                     if t.startswith("p:")}
         # each thing the sentence names, as an individual: one opened here, or the one
         # in mind it joins. Its id is where it was first heard, so a run reproduces it
-        opens: dict[str, bool] = {}
+        mentions: dict[str, list] = {}
         for ev in events:
-            for t, o in ev.get("things", {}).items():
-                opens[t] = opens.get(t, False) or o
+            mentions.update(ev.get("things", {}))
         fresh = self.db.execute("SELECT COUNT(*) FROM called WHERE turn = ?",
                                 (turn,)).fetchone()[0]
-        for t, o in opens.items():
-            node = None if o else self.in_mind(t[2:])
+        who: dict[str, str] = {}
+        here: list[tuple[str, set, str]] = []
+        for m, (name, opens, mods) in sorted(mentions.items(), key=lambda kv: int(kv[0])):
+            mods = [w for _, w in mods]
+            node = None
+            if not opens:
+                # one named earlier in this sentence first, then the episode's
+                node = next((n for lab, said, n in here if lab == name and set(mods) <= said),
+                            None) or self.in_mind(name, mods)
             if node is None:
                 node, fresh = f"i:{turn}.{fresh}", fresh + 1
-                self.db.execute("INSERT INTO called VALUES (?, ?, ?)", (node, t[2:], turn))
-                self._nodes.pop(t[2:], None)
-            resolved[t] = node
+                self.db.execute("INSERT INTO called VALUES (?, ?, ?)", (node, name, turn))
+            here.append((name, set(mods), node))
+            who[m] = node
         ids = []
+        # the words of what this sentence touched: a name or a description holding none
+        # of them stands for what it stood for before
+        touched: set[str] = set()
         for ev in events:
             cur = self.db.execute("INSERT INTO events (turn, lemma, heard, mood) VALUES "
                                   "(?, ?, ?, ?)", (turn, ev["lemma"], text, ev["mood"]))
             ids.append(cur.lastrowid)
         for ev, eid in zip(events, ids):
-            for label, t in ev["edges"]:
-                node = f"e:{ids[int(t[2:])]}" if t.startswith("e:") else resolved.get(t, t)
+            for (label, t), m in zip(ev["edges"], ev.get("mentions", [None] * len(ev["edges"]))):
+                node = (f"e:{ids[int(t[2:])]}" if t.startswith("e:") else
+                        who[str(m)] if m is not None else resolved.get(t, t))
                 if node is None:
                     continue
                 self.db.execute("INSERT INTO edges VALUES (?, ?, ?)", (eid, label, node))
                 self._steps.pop(node, None)
                 self._steps.pop(f"e:{eid}", None)
+                self._described.pop(node, None)
                 if (name := self.label(node)) is not None:
                     self._steps.pop(f"n:{name}", None)
                     self._marks.pop(name, None)
+                    touched.update(name.split())
+        for key in [k for k in self._nodes
+                    if touched & set((k[1] if isinstance(k, tuple) else k).split())]:
+            del self._nodes[key]
+        # a description's steps are its individuals', and what was said of them changed
+        for key in [k for k in self._steps if k.startswith("n:") and " " in k]:
+            del self._steps[key]
         for t, node in resolved.items():
             if node is not None and t.startswith("p:"):
                 # agreement is what everyone knows, so it is counted by label
@@ -444,7 +489,7 @@ class GraphArm:
         want = "nsubj" if pronoun != "it" else None
         for node, label in self.db.execute(
                 "SELECT edges.node, edges.label FROM edges JOIN events ON events.id = "
-                "edges.event WHERE events.turn > ? AND edges.node NOT LIKE 'e:%' "
+                "edges.event WHERE events.turn > ? AND edges.node LIKE 'i:%' "
                 "ORDER BY edges.event DESC LIMIT 200", (self.episode(),)):
             if (want and not label.startswith(want)) or (not want and (
                     label.startswith("nsubj") or label == "self")):
@@ -459,8 +504,12 @@ class GraphArm:
     # -- the graph -------------------------------------------------------------
 
     def holding(self, word: str) -> list[str]:
-        """The names that hold a word whole: 'ochre colour' for 'ochre'."""
-        return [f"n:{n}" for n in self.names_like(f"%{word}%") if said_in(word, n)]
+        """The names that hold a word whole: 'ochre colour' for 'ochre', and a
+        description that finds something: 'still room'."""
+        out = [f"n:{n}" for n in self.names_like(f"%{word}%") if said_in(word, n)]
+        if f"n:{word}" not in out and self.known(word):
+            out.append(f"n:{word}")
+        return out
 
     def names_like(self, like: str = "%") -> list[str]:
         """The names heard, as labels of individuals or as words held themselves."""
@@ -496,31 +545,84 @@ class GraphArm:
     def nodes(self, name: str) -> list[str]:
         """Everything a name stands for: the name itself, where it is held as a word
         ('red', '3'), and each individual it labels, the latest first. An index, so a
-        walk from a name reaches every individual it labels without holding a copy."""
+        walk from a name reaches every individual it labels without holding a copy.
+        Where no individual has the name as its label, it is read as a description:
+        the longest run of its words that is a label, and the individuals of that label
+        of which every other word was said ('still room' finds the room said to be
+        still, in whatever order the words came)."""
         got = self._nodes.get(name)
         if got is None:
-            got = self._nodes[name] = [f"n:{name}"] + [n for (n,) in self.db.execute(
-                "SELECT node FROM called WHERE name = ? ORDER BY turn DESC", (name,))]
+            got = [f"n:{name}"] + self.labelled(name)
+            words = name.split()
+            for size in range(len(words) - 1, 0, -1) if len(got) == 1 else ():
+                found = []
+                for at in range(len(words) - size + 1):
+                    rest = set(words[:at] + words[at + size:])
+                    found += [n for n in self.labelled(" ".join(words[at:at + size]))
+                              if rest <= set(self.said_of(n))]
+                if found:
+                    got += found
+                    break
+            self._nodes[name] = got
+            self._nodes[("set", name)] = set(got)
+        return got
+
+    def labelled(self, name: str) -> list[str]:
+        return [n for (n,) in self.db.execute(
+            "SELECT node FROM called WHERE name = ? ORDER BY turn DESC", (name,))]
+
+    def said_of(self, node: str) -> list[str]:
+        """What was said of an individual, the latest first: the adjectives it was heard
+        with, and what a clause made it or called it ('painted the ball blue', 'the ball
+        was red'), by the links the parse gives those."""
+        return [n[2:] for (n,) in self.db.execute(
+            "SELECT b.node FROM edges a JOIN edges b ON a.event = b.event WHERE a.node = ? "
+            "AND b.label IN ('amod', 'compound', 'acomp', 'oprd') AND b.node LIKE 'n:%' "
+            "GROUP BY b.node ORDER BY MAX(b.event) DESC", (node,))]
+
+    def describe(self, node: str) -> str:
+        """How an individual is said: its own words in the order first heard, then its
+        label ('still room'), so an answer tells apart what its label alone would not."""
+        if not node.startswith("i:"):
+            return self.label(node) or node
+        got = self._described.get(node)
+        if got is None:
+            mods = [n[2:] for (n,) in self.db.execute(
+                "SELECT b.node FROM edges a JOIN edges b ON a.event = b.event WHERE "
+                "a.node = ? AND a.label = 'self' AND b.label IN ('amod', 'compound') "
+                "GROUP BY b.node "
+                "ORDER BY MIN(b.event)", (node,))]
+            got = self._described[node] = " ".join(mods + [self.label(node)])
         return got
 
     def is_(self, node: str, goal: str) -> bool:
-        """Whether a node is the goal, or an individual the goal's name labels."""
-        return node == goal or (goal.startswith("n:") and node.startswith("i:")
-                                and self.label(node) == goal[2:])
+        """Whether a node is the goal, or an individual the goal's name finds."""
+        if node == goal:
+            return True
+        if not (goal.startswith("n:") and node.startswith("i:")):
+            return False
+        self.nodes(goal[2:])
+        return node in self._nodes[("set", goal[2:])]
 
     def among(self, node: str, nodes) -> bool:
-        """Whether a walk has been at a node already: at it, or at the name labelling it,
-        so a walk from 'lily' does not come back through a Lily."""
-        return node in nodes or (node.startswith("i:") and f"n:{self.label(node)}" in nodes)
+        """Whether a walk has been at a node already: at it, or at a name or description
+        that finds it, so a walk from 'lily' does not come back through a Lily."""
+        return node in nodes or (node.startswith("i:") and (
+            f"n:{self.label(node)}" in nodes or f"n:{self.describe(node)}" in nodes))
 
-    def in_mind(self, name: str) -> str | None:
-        """The individual a name joins: the one with this label, opened in this episode,
-        mentioned latest. Across episodes nothing joins until joining is learnt."""
-        row = self.db.execute(
-            "SELECT edges.node FROM edges JOIN called ON called.node = edges.node WHERE "
-            "called.name = ? AND called.turn > ? ORDER BY edges.event DESC LIMIT 1",
-            (name, self.episode())).fetchone()
-        return row[0] if row else None
+    def in_mind(self, name: str, mods=()) -> str | None:
+        """The individual a mention joins: the one with this label, opened in this
+        episode, mentioned latest, of which every adjective the mention has was said
+        already. Until concepts say which adjectives exclude each other, one never said
+        of it is read as contradicting it, so an unsure mention opens rather than
+        merges. Across episodes nothing joins until joining is learnt."""
+        for (node,) in self.db.execute(
+                "SELECT edges.node FROM edges JOIN called ON called.node = edges.node WHERE "
+                "called.name = ? AND called.turn > ? GROUP BY edges.node "
+                "ORDER BY MAX(edges.event) DESC LIMIT 20", (name, self.episode())):
+            if set(mods) <= set(self.said_of(node)):
+                return node
+        return None
 
     def individuals(self, name: str, episode: bool = False) -> list[str]:
         """The individuals a name labels, the latest first, this episode's alone with
@@ -874,7 +976,7 @@ class GraphArm:
             if not end.startswith("e:"):
                 # the most recent thing that happened to the first name first, then what
                 # followed from it: the football's last event, then its carrier's move
-                out.append((self.label(end), turns))
+                out.append((self.describe(end), turns))
         return out
 
     def signature(self, question: str, fillers: list[str]) -> list[str]:
@@ -1512,22 +1614,24 @@ class GraphArm:
                 (lemma, self.episode())).fetchall():
             # a possessed noun ('her veil') is an event of its own whose `self` is the
             # name, so an argument is read through it
-            edges = [(label, self.label(name)) for label, node in self.db.execute(
+            edges = [(label, n) for label, node in self.db.execute(
                 "SELECT label, node FROM edges WHERE event = ?", (eid,)).fetchall()
-                for name in ([n for lab, d, n in self.around(node)
-                              if lab == "self" and d == 1] if node.startswith("e:")
-                             else [node])]
-            if not all((label, name) in edges for label, name in bound):
+                for n in ([n for lab, d, n in self.around(node)
+                           if lab == "self" and d == 1] if node.startswith("e:")
+                          else [node])]
+            if not all(any(lab == label and self.is_(n, f"n:{name}") for lab, n in edges)
+                       for label, name in bound):
                 continue
             # each other name the question says is two steps from the event or nearer
-            near = {self.label(n) for _, _, a in self.around(f"e:{eid}") for n in
+            near = {n for _, _, a in self.around(f"e:{eid}") for n in
                     [a] + ([b for _, d, b in self.around(a) if d == 1]
                            if a.startswith("e:") else [])}
-            if not all(n in near for n in named):
+            if not all(any(self.is_(x, f"n:{n}") for x in near) for n in named):
                 continue
-            for label, name in edges:
-                if label in free and name is not None and not said_in(name, question):
-                    return name
+            for label, node in edges:
+                if label in free and not node.startswith("e:") and not said_in(
+                        said := self.describe(node), question):
+                    return said
         return None
 
     def focused(self, question: str) -> str | None:
@@ -1554,8 +1658,7 @@ class GraphArm:
                 "SELECT edges.node, events.turn FROM edges JOIN events ON events.id = "
                 "edges.event WHERE edges.node NOT LIKE 'e:%' AND events.turn > ?",
                 (self.episode(),)):
-            name = self.label(node)
-            act[name] = act.get(name, 0.0) + (now - turn + 1) ** -DECAY
+            act[node] = act.get(node, 0.0) + (now - turn + 1) ** -DECAY
         labels = self.db.execute("SELECT COUNT(DISTINCT label) FROM edges").fetchone()[0] or 1
 
         def fit(name: str) -> float:
@@ -1579,8 +1682,16 @@ class GraphArm:
             mark = self.mark(name)
             return 0.5 if mark is None else (asks.get(mark, 0) + 1) / (sum(asks.values()) + 2)
 
-        return {n: (a, fit(n), asked_for(n)) for n, a in act.items()
-                if not said_in(n, question) and n not in ("what", "who")}
+        # in mind as an individual, said by its description; how it fits and what it
+        # is asked for are what everyone knows, so they are read by its label
+        out: dict[str, tuple[float, float, float]] = {}
+        for node, a in act.items():
+            said, name = self.describe(node), self.label(node)
+            if said_in(said, question) or said in ("what", "who"):
+                continue
+            was = out.get(said)
+            out[said] = (a + (was[0] if was else 0.0), fit(name), asked_for(name))
+        return out
 
     def mark(self, name: str) -> str | None:
         """How a name is written where it is heard: 'capital' where its last word is
@@ -1672,11 +1783,11 @@ class GraphArm:
                         continue
                     way = path + [(label, direction), node]
                     if (not node.startswith("e:") and direction == 1 and label in roles
-                            and not said_in(self.label(node), text) and all(
+                            and not said_in(self.describe(node), text) and all(
                                 any(self.paths(n, f"n:{f}", limit=2, most=1) for n in way[::2]
                                     if n.startswith("e:")) for f in fillers[1:])):
                         turns = [self.event(n)[1] for n in way[::2] if n.startswith("e:")]
-                        found.append((self.label(node), (max(turns, default=0),)))
+                        found.append((self.describe(node), (max(turns, default=0),)))
                     nxt.append(way)
             if found:
                 return found
@@ -1788,7 +1899,7 @@ class GraphArm:
                 continue
             turns = [self.event(n)[1] for n in got.values()
                      if n.startswith("e:") and not self.mood(n)]
-            out.append((self.label(end), (max(turns, default=0),)))
+            out.append((self.describe(end), (max(turns, default=0),)))
         return out
 
     def apart(self, text: str, depth: int) -> str | None:

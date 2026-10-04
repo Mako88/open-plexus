@@ -70,19 +70,28 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
      treebanks (Stanza marks `PronType=Int` and `Polarity=Neg`). The parser is a dial;
      which way is John's to say. Number words have no feature in either and are learnt.
 - **After the foundation.** John's, 2026-10-04, in order:
-  1. Every missed check read and sorted by cause: the parser's misreading, a fault in
-     the system (a told fact it holds and does not find), or a malformed question. Only
-     the second is the system's to fix; the third is fixed only where the question is
-     wrong, never because it is missed.
+  1. ~~Every missed check read and sorted by cause~~. Struck 2026-10-04 (`a69e59ad`,
+     `384c1d53`): of 14 at 300 stories, 7 the system's (fixed but two), 5 ambiguous,
+     2 malformed.
   2. Size: 3,000 stories parsed ahead (`scripts/preparse.py`), one run profiled, and its
      hotspots fixed in the order the profile ranks them, until a 3,000-story reading
      takes about ten minutes. Answering is meant to cost what is in mind plus a bounded
      number of index lookups, as recall by cue does, never a scan of a label's history.
-  3. Harder checks: further from their sentence, needing two told facts, about what
-     changed, and early stories asked late.
+     Hearing and teaching are done (`bc5a61ca`: 34% less CPU at 1,000 stories). Per
+     question it still rises with history (0.013 s to 0.22 s): answering through
+     borrowed shapes (`nearest`, pushback #4), `follow` and `paths` are next. The
+     pre-parse of 3,000 stories is about 80% through (`scripts/preparse.py` resumes).
+  3. A check that more than one telling answers accepts every answer they support
+     (DECIDED with John, 2026-10-04: a question with several right answers is a real
+     form, and scoring one of them as the only right one was a fault in the test, not a
+     hard question). Five of the seven missed checks at 300 stories are this.
+  4. Harder checks, one at a time and each measured alone: further from their sentence
+     (5 to 15 sentences on), needing two told facts, about what changed, and early
+     stories asked late.
   Then John's two nearest goals (2026-10-04): a conversation with the system (the
   mouth, the graphed arm's item 2), and worlds it acts in, its output heard back as
-  input. Beside both, idle inference that feeds itself (OPEN FORKS), its conclusions
+  input. The first world is TextWorld (Microsoft's text adventures), and saying
+  commands is its prerequisite, which a conversation brings. Beside both, idle inference that feeds itself (OPEN FORKS), its conclusions
   marked as derived and kept only while later tellings bear them out, so a loop that
   hears itself does not harden its own mistakes.
 - **The stream.** John's, 2026-10-03. The target is the TinyStories stream (THE
@@ -549,7 +558,11 @@ Importance is measured, never asked for. Two sensors: surprise at writing, read 
 faculty's per-token loss on the sentence given what memory recalls for it, so that news is
 surprising and a thing heard before is not (read alone, the 1.7B scores filler and facts
 alike); and use at recall, where an assertion used in an answer gains weight. Forgetting is
-what falls below the recall floor, never a deletion.
+what falls below the recall floor, never a deletion. Recency and use are one mechanism,
+not two (John's, 2026-10-04): ACT-R's base-level activation, the sum over every use of
+the time since it to the power of minus the decay, which focus already reads. A name's
+steps are then returned by activation rather than by recency alone, once answers credit
+the events they rested on.
 
 - **Refutes:** surprise-weighted recall does no better than uniform importance on a house long
   enough that uniform recall degrades.

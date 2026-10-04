@@ -3,7 +3,7 @@
 from unfused.exam.world import Question
 from unfused.graph import GraphArm, extract, nlp
 
-MODEL = "en_core_web_sm"
+MODEL = "stanza"
 
 
 def q(text, answer=None):
@@ -261,7 +261,7 @@ def test_a_pronoun_is_resolved_against_the_episode(tmp_path):
     assert not any(n.startswith("p:") for _, n in edges)
     # onto the individuals already heard, not new ones of the same name
     assert ("nsubj", a.individuals("tom")[0]) in edges
-    assert ("dobj", a.individuals("ball")[0]) in edges and "red" in a.said_of(a.individuals("ball")[0])
+    assert ("obj", a.individuals("ball")[0]) in edges and "red" in a.said_of(a.individuals("ball")[0])
 
 
 def test_a_mention_opens_or_joins_an_individual_by_what_the_parse_marks(tmp_path):
@@ -275,7 +275,7 @@ def test_a_mention_opens_or_joins_an_individual_by_what_the_parse_marks(tmp_path
     first, second = sorted(a.individuals("ball"))[:2]
     thrown = a.db.execute("SELECT edges.node FROM edges JOIN events ON events.id = "
                           "edges.event WHERE events.lemma = 'throw' AND edges.label = "
-                          "'dobj'").fetchone()[0]
+                          "'obj'").fetchone()[0]
     assert thrown == first != second
 
 
@@ -308,6 +308,6 @@ def test_a_question_is_matched_as_an_event_with_one_slot_free(tmp_path):
 def test_a_blank_is_read_as_the_slot_it_stands_in(tmp_path):
     a = arm(tmp_path)
     # read as a clause of its own, as a word joined to another, through a particle
-    assert a.blank("She sat down and read what?") == ("read", "dobj")
+    assert a.blank("She sat down and read what?") == ("read", "obj")
     assert a.blank("In the end, Tom and what had a great time?") == ("have", "nsubj")
     assert a.blank("The man brought him back to what?") == ("bring", "prep:to")

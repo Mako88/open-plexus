@@ -51,6 +51,12 @@ CREATE TABLE IF NOT EXISTS contexts (word TEXT PRIMARY KEY, names TEXT NOT NULL,
 CREATE TABLE IF NOT EXISTS called (node TEXT NOT NULL, name TEXT NOT NULL,
     turn INTEGER NOT NULL, PRIMARY KEY (node, name));
 CREATE INDEX IF NOT EXISTS called_name ON called (name);
+CREATE TABLE IF NOT EXISTS heard_as (name TEXT NOT NULL, pos TEXT NOT NULL,
+    n INTEGER NOT NULL, PRIMARY KEY (name, pos));
+CREATE TABLE IF NOT EXISTS circumstances (wh TEXT NOT NULL, link TEXT NOT NULL,
+    n INTEGER NOT NULL, PRIMARY KEY (wh, link));
+CREATE TABLE IF NOT EXISTS counts (shape TEXT NOT NULL, walk TEXT NOT NULL,
+    word TEXT NOT NULL, size INTEGER NOT NULL);
 """
 # what a taught arm carries to the next conversation: no facts, only how to read and ask
 CARRIED = ("learnt", "positions")
@@ -58,26 +64,26 @@ CARRIED = ("learnt", "positions")
 # every extraction kept across runs: the parser is deterministic, and the version is in
 # the key so a change to what is extracted re-reads every sentence
 CACHE = Path(__file__).resolve().parents[2] / "state" / "parses.sqlite"
-VERSION = "graph-11"
+VERSION = "graph-12"
 # every text MiniLM has encoded, by its text
 VECTORS = Path(__file__).resolve().parents[2] / "state" / "vectors.sqlite"
 # every text the parser has read, as its reading, by model and text
 DOCS = Path(__file__).resolve().parents[2] / "state" / "docs.sqlite"
 
-# a clause's links that are not arguments
-SKIP = {"punct", "det", "aux", "auxpass", "cc", "mark", "neg", "intj", "case", "dep",
-        "advmod", "prt", "predet", "preconj", "expl", "attr_of"}
-PRONOUNS = {"it", "they", "them", "its", "their", "he", "she", "him", "her", "his"}
-# the links 'where' can stand in
-PLACES = ("in", "on", "under", "into", "onto", "at", "behind", "near", "inside", "to",
-          "over", "by", "from", "through")
+# a clause's links that are not arguments, as Universal Dependencies names them: each is
+# kept as a link to a function word's node, which walks skip
+SKIP = {"punct", "det", "det:predet", "aux", "aux:pass", "cc", "cc:preconj", "mark",
+        "discourse", "case", "dep", "advmod", "compound:prt", "expl", "expl:pv", "cop",
+        "fixed", "goeswith", "reparandum", "list", "orphan"}
 # the links that start a clause of its own
-CLAUSES = {"conj", "advcl", "ccomp", "xcomp", "relcl", "acl", "parataxis", "csubj"}
+CLAUSES = {"conj", "advcl", "ccomp", "xcomp", "acl", "acl:relcl", "parataxis", "csubj",
+           "csubj:pass"}
 # the links a blank can stand in, besides a preposition's
-BLANKS = {"nsubj", "nsubjpass", "dobj", "dative", "oprd", "pobj", "appos"}
-# each pronoun's form as a subject: what agreement is counted by
-PERSON = {"him": "he", "his": "he", "her": "she", "them": "they", "their": "they",
-          "its": "it"}
+BLANKS = {"nsubj", "nsubj:pass", "obj", "iobj", "xcomp", "appos", "nmod:poss", "attr",
+          "acomp"}
+# the parser every reading is taken with, and where its models are kept
+PARSER = "stanza"
+STANZA = Path(__file__).resolve().parents[2] / "state" / "stanza"
 
 _NLP: dict = {}
 # texts read this run, and the open store of readings
@@ -105,11 +111,53 @@ _ENCODER: dict = {}
 
 
 def nlp(model: str):
+    """The parser, as a function from text to a spaCy `Doc`. Stanza's reading carries the
+    Universal Dependencies relations and features (`PronType=Int`, `Polarity=Neg`,
+    `Definite`), which mark in any language what a rule on a word would otherwise hold
+    by hand."""
     if model not in _NLP:
-        import spacy
+        if model == "stanza":
+            _NLP[model] = _stanza()
+        else:
+            import spacy
 
-        _NLP[model] = spacy.load(model)
+            _NLP[model] = spacy.load(model)
     return _NLP[model]
+
+
+def _stanza():
+    import spacy
+    import stanza
+    from spacy.tokens import Doc
+
+    pipe = stanza.Pipeline("en", dir=str(STANZA), processors="tokenize,mwt,pos,lemma,"
+                           "depparse", download_method=None, verbose=False)
+    vocab = spacy.blank("xx").vocab
+
+    def read(text: str):
+        words, spaces, heads, deps, pos, tags, lemmas, morphs, starts = ([] for _ in range(9))
+        for sent in pipe(text).sentences:
+            base = len(words)
+            tokens = sent.tokens
+            for n, tok in enumerate(tokens):
+                after = tokens[n + 1].start_char if n + 1 < len(tokens) else None
+                for j, w in enumerate(tok.words):
+                    words.append(w.text)
+                    last = j == len(tok.words) - 1
+                    spaces.append(bool(last and after is not None and after > tok.end_char)
+                                  or (last and after is None and n + 1 == len(tokens)
+                                      and False))
+                    heads.append(base + (w.head - 1 if w.head else w.id - 1))
+                    deps.append("ROOT" if w.deprel == "root" else w.deprel)
+                    pos.append(w.upos)
+                    tags.append(w.xpos or "")
+                    lemmas.append(w.lemma or w.text)
+                    morphs.append(w.feats or "")
+                    starts.append(len(words) - 1 == base)
+        return Doc(vocab, words=words, spaces=spaces, heads=heads, deps=deps, pos=pos,
+                   tags=tags, lemmas=lemmas, morphs=morphs, sent_starts=starts)
+
+    return read
 
 
 def parse(model: str, text: str):
@@ -130,9 +178,8 @@ def parse(model: str, text: str):
         _DOCS_DB["db"].execute("PRAGMA synchronous=OFF")
         _DOCS_DB["db"].execute("CREATE TABLE IF NOT EXISTS docs (key TEXT PRIMARY KEY, "
                                "doc BLOB NOT NULL)")
-        # a blank English vocabulary still knows what a word is: its lower case, and
-        # whether it is like a number
-        _DOCS_DB["vocab"] = spacy.blank("en").vocab
+        # a vocabulary of no one language: a word's lower case and nothing else
+        _DOCS_DB["vocab"] = spacy.blank("xx").vocab
     db = _DOCS_DB["db"]
     row = db.execute("SELECT doc FROM docs WHERE key = ?", (key,)).fetchone()
     if row is not None:
@@ -177,9 +224,9 @@ def vectors(texts: list[str]):
 
 
 def phrase(tok) -> str:
-    """A noun as described: its compounds and adjectives with it, no determiner or
-    number. What a question or a reaction names, and what finds an individual."""
-    keep = [t for t in tok.children if t.dep_ in ("compound", "amod") and t.i < tok.i] + [tok]
+    """A noun as described: its own words with it, no determiner or number. What a
+    question or a reaction names, and what finds an individual."""
+    keep = [t for t in tok.children if t.dep_ in DESCRIBE] + [tok]
     return " ".join(t.text for t in sorted(keep, key=lambda t: t.i)).lower()
 
 
@@ -191,55 +238,96 @@ def called_by(tok) -> str:
 
 
 # the links by which a noun's own words describe it, as the parse names them
-DESCRIBE = ("amod", "compound")
+DESCRIBE = ("amod", "compound", "flat")
+
+
+def feature(tok, name: str) -> list[str]:
+    return tok.morph.get(name)
+
+
+def personal(tok) -> bool:
+    """A personal pronoun, by what the parse marks: 'she', 'it', 'them'."""
+    return tok.pos_ == "PRON" and "Prs" in feature(tok, "PronType")
+
+
+def asking(tok) -> bool:
+    """A word that asks, or relates a clause: 'who', 'where', 'which'."""
+    return bool({"Int", "Rel"} & set(feature(tok, "PronType")))
+
+
+def negates(tok) -> bool:
+    return "Neg" in feature(tok, "Polarity")
+
+
+def agreement(tok) -> str:
+    """What a pronoun agrees in, by its features less its case: 'him' and 'he' agree."""
+    return "|".join(f"{k}={v}" for k, v in sorted(tok.morph.to_dict().items())
+                    if k not in ("Case", "PronType", "Poss", "Reflex"))
+
+
+def mood(tok) -> str:
+    """What did not happen, and what only might or will, by what the parse marks: a
+    negation (`Polarity=Neg`), and an auxiliary marked finite with no mood of its own,
+    as a modal is ('might', 'will') where 'did' and 'has' are indicative."""
+    return " ".join(c.lemma_.lower() for c in tok.children
+                    if negates(c) or (c.dep_ == "aux" and "Fin" in feature(c, "VerbForm")
+                                      and not feature(c, "Mood")))
+
+
+def link(c) -> str:
+    """The link an argument hangs by: an oblique or a nominal modifier by its case
+    word ('prep:in' for 'in the room'), anything else by its relation."""
+    case = [k.lower_ for k in c.children if k.dep_ == "case"]
+    if case and (c.dep_.startswith("obl") or (c.dep_.startswith("nmod")
+                                               and c.dep_ != "nmod:poss")):
+        return "prep:" + " ".join(case)
+    return c.dep_
 
 
 def extract(doc) -> list[dict]:
     """A sentence as events: [{"lemma", "edges": [[label, target], ...]}], a target being
-    "n:<name>" or "e:<index into this list>". "it" and "they" are the sentence's first
-    subject that is not a pronoun. Each edge to a thing has its mention beside it, in
-    "mentions" (the token's index, or None), and "things" holds each mention's label,
-    whether it opens an individual, and what its adjectives say of it."""
-    first = next((t for t in doc if t.dep_ in ("nsubj", "nsubjpass") and t.pos_ != "PRON"
-                  and t.lower_ not in PRONOUNS), None)
+    "n:<name>", "e:<index into this list>" or "f:<a function word>". A personal pronoun
+    with something to refer to in its own sentence is that sentence's first subject.
+    Each edge to a thing has its mention beside it, in "mentions" (the token's index, or
+    None), and "things" holds each mention's label, whether it opens an individual, and
+    what its own words say of it."""
+    first = next((t for t in doc if t.dep_ in ("nsubj", "nsubj:pass") and t.pos_ != "PRON"),
+                 None)
     events: list[dict] = []
     index: dict[int, int] = {}
     # each mention of a thing, by its token: its label, whether it opens an individual
-    # of its own, and its adjectives. One marked indefinite ('a ball') opens one, by the
+    # of its own, and its own words. One marked indefinite ('a ball') opens one, by the
     # feature the parse marks in any language; any other joins one already in mind
     things: dict[int, list] = {}
 
     def thing(tok) -> str:
         if tok.pos_ not in ("NOUN", "PROPN"):
             return f"n:{phrase(tok)}"
-        opens = any("Ind" in c.morph.get("Definite") for c in tok.children
-                    if c.dep_ == "det")
+        opens = any("Ind" in feature(c, "Definite") for c in tok.children if c.dep_ == "det")
         mods = [[c.dep_, c.lower_] for c in tok.children if c.dep_ in DESCRIBE]
-        things[tok.i] = [called_by(tok), opens, mods]
+        things[tok.i] = [called_by(tok), opens, mods, tok.pos_]
         # the mention rides with the target until the events are written out
         return f"n:{called_by(tok)}\x1f{tok.i}"
 
     def heads(tok) -> bool:
-        # by structure, not by tag: 'Dethol shoes horses' is tagged a noun and has a
-        # subject and an object, and '22 years old' hangs a number off an adjective
-        # a preposition's object is its head's argument, never an event of its own
-        return tok.dep_ not in ("prep", "dative", "agent") and any(
-            c.dep_ not in SKIP and c.dep_ not in ("compound", "amod", "conj")
-            for c in tok.children)
+        # by structure, not by tag: anything with an argument of its own is an event
+        return any(c.dep_ not in SKIP and c.dep_ not in DESCRIBE and c.dep_ != "conj"
+                   for c in tok.children)
 
     for tok in doc:
         if heads(tok):
             index[tok.i] = len(events)
-            # the verb alone is its lemma, so 'will not give back' and 'gave' are one verb.
-            # What did not happen, and what only might or will, is marked on the event by
-            # the words the parse marks as such, and plans learn which moods they follow;
-            # the words themselves are links of their own, as every function word is
-            mood = [c.lemma_.lower() for c in tok.children
-                    if (c.dep_ == "aux" and c.tag_ == "MD") or c.dep_ == "neg"]
-            events.append({"lemma": tok.lemma_.lower(), "mood": " ".join(mood), "edges": []})
-            # the word as heard, where it is not the lemma: 'was', 'gave', the inflection a
-            # mouth will say again
-            if tok.lower_ != tok.lemma_.lower():
+            # a predicate with a copula is the copula's event ('the ball was red' is a
+            # 'be' with the ball and red), as a verb's is the verb's; the copula's word
+            # is kept as its link
+            cop = next((c for c in tok.children if c.dep_ == "cop"), None)
+            lemma = (cop or tok).lemma_.lower()
+            # the verb alone is its lemma, so 'will not give back' and 'gave' are one verb;
+            # what did not happen or only might is marked on the event
+            events.append({"lemma": lemma, "mood": mood(tok), "edges": []})
+            # the word as heard, where it is not the lemma: the inflection a mouth will
+            # say again
+            if cop is None and tok.lower_ != lemma:
                 events[-1]["edges"].append(["form", f"f:{tok.lower_}"])
 
     def keep(ev: dict, label: str, tok) -> None:
@@ -249,7 +337,7 @@ def extract(doc) -> list[dict]:
         # own, as the event it is
         if tok.i in index:
             return
-        if tok.pos_ == "PRON" or tok.lower_ in PRONOUNS:
+        if personal(tok) and "3" in feature(tok, "Person"):
             ev["edges"].append([label, f"f:{tok.lower_}"])
         for c in tok.children:
             if c.dep_ in SKIP and c.dep_ != "punct":
@@ -258,61 +346,54 @@ def extract(doc) -> list[dict]:
     def target(tok) -> str | None:
         if tok.i in index:
             return f"e:{index[tok.i]}"
-        if tok.lower_ in PRONOUNS:
+        if personal(tok):
+            # the speaker and the one spoken to are no one heard of before: only a third
+            # person refers back
+            if "3" not in feature(tok, "Person"):
+                return f"f:{tok.lower_}"
             # one with nothing to refer to in its own sentence is resolved when heard,
-            # against the episode
+            # against the episode, by what it agrees in and the slot it fills
             if first is not None:
                 return thing(first)
-            return f"p:{PERSON.get(tok.lower_, tok.lower_)}"
-        if tok.pos_ in ("NOUN", "PROPN", "NUM", "ADJ") or tok.like_num:
+            return f"p:{tok.dep_}|{agreement(tok)}"
+        if tok.pos_ in ("NOUN", "PROPN", "NUM", "ADJ") or "Card" in feature(tok, "NumType"):
             return thing(tok)
-        return None
+        # any other word is kept, as a function word is
+        return f"f:{tok.lower_}"
 
     for tok in doc:
         if tok.i not in index:
             continue
         ev = events[index[tok.i]]
-        if tok.pos_ in ("NOUN", "PROPN", "ADJ") and not any(
+        cop = any(c.dep_ == "cop" for c in tok.children)
+        if cop:
+            # the predicate is the copula's argument: 'red', 'a girl', or 'in the park',
+            # by its case word as an oblique is; its own function words are the event's
+            case = [k.lower_ for k in tok.children if k.dep_ == "case"]
+            label = "prep:" + " ".join(case) if case else (
+                "acomp" if tok.pos_ == "ADJ" else "attr")
+            ev["edges"].append([label, thing(tok)])
+        elif tok.pos_ in ("NOUN", "PROPN", "ADJ") and not any(
                 c.dep_.startswith("nsubj") for c in tok.children):
             ev["edges"].append(["self", thing(tok)])
             keep(ev, "self", tok)
         for c in tok.children:
-            if c.dep_ in ("prep", "dative", "agent"):
-                for p in c.children:
-                    if p.dep_ == "pobj" and (t := target(p)):
-                        ev["edges"].append([f"prep:{c.lower_}", t])
-                        keep(ev, f"prep:{c.lower_}", p)
-                        for cc in p.children:
-                            if cc.dep_ == "conj" and (t2 := target(cc)):
-                                ev["edges"].append([f"prep:{c.lower_}", t2])
-                                keep(ev, f"prep:{c.lower_}", cc)
-                if c.dep_ == "dative" and not any(p.dep_ == "pobj" for p in c.children):
-                    if t := target(c):
-                        ev["edges"].append(["dative", t])
-                        keep(ev, "dative", c)
+            if c.dep_ in DESCRIBE:
                 continue
-            if c.dep_ in SKIP or c.dep_ == "compound" or c.dep_ == "amod":
+            if c.dep_ in SKIP:
                 # a function word is kept as a link to a node of its own kind ('did',
                 # 'not', 'back', 'because'), which walks skip
-                if c.dep_ in SKIP and c.dep_ != "punct":
+                if c.dep_ != "punct":
                     ev["edges"].append([c.dep_, f"f:{c.lower_}"])
-                # an adverb is not an argument, but a particle's object is reached through
-                # its own preposition, as in 'went back to the bathroom'
-                if c.dep_ == "advmod":
-                    for p in c.children:
-                        if p.dep_ == "prep":
-                            for o in p.children:
-                                if o.dep_ == "pobj" and (t := target(o)):
-                                    ev["edges"].append([f"prep:{p.lower_}", t])
-                                    keep(ev, f"prep:{p.lower_}", o)
                 continue
+            label = link(c)
             if t := target(c):
-                ev["edges"].append([c.dep_, t])
-                keep(ev, c.dep_, c)
+                ev["edges"].append([label, t])
+                keep(ev, label, c)
                 for cc in c.children:
                     if cc.dep_ == "conj" and (t2 := target(cc)):
-                        ev["edges"].append([c.dep_, t2])
-                        keep(ev, c.dep_, cc)
+                        ev["edges"].append([label, t2])
+                        keep(ev, label, cc)
         # a conjoined verb shares its head's subject: 'picked up the milk and went'
         if tok.dep_ == "conj" and tok.head.i in index and not any(
                 e[0].startswith("nsubj") for e in ev["edges"]):
@@ -322,10 +403,10 @@ def extract(doc) -> list[dict]:
     # an adjective is said of its thing, as a link of its own: 'the red ball' tells the
     # ball and that it is red, so 'red' is a node, and the ball painted blue stays one
     # ball. The link's name is the one the parse gives it, in the order heard
-    for i, (_, _, mods) in sorted(things.items()):
-        for link, m in mods:
-            events.append({"lemma": link, "mood": "", "edges": [
-                ["self", f"n:{called_by(doc[i])}\x1f{i}"], [link, f"n:{m}"]]})
+    for i, (_, _, mods, _) in sorted(things.items()):
+        for label, m in mods:
+            events.append({"lemma": label, "mood": "", "edges": [
+                ["self", f"n:{called_by(doc[i])}\x1f{i}"], [label, f"n:{m}"]]})
     # an event left with no arguments goes, and every reference to the rest is
     # renumbered: its function words alone say nothing of anything
     kept = [i for i, e in enumerate(events)
@@ -346,7 +427,7 @@ def extract(doc) -> list[dict]:
 class GraphArm:
     name = "graphed"
 
-    def __init__(self, directory: Path, model: str = "en_core_web_trf",
+    def __init__(self, directory: Path, model: str = PARSER,
                  known: dict | None = None, cache: Path | None = CACHE) -> None:
         directory.mkdir(parents=True, exist_ok=True)
         self.db = sqlite3.connect(str(directory / "graph.db"))
@@ -432,15 +513,14 @@ class GraphArm:
             doc = parse(self.model, question)
             kept = []
             for tok in doc:
-                if tok.pos_ in ("NOUN", "PROPN") and tok.dep_ != "compound":
-                    left = [t for t in tok.children if t.dep_ in ("compound", "amod")
-                            and t.i < tok.i]
+                if tok.pos_ in ("NOUN", "PROPN") and tok.dep_ not in DESCRIBE:
+                    left = [t for t in tok.children if t.dep_ in DESCRIBE and t.i < tok.i]
                     start = min([t.idx for t in left] + [tok.idx])
                     # never the question's own verb: 'keep' in 'Where does Ada keep the
                     # jars?' is cut with the jars only where the graph holds Ada's keeping
                     # told actively, so one relation would be two shapes by how its facts
                     # were told
-                    verb = tok.head if tok.dep_ == "dobj" and tok.head.dep_ != "ROOT" else None
+                    verb = tok.head if tok.dep_ == "obj" and tok.head.dep_ != "ROOT" else None
                     between = (doc[verb.i + 1:min([t.i for t in left] + [tok.i])]
                                if verb is not None and verb.i < tok.i else None)
                     governs = ([verb.idx, verb.lemma_.lower()] if between is not None
@@ -469,8 +549,11 @@ class GraphArm:
                                 (turn,)).fetchone()[0]
         who: dict[str, str] = {}
         here: list[tuple[str, set, str]] = []
-        for m, (name, opens, mods) in sorted(mentions.items(), key=lambda kv: int(kv[0])):
+        for m, (name, opens, mods, pos) in sorted(mentions.items(),
+                                                  key=lambda kv: int(kv[0])):
             mods = [w for _, w in mods]
+            self.db.execute("INSERT INTO heard_as VALUES (?, ?, 1) ON CONFLICT(name, pos) "
+                            "DO UPDATE SET n = n + 1", (name, pos))
             node = None
             if not opens:
                 # one named earlier in this sentence first, then the episode's
@@ -514,25 +597,27 @@ class GraphArm:
                 # agreement is what everyone knows, so it is counted by label
                 self.db.execute("INSERT INTO agreement VALUES (?, ?, 1) ON CONFLICT(name, "
                                 "pronoun) DO UPDATE SET n = n + 1",
-                                (f"n:{self.label(node)}", t[2:]))
+                                (f"n:{self.label(node)}", t[2:].split("|", 1)[1]))
         self.db.commit()
 
     def referent(self, pronoun: str) -> str | None:
-        """What a pronoun refers to, from this episode, as centering theory has it: the
-        latest subject for 'he', 'she' and 'they', the latest thing that was not a subject
-        for 'it'. A name that has been called something else and never this is passed
-        over, so agreement is learnt from what pronouns have been resolved to."""
-        want = "nsubj" if pronoun != "it" else None
+        """What a pronoun refers to, from this episode: the latest individual in the slot
+        it fills, a subject for a subject and a thing that was not one for anything else,
+        as parallelism in centering has it. Given as its slot and what it agrees in
+        ('nsubj|Gender=Fem|Number=Sing|Person=3'), by what the parse marks. A label that
+        has been called something else and never this is passed over, so agreement is
+        learnt from what pronouns have been resolved to."""
+        slot, agrees = pronoun.split("|", 1)
+        subject = slot.startswith("nsubj")
         for node, label in self.db.execute(
                 "SELECT edges.node, edges.label FROM edges JOIN events ON events.id = "
                 "edges.event WHERE events.turn > ? AND edges.node LIKE 'i:%' "
                 "ORDER BY edges.event DESC LIMIT 200", (self.episode(),)):
-            if (want and not label.startswith(want)) or (not want and (
-                    label.startswith("nsubj") or label == "self")):
+            if label.startswith("nsubj") != subject or label == "self":
                 continue
             called = dict(self.db.execute("SELECT pronoun, n FROM agreement WHERE name = ?",
                                           (f"n:{self.label(node)}",)).fetchall())
-            if called and pronoun not in called and max(called.values()) >= 2:
+            if called and agrees not in called and max(called.values()) >= 2:
                 continue
             return node
         return None
@@ -613,7 +698,7 @@ class GraphArm:
         was red'), by the links the parse gives those."""
         return [n[2:] for (n,) in self.db.execute(
             "SELECT b.node FROM edges a JOIN edges b ON a.event = b.event WHERE a.node = ? "
-            "AND b.label IN ('amod', 'compound', 'acomp', 'oprd') AND b.node LIKE 'n:%' "
+            "AND b.label IN ('amod', 'compound', 'flat', 'acomp', 'xcomp') AND b.node LIKE 'n:%' "
             "GROUP BY b.node ORDER BY MAX(b.event) DESC", (node,))]
 
     def describe(self, node: str) -> str:
@@ -625,7 +710,7 @@ class GraphArm:
         if got is None:
             mods = [n[2:] for (n,) in self.db.execute(
                 "SELECT b.node FROM edges a JOIN edges b ON a.event = b.event WHERE "
-                "a.node = ? AND a.label = 'self' AND b.label IN ('amod', 'compound') "
+                "a.node = ? AND a.label = 'self' AND b.label IN ('amod', 'compound', 'flat') "
                 "GROUP BY b.node "
                 "ORDER BY MIN(b.event)", (node,))]
             got = self._described[node] = " ".join(mods + [self.label(node)])
@@ -857,6 +942,11 @@ class GraphArm:
             at = b
         return out + question[at:], spans
 
+    def proper_at(self, text: str, at: int) -> bool:
+        """Whether the word a text has at this offset is a proper name, by the part of
+        speech the parse gives it: a capital letter is a mark of some scripts only."""
+        return any(r[0] <= at < r[0] + len(r[1]) and r[5] == "PROPN" for r in self.spans(text))
+
     def heard_at(self, question: str) -> None:
         """A lesson's noun phrases counted by their place in its template."""
         template, spans = self.template(question)
@@ -881,7 +971,7 @@ class GraphArm:
     def shape(self, question: str) -> tuple[str, list[str]]:
         template, every = self.template(question)
         spans = [(a, b, n) for i, (a, b, n) in enumerate(every)
-                 if self.slot(template, i, n, question[a:a + 1].isupper() and a > 0)]
+                 if self.slot(template, i, n, self.proper_at(question, a))]
         shape, fillers, at = "", [], 0
         for a, b, n in sorted(spans):
             shape += question[at:a] + f"<{len(fillers)}>"
@@ -1057,7 +1147,7 @@ class GraphArm:
                 return f"<{heads[lower]}>"
             if lower in inside or dep in ("punct", "det", "aux", "case"):
                 return None
-            return lower if tag in ("WDT", "WP", "WP$", "WRB") else lemma
+            return lower if tag == "ask" else lemma
 
         out = set()
         for i, t in enumerate(tokens):
@@ -1070,14 +1160,19 @@ class GraphArm:
                 out.add(f"{me} {t[3]} {head}")
         return sorted(out)
 
+    def wh_word(self, question: str) -> str:
+        """The question's first word that asks, by what the parse marks, or ''."""
+        return next((t[0] for t in self.tokens(question) if t[2] == "ask"), "")
+
     def tokens(self, question: str) -> list:
         """A question's parse, one row a token: its word, lemma, tag, link and head."""
         if question not in self._tokens:
-            key = hashlib.sha256(f"{VERSION}|{self.model}|tokens|{question}".encode()
+            key = hashlib.sha256(f"{VERSION}|{self.model}|tokens-2|{question}".encode()
                                  ).hexdigest()
             kept = self._kept(key)
             if kept is None:
-                kept = [[t.lower_, t.lemma_.lower(), t.tag_, t.dep_, t.head.i]
+                kept = [[t.lower_, t.lemma_.lower(), "ask" if asking(t) else "", t.dep_,
+                         t.head.i]
                         for t in parse(self.model, question)]
                 self._keep(key, kept)
             self._tokens[question] = kept
@@ -1233,16 +1328,16 @@ class GraphArm:
             return chosen
         if plan.get("count"):
             if ends:
-                return [(str(len({e for e, _ in ends})), max(t for _, t in ends))]
+                return [(self.say_number(len({e for e, _ in ends})), max(t for _, t in ends))]
             # nothing left to count is an answer, resting on what emptied the set: 'Mary
             # dropped the football' is later than her picking it up
-            return [("none", (self.emptied,))] if self.emptied else []
+            return [(self.say_number(0), (self.emptied,))] if self.emptied else []
         return [f for f in ends if not said_in(f[0], question)]
 
     def teach(self, question: str, answer: str) -> None:
         want = answer.lower()
         # what the question's wh-word asked for, by the mark the answer is heard with
-        if (wh := wh_word(question)) and (mark := self.mark(want)):
+        if (wh := self.wh_word(question)) and (mark := self.mark(want)):
             self.db.execute("INSERT INTO asks VALUES (?, ?, 1) ON CONFLICT(wh, mark) DO "
                             "UPDATE SET n = n + 1", (wh, mark))
         # where each word sat is counted as heard, so a word held in its place is frame
@@ -1263,8 +1358,8 @@ class GraphArm:
                 if not found:
                     return None
                 said = max(found, key=lambda f: f[1])[0]
-                return said_in(want, said) or (numeral(want) is not None
-                                               and numeral(said) == numeral(want))
+                return said_in(want, said) or (self.number(want) is not None
+                                               and self.number(said) == self.number(want))
 
             # whether the answer is the visit just before or after another name of the
             # question, counted wherever that name is among the plan's ends
@@ -1301,17 +1396,21 @@ class GraphArm:
             self.db.execute(f"UPDATE learnt SET {column} = {column} + 1 WHERE rowid = ?",
                             (rowid,))
         goals = self.holding(want)
+        self.learn_circumstance(question, want)
         if not fillers:
             self.db.commit()
             return
+        if not goals and not want.isdigit():
+            # an answer nothing heard holds may be a number word, whose worth is learnt
+            self.heard_count(shape, fillers, want)
         # only the first twenty of the shortest are ever made plans
         found = [p for g in goals[:5] for p in self.paths(f"n:{fillers[0]}", g, most=20)]
         shortest = min((len(p) for p in found), default=0)
         plans = [self.plan_of(p, fillers[1:]) for p in found if len(p) == shortest][:20]
-        if not any(plans) and numeral(want) is not None:
+        if not any(plans) and self.number(want) is not None:
             # a number no telling said is a number of things: 'How many people keep
             # things in the pantry?' taught 3
-            plans = self.counted(fillers, numeral(want))
+            plans = self.counted(fillers, self.number(want))
         for plan in plans:
             if plan is None:
                 continue
@@ -1360,7 +1459,7 @@ class GraphArm:
         out = []
         for i, (a, b, name) in enumerate(spans):
             words = name.split()
-            if question[a:a + 1].isupper() and a > 0:
+            if self.proper_at(question, a):
                 continue
             if any(self.known(" ".join(words[j:])) for j in range(len(words))):
                 continue
@@ -1594,18 +1693,10 @@ class GraphArm:
     def blank(self, question: str) -> tuple[str, str] | None:
         """The slot the question's wh-word stands in: ('eat', 'dobj') for 'Lily ate
         what?', ('land', 'prep:on') for 'The bird landed on what?'."""
-        key = hashlib.sha256(f"{VERSION}|{self.model}|blank-2|{question}".encode()).hexdigest()
+        key = hashlib.sha256(f"{VERSION}|{self.model}|blank-3|{question}".encode()).hexdigest()
         kept = self._kept(key)
         if kept is None:
-            kept = _slot(parse(self.model, question), ("what", "who", "whom"))
-            if kept is None or kept[1] not in BLANKS and not kept[1].startswith("prep:"):
-                # a wh-word inside a sentence is often read as no argument at all ('She
-                # sat down and read what?' has it as a clause of its own); read as a
-                # thing, it takes the place it stands in
-                said = re.sub(r"\b(what|who|whom)\b", "something", question, count=1,
-                              flags=re.IGNORECASE)
-                kept = _slot(parse(self.model, said), ("something",)) or kept
-            kept = list(kept or [])
+            kept = list(_slot(parse(self.model, question)) or [])
             self._keep(key, kept)
         return tuple(kept) if kept else None
 
@@ -1616,35 +1707,43 @@ class GraphArm:
         ('dobj', 'veil') bound; 'Where did Roxy put the leaves?' is a 'put' event with any
         link of place free. A pronoun binds nothing, since a question's pronoun names no
         one of its own."""
-        key = hashlib.sha256(f"{VERSION}|{self.model}|pattern-4|{question}".encode()).hexdigest()
+        key = hashlib.sha256(f"{VERSION}|{self.model}|pattern-5|{question}".encode()).hexdigest()
         kept = self._kept(key)
         if kept is None:
             kept = []
             doc = parse(self.model, question)
-            wh = next((t for t in doc if t.lower_ in ("what", "who", "whom", "where")), None)
+            wh = next((t for t in doc if asking(t)), None)
             if wh is not None:
-                if wh.lower_ == "where":
-                    verb, free = wh.head, [f"prep:{p}" for p in PLACES]
-                elif wh.dep_ == "pobj" and wh.head.dep_ in ("prep", "dative", "agent"):
-                    verb, free = wh.head.head, [f"prep:{wh.head.lower_}"]
-                elif wh.dep_ not in ("det", "attr"):
+                case = [k.lower_ for k in wh.children if k.dep_ == "case"]
+                if any(c.dep_ == "cop" for c in wh.children):
+                    # the word that asks is a copula's predicate ('Who is cousins with
+                    # Ann?'): a copula equates its two sides, so it stands in either
+                    verb, free = wh, ["nsubj", "attr"]
+                elif wh.pos_ == "ADV":
+                    # a word that asks for a circumstance ('where', 'when') stands in an
+                    # oblique; which ones its answers hang by is learnt (`circumstances`)
+                    verb, free = wh.head, ["prep:*"]
+                elif case:
+                    verb, free = wh.head, ["prep:" + " ".join(case)]
+                elif wh.dep_ != "det":
                     verb, free = wh.head, [wh.dep_]
                 else:
                     verb, free = None, []
-                if verb is not None and verb.pos_ in ("VERB", "AUX"):
-                    mood = " ".join(c.lemma_.lower() for c in verb.children
-                                    if (c.dep_ == "aux" and c.tag_ == "MD") or c.dep_ == "neg")
-                    lemma = verb.lemma_.lower()
+                cop = next((c for c in verb.children if c.dep_ == "cop"), None) if verb \
+                    is not None else None
+                if verb is not None and (verb.pos_ in ("VERB", "AUX") or cop is not None):
+                    lemma = (cop or verb).lemma_.lower()
+                    mood_ = mood(verb)
                     bound = []
+                    if cop is not None and verb is not wh:
+                        vcase = [k.lower_ for k in verb.children if k.dep_ == "case"]
+                        bound.append(["prep:" + " ".join(vcase) if vcase else (
+                            "acomp" if verb.pos_ == "ADJ" else "attr"), phrase(verb)])
                     for c in verb.children:
-                        if c is wh or c.lower_ in PRONOUNS or c.pos_ == "PRON":
+                        if c is wh or c.pos_ == "PRON":
                             continue
-                        if c.dep_ in ("prep", "dative", "agent"):
-                            bound += [[f"prep:{c.lower_}", phrase(p)] for p in c.children
-                                      if p.dep_ == "pobj" and p.pos_ in ("NOUN", "PROPN")
-                                      and p.lower_ not in PRONOUNS]
-                        elif c.dep_ not in SKIP and c.pos_ in ("NOUN", "PROPN"):
-                            bound.append([c.dep_, phrase(c)])
+                        if c.dep_ not in SKIP and c.pos_ in ("NOUN", "PROPN"):
+                            bound.append([link(c), phrase(c)])
                     # every name inside the verb's own arguments, however deep: 'with
                     # Nogael' in 'Who is cousins with Nogael?' hangs off 'cousins', not the
                     # verb. Another clause ('and he puffed', 'which was his dog house') is
@@ -1652,15 +1751,14 @@ class GraphArm:
                     named, todo = set(), [c for c in verb.children if c.dep_ not in CLAUSES]
                     while todo:
                         t = todo.pop()
-                        if t.pos_ in ("NOUN", "PROPN") and t.dep_ != "compound" and \
-                                t.lower_ not in PRONOUNS:
+                        if t.pos_ in ("NOUN", "PROPN") and t.dep_ not in DESCRIBE:
                             named.add(phrase(t))
                         todo += [c for c in t.children if c.dep_ not in CLAUSES]
                     named = sorted(named)
-                    kept = [lemma, free, bound, named, mood]
+                    kept = [lemma, free, bound, named, mood_, wh.lemma_.lower()]
             self._keep(key, kept)
-        return (kept[0], kept[1], [tuple(b) for b in kept[2]], kept[3], kept[4]) if kept \
-            else None
+        return (kept[0], kept[1], [tuple(b) for b in kept[2]], kept[3], kept[4], kept[5]) \
+            if kept else None
 
     def matched(self, question: str) -> str | None:
         """The question's pattern matched against this episode: the latest event with the
@@ -1670,7 +1768,8 @@ class GraphArm:
         got = self.pattern(question)
         if got is None:
             return None
-        lemma, free, bound, named, mood = got
+        lemma, free, bound, named, mood, wh = got
+        free = self.circumstances(wh) if free == ["prep:*"] else free
         for (eid,) in self.db.execute(
                 "SELECT id FROM events WHERE lemma = ? AND mood = ? AND turn > ? ORDER BY id "
                 "DESC", (lemma, mood, self.episode())).fetchall():
@@ -1682,7 +1781,11 @@ class GraphArm:
                 for n in ([n for lab, d, n in self.around(node)
                            if lab == "self" and d == 1] if node.startswith("e:")
                           else [node])]
-            if not all(any(lab == label and self.is_(n, f"n:{name}") for lab, n in edges)
+            # a copula equates its two sides, so where the question asks for either, a
+            # name bound to one is found on the other as well
+            either = {"nsubj", "attr"} if set(free) == {"nsubj", "attr"} else set()
+            if not all(any((lab == label or {lab, label} <= either)
+                           and self.is_(n, f"n:{name}") for lab, n in edges)
                        for label, name in bound):
                 continue
             # each other name the question says is two steps from the event or nearer
@@ -1692,8 +1795,10 @@ class GraphArm:
             if not all(any(self.is_(x, f"n:{n}") for x in near) for n in named):
                 continue
             for label, node in edges:
-                if label in free and not node.startswith("e:") and not said_in(
-                        said := self.describe(node), question):
+                if (label in free or (free == ["prep:*"] and label.startswith("prep:")
+                                      and ">" not in label)) and not node.startswith("e:") \
+                        and not any(self.is_(node, f"n:{name}") for _, name in bound) \
+                        and not said_in(said := self.describe(node), question):
                     return said
         return None
 
@@ -1744,7 +1849,7 @@ class GraphArm:
                     + 0.1 * (link + 0.5) / (total + 0.5 * labels))
 
         asks = dict(self.db.execute("SELECT mark, n FROM asks WHERE wh = ?",
-                                    (wh_word(question),)).fetchall())
+                                    (self.wh_word(question),)).fetchall())
 
         def asked_for(name: str) -> float:
             # how often this wh-word's answers bore the name's mark, as lessons have it
@@ -1756,33 +1861,100 @@ class GraphArm:
         out: dict[str, tuple[float, float, float]] = {}
         for node, a in act.items():
             said, name = self.describe(node), self.label(node)
-            if said_in(said, question) or said in ("what", "who"):
+            if said_in(said, question):
                 continue
             was = out.get(said)
             out[said] = (a + (was[0] if was else 0.0), fit(name), asked_for(name))
         return out
 
     def mark(self, name: str) -> str | None:
-        """How a name is written where it is heard: 'capital' where its last word is
-        capitalised every time ('Lily', even at a sentence's start), 'lower' where it is
-        not, None where no sentence heard spells it out."""
+        """How a name is heard: the part of speech its mentions were given most ('PROPN'
+        for Lily, 'NOUN' for the ball), or None where nothing was heard of it by that
+        name. A capital letter is a mark of some scripts only."""
         if name not in self._marks:
             self._marks[name] = self._mark(name)
         return self._marks[name]
 
     def _mark(self, name: str) -> str | None:
-        word = name.split()[-1] if name.strip() else ""
-        if not word:
-            return None
-        held = self.nodes(name)
-        seen = [m.group(0) for (heard,) in self.db.execute(
-                    "SELECT DISTINCT events.heard FROM edges JOIN events ON events.id = "
-                    f"edges.event WHERE edges.node IN ({','.join('?' * len(held))}) LIMIT 20",
-                    held)
-                for m in re.finditer(rf"\b{re.escape(word)}\b", heard, re.IGNORECASE)]
-        if not seen:
-            return None
-        return "capital" if all(w[:1].isupper() for w in seen) else "lower"
+        row = self.db.execute("SELECT pos FROM heard_as WHERE name = ? ORDER BY n DESC "
+                              "LIMIT 1", (name.split()[-1] if name.strip() else "",)
+                              ).fetchone()
+        return row[0] if row else None
+
+    def circumstances(self, wh: str) -> list[str]:
+        """The links a word asking for a circumstance ('where', 'when') has had its
+        answers hang by, learnt from lessons, as the parse marks only that it asks; any
+        oblique until a lesson says."""
+        got = [lab for (lab,) in self.db.execute(
+            "SELECT link FROM circumstances WHERE wh = ? ORDER BY n DESC", (wh,))]
+        return got or ["prep:*"]
+
+    def learn_circumstance(self, question: str, want: str) -> None:
+        """A lesson's answer to a word asking for a circumstance: the oblique the answer
+        hangs by in the episode's event the question matches."""
+        got = self.pattern(question)
+        if got is None or got[1] != ["prep:*"]:
+            return
+        lemma, _, bound, _, mood_, wh = got
+        for (eid,) in self.db.execute(
+                "SELECT id FROM events WHERE lemma = ? AND mood = ? AND turn > ? ORDER BY "
+                "id DESC LIMIT 50", (lemma, mood_, self.episode())).fetchall():
+            edges = self.db.execute("SELECT label, node FROM edges WHERE event = ? AND node "
+                                    "NOT LIKE 'f:%'", (eid,)).fetchall()
+            if not all(any(lab == label and self.is_(n, f"n:{name}") for lab, n in edges)
+                       for label, name in bound):
+                continue
+            for lab, n in edges:
+                if lab.startswith("prep:") and not n.startswith("e:") and said_in(
+                        want, self.describe(n)):
+                    self.db.execute("INSERT INTO circumstances VALUES (?, ?, 1) ON CONFLICT"
+                                    "(wh, link) DO UPDATE SET n = n + 1", (wh, lab))
+                    return
+
+    # -- numbers ---------------------------------------------------------------
+
+    def number(self, text: str) -> int | None:
+        """A number said as digits, or as a word whose value lessons settled."""
+        t = text.strip().lower()
+        if t.isdigit():
+            return int(t)
+        return self.numbers().get(t)
+
+    def say_number(self, n: int) -> str:
+        """A number in the word lessons said it with, or as digits."""
+        return next((w for w, v in self.numbers().items() if v == n), str(n))
+
+    def numbers(self) -> dict[str, int]:
+        """What each number word is worth, learnt as a child learns to count: over the
+        lessons whose answer was a word nothing heard holds, one walk's count went with
+        each word, each word always with the same count and each count with the same
+        word. That walk is the counting, and the words' values are its counts. Two words
+        at least, since one cannot show a pairing."""
+        total = self.db.execute("SELECT COUNT(*) FROM counts").fetchone()[0]
+        if getattr(self, "_numbers", (None,))[0] == total:
+            return self._numbers[1]
+        by: dict = {}
+        for shape, walk, word, size in self.db.execute("SELECT * FROM counts"):
+            by.setdefault((shape, walk), []).append((word, size))
+        best: tuple = (0, {})
+        for items in by.values():
+            fwd: dict = {}
+            back: dict = {}
+            if all(fwd.setdefault(w, n) == n and back.setdefault(n, w) == w
+                   for w, n in items) and len(fwd) >= 2 and len(items) > best[0]:
+                best = (len(items), fwd)
+        self._numbers = (total, best[1])
+        return best[1]
+
+    def heard_count(self, shape: str, fillers: list[str], want: str) -> None:
+        """A lesson whose answer may be a number word: every walk from the question's
+        first name, with how many it reached, and none for a walk this shape had before
+        that reaches nothing now."""
+        ways = self.walks(f"n:{fillers[0]}")
+        rows = [(shape, key, want, len(ends)) for key, (ends, _) in ways.items()]
+        rows += [(shape, key, want, 0) for (key,) in self.db.execute(
+            "SELECT DISTINCT walk FROM counts WHERE shape = ?", (shape,)) if key not in ways]
+        self.db.executemany("INSERT INTO counts VALUES (?, ?, ?, ?)", rows)
 
     def answered(self, text: str, depth: int = 0) -> str | None:
         """An answer from the plans of the question's shape, or, where they find nothing,
@@ -2005,14 +2177,15 @@ class GraphArm:
         for i, (_, _, tag, _, _, pos) in enumerate(rows):
             if pos not in ("NOUN", "PROPN"):
                 continue
-            if not any(rows[k][3] in ("poss", "relcl", "acl", "prep") for k in kids.get(i, [])):
+            if not any(rows[k][3] in ("nmod:poss", "acl:relcl", "acl", "nmod")
+                       for k in kids.get(i, [])):
                 continue
             span = sorted(subtree(i))
             # the question's own wh-word, not a relative one ('the person who repairs')
             if span[0] == 0:
                 continue
             if len(span) >= len(rows) - 2 or not any(
-                    rows[k][1][:1].isupper() or self.known(rows[k][1].lower()) for k in span
+                    rows[k][5] == "PROPN" or self.known(rows[k][1].lower()) for k in span
                     if k != i):
                 continue
             a = rows[span[0]][0]
@@ -2067,7 +2240,7 @@ class GraphArm:
 
     def reaction(self, text: str, question: str) -> tuple[str | None, bool]:
         """What a reaction names that the question did not, and whether it says no."""
-        key = hashlib.sha256(f"{VERSION}|{self.model}|reaction|{text}".encode()).hexdigest()
+        key = hashlib.sha256(f"{VERSION}|{self.model}|reaction-2|{text}".encode()).hexdigest()
         rows = self._kept(key)
         if rows is None:
             doc = parse(self.model, text)
@@ -2075,9 +2248,9 @@ class GraphArm:
             # it is a number of things read as the arm reads one ('none')
             rows = []
             for t in doc:
-                no = t.dep_ == "neg" or (t.dep_ == "intj" and t.lower_ in ("no", "nope"))
-                part = t.dep_ in ("compound", "amod") and t.head.pos_ in ("NOUN", "PROPN")
-                number = t.like_num or numeral(t.lower_) is not None
+                no = negates(t)
+                part = t.dep_ in DESCRIBE and t.head.pos_ in ("NOUN", "PROPN")
+                number = "Card" in feature(t, "NumType") or t.lower_.isdigit()
                 names = not part and (t.pos_ in ("NOUN", "PROPN", "NUM", "ADJ") or number)
                 rows.append([no, names, t.lower_ if number else phrase(t), number])
             self._keep(key, rows)
@@ -2108,24 +2281,27 @@ class GraphArm:
             self._cdb.close()
 
 
-def _slot(doc, words: tuple) -> tuple[str, str] | None:
-    """The verb and link the first of `words` fills. One joined to another by 'and' fills
-    the other's slot ('Tom and what had fun' is a subject of 'have'), and a link through a
-    particle is the verb's ('brought him back to what' is 'bring' 'prep:to')."""
-    t = next((t for t in doc if t.lower_ in words), None)
+def _slot(doc) -> tuple[str, str] | None:
+    """The verb and link the word asking for a thing fills (a pronoun that asks, by
+    `PronType`). One joined to another by 'and' fills the other's slot ('Tom and what had
+    fun' is a subject of 'have'), and an oblique is named by its case word ('The bird
+    landed on what?' is 'land' 'prep:on'). A predicate with a copula is the copula's."""
+    t = next((t for t in doc if asking(t) and t.pos_ == "PRON"), None)
     if t is None:
         return None
     while t.dep_ == "conj" and t.head.i != t.i:
         t = t.head
-    if t.dep_ == "pobj" and t.head.dep_ in ("prep", "dative", "agent"):
-        link, head = f"prep:{t.head.lower_}", t.head.head
-    elif t.dep_ in ("det", "attr"):
+    if t.dep_ in ("det",):
         return None
-    else:
-        link, head = t.dep_, t.head
+    if any(c.dep_ == "cop" for c in t.children):
+        # 'The ball was what?': the word is the copula's predicate
+        cop = next(c for c in t.children if c.dep_ == "cop")
+        return cop.lemma_.lower(), "attr"
+    lab, head = link(t), t.head
     while head.pos_ in ("ADV", "ADP") and head.head.i != head.i:
         head = head.head
-    return head.lemma_.lower(), link
+    cop = next((c for c in head.children if c.dep_ == "cop"), None)
+    return (cop or head).lemma_.lower(), lab
 
 
 def asked(text: str) -> bool:
@@ -2135,24 +2311,6 @@ def asked(text: str) -> bool:
 class _Asked:
     def __init__(self, text: str) -> None:
         self.text = text
-
-
-WORDS = ["none", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine",
-         "ten", "eleven", "twelve"]
-
-
-def numeral(text: str) -> int | None:
-    """A number said as digits or as a word, or None."""
-    t = text.strip().lower()
-    if t.isdigit():
-        return int(t)
-    return WORDS.index(t) if t in WORDS else None
-
-
-def wh_word(question: str) -> str:
-    """The question's first wh-word, or '' where it has none."""
-    found = re.search(r"\b(who|whom|whose|what|which|where|when|how)\b", question.lower())
-    return found.group(1) if found else ""
 
 
 def said_in(answer: str, question: str) -> bool:

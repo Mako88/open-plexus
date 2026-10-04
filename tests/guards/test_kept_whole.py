@@ -3,7 +3,7 @@ foundation's item 2)."""
 
 from unfused.graph import extract, nlp
 
-MODEL = "en_core_web_trf"
+MODEL = "stanza"
 
 
 def test_nothing_the_parse_gives_is_dropped():

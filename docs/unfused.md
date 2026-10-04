@@ -617,6 +617,14 @@ the store merges by id. Kill a third of the nodes mid-exam.
   prediction fails, so Phase 6's surprise signal is the likely trigger.
 - **Idle-time inference**: the system composes and writes derived assertions when no input is
   arriving, so a chain is found once rather than per question.
+- **Pieces behind interfaces, and versioned representations.** John's, 2026-10-04. The
+  parser, the store and the encoder each swappable alone, and every derived row stamped
+  with the version that made it, read through a converter that does nothing for its own
+  version (event sourcing's upcaster). What was heard stays the source of truth, so a
+  representation that cannot be converted exactly (one parser's relations to another's)
+  is read again from it; a vector space can be, by a map fitted on texts both versions
+  encoded (orthogonal Procrustes), trusted once its error on held-out texts is read.
+  First: `graph.py` split along reading, storage, individuals and answering.
 - **A retryable buffer of saves.** John's, 2026-10-03, for stability at scale. Writes
   gather in memory and go to disk in batches that are retried until they land, sized by
   the RAM-against-speed dial, so a crash costs at most one buffer.

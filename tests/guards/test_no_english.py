@@ -1,8 +1,7 @@
-"""Red until the system stands on what it needs (John's, 2026-10-04): nothing of one
-language held by hand. THE ORDER's foundation item (the three layers: labels, concepts,
-individuals) says what each is for. What held moved to the guards: a thing apart from
-the words said of it (`test_individuals.py`), nothing the parse gives dropped
-(`test_kept_whole.py`), and kinds learnt from how words connect (`test_kinds.py`)."""
+"""Nothing of one language held by hand, out of the red set once it held (THE ORDER,
+the foundation's item 4). With the foundation's other parts, in `test_individuals.py`,
+`test_kept_whole.py` and `test_kinds.py`, it is what the system stands on (John's,
+2026-10-04)."""
 
 import ast
 from pathlib import Path

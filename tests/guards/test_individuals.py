@@ -1,10 +1,10 @@
 """The individual layer, out of the red set once it held (THE ORDER, the foundation's
-item 1). Read with the parser every run reads with: the small one takes 'painted the
+item 1). Read with the parser every run reads with: the small spaCy one takes 'painted the
 ball blue' as one name."""
 
 from unfused.graph import GraphArm
 
-MODEL = "en_core_web_trf"
+MODEL = "stanza"
 
 
 def arm(tmp_path):

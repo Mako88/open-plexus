@@ -3,7 +3,7 @@ the foundation's item 3)."""
 
 from unfused.graph import GraphArm
 
-MODEL = "en_core_web_trf"
+MODEL = "stanza"
 
 
 def arm(tmp_path):

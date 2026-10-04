@@ -53,9 +53,12 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
        is event segmentation: a boundary where what is heard stops being predicted by
        what was, so an episode is found rather than set.
        Decided (DECIDED, episode boundaries): the break before each story stays.
-     - Identity. Every Lily in every story is one node. An episode-scoped name
+     - Identity, next. Every Lily in every story is one node. An episode-scoped name
        ('lily' in this story) with a link to the shared word is what memory of many
-       stories needs.
+       stories needs. It is also what keeping the parse whole waits on (John's,
+       2026-10-04: drop nothing the parse gives): adjectives taken out of names merged
+       the house's rooms into 'room' (`4cdbe641`), so a thing needs a node of its own
+       apart from the words said of it.
      - Still expected and not yet traced: adjectives folded into names ('the red ball'
        is one name, so a colour is never a node), and the edges `SKIP` drops.
      - The plans learn one shape per wording, and a cloze is a wording of its own, so
@@ -82,7 +85,8 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
      stream's curve does not rise with it. On the stream, the graded fixed point (walks
      through names sharing verb slots, `6aaf8dcf`) tied the verb's fit, and a slot's
      kind by its fillers' case, part of speech or pronoun agreement lost (`e470b64f`,
-     `d7ab6e68`).
+     `d7ab6e68`), and latent classes over (name, slot) tied it too (`bb732491`). It
+     waits on identity and a graph that drops nothing.
   3. Retention and knowledge across stories: early questions asked again late, and
      questions only many stories answer ('What colour can a ball be?').
 - **The models are a milestone check, not a baseline.** John's, 2026-10-02: the system is

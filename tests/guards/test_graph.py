@@ -55,11 +55,13 @@ def test_nothing_learnt_is_nothing_said(tmp_path):
     assert a.answer(q("Where is Ada's kettle kept?")) == "I don't know."
 
 
-def test_what_did_not_happen_or_only_might_is_an_event_of_its_own():
+def test_what_did_not_happen_or_only_might_is_marked_on_the_verb():
+    """The verb alone is the lemma, and its mood says it did not happen or only might,
+    so 'doesn't keep' is the verb 'keep' heard again and never a keeping."""
     lemmas = {e["lemma"]: e["mood"] for t in ("Ada doesn't keep the kettle in the attic.",
                                               "Ada might move the kettle to the attic.")
               for e in extract(nlp(MODEL)(t))}
-    assert lemmas.get("not keep") == "not" and lemmas.get("might move") == "might"
+    assert lemmas.get("keep") == "not" and lemmas.get("move") == "might"
 
 
 def test_a_denial_or_a_hedge_never_makes_an_answer_the_latest(tmp_path):

@@ -56,7 +56,7 @@ CARRIED = ("learnt", "positions")
 # every extraction kept across runs: the parser is deterministic, and the version is in
 # the key so a change to what is extracted re-reads every sentence
 CACHE = Path(__file__).resolve().parents[2] / "state" / "parses.sqlite"
-VERSION = "graph-10"
+VERSION = "graph-11"
 # every text MiniLM has encoded, by its text
 VECTORS = Path(__file__).resolve().parents[2] / "state" / "vectors.sqlite"
 # every text the parser has read, as its reading, by model and text
@@ -226,14 +226,30 @@ def extract(doc) -> list[dict]:
     for tok in doc:
         if heads(tok):
             index[tok.i] = len(events)
-            # what did not happen, and what only might or will, is a different event from
-            # what did: 'might move' and 'not keep' are lemmas of their own, and plans
-            # learn from lessons which ones they follow
-            modal = [c.lemma_.lower() for c in tok.children if c.dep_ == "aux" and c.tag_ == "MD"]
-            neg = ["not"] if any(c.dep_ == "neg" for c in tok.children) else []
-            lemma = " ".join(modal + neg + [tok.lemma_.lower()] + [
-                c.lower_ for c in tok.children if c.dep_ == "prt"])
-            events.append({"lemma": lemma, "mood": " ".join(modal + neg), "edges": []})
+            # the verb alone is its lemma, so 'will not give back' and 'gave' are one verb.
+            # What did not happen, and what only might or will, is marked on the event by
+            # the words the parse marks as such, and plans learn which moods they follow;
+            # the words themselves are links of their own, as every function word is
+            mood = [c.lemma_.lower() for c in tok.children
+                    if (c.dep_ == "aux" and c.tag_ == "MD") or c.dep_ == "neg"]
+            events.append({"lemma": tok.lemma_.lower(), "mood": " ".join(mood), "edges": []})
+            # the word as heard, where it is not the lemma: 'was', 'gave', the inflection a
+            # mouth will say again
+            if tok.lower_ != tok.lemma_.lower():
+                events[-1]["edges"].append(["form", f"f:{tok.lower_}"])
+
+    def keep(ev: dict, label: str, tok) -> None:
+        # what the parse gives of an argument beyond the thing it names: a pronoun's own
+        # word beside what it resolves to, and the argument's function words ('the'),
+        # each a link to a node of their own kind, which walks skip. A clause keeps its
+        # own, as the event it is
+        if tok.i in index:
+            return
+        if tok.pos_ == "PRON" or tok.lower_ in PRONOUNS:
+            ev["edges"].append([label, f"f:{tok.lower_}"])
+        for c in tok.children:
+            if c.dep_ in SKIP and c.dep_ != "punct":
+                ev["edges"].append([f"{label}>{c.dep_}", f"f:{c.lower_}"])
 
     def target(tok) -> str | None:
         if tok.i in index:
@@ -255,19 +271,27 @@ def extract(doc) -> list[dict]:
         if tok.pos_ in ("NOUN", "PROPN", "ADJ") and not any(
                 c.dep_.startswith("nsubj") for c in tok.children):
             ev["edges"].append(["self", thing(tok)])
+            keep(ev, "self", tok)
         for c in tok.children:
             if c.dep_ in ("prep", "dative", "agent"):
                 for p in c.children:
                     if p.dep_ == "pobj" and (t := target(p)):
                         ev["edges"].append([f"prep:{c.lower_}", t])
+                        keep(ev, f"prep:{c.lower_}", p)
                         for cc in p.children:
                             if cc.dep_ == "conj" and (t2 := target(cc)):
                                 ev["edges"].append([f"prep:{c.lower_}", t2])
+                                keep(ev, f"prep:{c.lower_}", cc)
                 if c.dep_ == "dative" and not any(p.dep_ == "pobj" for p in c.children):
                     if t := target(c):
                         ev["edges"].append(["dative", t])
+                        keep(ev, "dative", c)
                 continue
             if c.dep_ in SKIP or c.dep_ == "compound" or c.dep_ == "amod":
+                # a function word is kept as a link to a node of its own kind ('did',
+                # 'not', 'back', 'because'), which walks skip
+                if c.dep_ in SKIP and c.dep_ != "punct":
+                    ev["edges"].append([c.dep_, f"f:{c.lower_}"])
                 # an adverb is not an argument, but a particle's object is reached through
                 # its own preposition, as in 'went back to the bathroom'
                 if c.dep_ == "advmod":
@@ -276,12 +300,15 @@ def extract(doc) -> list[dict]:
                             for o in p.children:
                                 if o.dep_ == "pobj" and (t := target(o)):
                                     ev["edges"].append([f"prep:{p.lower_}", t])
+                                    keep(ev, f"prep:{p.lower_}", o)
                 continue
             if t := target(c):
                 ev["edges"].append([c.dep_, t])
+                keep(ev, c.dep_, c)
                 for cc in c.children:
                     if cc.dep_ == "conj" and (t2 := target(cc)):
                         ev["edges"].append([c.dep_, t2])
+                        keep(ev, c.dep_, cc)
         # a conjoined verb shares its head's subject: 'picked up the milk and went'
         if tok.dep_ == "conj" and tok.head.i in index and not any(
                 e[0].startswith("nsubj") for e in ev["edges"]):
@@ -295,8 +322,10 @@ def extract(doc) -> list[dict]:
         for link, m in mods:
             events.append({"lemma": link, "mood": "", "edges": [
                 ["self", f"n:{called_by(doc[i])}\x1f{i}"], [link, f"n:{m}"]]})
-    # an event left with no edges goes, and every reference to the rest is renumbered
-    kept = [i for i, e in enumerate(events) if e["edges"]]
+    # an event left with no arguments goes, and every reference to the rest is
+    # renumbered: its function words alone say nothing of anything
+    kept = [i for i, e in enumerate(events)
+            if any(not t.startswith("f:") for _, t in e["edges"])]
     renumber = {f"e:{old}": f"e:{new}" for new, old in enumerate(kept)}
     out = []
     for i in kept:
@@ -661,7 +690,8 @@ class GraphArm:
         if node.startswith("e:"):
             eid = int(node[2:])
             out = [(label, 1, n) for label, n in self.db.execute(
-                "SELECT label, node FROM edges WHERE event = ?", (eid,))]
+                "SELECT label, node FROM edges WHERE event = ? AND node NOT LIKE 'f:%'",
+                (eid,))]
         else:
             out = []
         # the latest first, so a walk cut short keeps what was heard most recently. A
@@ -695,7 +725,7 @@ class GraphArm:
             def args(e: int) -> frozenset:
                 return frozenset(self.db.execute(
                     "SELECT label, node FROM edges WHERE event = ? AND label NOT LIKE "
-                    "'prep:%'", (e,)).fetchall())
+                    "'prep:%' AND node NOT LIKE 'f:%'", (e,)).fetchall())
 
             mine = args(eid)
             turn = self.db.execute("SELECT turn FROM events WHERE id = ?", (eid,)).fetchone()[0]
@@ -1553,7 +1583,7 @@ class GraphArm:
         ('dobj', 'veil') bound; 'Where did Roxy put the leaves?' is a 'put' event with any
         link of place free. A pronoun binds nothing, since a question's pronoun names no
         one of its own."""
-        key = hashlib.sha256(f"{VERSION}|{self.model}|pattern-3|{question}".encode()).hexdigest()
+        key = hashlib.sha256(f"{VERSION}|{self.model}|pattern-4|{question}".encode()).hexdigest()
         kept = self._kept(key)
         if kept is None:
             kept = []
@@ -1569,11 +1599,9 @@ class GraphArm:
                 else:
                     verb, free = None, []
                 if verb is not None and verb.pos_ in ("VERB", "AUX"):
-                    modal = [c.lemma_.lower() for c in verb.children
-                             if c.dep_ == "aux" and c.tag_ == "MD"]
-                    neg = ["not"] if any(c.dep_ == "neg" for c in verb.children) else []
-                    lemma = " ".join(modal + neg + [verb.lemma_.lower()] + [
-                        c.lower_ for c in verb.children if c.dep_ == "prt"])
+                    mood = " ".join(c.lemma_.lower() for c in verb.children
+                                    if (c.dep_ == "aux" and c.tag_ == "MD") or c.dep_ == "neg")
+                    lemma = verb.lemma_.lower()
                     bound = []
                     for c in verb.children:
                         if c is wh or c.lower_ in PRONOUNS or c.pos_ == "PRON":
@@ -1596,9 +1624,10 @@ class GraphArm:
                             named.add(phrase(t))
                         todo += [c for c in t.children if c.dep_ not in CLAUSES]
                     named = sorted(named)
-                    kept = [lemma, free, bound, named]
+                    kept = [lemma, free, bound, named, mood]
             self._keep(key, kept)
-        return (kept[0], kept[1], [tuple(b) for b in kept[2]], kept[3]) if kept else None
+        return (kept[0], kept[1], [tuple(b) for b in kept[2]], kept[3], kept[4]) if kept \
+            else None
 
     def matched(self, question: str) -> str | None:
         """The question's pattern matched against this episode: the latest event with the
@@ -1608,14 +1637,15 @@ class GraphArm:
         got = self.pattern(question)
         if got is None:
             return None
-        lemma, free, bound, named = got
+        lemma, free, bound, named, mood = got
         for (eid,) in self.db.execute(
-                "SELECT id FROM events WHERE lemma = ? AND turn > ? ORDER BY id DESC",
-                (lemma, self.episode())).fetchall():
+                "SELECT id FROM events WHERE lemma = ? AND mood = ? AND turn > ? ORDER BY id "
+                "DESC", (lemma, mood, self.episode())).fetchall():
             # a possessed noun ('her veil') is an event of its own whose `self` is the
             # name, so an argument is read through it
             edges = [(label, n) for label, node in self.db.execute(
-                "SELECT label, node FROM edges WHERE event = ?", (eid,)).fetchall()
+                "SELECT label, node FROM edges WHERE event = ? AND node NOT LIKE 'f:%'",
+                (eid,)).fetchall()
                 for n in ([n for lab, d, n in self.around(node)
                            if lab == "self" and d == 1] if node.startswith("e:")
                           else [node])]
@@ -1656,8 +1686,8 @@ class GraphArm:
         act: dict[str, float] = {}
         for node, turn in self.db.execute(
                 "SELECT edges.node, events.turn FROM edges JOIN events ON events.id = "
-                "edges.event WHERE edges.node NOT LIKE 'e:%' AND events.turn > ?",
-                (self.episode(),)):
+                "edges.event WHERE edges.node NOT LIKE 'e:%' AND edges.node NOT LIKE 'f:%' "
+                "AND events.turn > ?", (self.episode(),)):
             act[node] = act.get(node, 0.0) + (now - turn + 1) ** -DECAY
         labels = self.db.execute("SELECT COUNT(DISTINCT label) FROM edges").fetchone()[0] or 1
 

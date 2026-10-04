@@ -211,6 +211,10 @@ class GraphArm:
                  known: dict | None = None, cache: Path | None = CACHE) -> None:
         directory.mkdir(parents=True, exist_ok=True)
         self.db = sqlite3.connect(str(directory / "graph.db"))
+        # a commit after every sentence is kept, and written ahead, without waiting on
+        # the disk for each one
+        self.db.execute("PRAGMA journal_mode=WAL")
+        self.db.execute("PRAGMA synchronous=NORMAL")
         self.db.executescript(SCHEMA)
         for table, rows in (known or {}).items():
             self.db.executemany(f"INSERT OR IGNORE INTO {table} VALUES (?, ?, ?, ?)",
@@ -451,16 +455,22 @@ class GraphArm:
         if best is None:
             return []
         found: list[list] = []
+        # nodes a walk left with nothing found: every way on from them is a dead end,
+        # since a node's distance, and so where a walk may go from it, is fixed
+        dead: set = set()
 
         def walk(path: list, depth: int) -> None:
+            had = len(found)
             for label, direction, nxt in self.around(path[-1]):
                 if most is not None and len(found) >= most:
                     return
                 if nxt == goal:
                     if depth + 1 == best:
                         found.append(path + [(label, direction), nxt])
-                elif depth + 1 < best and dist.get(nxt) == depth + 1:
+                elif depth + 1 < best and dist.get(nxt) == depth + 1 and nxt not in dead:
                     walk(path + [(label, direction), nxt], depth + 1)
+            if len(found) == had:
+                dead.add(path[-1])
 
         walk([start], 0)
         return found

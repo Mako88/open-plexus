@@ -14,12 +14,17 @@ what each answer costs. A system that keeps learning keeps rising.
 from __future__ import annotations
 
 import hashlib
+import json
 import re
+import sqlite3
 from collections import Counter
-from dataclasses import dataclass, field
+from dataclasses import asdict, dataclass, field
 from pathlib import Path
 
 DATA = Path(__file__).resolve().parents[3] / "data" / "tinystories"
+# each story as made, kept by its text and how it is made: bump on any change to `make`
+CACHE = Path(__file__).resolve().parents[3] / "state" / "stories.sqlite"
+MADE = "stories-1"
 VALID = DATA / "TinyStories-valid.txt"
 URL = "https://huggingface.co/datasets/roneneldan/TinyStories/resolve/main/TinyStories-valid.txt"
 
@@ -117,8 +122,25 @@ def stream(n: int, seed: int = 0, path: Path = VALID) -> list[Story]:
     texts = raw(path)
     order = sorted(range(len(texts)),
                    key=lambda i: hashlib.sha256(f"{seed}|{i}".encode()).hexdigest())
-    nlp = _parser()
-    return [make(texts[j], k, nlp) for k, j in enumerate(order[:n])]
+    CACHE.parent.mkdir(parents=True, exist_ok=True)
+    db = sqlite3.connect(str(CACHE))
+    db.execute("CREATE TABLE IF NOT EXISTS stories (key TEXT PRIMARY KEY, value TEXT)")
+    nlp, out = None, []
+    for k, j in enumerate(order[:n]):
+        key = hashlib.sha256(f"{MADE}|{texts[j]}".encode()).hexdigest()
+        row = db.execute("SELECT value FROM stories WHERE key = ?", (key,)).fetchone()
+        if row is None:
+            nlp = nlp or _parser()
+            story = make(texts[j], k, nlp)
+            db.execute("INSERT OR REPLACE INTO stories VALUES (?, ?)",
+                       (key, json.dumps(asdict(story))))
+        else:
+            story = Story(**{**json.loads(row[0]), "index": k})
+            story.answers = tuple(story.answers)
+        out.append(story)
+    db.commit()
+    db.close()
+    return out
 
 
 def fingerprint(stories: list[Story]) -> str:

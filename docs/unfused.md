@@ -45,8 +45,10 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
   deleted 2026-10-02, when the parse graph replaced it.
 - **The foundation, first.** John's, 2026-10-04: what is known to be wrong in principle
   is fixed before it becomes the blocker, one change at a time and each measured, since
-  a change right in principle can still lose (`4cdbe641`). The red set
-  (`test_foundations.py`) is the list. In order:
+  a change right in principle can still lose (`4cdbe641`). A drop on the way is
+  expected, since crutches come out, and is recorded rather than chased until the
+  whole foundation is in (John's, 2026-10-04); a drop that lasts past the last item is
+  the finding. The red set (`test_foundations.py`) is the list. In order:
   1. Individuals (DECIDED, three layers). What joins two mentions into one is the hard
      part: the parse's own marks first, learnt later. With them, adjectives come out of
      names, and the house's rooms stay apart. The first rule, from what a Universal

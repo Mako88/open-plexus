@@ -256,8 +256,25 @@ def test_a_pronoun_is_resolved_against_the_episode(tmp_path):
     edges = set(a.db.execute(
         "SELECT edges.label, edges.node FROM edges JOIN events ON events.id = edges.event "
         "WHERE events.lemma = 'throw'").fetchall())
-    assert ("nsubj", "n:tom") in edges and ("dobj", "n:red ball") in edges
     assert not any(n.startswith("p:") for _, n in edges)
+    # onto the individuals already heard, not new ones of the same name
+    assert ("nsubj", a.individuals("tom")[0]) in edges
+    assert ("dobj", a.individuals("red ball")[0]) in edges
+
+
+def test_a_mention_opens_or_joins_an_individual_by_what_the_parse_marks(tmp_path):
+    """'a ball' opens an individual, 'the ball' joins the one in mind, and a name joins
+    its namesake in the episode; across a break nothing joins."""
+    a = arm(tmp_path)
+    for turn, text in enumerate(["Lily found a ball.", "Lily threw the ball.",
+                                 "Tom found a ball.", "***", "Lily found the ball."]):
+        a.hear(turn, text)
+    assert len(a.individuals("lily")) == 2 and len(a.individuals("ball")) == 3
+    first, second = sorted(a.individuals("ball"))[:2]
+    thrown = a.db.execute("SELECT edges.node FROM edges JOIN events ON events.id = "
+                          "edges.event WHERE events.lemma = 'throw' AND edges.label = "
+                          "'dobj'").fetchone()[0]
+    assert thrown == first != second
 
 
 def test_steps_stay_loaded_across_sentences_and_never_go_stale(tmp_path):

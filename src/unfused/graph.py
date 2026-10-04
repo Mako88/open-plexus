@@ -61,6 +61,11 @@ VECTORS = Path(__file__).resolve().parents[2] / "state" / "vectors.sqlite"
 SKIP = {"punct", "det", "aux", "auxpass", "cc", "mark", "neg", "intj", "case", "dep",
         "advmod", "prt", "predet", "preconj", "expl", "attr_of"}
 PRONOUNS = {"it", "they", "them", "its", "their", "he", "she", "him", "her", "his"}
+# the links 'where' can stand in
+PLACES = ("in", "on", "under", "into", "onto", "at", "behind", "near", "inside", "to",
+          "over", "by", "from", "through")
+# the links that start a clause of its own
+CLAUSES = {"conj", "advcl", "ccomp", "xcomp", "relcl", "acl", "parataxis", "csubj"}
 # each pronoun's form as a subject: what agreement is counted by
 PERSON = {"him": "he", "his": "he", "her": "she", "them": "they", "their": "they",
           "its": "it"}
@@ -1255,10 +1260,14 @@ class GraphArm:
         planned, fit = said, self.focused(question.text)
         if said is None or not self.in_focus(said):
             said = fit or said
+        # what the episode says outright, read from the question's grammar, comes first
+        match = self.matched(question.text)
+        said = match or said
         self.last_notes = (["(gave up)"] if given_up else []) + (
             ["(nothing)"] if said is None else ["(found)"]) + [
-            f"plans:{planned}", f"focus:{fit}", "by:" + (
-                "none" if said is None else "plans" if said == planned else "focus")]
+            f"plans:{planned}", f"focus:{fit}", f"match:{match}", "by:" + (
+                "none" if said is None else "match" if said == match else
+                "plans" if said == planned else "focus")]
         return "I don't know." if said is None else said
 
     def now(self) -> int:
@@ -1290,6 +1299,92 @@ class GraphArm:
                 break
             self._keep(key, kept)
         return tuple(kept) if kept else None
+
+    def pattern(self, question: str) -> tuple[str, list[str], list] | None:
+        """The question read as an event with one slot free: its verb's lemma as a telling's
+        event is named, the links the wh-word could stand in, and the names it is bound to,
+        as (label, name). 'Who loved her veil?' is a 'love' event with 'nsubj' free and
+        ('dobj', 'veil') bound; 'Where did Roxy put the leaves?' is a 'put' event with any
+        link of place free. A pronoun binds nothing, since a question's pronoun names no
+        one of its own."""
+        key = hashlib.sha256(f"{VERSION}|{self.model}|pattern-3|{question}".encode()).hexdigest()
+        kept = self._kept(key)
+        if kept is None:
+            kept = []
+            doc = nlp(self.model)(question)
+            wh = next((t for t in doc if t.lower_ in ("what", "who", "whom", "where")), None)
+            if wh is not None:
+                if wh.lower_ == "where":
+                    verb, free = wh.head, [f"prep:{p}" for p in PLACES]
+                elif wh.dep_ == "pobj" and wh.head.dep_ in ("prep", "dative", "agent"):
+                    verb, free = wh.head.head, [f"prep:{wh.head.lower_}"]
+                elif wh.dep_ not in ("det", "attr"):
+                    verb, free = wh.head, [wh.dep_]
+                else:
+                    verb, free = None, []
+                if verb is not None and verb.pos_ in ("VERB", "AUX"):
+                    modal = [c.lemma_.lower() for c in verb.children
+                             if c.dep_ == "aux" and c.tag_ == "MD"]
+                    neg = ["not"] if any(c.dep_ == "neg" for c in verb.children) else []
+                    lemma = " ".join(modal + neg + [verb.lemma_.lower()] + [
+                        c.lower_ for c in verb.children if c.dep_ == "prt"])
+                    bound = []
+                    for c in verb.children:
+                        if c is wh or c.lower_ in PRONOUNS or c.pos_ == "PRON":
+                            continue
+                        if c.dep_ in ("prep", "dative", "agent"):
+                            bound += [[f"prep:{c.lower_}", phrase(p)] for p in c.children
+                                      if p.dep_ == "pobj" and p.pos_ in ("NOUN", "PROPN")
+                                      and p.lower_ not in PRONOUNS]
+                        elif c.dep_ not in SKIP and c.pos_ in ("NOUN", "PROPN"):
+                            bound.append([c.dep_, phrase(c)])
+                    # every name inside the verb's own arguments, however deep: 'with
+                    # Nogael' in 'Who is cousins with Nogael?' hangs off 'cousins', not the
+                    # verb. Another clause ('and he puffed', 'which was his dog house') is
+                    # another event and binds nothing here
+                    named, todo = set(), [c for c in verb.children if c.dep_ not in CLAUSES]
+                    while todo:
+                        t = todo.pop()
+                        if t.pos_ in ("NOUN", "PROPN") and t.dep_ != "compound" and \
+                                t.lower_ not in PRONOUNS:
+                            named.add(phrase(t))
+                        todo += [c for c in t.children if c.dep_ not in CLAUSES]
+                    named = sorted(named)
+                    kept = [lemma, free, bound, named]
+            self._keep(key, kept)
+        return (kept[0], kept[1], [tuple(b) for b in kept[2]], kept[3]) if kept else None
+
+    def matched(self, question: str) -> str | None:
+        """The question's pattern matched against this episode: the latest event with the
+        question's lemma that holds every name the question binds it to, read at the free
+        slot. A question needs no lesson in its wording, as a plan's shape does; what it
+        asks is in its grammar."""
+        got = self.pattern(question)
+        if got is None:
+            return None
+        lemma, free, bound, named = got
+        for (eid,) in self.db.execute(
+                "SELECT id FROM events WHERE lemma = ? AND turn > ? ORDER BY id DESC",
+                (lemma, self.episode())).fetchall():
+            # a possessed noun ('her veil') is an event of its own whose `self` is the
+            # name, so an argument is read through it
+            edges = [(label, name) for label, node in self.db.execute(
+                "SELECT label, node FROM edges WHERE event = ?", (eid,)).fetchall()
+                for name in ([n for lab, d, n in self.around(node)
+                              if lab == "self" and d == 1] if node.startswith("e:")
+                             else [node])]
+            if not all((label, f"n:{name}") in edges for label, name in bound):
+                continue
+            # each other name the question says is two steps from the event or nearer
+            near = {n for _, _, a in self.around(f"e:{eid}") for n in
+                    [a] + ([b for _, d, b in self.around(a) if d == 1]
+                           if a.startswith("e:") else [])}
+            if not all(f"n:{n}" in near for n in named):
+                continue
+            for label, node in edges:
+                if label in free and node.startswith("n:") and not said_in(node[2:], question):
+                    return node[2:]
+        return None
 
     def focused(self, question: str) -> str | None:
         """The name in this episode that best fits the asked slot: how strongly it is in focus,

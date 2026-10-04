@@ -66,10 +66,10 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
        `e3b3647d`).
      - No stream question meets a shape a plan was learnt for, and half have a path
        from their names to the answer (`e3b3647d`). Plans are kept by wording, so
-       they never reach the stream. Next: a question
-       read as its own pattern ('Lily ate what?' is an 'eat' event with Lily as its
-       subject and its object free), matched against the episode, as `solve` matches
-       a plan, so the question needs no lesson in its wording.
+       they never reach the stream. A question is now also read as its own pattern
+       (`matched`), but only on the told verb and links exactly, so a cloze, whose
+       sentence was never told, is mostly left to focus. Loosening the match by
+       which verbs and links are alike is item 2's.
   2. Kinds as the fixed point of relations and things (John's, 2026-10-03). Two things
      are of a kind where they take part in alike relations with things of alike kinds,
      and two relations are alike where they join alike kinds. Each starts as its own

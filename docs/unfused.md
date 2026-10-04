@@ -53,12 +53,22 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
      Dependencies parse marks in any language: an indefinite mention opens an
      individual; a definite one (the `Definite` feature) joins the most active
      individual with its label whose attributes its modifiers do not contradict, else
-     opens one; a proper name joins its namesake in the episode. Across episodes, nothing
-     joins until it is learnt. Fit and kinds count by label (what everyone knows);
-     focus, `matched` and pronouns work on individuals (what this story is about).
+     opens one; a proper name joins its namesake in the episode. Until concepts exist,
+     a modifier contradicts an individual when it was never said of it, so an unsure
+     mention splits rather than merges: an answer is said by its label, so a split
+     costs little, and a merge cost the house its rooms. Across episodes, nothing joins
+     until it is learnt, which is how a person met once is the same person next week.
+     Fit and kinds count by label (what everyone knows); focus, `matched` and pronouns
+     work on individuals (what this story is about).
+     An individual is an index and holds no copies (John's, 2026-10-04): an id, with
+     its labels, its attributes and the events it takes part in as links pointing at
+     it, each wherever it is stored. What it is now is read from its latest links, so a
+     change is one more link and nothing is rewritten.
   2. Nothing the parse gives dropped: function words as links to their own kind of node
      (walks skip them), negation, modals and particles as links rather than parts of the
-     lemma, pronouns kept beside what they resolve to.
+     lemma, pronouns kept beside what they resolve to. Plans learn which links matter,
+     as negation, modals and 'before' were pulled out of `SKIP` one at a time. Refuted
+     if neither the stream nor the many-worded house reads higher with everything kept.
   3. Concepts: kinds as the fixed point (the stream's item 2) on the graph above.
   4. No English by hand: each rule on a word replaced as the code around it is rebuilt.
 - **The stream.** John's, 2026-10-03. The target is the TinyStories stream (THE
@@ -71,14 +81,10 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
        is event segmentation: a boundary where what is heard stops being predicted by
        what was, so an episode is found rather than set.
        Decided (DECIDED, episode boundaries): the break before each story stays.
-     - Identity, next. Every Lily in every story is one node. An episode-scoped name
-       ('lily' in this story) with a link to the shared word is what memory of many
-       stories needs. It is also what keeping the parse whole waits on (John's,
-       2026-10-04: drop nothing the parse gives): adjectives taken out of names merged
-       the house's rooms into 'room' (`4cdbe641`), so a thing needs a node of its own
-       apart from the words said of it.
-     - Still expected and not yet traced: adjectives folded into names ('the red ball'
-       is one name, so a colour is never a node), and the edges `SKIP` drops.
+     - Identity: every Lily in every story is one node. Moved to the foundation's item
+       1; adjectives taken out of names merged the house's rooms into 'room'
+       (`4cdbe641`), which is why it comes first.
+     - Adjectives folded into names and the edges `SKIP` drops: the foundation's item 2.
      - The plans learn one shape per wording, and a cloze is a wording of its own, so
        plans rarely answer here and the slot fit carries the learning.
      - A wrong kind is most of what is left ('thanked what?' answered 'guitar'). It
@@ -91,7 +97,8 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
        (`matched`), but only on the told verb and links exactly, so a cloze, whose
        sentence was never told, is mostly left to focus. Loosening the match by
        which verbs and links are alike is item 2's.
-  2. Kinds as the fixed point of relations and things (John's, 2026-10-03). Two things
+  2. Kinds as the fixed point of relations and things (John's, 2026-10-03), built as the
+     foundation's item 3. Two things
      are of a kind where they take part in alike relations with things of alike kinds,
      and two relations are alike where they join alike kinds. Each starts as its own
      class and both are refined in turn until nothing moves, as colour refinement
@@ -231,12 +238,9 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
      Phase 5 has it, and the first house is read at 3,000 and 30,000 turns, a size the
      house already has, for seconds a question as well as score (`tests/pushback.py`).
      Both are needed before the primer fork.
-  6. The edges `SKIP` drops (determiners, auxiliaries, conjunctions, `advmod`,
-     particles) are kept and plans learn which matter, as negation, modals and 'before'
-     were pulled out of it one at a time. Last because no miss traced on the
-     many-worded house came from a dropped function word. A function word is an edge's
-     label or a node's mark, never a node, so 'the' does not become a hub. Refuted if
-     the many-worded house reads no higher with every edge kept than with `SKIP`.
+  6. The edges `SKIP` drops: moved to the foundation's item 2, which gives function
+     words a kind of node of their own that walks skip, so 'the' is kept and is still
+     never a hub a walk passes through.
 - **Phase 5 — Learning rules, and operations over facts.** Plans learnt from lessons
   answer bAbI tasks 1, 2, 3 and 7. Order in time, the present against history, and a
   visit before or after another are learnt per plan. Rules induced from co-occurring
@@ -408,6 +412,9 @@ every 50 turns, so what it knows must survive on disk.
 
 ## THE PHASES
 
+As designed. Where a phase gives the faculty a job (ear, planner, judge), DECIDED's "no
+language model in the system" overrides it: the parse reads, and the graph plans.
+
 ### Phase 1 — Text memory
 
 Every turn is written to the store, and every question arrives at the faculty with what it
@@ -495,7 +502,7 @@ questions on a house are the teaching; the test split and the house's exam stay 
 is explanation-based learning, and it takes planning from the faculty, which is the planner
 role's exit.
 
-Pronouns are bound by the system: the ear writes 'she' or 'there' as heard, and the system
+Pronouns are bound by the system: the parse gives 'she' or 'there' as heard, and the system
 binds it to the entity most recently in focus that is consistent with what is known of it,
 as centering theory has it.
 

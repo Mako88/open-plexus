@@ -64,7 +64,7 @@ CARRIED = ("learnt", "positions")
 # every extraction kept across runs: the parser is deterministic, and the version is in
 # the key so a change to what is extracted re-reads every sentence
 CACHE = Path(__file__).resolve().parents[2] / "state" / "parses.sqlite"
-VERSION = "graph-13"
+VERSION = "graph-14"
 # every text MiniLM has encoded, by its text
 VECTORS = Path(__file__).resolve().parents[2] / "state" / "vectors.sqlite"
 # every text the parser has read, as its reading, by model and text
@@ -291,7 +291,9 @@ def asking(tok) -> bool:
 
 
 def negates(tok) -> bool:
-    return "Neg" in feature(tok, "Polarity")
+    """A word that says no: negation (`Polarity=Neg`), or a negative word as the parse
+    marks it ('never', 'nothing': `PronType=Neg`)."""
+    return "Neg" in feature(tok, "Polarity") or "Neg" in feature(tok, "PronType")
 
 
 def agreement(tok) -> str:
@@ -359,7 +361,12 @@ def extract(doc) -> list[dict]:
             lemma = (cop or tok).lemma_.lower()
             # the verb alone is its lemma, so 'will not give back' and 'gave' are one verb;
             # what did not happen or only might is marked on the event
-            events.append({"lemma": lemma, "mood": mood(tok), "edges": []})
+            # a clause a negated predicate is about was never so ('It isn't true that Ada
+            # keeps the jars'): it takes the negation
+            said = mood(tok)
+            if tok.dep_ in ("csubj", "ccomp") and any(negates(c) for c in tok.head.children):
+                said = " ".join(w for w in (said, mood(tok.head)) if w)
+            events.append({"lemma": lemma, "mood": said, "edges": []})
             # the word as heard, where it is not the lemma: the inflection a mouth will
             # say again
             if cop is None and tok.lower_ != lemma:

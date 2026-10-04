@@ -75,6 +75,12 @@ class Traced(runner.Graphed):
 
 
 def summarise(rows: list[dict]) -> dict:
+    """Each form apart, as the stream reads it."""
+    return {form: _summarise([r for r in rows if r["form"] == form])
+            for form in sorted({r["form"] for r in rows})}
+
+
+def _summarise(rows: list[dict]) -> dict:
     out = {}
     for name, keep in (("all", lambda r: True), ("early", lambda r: r["story"] < 100),
                        ("late", lambda r: r["story"] >= 100)):

@@ -56,6 +56,8 @@ CACHE = Path(__file__).resolve().parents[2] / "state" / "parses.sqlite"
 VERSION = "graph-7"
 # every text MiniLM has encoded, by its text
 VECTORS = Path(__file__).resolve().parents[2] / "state" / "vectors.sqlite"
+# every text the parser has read, as its reading, by model and text
+DOCS = Path(__file__).resolve().parents[2] / "state" / "docs.sqlite"
 
 # a clause's links that are not arguments
 SKIP = {"punct", "det", "aux", "auxpass", "cc", "mark", "neg", "intj", "case", "dep",
@@ -66,11 +68,16 @@ PLACES = ("in", "on", "under", "into", "onto", "at", "behind", "near", "inside",
           "over", "by", "from", "through")
 # the links that start a clause of its own
 CLAUSES = {"conj", "advcl", "ccomp", "xcomp", "relcl", "acl", "parataxis", "csubj"}
+# the links a blank can stand in, besides a preposition's
+BLANKS = {"nsubj", "nsubjpass", "dobj", "dative", "oprd", "pobj", "appos"}
 # each pronoun's form as a subject: what agreement is counted by
 PERSON = {"him": "he", "his": "he", "her": "she", "them": "they", "their": "they",
           "its": "it"}
 
 _NLP: dict = {}
+# texts read this run, and the open store of readings
+_DOCS: dict = {}
+_DOCS_DB: dict = {}
 
 # how much nearer a word's likest candidate must be than the next for a vote: right picks'
 # gaps sat at 0.14 to 0.21 and wrong ones' at 0.02 to 0.06 (readings/unheard-*)
@@ -96,6 +103,37 @@ def nlp(model: str):
 
         _NLP[model] = spacy.load(model)
     return _NLP[model]
+
+
+def parse(model: str, text: str):
+    """The parser's reading of a text, kept on disk whole: what is extracted from it can
+    change without the transformer reading anything again. The parser is loaded only for
+    a text never read."""
+    from spacy.tokens import Doc
+    import spacy
+
+    key = f"{model}|{text}"
+    if key in _DOCS:
+        return _DOCS[key]
+    if "db" not in _DOCS_DB:
+        DOCS.parent.mkdir(parents=True, exist_ok=True)
+        _DOCS_DB["db"] = sqlite3.connect(str(DOCS), timeout=60)
+        _DOCS_DB["db"].execute("CREATE TABLE IF NOT EXISTS docs (key TEXT PRIMARY KEY, "
+                               "doc BLOB NOT NULL)")
+        # a blank English vocabulary still knows what a word is: its lower case, and
+        # whether it is like a number
+        _DOCS_DB["vocab"] = spacy.blank("en").vocab
+    db = _DOCS_DB["db"]
+    row = db.execute("SELECT doc FROM docs WHERE key = ?", (key,)).fetchone()
+    if row is not None:
+        doc = Doc(_DOCS_DB["vocab"]).from_bytes(row[0])
+    else:
+        doc = nlp(model)(text)
+        db.execute("INSERT OR REPLACE INTO docs VALUES (?, ?)",
+                   (key, doc.to_bytes(exclude=["tensor", "user_data"])))
+        db.commit()
+    _DOCS[key] = doc
+    return doc
 
 
 def vectors(texts: list[str]):
@@ -294,7 +332,7 @@ class GraphArm:
         key = hashlib.sha256(f"{VERSION}|{self.model}|events|{text}".encode()).hexdigest()
         kept = self._kept(key)
         if kept is None:
-            kept = extract(nlp(self.model)(text))
+            kept = extract(parse(self.model, text))
             self.parsed += 1
             self._keep(key, kept)
         return kept
@@ -304,7 +342,7 @@ class GraphArm:
         key = hashlib.sha256(f"{VERSION}|{self.model}|names-2|{question}".encode()).hexdigest()
         kept = self._kept(key)
         if kept is None:
-            doc = nlp(self.model)(question)
+            doc = parse(self.model, question)
             kept = []
             for tok in doc:
                 if tok.pos_ in ("NOUN", "PROPN") and tok.dep_ != "compound":
@@ -771,7 +809,7 @@ class GraphArm:
             kept = self._kept(key)
             if kept is None:
                 kept = [[t.lower_, t.lemma_.lower(), t.tag_, t.dep_, t.head.i]
-                        for t in nlp(self.model)(question)]
+                        for t in parse(self.model, question)]
                 self._keep(key, kept)
             self._tokens[question] = kept
         return self._tokens[question]
@@ -1285,18 +1323,18 @@ class GraphArm:
     def blank(self, question: str) -> tuple[str, str] | None:
         """The slot the question's wh-word stands in: ('eat', 'dobj') for 'Lily ate
         what?', ('land', 'prep:on') for 'The bird landed on what?'."""
-        key = hashlib.sha256(f"{VERSION}|{self.model}|blank|{question}".encode()).hexdigest()
+        key = hashlib.sha256(f"{VERSION}|{self.model}|blank-2|{question}".encode()).hexdigest()
         kept = self._kept(key)
         if kept is None:
-            kept = []
-            for t in nlp(self.model)(question):
-                if t.lower_ not in ("what", "who", "whom"):
-                    continue
-                if t.dep_ == "pobj" and t.head.dep_ in ("prep", "dative", "agent"):
-                    kept = [t.head.head.lemma_.lower(), f"prep:{t.head.lower_}"]
-                elif t.dep_ not in ("det", "attr"):
-                    kept = [t.head.lemma_.lower(), t.dep_]
-                break
+            kept = _slot(parse(self.model, question), ("what", "who", "whom"))
+            if kept is None or kept[1] not in BLANKS and not kept[1].startswith("prep:"):
+                # a wh-word inside a sentence is often read as no argument at all ('She
+                # sat down and read what?' has it as a clause of its own); read as a
+                # thing, it takes the place it stands in
+                said = re.sub(r"\b(what|who|whom)\b", "something", question, count=1,
+                              flags=re.IGNORECASE)
+                kept = _slot(parse(self.model, said), ("something",)) or kept
+            kept = list(kept or [])
             self._keep(key, kept)
         return tuple(kept) if kept else None
 
@@ -1311,7 +1349,7 @@ class GraphArm:
         kept = self._kept(key)
         if kept is None:
             kept = []
-            doc = nlp(self.model)(question)
+            doc = parse(self.model, question)
             wh = next((t for t in doc if t.lower_ in ("what", "who", "whom", "where")), None)
             if wh is not None:
                 if wh.lower_ == "where":
@@ -1701,7 +1739,7 @@ class GraphArm:
         kept = self._kept(key)
         if kept is None:
             kept = [[t.idx, t.text, t.tag_, t.dep_, t.head.i, t.pos_]
-                    for t in nlp(self.model)(text)]
+                    for t in parse(self.model, text)]
             self._keep(key, kept)
         return kept
 
@@ -1742,7 +1780,7 @@ class GraphArm:
         key = hashlib.sha256(f"{VERSION}|{self.model}|reaction|{text}".encode()).hexdigest()
         rows = self._kept(key)
         if rows is None:
-            doc = nlp(self.model)(text)
+            doc = parse(self.model, text)
             # one row a token: no, whether it may name something, its name, and whether
             # it is a number of things read as the arm reads one ('none')
             rows = []
@@ -1776,6 +1814,26 @@ class GraphArm:
         self.db.close()
         if hasattr(self, "_cdb"):
             self._cdb.close()
+
+
+def _slot(doc, words: tuple) -> tuple[str, str] | None:
+    """The verb and link the first of `words` fills. One joined to another by 'and' fills
+    the other's slot ('Tom and what had fun' is a subject of 'have'), and a link through a
+    particle is the verb's ('brought him back to what' is 'bring' 'prep:to')."""
+    t = next((t for t in doc if t.lower_ in words), None)
+    if t is None:
+        return None
+    while t.dep_ == "conj" and t.head.i != t.i:
+        t = t.head
+    if t.dep_ == "pobj" and t.head.dep_ in ("prep", "dative", "agent"):
+        link, head = f"prep:{t.head.lower_}", t.head.head
+    elif t.dep_ in ("det", "attr"):
+        return None
+    else:
+        link, head = t.dep_, t.head
+    while head.pos_ in ("ADV", "ADP") and head.head.i != head.i:
+        head = head.head
+    return head.lemma_.lower(), link
 
 
 def asked(text: str) -> bool:

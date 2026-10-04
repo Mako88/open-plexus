@@ -284,3 +284,11 @@ def test_a_question_is_matched_as_an_event_with_one_slot_free(tmp_path):
     assert a.matched("Where did Roxy put the leaves?") == "feet"
     assert a.matched("Who is cousins with Ann?") == "tom"
     assert a.matched("Who hated her veil?") is None
+
+
+def test_a_blank_is_read_as_the_slot_it_stands_in(tmp_path):
+    a = arm(tmp_path)
+    # read as a clause of its own, as a word joined to another, through a particle
+    assert a.blank("She sat down and read what?") == ("read", "dobj")
+    assert a.blank("In the end, Tom and what had a great time?") == ("have", "nsubj")
+    assert a.blank("The man brought him back to what?") == ("bring", "prep:to")

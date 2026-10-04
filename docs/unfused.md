@@ -80,6 +80,11 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
      number of index lookups, as recall by cue does, never a scan of a label's history.
   3. Harder checks: further from their sentence, needing two told facts, about what
      changed, and early stories asked late.
+  Then John's two nearest goals (2026-10-04): a conversation with the system (the
+  mouth, the graphed arm's item 2), and worlds it acts in, its output heard back as
+  input. Beside both, idle inference that feeds itself (OPEN FORKS), its conclusions
+  marked as derived and kept only while later tellings bear them out, so a loop that
+  hears itself does not harden its own mistakes.
 - **The stream.** John's, 2026-10-03. The target is the TinyStories stream (THE
   STREAM, below); the houses and bAbI are regression checks, and their items further down
   wait behind these. In order:

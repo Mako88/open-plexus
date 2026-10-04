@@ -24,7 +24,7 @@ from pathlib import Path
 DATA = Path(__file__).resolve().parents[3] / "data" / "tinystories"
 # each story as made, kept by its text and how it is made: bump on any change to `make`
 CACHE = Path(__file__).resolve().parents[3] / "state" / "stories.sqlite"
-MADE = "stories-1"
+MADE = "stories-3"
 VALID = DATA / "TinyStories-valid.txt"
 URL = "https://huggingface.co/datasets/roneneldan/TinyStories/resolve/main/TinyStories-valid.txt"
 
@@ -32,6 +32,19 @@ DEFINITE = {"the", "his", "her", "their", "its", "my", "your", "our"}
 
 # A sentence ends at . ! or ? with any closing quotes kept on it.
 _END = re.compile(r'(?<=[.!?])["”\']?\s+(?=["“\']?[A-Z])')
+
+
+@dataclass
+class Check:
+    """A comprehension question: about a sentence already told, asked a few sentences on in
+    a parent's words ('Where did Roxy put the leaves?'), so its answer is in what was heard
+    and only its wording is new."""
+
+    at: int  # sentences of the story told before it is asked
+    question: str
+    answer: str
+    answers: tuple[str, ...]
+    earlier: list[str]  # the story's nouns told before it is asked
 
 
 @dataclass
@@ -43,6 +56,7 @@ class Story:
     answers: tuple[str, ...] = ()  # every form counted right: surface and lemma
     after: list[str] = field(default_factory=list)  # the held-back sentence and the rest
     earlier: list[str] = field(default_factory=list)  # the story's nouns before the question
+    checks: list[Check] = field(default_factory=list)
 
 
 _TITLES = ("Mr.", "Mrs.", "Ms.", "Dr.", "St.")
@@ -109,12 +123,92 @@ def make(text: str, index: int, nlp) -> Story:
         rest = re.sub(r"[.!]+$", "", rest).rstrip()
         q = (before + wh + (" " + rest if rest and not rest.startswith((",", "'")) else rest))
         q = q[0].upper() + q[1:] + "?"
-        earlier = [w for w in Counter(
-            tok.lemma_.lower() for dd in docs[:i] for tok in dd
-            if tok.pos_ in ("NOUN", "PROPN")).elements()]
         return Story(index, sents[:i], q, t.text.lower(),
-                     tuple(sorted({t.text.lower(), t.lemma_.lower()})), sents[i:], earlier)
-    return Story(index, sents, None, None)
+                     tuple(sorted({t.text.lower(), t.lemma_.lower()})), sents[i:],
+                     _nouns(docs[:i]), _checks(text, sents, docs, i))
+    return Story(index, sents, None, None, checks=_checks(text, sents, docs, None))
+
+
+def _nouns(docs) -> list[str]:
+    return [w for w in Counter(tok.lemma_.lower() for d in docs for tok in d
+                               if tok.pos_ in ("NOUN", "PROPN")).elements()]
+
+
+# how many sentences after the one it asks about a comprehension question comes
+GAP = 2
+# at most this many a story, each about a sentence of its own
+CHECKS = 2
+_PLACES = {"in", "on", "under", "into", "onto", "at", "behind", "near", "inside", "to"}
+_KEPT = {"dobj", "dative", "prt", "prep", "acomp", "oprd"}
+
+
+def _phrase(t) -> str:
+    return "".join(x.text_with_ws for x in t.subtree).strip()
+
+
+def asked(d) -> list[tuple[str, object]]:
+    """What a parent asks of a told sentence, as (question, the answer's token): its object
+    ('What did Roxy find?'), where it happened ('Where did Roxy put the leaves?') and who
+    did it ('Who found an icy hill?'). Only a plain past-tense clause whose doer is named;
+    the verb goes to its base form under 'did', so the wording is the parent's."""
+    root = d[:].root
+    if root.pos_ != "VERB" or root.tag_ != "VBD":
+        return []
+    kids = list(root.children)
+    if any(c.dep_ in ("aux", "auxpass", "neg") for c in kids):
+        return []
+    subj = next((c for c in kids if c.dep_ == "nsubj"), None)
+    if subj is None or subj.pos_ not in ("PROPN", "NOUN") or any(
+            c.dep_ == "conj" for c in subj.children):
+        return []
+    if subj.pos_ == "NOUN" and not any(c.lower_ in DEFINITE for c in subj.children):
+        return []  # 'a little boy' asked back is not a parent's question
+    # what follows the verb, in order; a phrase fronted before it ('At last,') is dropped
+    parts = [c for c in kids if c.dep_ in _KEPT and c.i > root.i]
+    if not parts:
+        return []
+
+    def rest(without) -> str:
+        return " ".join(_phrase(c) for c in parts if c is not without)
+
+    doer = _phrase(subj)
+    doer = doer if subj.pos_ == "PROPN" else doer[0].lower() + doer[1:]
+    out = []
+    for c in parts:
+        if c.dep_ == "dobj" and c.pos_ in ("NOUN", "PROPN"):
+            wh = "Who" if c.pos_ == "PROPN" else "What"
+            out.append((f"{wh} did {doer} {root.lemma_} {rest(c)}".strip() + "?", c))
+        elif c.dep_ == "prep" and c.lower_ in _PLACES:
+            obj = next((g for g in c.children if g.dep_ == "pobj"), None)
+            if obj is not None and obj.pos_ in ("NOUN", "PROPN"):
+                out.append((f"Where did {doer} {root.lemma_} {rest(c)}".strip() + "?", obj))
+    if any(c.dep_ in ("dobj", "prep") for c in parts):
+        # a story's doers are its people and animals, so a parent asks 'who'
+        out.append((f"Who {root.text} {rest(None)}?", subj))
+    return out
+
+
+def _checks(text, sents, docs, held) -> list[Check]:
+    """Up to CHECKS comprehension questions, each about its own told sentence and asked GAP
+    sentences after it. The cloze's held-back sentence is never asked about, so the two
+    curves stay apart. Which are asked is fixed by the story's text."""
+    found = []
+    for j, (s, d) in enumerate(zip(sents, docs)):
+        if j == held or any(q in s for q in '"“”') or s.endswith("?"):
+            continue
+        for q, t in asked(d):
+            key = hashlib.sha256(f"{text}|{j}|{q}".encode()).hexdigest()
+            found.append((key, j, q, t))
+    out, used = [], set()
+    for _, j, q, t in sorted(found):
+        if j in used or len(out) == CHECKS:
+            continue
+        used.add(j)
+        at = min(j + 1 + GAP, len(sents))
+        out.append(Check(at, q, t.text.lower(), tuple(sorted({t.text.lower(),
+                                                              t.lemma_.lower()})),
+                         _nouns(docs[:at])))
+    return sorted(out, key=lambda c: c.at)
 
 
 def stream(n: int, seed: int = 0, path: Path = VALID) -> list[Story]:
@@ -137,6 +231,8 @@ def stream(n: int, seed: int = 0, path: Path = VALID) -> list[Story]:
         else:
             story = Story(**{**json.loads(row[0]), "index": k})
             story.answers = tuple(story.answers)
+            story.checks = [Check(**{**c, "answers": tuple(c["answers"])})
+                            for c in story.checks]
         out.append(story)
     db.commit()
     db.close()
@@ -147,6 +243,8 @@ def fingerprint(stories: list[Story]) -> str:
     h = hashlib.sha256()
     for s in stories:
         h.update(f"{s.question}|{s.answer}|{len(s.told)}".encode())
+        for c in s.checks:
+            h.update(f"{c.at}|{c.question}|{c.answer}".encode())
     return h.hexdigest()[:12]
 
 

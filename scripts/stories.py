@@ -34,16 +34,18 @@ class Blind:
     name = "blind"
 
     def __init__(self) -> None:
-        self.answers: Counter = Counter()
+        # a tally a form: a cloze and a comprehension question are not one kind
+        self.answers: dict[str, Counter] = defaultdict(Counter)
 
     def tell(self, turn, text):
         pass
 
     def ask(self, turn, story):
-        return self.answers.most_common(1)[0][0] if self.answers else "I don't know."
+        seen = self.answers[type(story).__name__]
+        return seen.most_common(1)[0][0] if seen else "I don't know."
 
     def react(self, turn, story, said):
-        self.answers[story.answer] += 1
+        self.answers[type(story).__name__][story.answer] += 1
 
     def dials(self):
         return {}
@@ -123,44 +125,57 @@ def _stream(arm, stories, reopen_every, rows, sizes) -> int:
         # each boundary itself
         arm.tell(turn, BREAK)
         turn += 1
-        for text in s.told:
-            arm.tell(turn, text)
-            turn += 1
-        if s.question is not None:
-            t0 = time.perf_counter()
-            said = arm.ask(turn, s)
-            seconds = time.perf_counter() - t0
-            arm.react(turn, s, said)
-            rows.append({"story": s.index, "bucket": bucket(s.index), "question": s.question,
-                         "answer": s.answer, "said": said, "correct": right(s.answers, said),
-                         "refused": "don't know" in (said or "").lower(),
-                         "seconds": round(seconds, 3),
-                         "gave_up": "(gave up)" in getattr(getattr(arm, "arm", None),
-                                                          "last_notes", []),
-                         "notes": list(getattr(getattr(arm, "arm", None), "last_notes", []))})
-        for text in s.after:
-            arm.tell(turn, text)
-            turn += 1
+        told = s.told + s.after
+        for p in range(len(told) + 1):
+            # the cloze before its held-back sentence, then whatever is due to be checked
+            due = ([("cloze", s)] if s.question is not None and p == len(s.told) else []) + \
+                [("check", c) for c in s.checks if c.at == p]
+            for form, q in due:
+                rows.append(_ask(arm, turn, s, form, q))
+            if p < len(told):
+                arm.tell(turn, told[p])
+                turn += 1
         if (b := bucket(s.index)) != bucket(s.index + 1):
             sizes[b] = arm.dials()
     return turn
 
 
-def _summary(arm, rows, sizes, turn, started) -> dict:
-    dials = arm.dials()
-    arm.close()
+def _ask(arm, turn, s, form, q) -> dict:
+    t0 = time.perf_counter()
+    said = arm.ask(turn, q)
+    seconds = time.perf_counter() - t0
+    arm.react(turn, q, said)
+    notes = list(getattr(getattr(arm, "arm", None), "last_notes", []))
+    return {"story": s.index, "bucket": bucket(s.index), "form": form,
+            "question": q.question, "answer": q.answer, "said": said,
+            "correct": right(q.answers, said), "refused": "don't know" in (said or "").lower(),
+            "seconds": round(seconds, 3), "gave_up": "(gave up)" in notes, "notes": notes}
+
+
+def _curve(rows, sizes) -> dict:
     by = defaultdict(list)
     for r in rows:
         by[r["bucket"]].append(r)
-    curve = {b: {"score": round(sum(r["correct"] for r in rs) / len(rs), 3), "n": len(rs),
-                 "refused": round(sum(r["refused"] for r in rs) / len(rs), 3),
-                 "seconds_per_question": round(sum(r["seconds"] for r in rs) / len(rs), 3),
-                 "size": sizes.get(b)}
-             for b, rs in by.items()}
+    return {b: {"score": round(sum(r["correct"] for r in rs) / len(rs), 3), "n": len(rs),
+                "refused": round(sum(r["refused"] for r in rs) / len(rs), 3),
+                "seconds_per_question": round(sum(r["seconds"] for r in rs) / len(rs), 3),
+                "size": sizes.get(b)}
+            for b, rs in by.items()}
+
+
+def _summary(arm, rows, sizes, turn, started) -> dict:
+    dials = arm.dials()
+    arm.close()
+    # `score` and `curve` stay the cloze's; each form is read as its own curve
+    forms = {}
+    for form in ("cloze", "check"):
+        rs = [r for r in rows if r["form"] == form]
+        forms[form] = {"score": round(sum(r["correct"] for r in rs) / len(rs), 3)
+                       if rs else None, "n": len(rs), "curve": _curve(rs, sizes)}
     return {"arm": arm.name, "dials": dials, "turns": turn,
             "seconds": round(time.perf_counter() - started, 1),
-            "score": round(sum(r["correct"] for r in rows) / len(rows), 3) if rows else None,
-            "curve": curve, "rows": rows}
+            "score": forms["cloze"]["score"], "curve": forms["cloze"]["curve"],
+            "forms": forms, "rows": rows}
 
 
 def main() -> None:
@@ -176,7 +191,8 @@ def main() -> None:
 
     stories = [s for s in stream(args.stories, args.seed) if s.index >= args.skip]
     asked = sum(s.question is not None for s in stories)
-    print(f"{len(stories)} stories, {asked} questions", flush=True)
+    checks = sum(len(s.checks) for s in stories)
+    print(f"{len(stories)} stories, {asked} cloze, {checks} checks", flush=True)
     stamp = datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")
     for name in args.arms.split(","):
         work = Path(tempfile.mkdtemp(prefix=f"unfused-stories-{name}-"))
@@ -187,15 +203,16 @@ def main() -> None:
         reading = {"kind": "stories", "taken_at": stamp, "note": args.note,
                    "stream": {"source": "TinyStories-valid", "seed": args.seed,
                               "stories": args.stories, "skip": args.skip,
-                              "questions": asked,
+                              "questions": asked, "checks": checks,
                               "fingerprint": fingerprint(stories)},
                    **out}
         skip = f"-k{args.skip}" if args.skip else ""
         path = ROOT / "readings" / f"stories-{name}-s{args.seed}-n{args.stories}{skip}-{stamp}.json"
         path.write_text(json.dumps(reading, indent=1), encoding="utf-8")
-        curve = "  ".join(f"{b}:{c['score']}" for b, c in out["curve"].items())
-        print(f"{name:9} score {out['score']}  {curve}  {out['seconds']}s -> {path.name}",
-              flush=True)
+        for form, f in out["forms"].items():
+            curve = "  ".join(f"{b}:{c['score']}" for b, c in f["curve"].items())
+            print(f"{name:9} {form:5} {f['score']}  {curve}", flush=True)
+        print(f"{name:9} {out['seconds']}s -> {path.name}", flush=True)
         if "crashed" in out:
             print(out["crashed"], flush=True)
             return 1

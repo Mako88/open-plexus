@@ -66,7 +66,7 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
        `e3b3647d`).
      - No stream question meets a shape a plan was learnt for, and half have a path
        from their names to the answer (`e3b3647d`). Plans are kept by wording, so
-       they never reach the stream. Next, after the comprehension form: a question
+       they never reach the stream. Next: a question
        read as its own pattern ('Lily ate what?' is an 'eat' event with Lily as its
        subject and its object free), matched against the episode, as `solve` matches
        a plan, so the question needs no lesson in its wording.
@@ -348,7 +348,8 @@ reacts as a lesson's teacher does, then the held-back sentence and the rest are 
   about one already told, a few sentences on, as a parent checks that a child followed:
   'Where did Lily put the ball?'. Its answer is in the graph, so it measures what the
   system kept and can find. Each story keeps its cloze and adds these, read as their own
-  curve. Not built yet.
+  curve. It is asked in a parent's words, the verb under 'did' ('Where did Roxy put the
+  leaves?'), so it is never the told sentence with a hole in it.
 - **Refutes the target's bet:** the graphed arm's curve flat from the start, so nothing it
   learns on one story helps on the next.
 

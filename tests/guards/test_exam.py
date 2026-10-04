@@ -106,3 +106,17 @@ def test_a_story_is_asked_about_what_it_told_before():
     assert s.answer in ("ball", "tree", "tom") and "what" in s.question.lower() + "who"
     assert s.answer not in s.question.lower().split()
     assert right(s.answers, f"It was the {s.answer}.") and not right(s.answers, "the moon")
+
+
+def test_a_check_asks_a_told_sentence_in_a_parents_words():
+    import spacy
+
+    from unfused.exam.stories import asked
+
+    got = {q: t.lemma_ for q, t in asked(spacy.load("en_core_web_sm")(
+        "Roxy put the leaves under her feet."))}
+    assert got == {"What did Roxy put under her feet?": "leaf",
+                   "Where did Roxy put the leaves?": "foot",
+                   "Who put the leaves under her feet?": "Roxy"}, got
+    # no doer named, or a verb under an auxiliary: nothing a parent's 'did' can ask
+    assert not asked(spacy.load("en_core_web_sm")("She was playing in the park."))

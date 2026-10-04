@@ -43,7 +43,19 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
 - ~~**Phase 3 — Ears.**~~ Struck 2026-09-29 under the strict scorer, which wants each gold
   filler in a slot of its own: Qwen3.5-2B at 0.96 recall and 1.00 precision. The ear was
   deleted 2026-10-02, when the parse graph replaced it.
-- **The stream, first.** John's, 2026-10-03. The target is the TinyStories stream (THE
+- **The foundation, first.** John's, 2026-10-04: what is known to be wrong in principle
+  is fixed before it becomes the blocker, one change at a time and each measured, since
+  a change right in principle can still lose (`4cdbe641`). The red set
+  (`test_foundations.py`) is the list. In order:
+  1. Individuals (DECIDED, three layers). What joins two mentions into one is the hard
+     part: the parse's own marks first, learnt later. With them, adjectives come out of
+     names, and the house's rooms stay apart.
+  2. Nothing the parse gives dropped: function words as links to their own kind of node
+     (walks skip them), negation, modals and particles as links rather than parts of the
+     lemma, pronouns kept beside what they resolve to.
+  3. Concepts: kinds as the fixed point (the stream's item 2) on the graph above.
+  4. No English by hand: each rule on a word replaced as the code around it is rebuilt.
+- **The stream.** John's, 2026-10-03. The target is the TinyStories stream (THE
   STREAM, below); the houses and bAbI are regression checks, and their items further down
   wait behind these. In order:
   1. What broke first, traced on 300 stories (each fault's reading is in its commit):
@@ -289,6 +301,17 @@ commit.
   bAbI lessons at all. Until a curriculum exists, the bAbI reading taught on its own 20
   stories stays as the regression check.
 
+- **Three layers: labels, concepts, individuals.** John's, 2026-10-04. A label is a
+  word, and belongs to a language. A concept is what labels point at, learnt from how
+  they connect (kinds), so 'red' is a colour by how it attaches to things, and naming the
+  concept later is one more label. An individual is a thing: an identity of its own (a
+  GUID, John's; derived from where it was first heard, so a run reproduces it) with
+  labels and concepts attached and free to change. A ball painted blue is the same ball;
+  two red balls are two. A description finds an individual and is not it. Individuals
+  are long-lived (a person met once is the same person next week), and what is in mind
+  now is what is active, which focus already is. Nothing of one language is held by
+  hand: what a word does is read from what the parser marks in any language, or learnt.
+  The red set holds each part (`tests/outstanding/test_foundations.py`).
 - **The 1080 Ti is the hardware.** No rented compute. Anything that needs more than one
   11 GB Pascal card does not get built.
 - **No language model in the system.** John's, 2026-10-02, replacing 2026-09-29's faculty

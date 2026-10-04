@@ -11,7 +11,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-COUNT = 9
+COUNT = 8
 
 
 @dataclass(frozen=True)
@@ -43,16 +43,6 @@ OBJECTIONS = [
             "that can hide a difference between arms that hedge differently.",
         settled_by="Count answers naming more than one candidate of the right kind, per arm. "
                    "Above a few per cent for any arm, score those as wrong and re-read.",
-    ),
-    Objection(
-        what="`graph.py` holds English words by hand: the pronouns, 'no' and 'nope' in a "
-             "reaction, and the number words.",
-        why="John's, 2026-10-01: a rule for a word does not generalise. The list it replaced, "
-            "`System.clean`'s, went with the taught arm; these are what is left of the habit, "
-            "and the next pronoun, refusal or numeral will need another.",
-        settled_by="A learnt reading of each: a pronoun bound by centering as Phase 5 says, "
-                   "'no' learnt from reactions that came before a corrected lesson, numbers "
-                   "from counts a lesson taught. Each scored on the readings it touches.",
     ),
     Objection(
         what="The graph is walked one SQL query a step, and borrowing scans every taught "

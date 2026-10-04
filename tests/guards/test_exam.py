@@ -120,3 +120,25 @@ def test_a_check_asks_a_told_sentence_in_a_parents_words():
                    "Who put the leaves under her feet?": "Roxy"}, got
     # no doer named, or a verb under an auxiliary: nothing a parent's 'did' can ask
     assert not asked(spacy.load("en_core_web_sm")("She was playing in the park."))
+
+
+def test_a_check_two_tellings_answer_accepts_both_and_is_asked_once():
+    import spacy
+
+    from unfused.exam.stories import _checks, sentences
+
+    text = "Lily found a shell. Lily found a crab. She was happy. It was a fun day."
+    sents = sentences(text)
+    checks = _checks(text, sents, list(spacy.load("en_core_web_sm").pipe(sents)), None)
+    got = [(c.question, c.answers) for c in checks]
+    assert got.count(("What did Lily find?", ("crab", "shell"))) == 1, got
+    assert all(q != "What did Lily find?" or a == ("crab", "shell") for q, a in got), got
+    # told with a pronoun and more besides, a telling still answers; 'they' is not Lily
+    from unfused.exam.stories import _answers, _asks
+
+    nlp = spacy.load("en_core_web_sm")
+    (_, _, asking), = [a for a in _asks(nlp("Lily saw a bird.")) if a[0].startswith("What")]
+    told = [w for _, _, w in _asks(nlp("Then she saw dark clouds in the sky."), pronoun=True)]
+    assert any(_answers(asking, w) for w in told), told
+    told = [w for _, _, w in _asks(nlp("Then they saw dark clouds in the sky."), pronoun=True)]
+    assert not any(_answers(asking, w) for w in told), told

@@ -81,10 +81,8 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
      question it still rises with history (0.013 s to 0.22 s): answering through
      borrowed shapes (`nearest`, pushback #4), `follow` and `paths` are next. The
      pre-parse of 3,000 stories is about 80% through (`scripts/preparse.py` resumes).
-  3. A check that more than one telling answers accepts every answer they support
-     (DECIDED with John, 2026-10-04: a question with several right answers is a real
-     form, and scoring one of them as the only right one was a fault in the test, not a
-     hard question). Five of the seven missed checks at 300 stories are this.
+  3. ~~A check that more than one telling answers accepts every answer they support~~.
+     Struck 2026-10-04 (`_answers` in `exam/stories.py`).
   4. Harder checks, one at a time and each measured alone: further from their sentence
      (5 to 15 sentences on), needing two told facts, about what changed, and early
      stories asked late.

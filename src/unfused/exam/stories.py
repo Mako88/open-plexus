@@ -24,7 +24,7 @@ from pathlib import Path
 DATA = Path(__file__).resolve().parents[3] / "data" / "tinystories"
 # each story as made, kept by its text and how it is made: bump on any change to `make`
 CACHE = Path(__file__).resolve().parents[3] / "state" / "stories.sqlite"
-MADE = "stories-3"
+MADE = "stories-5"
 VALID = DATA / "TinyStories-valid.txt"
 URL = "https://huggingface.co/datasets/roneneldan/TinyStories/resolve/main/TinyStories-valid.txt"
 
@@ -151,6 +151,18 @@ def asked(d) -> list[tuple[str, object]]:
     ('What did Roxy find?'), where it happened ('Where did Roxy put the leaves?') and who
     did it ('Who found an icy hill?'). Only a plain past-tense clause whose doer is named;
     the verb goes to its base form under 'did', so the wording is the parent's."""
+    return [(q, t) for q, t, _ in _asks(d)]
+
+
+# a told sentence whose doer is one of these answers what a named doer's question asks:
+# 'she saw dark clouds' answers 'What did Lily see?' as well as 'Lily saw a bird' does
+_PRONOUNS = {"he": "Sing", "she": "Sing", "they": "Plur"}
+
+
+def _asks(d, pronoun: bool = False) -> list[tuple[str, object, tuple]]:
+    """`asked`, each with what it asks as (what is asked, the verb, the doer, the other
+    parts), so a question can be matched against every telling that answers it. With
+    `pronoun`, a clause whose doer is a personal pronoun is read too, for matching only."""
     root = d[:].root
     if root.pos_ != "VERB" or root.tag_ != "VBD":
         return []
@@ -158,10 +170,14 @@ def asked(d) -> list[tuple[str, object]]:
     if any(c.dep_ in ("aux", "auxpass", "neg") for c in kids):
         return []
     subj = next((c for c in kids if c.dep_ == "nsubj"), None)
-    if subj is None or subj.pos_ not in ("PROPN", "NOUN") or any(
-            c.dep_ == "conj" for c in subj.children):
+    if subj is None or any(c.dep_ == "conj" for c in subj.children):
         return []
-    if subj.pos_ == "NOUN" and not any(c.lower_ in DEFINITE for c in subj.children):
+    if subj.pos_ == "PRON":
+        if not pronoun or subj.lower_ not in _PRONOUNS:
+            return []
+    elif subj.pos_ not in ("PROPN", "NOUN"):
+        return []
+    elif subj.pos_ == "NOUN" and not any(c.lower_ in DEFINITE for c in subj.children):
         return []  # 'a little boy' asked back is not a parent's question
     # what follows the verb, in order; a phrase fronted before it ('At last,') is dropped
     parts = [c for c in kids if c.dep_ in _KEPT and c.i > root.i]
@@ -171,43 +187,71 @@ def asked(d) -> list[tuple[str, object]]:
     def rest(without) -> str:
         return " ".join(_phrase(c) for c in parts if c is not without)
 
+    def others(without) -> frozenset:
+        return frozenset(_phrase(c).lower() for c in parts if c is not without)
+
     doer = _phrase(subj)
     doer = doer if subj.pos_ == "PROPN" else doer[0].lower() + doer[1:]
+    who = (subj.lower_ if subj.pos_ == "PRON" else doer.lower(),
+           _PRONOUNS.get(subj.lower_) or ("Plur" if subj.tag_ in ("NNS", "NNPS") else "Sing"))
     out = []
     for c in parts:
         if c.dep_ == "dobj" and c.pos_ in ("NOUN", "PROPN"):
             wh = "Who" if c.pos_ == "PROPN" else "What"
-            out.append((f"{wh} did {doer} {root.lemma_} {rest(c)}".strip() + "?", c))
+            out.append((f"{wh} did {doer} {root.lemma_} {rest(c)}".strip() + "?", c,
+                        ("dobj", root.lemma_, who, others(c))))
         elif c.dep_ == "prep" and c.lower_ in _PLACES:
             obj = next((g for g in c.children if g.dep_ == "pobj"), None)
             if obj is not None and obj.pos_ in ("NOUN", "PROPN"):
-                out.append((f"Where did {doer} {root.lemma_} {rest(c)}".strip() + "?", obj))
-    if any(c.dep_ in ("dobj", "prep") for c in parts):
+                out.append((f"Where did {doer} {root.lemma_} {rest(c)}".strip() + "?", obj,
+                            ("where", root.lemma_, who, others(c))))
+    if subj.pos_ != "PRON" and any(c.dep_ in ("dobj", "prep") for c in parts):
         # a story's doers are its people and animals, so a parent asks 'who'
-        out.append((f"Who {root.text} {rest(None)}?", subj))
+        out.append((f"Who {root.text} {rest(None)}?", subj,
+                    ("who", root.lemma_, None, others(None))))
     return out
+
+
+def _answers(asking: tuple, telling: tuple) -> bool:
+    """Whether a telling answers a question: what is asked and the verb the same, the doer
+    the same or a pronoun that can stand for it, and every other part the question names
+    in it, so 'she saw dark clouds in the sky' answers 'What did Lily see?'."""
+    form, lemma, doer, rest = asking
+    t_form, t_lemma, t_doer, t_rest = telling
+    if (form, lemma) != (t_form, t_lemma) or not rest <= t_rest:
+        return False
+    if doer is None or t_doer == doer:
+        return True
+    # a pronoun stands for a doer of its number
+    return t_doer[0] in _PRONOUNS and t_doer[1] == doer[1]
 
 
 def _checks(text, sents, docs, held) -> list[Check]:
     """Up to CHECKS comprehension questions, each about its own told sentence and asked GAP
     sentences after it. The cloze's held-back sentence is never asked about, so the two
     curves stay apart. Which are asked is fixed by the story's text."""
-    found = []
+    found, tellings = [], []
     for j, (s, d) in enumerate(zip(sents, docs)):
         if j == held or any(q in s for q in '"“”') or s.endswith("?"):
             continue
-        for q, t in asked(d):
+        for q, t, what in _asks(d):
             key = hashlib.sha256(f"{text}|{j}|{q}".encode()).hexdigest()
-            found.append((key, j, q, t))
+            found.append((key, j, q, t, what))
+        tellings += [(j, t, what) for _, t, what in _asks(d, pronoun=True)]
     out, used = [], set()
-    for _, j, q, t in sorted(found):
-        if j in used or len(out) == CHECKS:
+    for _, j, q, t, what in sorted(found):
+        # a parent asks a question once, whichever telling it was of
+        if j in used or q in used or len(out) == CHECKS:
             continue
-        used.add(j)
+        used |= {j, q}
         at = min(j + 1 + GAP, len(sents))
-        out.append(Check(at, q, t.text.lower(), tuple(sorted({t.text.lower(),
-                                                              t.lemma_.lower()})),
-                         _nouns(docs[:at])))
+        # a question more than one telling answers ('What did Lily see?' after she saw a
+        # bird and then dark clouds in the sky) has every answer they support right
+        # (John's, 2026-10-04)
+        same = {t} | {u for k, u, told in tellings if k < at and _answers(what, told)}
+        out.append(Check(at, q, t.text.lower(), tuple(sorted(
+            {u.text.lower() for u in same} | {u.lemma_.lower() for u in same})),
+            _nouns(docs[:at])))
     return sorted(out, key=lambda c: c.at)
 
 
@@ -244,7 +288,7 @@ def fingerprint(stories: list[Story]) -> str:
     for s in stories:
         h.update(f"{s.question}|{s.answer}|{len(s.told)}".encode())
         for c in s.checks:
-            h.update(f"{c.at}|{c.question}|{c.answer}".encode())
+            h.update(f"{c.at}|{c.question}|{c.answer}|{c.answers}".encode())
     return h.hexdigest()[:12]
 
 

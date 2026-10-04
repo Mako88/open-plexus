@@ -52,14 +52,7 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
        far it reaches is a fixed number of turns for now. The mechanism it stands in for
        is event segmentation: a boundary where what is heard stops being predicted by
        what was, so an episode is found rather than set.
-       OPEN, John's to decide: the stream tells stories back to back on one clock, so
-       nothing but their words separates them. Real conversations are separated by
-       time, and the turn index is the system's clock, so the stream could advance it
-       between stories, as a night passing. That adds time the real world has rather
-       than removing difficulty, and it is still a change to the world made because the
-       machine did badly, which the rules forbid unless he says otherwise. Without it,
-       the boundary has to be found from the words, where TinyStories' shared
-       vocabulary (every story has a Lily and a park) makes overlap a weak signal.
+       Decided (DECIDED, episode boundaries): the break before each story stays.
      - Identity. Every Lily in every story is one node. An episode-scoped name
        ('lily' in this story) with a link to the shared word is what memory of many
        stories needs.
@@ -281,6 +274,11 @@ commit.
 - **Nothing memorised in one world is read back as a score in another.** John's,
   2026-10-03. Aliases are never carried from practice houses, since every house draws on one
   synonym table, and no reading is called "as deployed".
+- **Stories bring their own episode boundaries** (John's, 2026-10-03). A story's end is
+  the world's, as a chapter break or a conversation ending is, so the stream's break
+  before each story stays and no clock is advanced between them. Boundaries the system
+  sets itself are still wanted (OPEN FORKS); when they are built, a control with the
+  breaks removed says how much the system leaned on the given ones.
 - **bAbI's milestone is transfer** (John's, 2026-10-03). A system that learns as it goes is
   judged after teaching, as a model is judged after training rather than at its first
   weights. The milestone reading is bAbI after a general curriculum (the primer fork) with no

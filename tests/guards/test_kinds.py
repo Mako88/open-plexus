@@ -1,9 +1,9 @@
 """Kinds learnt from how words connect, out of the red set once it held (THE ORDER,
 the foundation's item 3)."""
 
-from unfused.graph import GraphArm
+from unfused.graph import PARSER, GraphArm
 
-MODEL = "stanza"
+MODEL = PARSER
 
 
 def arm(tmp_path):

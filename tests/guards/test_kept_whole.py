@@ -1,9 +1,9 @@
 """Nothing the parse gives dropped, out of the red set once it held (THE ORDER, the
 foundation's item 2)."""
 
-from unfused.graph import extract, nlp
+from unfused.graph import PARSER, extract, nlp
 
-MODEL = "stanza"
+MODEL = PARSER
 
 
 def test_nothing_the_parse_gives_is_dropped():

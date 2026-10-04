@@ -64,7 +64,7 @@ CARRIED = ("learnt", "positions")
 # every extraction kept across runs: the parser is deterministic, and the version is in
 # the key so a change to what is extracted re-reads every sentence
 CACHE = Path(__file__).resolve().parents[2] / "state" / "parses.sqlite"
-VERSION = "graph-12"
+VERSION = "graph-13"
 # every text MiniLM has encoded, by its text
 VECTORS = Path(__file__).resolve().parents[2] / "state" / "vectors.sqlite"
 # every text the parser has read, as its reading, by model and text
@@ -81,8 +81,14 @@ CLAUSES = {"conj", "advcl", "ccomp", "xcomp", "acl", "acl:relcl", "parataxis", "
 # the links a blank can stand in, besides a preposition's
 BLANKS = {"nsubj", "nsubj:pass", "obj", "iobj", "xcomp", "appos", "nmod:poss", "attr",
           "acomp"}
-# the parser every reading is taken with, and where its models are kept
-PARSER = "stanza"
+# the parser every reading is taken with, and where its models are kept: Stanza's
+# transformer package, which reads 'Someone painted the jars slate' with the jars as the
+# object where its default package took them as part of 'slate'
+PARSER = "stanza-accurate"
+# Stanza's package for each name a parser goes by
+PACKAGES = {"stanza": "default", "stanza-accurate": "default_accurate"}
+# how many texts the parser reads in one batch
+BATCH = 256
 STANZA = Path(__file__).resolve().parents[2] / "state" / "stanza"
 
 _NLP: dict = {}
@@ -114,10 +120,10 @@ def nlp(model: str):
     """The parser, as a function from text to a spaCy `Doc`. Stanza's reading carries the
     Universal Dependencies relations and features (`PronType=Int`, `Polarity=Neg`,
     `Definite`), which mark in any language what a rule on a word would otherwise hold
-    by hand."""
+    by hand. A Stanza parser also reads many texts at once (`.many`)."""
     if model not in _NLP:
-        if model == "stanza":
-            _NLP[model] = _stanza()
+        if model in PACKAGES:
+            _NLP[model] = _stanza(PACKAGES[model])
         else:
             import spacy
 
@@ -125,18 +131,18 @@ def nlp(model: str):
     return _NLP[model]
 
 
-def _stanza():
+def _stanza(package: str):
     import spacy
     import stanza
     from spacy.tokens import Doc
 
-    pipe = stanza.Pipeline("en", dir=str(STANZA), processors="tokenize,mwt,pos,lemma,"
-                           "depparse", download_method=None, verbose=False)
+    pipe = stanza.Pipeline("en", dir=str(STANZA), package=package, processors="tokenize,"
+                           "mwt,pos,lemma,depparse", download_method=None, verbose=False)
     vocab = spacy.blank("xx").vocab
 
-    def read(text: str):
+    def convert(read) -> Doc:
         words, spaces, heads, deps, pos, tags, lemmas, morphs, starts = ([] for _ in range(9))
-        for sent in pipe(text).sentences:
+        for sent in read.sentences:
             base = len(words)
             tokens = sent.tokens
             for n, tok in enumerate(tokens):
@@ -144,9 +150,7 @@ def _stanza():
                 for j, w in enumerate(tok.words):
                     words.append(w.text)
                     last = j == len(tok.words) - 1
-                    spaces.append(bool(last and after is not None and after > tok.end_char)
-                                  or (last and after is None and n + 1 == len(tokens)
-                                      and False))
+                    spaces.append(bool(last and after is not None and after > tok.end_char))
                     heads.append(base + (w.head - 1 if w.head else w.id - 1))
                     deps.append("ROOT" if w.deprel == "root" else w.deprel)
                     pos.append(w.upos)
@@ -157,7 +161,32 @@ def _stanza():
         return Doc(vocab, words=words, spaces=spaces, heads=heads, deps=deps, pos=pos,
                    tags=tags, lemmas=lemmas, morphs=morphs, sent_starts=starts)
 
+    def read(text: str) -> Doc:
+        return convert(pipe(text))
+
+    def many(texts: list[str]) -> list[Doc]:
+        # a batch keeps the card busy: one sentence at a time leaves it two-thirds idle
+        return [convert(r) for r in pipe.bulk_process(texts)]
+
+    read.many = many
     return read
+
+
+def parse_many(model: str, texts) -> int:
+    """Every text not yet read, read in batches into the store of readings, so a stream
+    is parsed ahead of being heard. How many were read."""
+    db = _store()
+    todo = list(dict.fromkeys(t for t in texts if t.strip() and db.execute(
+        "SELECT 1 FROM docs WHERE key = ?", (f"{model}|{t}",)).fetchone() is None))
+    reader = nlp(model)
+    for at in range(0, len(todo), BATCH):
+        chunk = todo[at:at + BATCH]
+        docs = reader.many(chunk) if hasattr(reader, "many") else [reader(t) for t in chunk]
+        db.executemany("INSERT OR REPLACE INTO docs VALUES (?, ?)",
+                       [(f"{model}|{t}", d.to_bytes(exclude=["tensor", "user_data"]))
+                        for t, d in zip(chunk, docs)])
+        db.commit()
+    return len(todo)
 
 
 def parse(model: str, text: str):
@@ -165,22 +194,11 @@ def parse(model: str, text: str):
     change without the transformer reading anything again. The parser is loaded only for
     a text never read."""
     from spacy.tokens import Doc
-    import spacy
 
     key = f"{model}|{text}"
     if key in _DOCS:
         return _DOCS[key]
-    if "db" not in _DOCS_DB:
-        DOCS.parent.mkdir(parents=True, exist_ok=True)
-        _DOCS_DB["db"] = sqlite3.connect(str(DOCS), timeout=60)
-        # a reading lost to a crash is read again, so none waits on the disk
-        _DOCS_DB["db"].execute("PRAGMA journal_mode=WAL")
-        _DOCS_DB["db"].execute("PRAGMA synchronous=OFF")
-        _DOCS_DB["db"].execute("CREATE TABLE IF NOT EXISTS docs (key TEXT PRIMARY KEY, "
-                               "doc BLOB NOT NULL)")
-        # a vocabulary of no one language: a word's lower case and nothing else
-        _DOCS_DB["vocab"] = spacy.blank("xx").vocab
-    db = _DOCS_DB["db"]
+    db = _store()
     row = db.execute("SELECT doc FROM docs WHERE key = ?", (key,)).fetchone()
     if row is not None:
         doc = Doc(_DOCS_DB["vocab"]).from_bytes(row[0])
@@ -191,6 +209,23 @@ def parse(model: str, text: str):
         db.commit()
     _DOCS[key] = doc
     return doc
+
+
+def _store() -> sqlite3.Connection:
+    """The open store of readings."""
+    import spacy
+
+    if "db" not in _DOCS_DB:
+        DOCS.parent.mkdir(parents=True, exist_ok=True)
+        _DOCS_DB["db"] = sqlite3.connect(str(DOCS), timeout=60)
+        # a reading lost to a crash is read again, so none waits on the disk
+        _DOCS_DB["db"].execute("PRAGMA journal_mode=WAL")
+        _DOCS_DB["db"].execute("PRAGMA synchronous=OFF")
+        _DOCS_DB["db"].execute("CREATE TABLE IF NOT EXISTS docs (key TEXT PRIMARY KEY, "
+                               "doc BLOB NOT NULL)")
+        # a vocabulary of no one language: a word's lower case and nothing else
+        _DOCS_DB["vocab"] = spacy.blank("xx").vocab
+    return _DOCS_DB["db"]
 
 
 def vectors(texts: list[str]):
@@ -1707,7 +1742,7 @@ class GraphArm:
         ('dobj', 'veil') bound; 'Where did Roxy put the leaves?' is a 'put' event with any
         link of place free. A pronoun binds nothing, since a question's pronoun names no
         one of its own."""
-        key = hashlib.sha256(f"{VERSION}|{self.model}|pattern-5|{question}".encode()).hexdigest()
+        key = hashlib.sha256(f"{VERSION}|{self.model}|pattern-6|{question}".encode()).hexdigest()
         kept = self._kept(key)
         if kept is None:
             kept = []
@@ -1726,6 +1761,9 @@ class GraphArm:
                 elif case:
                     verb, free = wh.head, ["prep:" + " ".join(case)]
                 elif wh.dep_ != "det":
+                    # an object asked for is either of the core objects the parse tells
+                    # apart ('told the eye', 'asked his mommy' are read as indirect), the
+                    # direct first
                     verb, free = wh.head, [wh.dep_]
                 else:
                     verb, free = None, []
@@ -1769,7 +1807,12 @@ class GraphArm:
         if got is None:
             return None
         lemma, free, bound, named, mood, wh = got
-        free = self.circumstances(wh) if free == ["prep:*"] else free
+        free = (self.circumstances(wh) or ["prep:*"]) if free == ["prep:*"] else free
+
+        def rank(label: str) -> int | None:
+            return 0 if label in free or (free == ["prep:*"] and label.startswith("prep:")
+                                          and ">" not in label) else None
+
         for (eid,) in self.db.execute(
                 "SELECT id FROM events WHERE lemma = ? AND mood = ? AND turn > ? ORDER BY id "
                 "DESC", (lemma, mood, self.episode())).fetchall():
@@ -1794,12 +1837,17 @@ class GraphArm:
                            if a.startswith("e:") else [])}
             if not all(any(self.is_(x, f"n:{n}") for x in near) for n in named):
                 continue
+            best = None
             for label, node in edges:
-                if (label in free or (free == ["prep:*"] and label.startswith("prep:")
-                                      and ">" not in label)) and not node.startswith("e:") \
-                        and not any(self.is_(node, f"n:{name}") for _, name in bound) \
-                        and not said_in(said := self.describe(node), question):
-                    return said
+                r = rank(label)
+                if r is None or node.startswith("e:") or any(
+                        self.is_(node, f"n:{name}") for _, name in bound):
+                    continue
+                said = self.describe(node)
+                if not said_in(said, question) and (best is None or r < best[0]):
+                    best = (r, said)
+            if best is not None:
+                return best[1]
         return None
 
     def focused(self, question: str) -> str | None:
@@ -1883,11 +1931,11 @@ class GraphArm:
 
     def circumstances(self, wh: str) -> list[str]:
         """The links a word asking for a circumstance ('where', 'when') has had its
-        answers hang by, learnt from lessons, as the parse marks only that it asks; any
-        oblique until a lesson says."""
+        answers hang by, learnt from lessons, as the parse marks only that it asks, the
+        commonest first. `matched` tries them first and any other oblique after."""
         got = [lab for (lab,) in self.db.execute(
             "SELECT link FROM circumstances WHERE wh = ? ORDER BY n DESC", (wh,))]
-        return got or ["prep:*"]
+        return got
 
     def learn_circumstance(self, question: str, want: str) -> None:
         """A lesson's answer to a word asking for a circumstance: the oblique the answer

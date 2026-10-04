@@ -1,9 +1,9 @@
 """The graphed arm, on the small parser so the guards stay fast."""
 
 from unfused.exam.world import Question
-from unfused.graph import GraphArm, extract, nlp
+from unfused.graph import PARSER, GraphArm, extract, nlp
 
-MODEL = "stanza"
+MODEL = PARSER
 
 
 def q(text, answer=None):

@@ -69,6 +69,17 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
      from teaching, or the parser becomes one trained on Universal Dependencies
      treebanks (Stanza marks `PronType=Int` and `Polarity=Neg`). The parser is a dial;
      which way is John's to say. Number words have no feature in either and are learnt.
+- **After the foundation.** John's, 2026-10-04, in order:
+  1. Every missed check read and sorted by cause: the parser's misreading, a fault in
+     the system (a told fact it holds and does not find), or a malformed question. Only
+     the second is the system's to fix; the third is fixed only where the question is
+     wrong, never because it is missed.
+  2. Size: 3,000 stories parsed ahead (`scripts/preparse.py`), one run profiled, and its
+     hotspots fixed in the order the profile ranks them, until a 3,000-story reading
+     takes about ten minutes. Answering is meant to cost what is in mind plus a bounded
+     number of index lookups, as recall by cue does, never a scan of a label's history.
+  3. Harder checks: further from their sentence, needing two told facts, about what
+     changed, and early stories asked late.
 - **The stream.** John's, 2026-10-03. The target is the TinyStories stream (THE
   STREAM, below); the houses and bAbI are regression checks, and their items further down
   wait behind these. In order:
@@ -291,6 +302,12 @@ commit.
   three or four frames a kind, so it runs out of things to learn, and work fitted to it
   bent the system to its templates. bAbI is small and templated the same way. A score on
   either is never the objective.
+- **On the stream, comprehension is the objective and the cloze is prediction.** John's,
+  2026-10-04. The checks ask about what was told, which is what the bet says the system
+  does exactly, so they are the curve the target is read by; a symbolic memory that holds
+  a fact should answer it every time, so each miss has a cause to find. The cloze stays
+  as a second curve, read as prediction (what a story brings back), never removed. The
+  checks are made harder (THE ORDER) so they measure past 0.94.
 - **A continual learner is judged by how well it keeps learning.** John's, 2026-10-03.
   Three readings along one stream, weightiest first: whether it still gets more right as it
   hears more, whether it keeps what it had (early material asked late), and what an answer

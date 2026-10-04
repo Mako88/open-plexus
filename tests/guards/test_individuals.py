@@ -2,9 +2,9 @@
 item 1). Read with the parser every run reads with: the small spaCy one takes 'painted the
 ball blue' as one name."""
 
-from unfused.graph import GraphArm
+from unfused.graph import PARSER, GraphArm
 
-MODEL = "stanza"
+MODEL = PARSER
 
 
 def arm(tmp_path):

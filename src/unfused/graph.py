@@ -118,6 +118,9 @@ def parse(model: str, text: str):
     if "db" not in _DOCS_DB:
         DOCS.parent.mkdir(parents=True, exist_ok=True)
         _DOCS_DB["db"] = sqlite3.connect(str(DOCS), timeout=60)
+        # a reading lost to a crash is read again, so none waits on the disk
+        _DOCS_DB["db"].execute("PRAGMA journal_mode=WAL")
+        _DOCS_DB["db"].execute("PRAGMA synchronous=OFF")
         _DOCS_DB["db"].execute("CREATE TABLE IF NOT EXISTS docs (key TEXT PRIMARY KEY, "
                                "doc BLOB NOT NULL)")
         # a blank English vocabulary still knows what a word is: its lower case, and
@@ -316,7 +319,9 @@ class GraphArm:
             return None
         if not hasattr(self, "_cdb"):
             self.cache.parent.mkdir(parents=True, exist_ok=True)
-            self._cdb = sqlite3.connect(str(self.cache))
+            self._cdb = sqlite3.connect(str(self.cache), timeout=60)
+            self._cdb.execute("PRAGMA journal_mode=WAL")
+            self._cdb.execute("PRAGMA synchronous=OFF")
             self._cdb.execute("CREATE TABLE IF NOT EXISTS parses (key TEXT PRIMARY KEY, "
                               "value TEXT NOT NULL)")
         row = self._cdb.execute("SELECT value FROM parses WHERE key = ?", (key,)).fetchone()

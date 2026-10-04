@@ -1764,7 +1764,7 @@ class GraphArm:
                     # an object asked for is either of the core objects the parse tells
                     # apart ('told the eye', 'asked his mommy' are read as indirect), the
                     # direct first
-                    verb, free = wh.head, [wh.dep_]
+                    verb, free = wh.head, (["obj", "iobj"] if wh.dep_ == "obj" else [wh.dep_])
                 else:
                     verb, free = None, []
                 cop = next((c for c in verb.children if c.dep_ == "cop"), None) if verb \
@@ -1807,11 +1807,16 @@ class GraphArm:
         if got is None:
             return None
         lemma, free, bound, named, mood, wh = got
-        free = (self.circumstances(wh) or ["prep:*"]) if free == ["prep:*"] else free
+        # the links lessons showed come first, then any oblique: a lesson ranks where a
+        # circumstance is found, and never rules out one it has not shown
+        free = self.circumstances(wh) + ["prep:*"] if free == ["prep:*"] else free
 
         def rank(label: str) -> int | None:
-            return 0 if label in free or (free == ["prep:*"] and label.startswith("prep:")
-                                          and ">" not in label) else None
+            for r, f in enumerate(free):
+                if label == f or (f == "prep:*" and label.startswith("prep:")
+                                  and ">" not in label):
+                    return r
+            return None
 
         for (eid,) in self.db.execute(
                 "SELECT id FROM events WHERE lemma = ? AND mood = ? AND turn > ? ORDER BY id "

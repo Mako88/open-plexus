@@ -102,6 +102,8 @@ class Graphed:
 def run(arm, stories, reopen_every: int = 100) -> dict:
     rows, turn, sizes = [], 0, {}
     started = time.perf_counter()
+    # what the run itself spent, apart from what else the machine was doing
+    cpu = time.process_time()
     crashed = None
     try:
         turn = _stream(arm, stories, reopen_every, rows, sizes)
@@ -110,7 +112,7 @@ def run(arm, stories, reopen_every: int = 100) -> dict:
         import traceback
 
         crashed = traceback.format_exc()
-    out = _summary(arm, rows, sizes, turn, started)
+    out = _summary(arm, rows, sizes, turn, started, cpu)
     if crashed:
         out["crashed"] = crashed
     return out
@@ -163,7 +165,7 @@ def _curve(rows, sizes) -> dict:
             for b, rs in by.items()}
 
 
-def _summary(arm, rows, sizes, turn, started) -> dict:
+def _summary(arm, rows, sizes, turn, started, cpu) -> dict:
     dials = arm.dials()
     arm.close()
     # `score` and `curve` stay the cloze's; each form is read as its own curve
@@ -174,6 +176,7 @@ def _summary(arm, rows, sizes, turn, started) -> dict:
                        if rs else None, "n": len(rs), "curve": _curve(rs, sizes)}
     return {"arm": arm.name, "dials": dials, "turns": turn,
             "seconds": round(time.perf_counter() - started, 1),
+            "cpu_seconds": round(time.process_time() - cpu, 1),
             "score": forms["cloze"]["score"], "curve": forms["cloze"]["curve"],
             "forms": forms, "rows": rows}
 
@@ -212,7 +215,8 @@ def main() -> None:
         for form, f in out["forms"].items():
             curve = "  ".join(f"{b}:{c['score']}" for b, c in f["curve"].items())
             print(f"{name:9} {form:5} {f['score']}  {curve}", flush=True)
-        print(f"{name:9} {out['seconds']}s -> {path.name}", flush=True)
+        print(f"{name:9} {out['seconds']}s (cpu {out.get('cpu_seconds')}s) -> {path.name}",
+              flush=True)
         if "crashed" in out:
             print(out["crashed"], flush=True)
             return 1

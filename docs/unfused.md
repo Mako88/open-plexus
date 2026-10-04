@@ -49,30 +49,26 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
   expected, since crutches come out, and is recorded rather than chased until the
   whole foundation is in (John's, 2026-10-04); a drop that lasts past the last item is
   the finding. The red set (`test_foundations.py`) is the list. In order:
-  1. Individuals (DECIDED, three layers). What joins two mentions into one is the hard
-     part: the parse's own marks first, learnt later. With them, adjectives come out of
-     names, and the house's rooms stay apart. The first rule, from what a Universal
-     Dependencies parse marks in any language: an indefinite mention opens an
-     individual; a definite one (the `Definite` feature) joins the most active
-     individual with its label whose attributes its modifiers do not contradict, else
-     opens one; a proper name joins its namesake in the episode. Until concepts exist,
-     a modifier contradicts an individual when it was never said of it, so an unsure
-     mention splits rather than merges: an answer is said by its label, so a split
-     costs little, and a merge cost the house its rooms. Across episodes, nothing joins
-     until it is learnt, which is how a person met once is the same person next week.
-     Fit and kinds count by label (what everyone knows); focus, `matched` and pronouns
-     work on individuals (what this story is about).
-     An individual is an index and holds no copies (John's, 2026-10-04): an id, with
-     its labels, its attributes and the events it takes part in as links pointing at
-     it, each wherever it is stored. What it is now is read from its latest links, so a
-     change is one more link and nothing is rewritten.
-  2. Nothing the parse gives dropped: function words as links to their own kind of node
-     (walks skip them), negation, modals and particles as links rather than parts of the
-     lemma, pronouns kept beside what they resolve to. Plans learn which links matter,
-     as negation, modals and 'before' were pulled out of `SKIP` one at a time. Refuted
-     if neither the stream nor the many-worded house reads higher with everything kept.
-  3. Concepts: kinds as the fixed point (the stream's item 2) on the graph above.
-  4. No English by hand: each rule on a word replaced as the code around it is rebuilt.
+  1. ~~Individuals~~ (DECIDED, three layers). Struck 2026-10-04: `cecba76b` (identity,
+     labels as before), `6e5b8391` (adjectives and compounds out of labels, said of the
+     individual; the house's rooms stay apart). An individual is an index (John's): an
+     id, its label and what was said of it are links pointing at it. The joining rule
+     is in `in_mind`, and across episodes nothing joins until joining is learnt.
+  2. ~~Nothing the parse gives dropped~~. Struck 2026-10-04 (`203e5829`). Plans learning
+     which of the kept links matter is still to come. Refuted if neither the stream
+     nor the many-worded house reads higher with everything kept than with `SKIP`.
+  3. ~~Concepts~~. Struck 2026-10-04 (`51ad1e33`, `kinds.py`). Kinds read right on the
+     stream and enter only focus's slot fit, where they tie. Where else they enter
+     (plans' loose walks, a join's free variable, a borrowed shape's answer, THE ORDER
+     below) is what is left of them.
+  4. No English by hand (the red set's last test: 41 words and 4 readings of capitals).
+     The parser marks some of what is needed in any language: pronouns' `Gender`,
+     `Number`, `Person` and `Case`, proper names' part of speech. It marks nothing for
+     wh-words or refusals: `en_core_web_trf` gives 'who' and 'where' an empty
+     morphology and 'no' no `Polarity`, only the English tags. Either those are learnt
+     from teaching, or the parser becomes one trained on Universal Dependencies
+     treebanks (Stanza marks `PronType=Int` and `Polarity=Neg`). The parser is a dial;
+     which way is John's to say. Number words have no feature in either and are learnt.
 - **The stream.** John's, 2026-10-03. The target is the TinyStories stream (THE
   STREAM, below); the houses and bAbI are regression checks, and their items further down
   wait behind these. In order:
@@ -112,8 +108,9 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
      stream's curve does not rise with it. On the stream, the graded fixed point (walks
      through names sharing verb slots, `6aaf8dcf`) tied the verb's fit, and a slot's
      kind by its fillers' case, part of speech or pronoun agreement lost (`e470b64f`,
-     `d7ab6e68`), and latent classes over (name, slot) tied it too (`bb732491`). It
-     waits on identity and a graph that drops nothing.
+     `d7ab6e68`), and latent classes over (name, slot) tied it too (`bb732491`). Built
+     on individuals and a graph that drops nothing (`51ad1e33`), it ties in the slot fit
+     as well, with kinds that read right.
   3. Retention and knowledge across stories: early questions asked again late, and
      questions only many stories answer ('What colour can a ball be?').
 - **The models are a milestone check, not a baseline.** John's, 2026-10-02: the system is

@@ -1294,7 +1294,17 @@ class GraphArm:
     def focused(self, question: str) -> str | None:
         """The name in this episode that best fits the asked slot: how strongly it is in focus,
         each hearing fading as ACT-R's base level does, times how often it has filled the
-        asked verb's slot, out of everything it has filled."""
+        asked verb's slot, out of everything it has filled, times how often the wh-word's
+        answers bore its mark."""
+        scores = self.focus(question)
+        if not scores:
+            return None
+        return max((a * f * w, n) for n, (a, f, w) in scores.items())[1]
+
+    def focus(self, question: str) -> dict[str, tuple[float, float, float]] | None:
+        """Each name focus weighs for a question, with its three factors: how strongly it
+        is in focus, how it fits the asked slot, and how often the wh-word asks for its
+        mark. None where the question is not guessed at."""
         slot = self.blank(question)
         # a question about someone never mentioned is not guessed at
         if slot is None or not all(self.known(f) for f in self.shape(question)[1]):
@@ -1329,9 +1339,8 @@ class GraphArm:
             mark = self.mark(name)
             return 0.5 if mark is None else (asks.get(mark, 0) + 1) / (sum(asks.values()) + 2)
 
-        scored = [(a * fit(n) * asked_for(n), n) for n, a in act.items()
-                  if not said_in(n, question) and n not in ("what", "who")]
-        return max(scored)[1] if scored else None
+        return {n: (a, fit(n), asked_for(n)) for n, a in act.items()
+                if not said_in(n, question) and n not in ("what", "who")}
 
     def mark(self, name: str) -> str | None:
         """How a name is written where it is heard: 'capital' where its last word is

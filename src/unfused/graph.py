@@ -54,6 +54,8 @@ CARRIED = ("learnt", "positions")
 # the key so a change to what is extracted re-reads every sentence
 CACHE = Path(__file__).resolve().parents[2] / "state" / "parses.sqlite"
 VERSION = "graph-7"
+# every text MiniLM has encoded, by its text
+VECTORS = Path(__file__).resolve().parents[2] / "state" / "vectors.sqlite"
 
 # a clause's links that are not arguments
 SKIP = {"punct", "det", "aux", "auxpass", "cc", "mark", "neg", "intj", "case", "dep",
@@ -92,16 +94,32 @@ def nlp(model: str):
 
 
 def vectors(texts: list[str]):
-    """MiniLM's vector for each text, each encoded once a process: a word's vector never
-    changes, so it is what everyone knows about the word, read once and kept."""
-    if "model" not in _ENCODER:
-        from unfused.store import MiniLmEmbedder
+    """MiniLM's vector for each text, each encoded once and kept on disk: a word's vector
+    never changes, so it is what everyone knows about the word, read once and kept. The
+    model is loaded only for a text never encoded."""
+    import numpy as np
 
-        _ENCODER["model"] = MiniLmEmbedder()
     new = [t for t in dict.fromkeys(texts) if t not in _VECTORS]
     if new:
-        for t, v in zip(new, _ENCODER["model"].encode(new)):
-            _VECTORS[t] = v
+        VECTORS.parent.mkdir(parents=True, exist_ok=True)
+        db = sqlite3.connect(str(VECTORS))
+        db.execute("CREATE TABLE IF NOT EXISTS vectors (text TEXT PRIMARY KEY, v BLOB)")
+        for t in new:
+            row = db.execute("SELECT v FROM vectors WHERE text = ?", (t,)).fetchone()
+            if row is not None:
+                _VECTORS[t] = np.frombuffer(row[0], dtype=np.float32)
+        missing = [t for t in new if t not in _VECTORS]
+        if missing:
+            if "model" not in _ENCODER:
+                from unfused.store import MiniLmEmbedder
+
+                _ENCODER["model"] = MiniLmEmbedder()
+            for t, v in zip(missing, _ENCODER["model"].encode(missing)):
+                _VECTORS[t] = np.asarray(v, dtype=np.float32)
+                db.execute("INSERT OR REPLACE INTO vectors VALUES (?, ?)",
+                           (t, _VECTORS[t].tobytes()))
+            db.commit()
+        db.close()
     return [_VECTORS[t] for t in texts]
 
 
@@ -239,6 +257,8 @@ class GraphArm:
         # for the same node's steps thousands of times. A sentence drops only the nodes it
         # gives a new step, so what was loaded stays loaded
         self._steps: dict = {}
+        # each node's steps by label and direction, kept beside the steps they sort
+        self._labelled: dict = {}
         # every event's lemma, turn and mood, kept for good: what was heard never changes
         self._events: dict = {}
         # every name's mark, dropped only for names a sentence names
@@ -378,6 +398,19 @@ class GraphArm:
         if steps is None:
             steps = self._steps[node] = self._around(node)
         return steps
+
+    def around_as(self, node: str, label: str, direction: int) -> list[str]:
+        """The nodes one step of this label and direction away, in the order `around`
+        gives them and counted as one look as `around` is: a hub's steps are sorted by
+        label once, so a pattern does not read all of them for each of its partials."""
+        steps = self.around(node)
+        kept = self._labelled.get(node)
+        if kept is None or kept[0] is not steps:
+            by: dict = {}
+            for lab, d, nxt in steps:
+                by.setdefault((lab, d), []).append(nxt)
+            kept = self._labelled[node] = (steps, by)
+        return kept[1].get((label, direction), [])
 
     def _around(self, node: str) -> list[tuple[str, int, str]]:
         if node.startswith("e:"):
@@ -1484,8 +1517,8 @@ class GraphArm:
             here, there, way = (u, v, d) if u in seen else (v, u, -d)
             nxt = []
             for got in partials:
-                for label, direction, node in self.around(got[here]):
-                    if label != lab or direction != way or node in got.values():
+                for node in self.around_as(got[here], lab, way):
+                    if node in got.values():
                         continue
                     if there in want and node != want[there]:
                         continue

@@ -86,9 +86,11 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
      taken, 2026-10-04); re-read the 3,000 reading once it lands.
   3. ~~A check that more than one telling answers accepts every answer they support~~.
      Struck 2026-10-04 (`_answers` in `exam/stories.py`).
-  4. Harder checks, one at a time and each measured alone: further from their sentence
-     (5 to 15 sentences on), needing two told facts, about what changed, and early
-     stories asked late.
+  4. Harder checks, one at a time and each measured alone. Done: further from their
+     sentence (`far`, not harder: an episode is held whole) and early stories asked
+     late (`late`, after a parent's reminder, 0.484 against near 0.965; 0.686 with
+     no reminder, since a retold sentence opens new individuals). Left: needing two
+     told facts, and about what changed.
   5. What usually happens, before the two goals below (John's yes, 2026-10-04). The
      cloze is prediction, and its curve stops rising near 100 stories (0.41 at 300,
      0.43 at 1,000): nothing counts how events follow one another. Narrative schemas

@@ -29,10 +29,10 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 import stories as runner  # noqa: E402
 from unfused.exam.stories import fingerprint, right, stream  # noqa: E402
-from unfused.graph import BLANKS, GraphArm  # noqa: E402
+from unfused.graph import BLANKS, GraphArm, parse  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[1]
-FACTORS = ("recency", "fit", "mark", "schema")
+FACTORS = ("recency", "fit", "mark", "schema", "echo")
 # narrative schemas, read as an instrument only: what `aff38ef2` had as focus's fourth
 # factor, counted here so the sweep can weigh it, and never used to answer
 CHAIN = 6
@@ -40,6 +40,8 @@ SMOOTH = 5.0
 # each factor's exponent is swept over these; a common scale changes nothing, so one
 # grid holds every ratio worth reading
 GRID = (0.0, 0.25, 0.5, 1.0, 2.0, 4.0)
+# what an echo starts from where nothing of the sentence reached a name
+QUIET = 1e-3
 
 
 class Schemed(GraphArm):
@@ -58,6 +60,34 @@ class Schemed(GraphArm):
         if not any(ch.isalnum() for ch in text):
             self.consolidate()
         super().hear(turn, text)
+
+    def echoes(self, question: str) -> dict[str, float]:
+        """How much of the question's sentence reaches each name in mind: every noun
+        fires the story's individuals of its lemma, every verb the story's events of
+        its lemma, each spreading by the committed walk, and what reaches a name is
+        summed. Copying from context, as an attention head does: what sat beside the
+        sentence's other words earlier in the story."""
+        self._now = self.now()
+        out: dict[str, float] = {}
+        episode, first = self.episode(), self.first_event()
+        for t in parse(self.model, question):
+            lemma = t.lemma_.lower()
+            if t.pos_ in ("NOUN", "PROPN"):
+                held = self.individuals(lemma, episode=True)
+            elif t.pos_ == "VERB":
+                held = [f"e:{e}" for (e,) in self.db.execute(
+                    "SELECT id FROM events WHERE lemma = ? AND turn > ? AND id >= ?",
+                    (lemma, episode, first))]
+            else:
+                continue
+            if not held:
+                continue
+            total, _ = self.spread({n: 1.0 / len(held) for n in held})
+            for node, a in total.items():
+                if node.startswith("i:") and node not in held:
+                    said = self.describe(node)
+                    out[said] = out.get(said, 0.0) + a
+        return out
 
     def schemas(self, question: str) -> dict[str, float]:
         """Each name focus weighs, by its best individual's schema for the blank."""
@@ -152,12 +182,19 @@ class Recorded(runner.Graphed):
     def ask(self, turn, story):
         scores = self.arm.focus(story.question) or {}
         schemas = self.arm.schemas(story.question) if scores else {}
-        scores = {n: (*f, schemas.get(n, 1.0)) for n, f in scores.items()}
+        echoes = self.arm.echoes(story.question) if scores else {}
+        scores = {n: (*f, schemas.get(n, 1.0), QUIET + echoes.get(n, 0.0))
+                  for n, f in scores.items()}
         said = super().ask(turn, story)
         notes = self.arm.last_notes
         # one entry an ask, in the order the runner's rows come, to be joined with them
+        # whether each right name's label had a kind when asked: a word first heard since
+        # kinds were last read has none, and fits as nothing
+        kinded = [self.arm.kind_of(story.answer) is not None] if scores else []
         self.records.append({"candidates": [[list(f), right(story.answers, name)]
-                                            for name, f in scores.items()]}
+                                            for name, f in scores.items()],
+                             "kinded": kinded[0] if kinded else None,
+                             "correct": right(story.answers, said)}
                             if notes and notes[-1] == "by:focus" and scores else None)
         return said
 
@@ -199,23 +236,31 @@ def main() -> int:
         # how often any candidate focus weighed was right: the ceiling of any ranking
         reachable = [sum(any(c[1] for c in r["candidates"]) for r in x) / len(x) if x
                      else None for x in (fit_on, read_on)]
-        swept = sorted(((accuracy(fit_on, w), w) for w in itertools.product(GRID, repeat=len(FACTORS))
+        # schemas are refuted at any weight (e7d53f7c), so they are held at 0 here
+        swept = sorted(((accuracy(fit_on, w), w) for w in
+                        ((r, f, m, 0.0, e) for r, f, m, e in itertools.product(GRID, repeat=4))
                         if any(w)), reverse=True)
+        without = max(((accuracy(fit_on, w), w) for w in
+                       ((r, f, m, 0.0, 0.0) for r, f, m in itertools.product(GRID, repeat=3))
+                       if any(w)), default=None)
         best = swept[0][1] if swept else None
         reading["forms"][form] = {
             "n": [len(fit_on), len(read_on)],
             "reachable": reachable,
-            "at_1": [accuracy(fit_on, (1, 1, 1, 0)), accuracy(read_on, (1, 1, 1, 0))],
-            "at_1_schema": [accuracy(fit_on, (1, 1, 1, 1)), accuracy(read_on, (1, 1, 1, 1))],
-            "best_without_schema": (lambda sw: [sw[0][0], accuracy(read_on, sw[0][1]),
-                                                list(sw[0][1])] if sw else None)(sorted(
-                ((accuracy(fit_on, w), w) for w in itertools.product(GRID, repeat=3)
-                 if any(w)), reverse=True)),
+            "at_1": [accuracy(fit_on, (1, 1, 1, 0, 0)), accuracy(read_on, (1, 1, 1, 0, 0))],
+            "at_1_echo": [accuracy(fit_on, (1, 1, 1, 0, 1)), accuracy(read_on, (1, 1, 1, 0, 1))],
+            "best_without_echo": [without[0], accuracy(read_on, without[1]), list(without[1])]
+            if without else None,
             "best": best, "best_fit_on": swept[0][0] if swept else None,
             "best_read_on": accuracy(read_on, best) if best else None,
             "alone": {f: [accuracy(fit_on, w), accuracy(read_on, w)] for f, w in zip(
-                FACTORS, ((1, 0, 0, 0), (0, 1, 0, 0), (0, 0, 1, 0), (0, 0, 0, 1)))},
+                FACTORS, [tuple(int(i == j) for j in range(len(FACTORS)))
+                          for i in range(len(FACTORS))])},
             "top": [[a, list(w)] for a, w in swept[:10]],
+            # the answer's word had a kind when asked, among focus's misses and its hits
+            "kinded": {k: (lambda xs: [sum(1 for x in xs if x["kinded"]), len(xs)])(
+                [r for r in rs if r["correct"] == want and r["kinded"] is not None])
+                for k, want in (("missed", False), ("hit", True))},
         }
     path = ROOT / "readings" / f"weights-s{args.seed}-n{args.stories}-{stamp}.json"
     path.write_text(json.dumps(reading, indent=1), encoding="utf-8")

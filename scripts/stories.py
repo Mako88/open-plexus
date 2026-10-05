@@ -118,8 +118,14 @@ def run(arm, stories, reopen_every: int = 100) -> dict:
     return out
 
 
+# a story is asked about again this many stories after it was told: early material
+# asked late (THE ORDER, harder checks; DECIDED, a continual learner keeps what it had)
+LATE = 100
+
+
 def _stream(arm, stories, reopen_every, rows, sizes) -> int:
     turn = 0
+    by_index = {s.index: s for s in stories}
     for s in stories:
         if s.index and s.index % reopen_every == 0 and hasattr(arm, "reopen"):
             arm.reopen()
@@ -137,6 +143,16 @@ def _stream(arm, stories, reopen_every, rows, sizes) -> int:
             if p < len(told):
                 arm.tell(turn, told[p])
                 turn += 1
+        # a story told LATE stories ago, recalled as a parent recalls one: its first
+        # sentence said again after a break, then one of its checks asked
+        old = by_index.get(s.index - LATE)
+        check = next((c for c in old.checks if c.form == "check"), None) if old else None
+        if check is not None and old.told:
+            arm.tell(turn, BREAK)
+            turn += 1
+            arm.tell(turn, old.told[0])
+            turn += 1
+            rows.append(_ask(arm, turn, s, "late", check))
         if (b := bucket(s.index)) != bucket(s.index + 1):
             sizes[b] = arm.dials()
     return turn
@@ -170,7 +186,7 @@ def _summary(arm, rows, sizes, turn, started, cpu) -> dict:
     arm.close()
     # `score` and `curve` stay the cloze's; each form is read as its own curve
     forms = {}
-    for form in ("cloze", "check", "far"):
+    for form in ("cloze", "check", "far", "late"):
         rs = [r for r in rows if r["form"] == form]
         forms[form] = {"score": round(sum(r["correct"] for r in rs) / len(rs), 3)
                        if rs else None, "n": len(rs), "curve": _curve(rs, sizes)}

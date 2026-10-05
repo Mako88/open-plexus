@@ -1798,6 +1798,13 @@ class GraphArm:
         # what the plans of either wording's own shape find comes before anything
         # borrowed or joined: a wording taught before an alias settled holds the lessons
         self.heard_in(question.text)
+        # what the episode says outright, read from the question's grammar, is the answer
+        # whatever else is found, so it is asked first and nothing else is asked when it
+        # answers: most checks are answered so, and paid for every plan before it
+        match = self.matched(question.text)
+        if match:
+            self.last_notes = ["(found)", f"match:{match}", "by:match"]
+            return match
         put = self.unaliased(question.text)
         said, self.spent = None, 0
         try:
@@ -1820,14 +1827,10 @@ class GraphArm:
         planned, fit = said, self.focused(question.text)
         if said is None or not self.in_focus(said):
             said = fit or said
-        # what the episode says outright, read from the question's grammar, comes first
-        match = self.matched(question.text)
-        said = match or said
         self.last_notes = (["(gave up)"] if given_up else []) + (
             ["(nothing)"] if said is None else ["(found)"]) + [
-            f"plans:{planned}", f"focus:{fit}", f"match:{match}", "by:" + (
-                "none" if said is None else "match" if said == match else
-                "plans" if said == planned else "focus")]
+            f"plans:{planned}", f"focus:{fit}", "match:None", "by:" + (
+                "none" if said is None else "plans" if said == planned else "focus")]
         return "I don't know." if said is None else said
 
     def now(self) -> int:

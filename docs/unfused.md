@@ -77,10 +77,13 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
      hotspots fixed in the order the profile ranks them, until a 3,000-story reading
      takes about ten minutes. Answering is meant to cost what is in mind plus a bounded
      number of index lookups, as recall by cue does, never a scan of a label's history.
-     Hearing and teaching are done (`bc5a61ca`: 34% less CPU at 1,000 stories). Per
-     question it still rises with history (0.013 s to 0.22 s): answering through
-     borrowed shapes (`nearest`, pushback #4), `follow` and `paths` are next. The
-     pre-parse of 3,000 stories is about 80% through (`scripts/preparse.py` resumes).
+     Hearing and teaching are done (`bc5a61ca`: 34% less CPU at 1,000 stories), and
+     answering's hotspots (2026-10-04: 870 s at 1,000 stories to about 220). 3,000
+     stories are parsed. A 3,000-story reading takes 48 minutes: seconds a question
+     still grow with history (fivefold from 300-1,000 to 1,000-3,000), through hubs
+     and the taught shapes several ways of answering still scan. What is left rides
+     on item 5's walk, whose decay bounds what a question touches (John's suggestion
+     taken, 2026-10-04); re-read the 3,000 reading once it lands.
   3. ~~A check that more than one telling answers accepts every answer they support~~.
      Struck 2026-10-04 (`_answers` in `exam/stories.py`).
   4. Harder checks, one at a time and each measured alone: further from their sentence

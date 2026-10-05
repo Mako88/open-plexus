@@ -93,6 +93,20 @@ def test_a_conversation_teaches_with_nothing_labelled(tmp_path):
     assert not a.db.execute("SELECT 1 FROM events WHERE heard LIKE '%?'").fetchone()
 
 
+def test_a_yes_confirms_the_answer_given_even_once_right_is_a_word_heard(tmp_path):
+    a = arm(tmp_path)
+    a.turn(0, "Bren keeps the rope in the attic.")
+    # 'right' is now a word the graph holds, as a colour is
+    a.turn(1, "The answer was right.")
+    taught = []
+    a.teach = lambda question, answer: taught.append(answer)
+    a.pending = ("Where does Bren keep the rope?", "attic")
+    a.turn(2, "Yes, that's right.")
+    a.pending = ("Where does Bren keep the rope?", "shed")
+    a.turn(3, "No, it's the attic.")
+    assert taught == ["attic", "attic"], taught
+
+
 def test_a_later_event_on_the_same_arguments_replaces_an_earlier_one(tmp_path):
     a = arm(tmp_path)
     a.hear(0, "Mary went to the kitchen.")

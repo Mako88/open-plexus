@@ -2392,22 +2392,28 @@ class GraphArm:
 
     def reaction(self, text: str, question: str) -> tuple[str | None, bool]:
         """What a reaction names that the question did not, and whether it says no."""
-        key = hashlib.sha256(f"{VERSION}|{self.model}|reaction-2|{text}".encode()).hexdigest()
+        key = hashlib.sha256(f"{VERSION}|{self.model}|reaction-3|{text}".encode()).hexdigest()
         rows = self._kept(key)
         if rows is None:
             doc = parse(self.model, text)
-            # one row a token: no, whether it may name something, its name, and whether
-            # it is a number of things read as the arm reads one ('none')
+            # one row a token: no, yes, whether it may name something, its name, and
+            # whether it is a number of things read as the arm reads one ('none')
             rows = []
             for t in doc:
                 no = negates(t)
+                yes = "Pos" in feature(t, "Polarity")
                 part = t.dep_ in DESCRIBE and t.head.pos_ in ("NOUN", "PROPN")
                 number = "Card" in feature(t, "NumType") or t.lower_.isdigit()
                 names = not part and (t.pos_ in ("NOUN", "PROPN", "NUM", "ADJ") or number)
-                rows.append([no, names, t.lower_ if number else phrase(t), number])
+                rows.append([no, yes, names, t.lower_ if number else phrase(t), number])
             self._keep(key, rows)
-        negated = any(no for no, _, _, _ in rows)
-        for _, names, name, number in rows:
+        negated = any(no for no, _, _, _, _ in rows)
+        # a reaction that says yes and not no confirms the answer given and names
+        # nothing: 'right' in 'Yes, that's right' is an adjective as a colour is, and
+        # once a story has said 'right', every confirmed answer was taught as 'right'
+        if not negated and any(yes for _, yes, _, _, _ in rows):
+            return None, False
+        for _, _, names, name, number in rows:
             # 'right' in 'that's right' is an adjective as a colour is, and names nothing
             # here, so a name must be one the graph holds
             if names and not said_in(name, question) and (number or self.holding(name)):

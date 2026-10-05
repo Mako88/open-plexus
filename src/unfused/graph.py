@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import math
 import re
 import sqlite3
 from collections import Counter, deque
@@ -822,20 +823,28 @@ class GraphArm:
     def concepts(self) -> tuple[dict, Counter, Counter]:
         """Each label's kind (`kinds`), with what each kind filled: by (kind, verb, link)
         and in all. Kinds are what everyone knows, so they are read again once the
-        graph has grown by a quarter, not with each episode."""
+        graph has grown by a quarter, not with each episode. The sizes they are read at
+        are fixed (each a quarter past the last, counted from nothing), so what reads
+        them, and when, never moves where they change."""
         events = self.db.execute("SELECT COUNT(*) FROM events").fetchone()[0]
+        stage = int(math.log(events, 1.25)) if events else -1
         got = self._kinds
-        if got is None or events > got[1] * 1.25:
+        if got is None or stage != got[1]:
+            # read from the stage's own events and none heard since, so they are the same
+            # kinds whenever in the stage they are read, a reopening included
+            last = self.db.execute("SELECT id FROM events ORDER BY id LIMIT 1 OFFSET ?",
+                                   (max(0, min(events, math.ceil(1.25 ** stage)) - 1),)).fetchone()
             rows = [(e, lemma, link, self.label(n)) for e, lemma, link, n in self.db.execute(
                 "SELECT edges.event, events.lemma, edges.label, edges.node FROM edges JOIN "
                 "events ON events.id = edges.event WHERE edges.node NOT LIKE 'e:%' AND "
-                "edges.node NOT LIKE 'f:%'")]
+                "edges.node NOT LIKE 'f:%' AND edges.event <= ?",
+                (last[0] if last else 0,))]
             kind = kinds(rows)
             slots, filled = Counter(), Counter()
             for _, lemma, link, label in rows:
                 slots[(kind[label], lemma, link)] += 1
                 filled[kind[label]] += 1
-            got = self._kinds = (self.episode(), events, kind, slots, filled)
+            got = self._kinds = (self.episode(), stage, kind, slots, filled)
         return got[2], got[3], got[4]
 
     def kind_of(self, word: str) -> int | None:

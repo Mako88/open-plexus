@@ -506,6 +506,8 @@ class GraphArm:
         self._replaced: dict = {}
         # taught shapes' signatures, rebuilt after a lesson; questions' parses
         self._sigs: list | None = None
+        # each stored plan's text, decoded (`read_plan`)
+        self._read: dict[str, dict] = {}
         self._tokens: dict = {}
         # every node's steps, kept across sentences and questions: a walk over a hub asks
         # for the same node's steps thousands of times. A sentence drops only the nodes it
@@ -1267,13 +1269,25 @@ class GraphArm:
             self._tokens[question] = kept
         return self._tokens[question]
 
+    def read_plan(self, text: str) -> dict:
+        """A stored plan, decoded once for every reader: answering reads every taught
+        plan many times a question and a lesson changes one shape's. Shared, so only
+        `teach`, which changes plans, decodes its own."""
+        got = self._read.get(text)
+        if got is None:
+            # a lesson rewrites a plan's text, so the texts it replaced are let go in bulk
+            if len(self._read) > 100_000:
+                self._read.clear()
+            got = self._read[text] = json.loads(text)
+        return got
+
     def taught(self) -> list[tuple[str, set]]:
         """Every taught shape's plans' signatures, rebuilt after a lesson."""
         if self._sigs is None:
             self._sigs = []
             for shape, plan in self.db.execute(
                     "SELECT shape, plan FROM learnt WHERE hits > misses").fetchall():
-                sig = json.loads(plan).get("sig")
+                sig = self.read_plan(plan).get("sig")
                 if sig:
                     self._sigs.append((shape, set(sig)))
         return self._sigs
@@ -1363,7 +1377,7 @@ class GraphArm:
         for _, fillers, shape in readings[:tries]:
             ranked = [(p,) for (p,) in self.db.execute(
                 "SELECT plan FROM learnt WHERE shape = ? AND hits > misses "
-                "ORDER BY hits - misses DESC, hits DESC", (shape,)) if not json.loads(p).get("count")]
+                "ORDER BY hits - misses DESC, hits DESC", (shape,)) if not self.read_plan(p).get("count")]
             found = self.followed(ranked, fillers, question)
             if found:
                 return found
@@ -1373,7 +1387,7 @@ class GraphArm:
         for strict in (True, False):
             found = []
             for (plan,) in ranked:
-                plan = json.loads(plan)
+                plan = self.read_plan(plan)
                 said = self.said(plan, fillers, strict, question)
                 if said and plan.get("count"):
                     # a count is of a set, not of one latest event, so the plan that held
@@ -1637,7 +1651,7 @@ class GraphArm:
         for _, order, shapes in self.readings(question, spans):
             plans = [p for sh in shapes for (raw,) in self.db.execute(
                 "SELECT plan FROM learnt WHERE shape = ? AND hits > misses", (sh,))
-                if not (p := json.loads(raw)).get("count")]
+                if not (p := self.read_plan(raw)).get("count")]
             for free, w in enumerate(order):
                 if w not in unheard or w in done:
                     continue
@@ -1699,7 +1713,7 @@ class GraphArm:
         unheard = {u for _, _, u in spans}
         found: dict[str, set] = {}
         for near, order, shapes in self.readings(question, spans):
-            plans = [json.loads(p) for sh in shapes for (p,) in self.db.execute(
+            plans = [self.read_plan(p) for sh in shapes for (p,) in self.db.execute(
                 "SELECT plan FROM learnt WHERE shape = ? AND hits > misses", (sh,))]
             for free, w in enumerate(order):
                 if w not in unheard or found.get(w):
@@ -2110,7 +2124,7 @@ class GraphArm:
         for shape in shapes:
             for (p,) in self.db.execute(
                     "SELECT plan FROM learnt WHERE shape = ? AND hits > misses", (shape,)):
-                plan = json.loads(p)
+                plan = self.read_plan(p)
                 if plan["steps"] and not plan.get("count") and plan["steps"][-1][1] == 1:
                     out.add(plan["steps"][-1][0])
         return out
@@ -2181,7 +2195,7 @@ class GraphArm:
         for shape, plan in self.db.execute(
                 "SELECT shape, plan FROM learnt WHERE hits > misses "
                 "ORDER BY hits - misses DESC, hits DESC").fetchall():
-            rows.setdefault(shape, []).append(json.loads(plan))
+            rows.setdefault(shape, []).append(self.read_plan(plan))
         sigs = {shape: next((set(p["sig"]) for p in plans if p.get("sig")), set())
                 for shape, plans in rows.items()}
         shapes = []

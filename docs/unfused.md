@@ -666,6 +666,12 @@ the store merges by id. Kill a third of the nodes mid-exam.
   prediction fails, so Phase 6's surprise signal is the likely trigger.
 - **Idle-time inference**: the system composes and writes derived assertions when no input is
   arriving, so a chain is found once rather than per question.
+- **Meta layers, minted rather than built.** John's, 2026-10-04. A pattern that recurs and
+  pays (a schema, 'lose, search, find') becomes a node of its own, and patterns are learnt
+  over those nodes in turn, with no fixed number of layers: chunking (Soar; ACT-R's
+  production compilation). `commitments`' rung five was the same idea (`docs/history/`);
+  its lesson holds, that the vocabulary grows under the learner, never a controller
+  tuning it from above. After item 5, since schemas are the first thing to mint.
 - **Pieces behind interfaces, and versioned representations.** John's, 2026-10-04. The
   parser, the store and the encoder each swappable alone, and every derived row stamped
   with the version that made it, read through a converter that does nothing for its own

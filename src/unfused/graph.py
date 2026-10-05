@@ -959,14 +959,36 @@ class GraphArm:
         nodes' steps are kept. Distances come first, from a search that copies no path;
         then only the ways along which each node is at its distance are followed, so a
         hub that joins every story costs its steps once, not once a path through it."""
+        # `is_` and `among`, with what they look up for the goal and for each individual
+        # read once a search: a search asks them millions of times of the same few
+        if goal.startswith("n:"):
+            self.nodes(goal[2:])
+            found_by = self._nodes[("set", goal[2:])]
+
+            def is_goal(n: str) -> bool:
+                return n == goal or (n.startswith("i:") and n in found_by)
+        else:
+            is_goal = goal.__eq__
+        names: dict = {}
+
+        def among(n: str, where) -> bool:
+            if n in where:
+                return True
+            if not n.startswith("i:"):
+                return False
+            got = names.get(n)
+            if got is None:
+                got = names[n] = (f"n:{self.label(n)}", f"n:{self.describe(n)}")
+            return got[0] in where or got[1] in where
+
         dist, layer, best = {start: 0}, [start], None
         for depth in range(1, limit + 1):
             nxt_layer = []
             for node in layer:
                 for _, _, nxt in self.around(node):
-                    if self.is_(nxt, goal):
+                    if is_goal(nxt):
                         best = depth
-                    elif not self.among(nxt, dist) and not (avoid and self.among(nxt, avoid)):
+                    elif not among(nxt, dist) and not (avoid and among(nxt, avoid)):
                         dist[nxt] = depth
                         nxt_layer.append(nxt)
             if best is not None or not nxt_layer:
@@ -984,7 +1006,7 @@ class GraphArm:
             for label, direction, nxt in self.around(path[-1]):
                 if most is not None and len(found) >= most:
                     return
-                if self.is_(nxt, goal):
+                if is_goal(nxt):
                     if depth + 1 == best:
                         found.append(path + [(label, direction), nxt])
                 elif depth + 1 < best and dist.get(nxt) == depth + 1 and nxt not in dead:

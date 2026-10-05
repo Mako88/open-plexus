@@ -142,3 +142,21 @@ def test_a_check_two_tellings_answer_accepts_both_and_is_asked_once():
     assert any(_answers(asking, w) for w in told), told
     told = [w for _, _, w in _asks(nlp("Then they saw dark clouds in the sky."), pronoun=True)]
     assert not any(_answers(asking, w) for w in told), told
+
+
+def test_a_far_check_is_asked_once_the_story_is_told_about_an_early_sentence():
+    import spacy
+
+    from unfused.exam.stories import FAR, _checks, sentences
+
+    text = ("Lily found a shell. Tom kicked the ball. Ben ate the cake. Mia lost her hat. "
+            "Sam saw a dog. They were happy. It was a fun day. The sun was warm. "
+            "Everyone went home.")
+    sents = sentences(text)
+    checks = _checks(text, sents, list(spacy.load("en_core_web_sm").pipe(sents)), None)
+    far = [c for c in checks if c.form == "far"]
+    assert far and all(c.at == len(sents) for c in far), checks
+    # each about a sentence at least FAR before the end, and never one a near check asks
+    near = {c.question for c in checks if c.form == "check"}
+    assert all(c.question not in near for c in far), checks
+    assert all(any(c.answer in s.lower() for s in sents[:len(sents) - FAR]) for c in far)

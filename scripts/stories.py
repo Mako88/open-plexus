@@ -131,7 +131,7 @@ def _stream(arm, stories, reopen_every, rows, sizes) -> int:
         for p in range(len(told) + 1):
             # the cloze before its held-back sentence, then whatever is due to be checked
             due = ([("cloze", s)] if s.question is not None and p == len(s.told) else []) + \
-                [("check", c) for c in s.checks if c.at == p]
+                [(c.form, c) for c in s.checks if c.at == p]
             for form, q in due:
                 rows.append(_ask(arm, turn, s, form, q))
             if p < len(told):
@@ -170,7 +170,7 @@ def _summary(arm, rows, sizes, turn, started, cpu) -> dict:
     arm.close()
     # `score` and `curve` stay the cloze's; each form is read as its own curve
     forms = {}
-    for form in ("cloze", "check"):
+    for form in ("cloze", "check", "far"):
         rs = [r for r in rows if r["form"] == form]
         forms[form] = {"score": round(sum(r["correct"] for r in rs) / len(rs), 3)
                        if rs else None, "n": len(rs), "curve": _curve(rs, sizes)}

@@ -24,7 +24,7 @@ from pathlib import Path
 DATA = Path(__file__).resolve().parents[3] / "data" / "tinystories"
 # each story as made, kept by its text and how it is made: bump on any change to `make`
 CACHE = Path(__file__).resolve().parents[3] / "state" / "stories.sqlite"
-MADE = "stories-5"
+MADE = "stories-6"
 VALID = DATA / "TinyStories-valid.txt"
 URL = "https://huggingface.co/datasets/roneneldan/TinyStories/resolve/main/TinyStories-valid.txt"
 
@@ -45,6 +45,8 @@ class Check:
     answer: str
     answers: tuple[str, ...]
     earlier: list[str]  # the story's nouns told before it is asked
+    # 'check' a few sentences on; 'far' once the story is told, FAR or more sentences on
+    form: str = "check"
 
 
 @dataclass
@@ -138,6 +140,9 @@ def _nouns(docs) -> list[str]:
 GAP = 2
 # at most this many a story, each about a sentence of its own
 CHECKS = 2
+# a far check is asked once the story is told, about a sentence at least this many
+# sentences before its end (THE ORDER, harder checks: further from their sentence)
+FAR = 5
 _PLACES = {"in", "on", "under", "into", "onto", "at", "behind", "near", "inside", "to"}
 _KEPT = {"dobj", "dative", "prt", "prep", "acomp", "oprd"}
 
@@ -228,8 +233,9 @@ def _answers(asking: tuple, telling: tuple) -> bool:
 
 def _checks(text, sents, docs, held) -> list[Check]:
     """Up to CHECKS comprehension questions, each about its own told sentence and asked GAP
-    sentences after it. The cloze's held-back sentence is never asked about, so the two
-    curves stay apart. Which are asked is fixed by the story's text."""
+    sentences after it, and up to CHECKS far ones about other sentences, asked once the
+    story is told. The cloze's held-back sentence is never asked about, so the curves
+    stay apart. Which are asked is fixed by the story's text."""
     found, tellings = [], []
     for j, (s, d) in enumerate(zip(sents, docs)):
         if j == held or any(q in s for q in '"“”') or s.endswith("?"):
@@ -244,15 +250,25 @@ def _checks(text, sents, docs, held) -> list[Check]:
         if j in used or q in used or len(out) == CHECKS:
             continue
         used |= {j, q}
-        at = min(j + 1 + GAP, len(sents))
-        # a question more than one telling answers ('What did Lily see?' after she saw a
-        # bird and then dark clouds in the sky) has every answer they support right
-        # (John's, 2026-10-04)
-        same = {t} | {u for k, u, told in tellings if k < at and _answers(what, told)}
-        out.append(Check(at, q, t.text.lower(), tuple(sorted(
-            {u.text.lower() for u in same} | {u.lemma_.lower() for u in same})),
-            _nouns(docs[:at])))
-    return sorted(out, key=lambda c: c.at)
+        out.append(_check(q, t, what, min(j + 1 + GAP, len(sents)), "check",
+                          tellings, docs))
+    far = []
+    for _, j, q, t, what in sorted(found):
+        if j in used or q in used or len(far) == CHECKS or len(sents) - (j + 1) < FAR:
+            continue
+        used |= {j, q}
+        far.append(_check(q, t, what, len(sents), "far", tellings, docs))
+    return sorted(out + far, key=lambda c: c.at)
+
+
+def _check(q, t, what, at, form, tellings, docs) -> Check:
+    """A question asked at `at`, right in every answer a telling of it by then supports:
+    one more than one telling answers ('What did Lily see?' after she saw a bird and then
+    dark clouds in the sky) has each of their answers right (John's, 2026-10-04)."""
+    same = {t} | {u for k, u, told in tellings if k < at and _answers(what, told)}
+    return Check(at, q, t.text.lower(), tuple(sorted(
+        {u.text.lower() for u in same} | {u.lemma_.lower() for u in same})),
+        _nouns(docs[:at]), form)
 
 
 def stream(n: int, seed: int = 0, path: Path = VALID) -> list[Story]:
@@ -288,7 +304,7 @@ def fingerprint(stories: list[Story]) -> str:
     for s in stories:
         h.update(f"{s.question}|{s.answer}|{len(s.told)}".encode())
         for c in s.checks:
-            h.update(f"{c.at}|{c.question}|{c.answer}|{c.answers}".encode())
+            h.update(f"{c.at}|{c.question}|{c.answer}|{c.answers}|{c.form}".encode())
     return h.hexdigest()[:12]
 
 

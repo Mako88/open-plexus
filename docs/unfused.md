@@ -86,6 +86,15 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
   4. Harder checks, one at a time and each measured alone: further from their sentence
      (5 to 15 sentences on), needing two told facts, about what changed, and early
      stories asked late.
+  5. What usually happens, before the two goals below (John's yes, 2026-10-04). The
+     cloze is prediction, and its curve stops rising near 100 stories (0.41 at 300,
+     0.43 at 1,000): nothing counts how events follow one another. Narrative schemas
+     (Chambers and Jurafsky, 2008): across stories, how often an individual that filled
+     one verb's slot fills another's later ('lose' then 'find', the same ball). At a
+     cloze, each individual of the episode is scored by how the slots it has filled
+     predict the blank's. Learnt from counts, never written ('you find what was lost'
+     is English by hand). Refuted if the cloze with schemas rises no more past 100
+     stories than the same run without them.
   Then John's two nearest goals (2026-10-04): a conversation with the system (the
   mouth, the graphed arm's item 2), and worlds it acts in, its output heard back as
   input. The first world is TextWorld (Microsoft's text adventures), and saying

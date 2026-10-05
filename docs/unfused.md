@@ -105,9 +105,20 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
      and the walk and plans recall what was told. The walk's activation alone ranked
      focus's names at 0.23 (`f16c57f8`) and the walk as the whole stack read 0.244.
      The cloze's lever is a better predictor. Refuted so far: weighting focus's
-     factors (`e7d53f7c`), narrative schemas, fit by the verb's own slot (Resnik).
-     Next: analogy, the told sentence most like the blank's and what filled the asked
-     slot there, as TinyStories repeats its own patterns.
+     factors (`e7d53f7c`), narrative schemas, fit by the verb's own slot (Resnik),
+     analogy, Erk's preference by MiniLM. A reader gets 0.925 where the system gets
+     0.517 (`readings/reader-cloze-*`), so the cloze has room. From its misses, in
+     order, each measured alone:
+     a. The question's own thing given back ('helped the pig at what?' answered the
+        pig): a candidate is dropped by its description, not by its individual. A bug.
+     b. The kind the question asks for (John's: these are one fault, not knowing
+        categories). 'who' wants a person and 'at what' a place whatever the verb,
+        which is why fit by the verb's slot lost. Learn, from each lesson's answer,
+        which kind each question frame (wh-word with its preposition) brings, by the
+        kinds already learnt, as counts; rank by it in place of the wh-word's mark.
+     c. What the story is about (its setting and thread: the circus, the camp trip),
+        a layer over the episode's individuals, as a reader holds a story's gist
+        (John's episode layer, item 6). After a and b say how much is left.
   6. An episode recalled by its gist (John's, 2026-10-05; hippocampal indexing, Teyler
      and DiScenna). A boundary changes what is in mind and erases nothing; `remind`
      runs it backwards, and the oracle arms (`recalled`, `asked`) say what is left is

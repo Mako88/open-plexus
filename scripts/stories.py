@@ -108,6 +108,13 @@ class Recalled(Graphed):
         self.arm.recall(lo, hi)
 
 
+class Asked(Recalled):
+    """The same control handed the episode only at the question, after the retold
+    sentence has opened individuals of its own, as recall by a cue is."""
+
+    at_ask = True
+
+
 def run(arm, stories, reopen_every: int = 100) -> dict:
     rows, turn, sizes = [], 0, {}
     started = time.perf_counter()
@@ -163,10 +170,13 @@ def _stream(arm, stories, reopen_every, rows, sizes) -> int:
         if check is not None and old.told:
             arm.tell(turn, BREAK)
             turn += 1
-            if hasattr(arm, "recall") and old.index in spans:
+            handed = hasattr(arm, "recall") and old.index in spans
+            if handed and not getattr(arm, "at_ask", False):
                 arm.recall(*spans[old.index])
             arm.tell(turn, old.told[0])
             turn += 1
+            if handed and getattr(arm, "at_ask", False):
+                arm.recall(*spans[old.index])
             rows.append(_ask(arm, turn, s, "late", check))
         if (b := bucket(s.index)) != bucket(s.index + 1):
             sizes[b] = arm.dials()
@@ -212,7 +222,7 @@ def _summary(arm, rows, sizes, turn, started, cpu) -> dict:
             "forms": forms, "rows": rows}
 
 
-ARMS = {"graphed": Graphed, "recalled": Recalled}
+ARMS = {"graphed": Graphed, "recalled": Recalled, "asked": Asked}
 
 
 def main() -> None:

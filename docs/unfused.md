@@ -96,38 +96,22 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
      story apart ('Think back to the story with Lily and the lost red ball'), its words
      chosen by the world as the story's nouns rarest across the others. It asks for an
      episode recalled by its gist, and for a cue heard as a cue rather than a telling.
-  5. NEXT. The walk first, then the schemas: the walk (below) as an arm beside
-     today's stack, read on cloze, checks, far, late and CPU at 1,000 and 3,000
-     stories, since its decay is what stops a question's cost growing with history;
-     a piece of the stack retires only once the walk matches it on its questions.
-     A first walk without learnt weights may read below the stack; the schemas are
-     what should lift it. What usually happens, before the two goals below (John's yes, 2026-10-04). The
-     cloze is prediction, and its curve stops rising near 100 stories (0.41 at 300,
-     0.43 at 1,000): nothing counts how events follow one another. Narrative schemas
-     (Chambers and Jurafsky, 2008): across stories, how often an individual that filled
-     one verb's slot fills another's later ('lose' then 'find', the same ball). At a
-     cloze, each individual of the episode is scored by how the slots it has filled
-     predict the blank's. Learnt from counts, never written ('you find what was lost'
-     is English by hand). Refuted if the cloze with schemas rises no more past 100
-     stories than the same run without them. Built as consolidation (John's): a
-     process over what is stored that finds what is common to the things in a slot,
-     and the walk learnt from it. The walk John proposed: every node a question names
-     fires at once and what their activations meet at is the answer, as spreading
-     activation (Quillian; ACT-R) does, each node passing on activation divided by
-     its fan so a hub passes almost none, and along links weighted by the schemas'
-     counts. One walk that could retire match, focus, joins and borrowing, each
-     against a control.
+  5. NEXT. The walk (John's): every node a question names fires at once, and what
+     their activations meet at is the answer, as spreading activation does
+     (Quillian; ACT-R), each node passing on activation divided by its fan so a hub
+     passes almost none. `match` is retired for its meet (`met`, `7bc77a2e`). Left:
+     the walk retiring focus, joins and borrowing, each against a control, and what
+     its decay does to item 2's cost at 3,000 stories. Narrative schemas as focus's
+     factor were refuted (the commit that deletes them, with what would bring them
+     back). The cloze is still flat past 100 stories.
   6. Predict, then learn from the error (John's, 2026-10-04; predictive processing,
-     Rao and Ballard; a model's next-token objective). Before each telling is stored,
-     the system guesses its arguments from what is in mind, then compares the guesses
-     with what was said: a cloze on every sentence, with no teacher, about ten times
-     the lessons a story. What it learns first: how much each of focus's factors
-     counts. They are multiplied now with every exponent at 1, where a model learns
-     each weight of a dot product. They are learnt by multiplicative updates (Hedge,
-     Winnow), so the thinking is still not trained by gradient: a factor's weight
-     shrinks when it ranked a wrong answer first and grows when it ranked the right
-     one. The error is Phase 6's surprise too, and where event segmentation puts a
-     boundary. Refuted if the cloze reads no higher than with the weights fixed at 1.
+     Rao and Ballard). Before each telling is stored, the system guesses its
+     arguments from what is in mind and learns from what was said: a cloze on every
+     sentence, with no teacher. Learning focus's factor weights from it was refuted,
+     and learning them from lessons alone too (the commit that deletes them), though
+     the guesses themselves improved. Left: a target the questions share with the
+     guesses, and the error as Phase 6's surprise and where event segmentation puts
+     a boundary. Refuted if the cloze reads no higher than without it.
   Then John's two nearest goals (2026-10-04): a conversation with the system (the
   mouth, the graphed arm's item 2), and worlds it acts in, its output heard back as
   input. The first world is TextWorld (Microsoft's text adventures), and saying
@@ -706,6 +690,16 @@ the store merges by id. Kill a third of the nodes mid-exam.
   is read again from it; a vector space can be, by a map fitted on texts both versions
   encoded (orthogonal Procrustes), trusted once its error on held-out texts is read.
   First: `graph.py` split along reading, storage, individuals and answering.
+- **Concurrent walks, and sessions.** John's, 2026-10-04. Every walk has an id and
+  runs on its own: a question's answers now, and a prediction's (THE ORDER, item 6)
+  runs beside it, as a brain predicts while it perceives, never in the answer's path.
+  An answer reads the learnt state as of a version (MVCC), and an exam's stream waits
+  at a checkpoint (a story's end) until that story's predictions land, so a reading
+  reproduces; a live session does not wait. Each session holds its own working memory
+  (what is in mind, its episode) and shares the long-term store, so every
+  conversation teaches the whole. What follows for learning: concurrent updates must
+  merge without coordination, so what is learnt is kept as counts (DECIDED, counters
+  only rise) and weights are read from them. After item 6 shows predicting pays.
 - **A retryable buffer of saves.** John's, 2026-10-03, for stability at scale. Writes
   gather in memory and go to disk in batches that are retried until they land, sized by
   the RAM-against-speed dial, so a crash costs at most one buffer.

@@ -61,11 +61,6 @@ CREATE TABLE IF NOT EXISTS named (word TEXT NOT NULL, name TEXT NOT NULL,
     PRIMARY KEY (word, name));
 CREATE TABLE IF NOT EXISTS filled (name TEXT NOT NULL, lemma TEXT NOT NULL,
     link TEXT NOT NULL, n INTEGER NOT NULL, PRIMARY KEY (name, lemma, link));
-CREATE TABLE IF NOT EXISTS chained (a TEXT NOT NULL, b TEXT NOT NULL, n INTEGER NOT NULL,
-    PRIMARY KEY (a, b));
-CREATE INDEX IF NOT EXISTS chained_b ON chained (b);
-CREATE TABLE IF NOT EXISTS chain_ends (slot TEXT NOT NULL, side INTEGER NOT NULL,
-    n INTEGER NOT NULL, PRIMARY KEY (slot, side));
 CREATE TABLE IF NOT EXISTS counts (shape TEXT NOT NULL, walk TEXT NOT NULL,
     word TEXT NOT NULL, size INTEGER NOT NULL);
 """
@@ -130,10 +125,6 @@ STEPS = 3
 PASS = 0.8
 FLOOR = 1e-3
 LEMMA = 300
-# how many later slots of an individual each slot is counted with, and how many counts a
-# schema's estimate is pulled towards knowing nothing by
-CHAIN = 6
-SMOOTH = 5.0
 
 
 class Spent(Exception):
@@ -615,7 +606,6 @@ class GraphArm:
         # a turn holding no words is a break in the text ('***', a new page): what is
         # heard after it is another episode
         if not any(ch.isalnum() for ch in text):
-            self.consolidate()
             self.db.execute("INSERT OR IGNORE INTO boundaries VALUES (?)", (turn,))
             self.db.commit()
             # a name's steps are its individuals in mind, and a new episode has none
@@ -2082,73 +2072,6 @@ class GraphArm:
             frontier = nxt
         return total, depth
 
-    def consolidate(self) -> None:
-        """What usually happens, counted once an episode ends (Chambers and Jurafsky's
-        narrative schemas): for each individual of the episode, the verb slots it filled
-        in the order it filled them, each earlier slot counted with each later one. 'lose'
-        then 'find', the same ball. Learnt from counts across episodes, never written."""
-        first = self.first_event()
-        seen: dict[str, list[str]] = {}
-        for node, lemma, label in self.db.execute(
-                "SELECT edges.node, events.lemma, edges.label FROM edges JOIN events ON "
-                "events.id = edges.event WHERE edges.event >= ? AND edges.node LIKE 'i:%' AND "
-                "events.mood = '' ORDER BY edges.event", (first,)):
-            if label not in BLANKS and not label.startswith("prep:"):
-                continue
-            slots = seen.setdefault(node, [])
-            slot = f"{lemma}|{label}"
-            if not slots or slots[-1] != slot:
-                slots.append(slot)
-        pairs: Counter = Counter()
-        for slots in seen.values():
-            for i, a in enumerate(slots):
-                for b in slots[i + 1:i + 1 + CHAIN]:
-                    pairs[(a, b)] += 1
-        self.db.executemany("INSERT INTO chained VALUES (?, ?, ?) ON CONFLICT(a, b) DO UPDATE "
-                            "SET n = n + excluded.n", [(a, b, n) for (a, b), n in pairs.items()])
-        ends: Counter = Counter()
-        for (a, b), n in pairs.items():
-            ends[(a, 0)] += n
-            ends[(b, 1)] += n
-        self.db.executemany("INSERT INTO chain_ends VALUES (?, ?, ?) ON CONFLICT(slot, side) "
-                            "DO UPDATE SET n = n + excluded.n",
-                            [(a, side, n) for (a, side), n in ends.items()])
-
-    def schema(self, node: str, blank: tuple[str, str]) -> float:
-        """How the slots an individual of this episode has filled predict the blank's
-        slot, from the counts consolidation keeps: the mean, over its slots, of how much
-        likelier the blank is after that slot than after any, smoothed towards 1 where
-        little was counted. 1 where nothing is known."""
-        b = f"{blank[0]}|{blank[1]}"
-        total = self._chain_total()
-        after = self.db.execute("SELECT n FROM chain_ends WHERE slot = ? AND side = 1",
-                                (b,)).fetchone()
-        if not total or after is None:
-            return 1.0
-        prior = after[0] / total
-        logs = []
-        for lemma, label in self.db.execute(
-                "SELECT events.lemma, edges.label FROM edges JOIN events ON events.id = "
-                "edges.event WHERE edges.node = ? AND edges.event >= ? AND events.mood = ''",
-                (node, self.first_event())):
-            if label not in BLANKS and not label.startswith("prep:"):
-                continue
-            a = f"{lemma}|{label}"
-            before = self.db.execute("SELECT n FROM chain_ends WHERE slot = ? AND side = 0",
-                                     (a,)).fetchone()
-            both = self.db.execute("SELECT n FROM chained WHERE a = ? AND b = ?",
-                                   (a, b)).fetchone()
-            n_a, n_ab = (before[0] if before else 0), (both[0] if both else 0)
-            # only what was counted raises: a pair never counted is, at this sparsity,
-            # mostly a pair never heard, and read as against it, it sank whoever filled
-            # common slots, which is most answers
-            logs.append(max(0.0, math.log((n_ab + SMOOTH * prior) / ((n_a + SMOOTH) * prior))))
-        return math.exp(sum(logs) / len(logs)) if logs else 1.0
-
-    def _chain_total(self) -> int:
-        return self.db.execute("SELECT COALESCE(SUM(n), 0) FROM chain_ends WHERE side = 1"
-                               ).fetchone()[0]
-
     def focused(self, question: str) -> str | None:
         """The name in this episode that best fits the asked slot: how strongly it is in focus,
         each hearing fading as ACT-R's base level does, times how often it has filled the
@@ -2157,13 +2080,12 @@ class GraphArm:
         scores = self.focus(question)
         if not scores:
             return None
-        return max((a * f * w * c, n) for n, (a, f, w, c) in scores.items())[1]
+        return max((a * f * w, n) for n, (a, f, w) in scores.items())[1]
 
-    def focus(self, question: str) -> dict[str, tuple[float, float, float, float]] | None:
-        """Each name focus weighs for a question, with its four factors: how strongly it
-        is in focus, how it fits the asked slot, how often the wh-word asks for its mark,
-        and what its slots in this episode predict of the asked one (`schema`). None
-        where the question is not guessed at."""
+    def focus(self, question: str) -> dict[str, tuple[float, float, float]] | None:
+        """Each name focus weighs for a question, with its three factors: how strongly it
+        is in focus, how it fits the asked slot, and how often the wh-word asks for its
+        mark. None where the question is not guessed at."""
         slot = self.blank(question)
         # a question about someone never mentioned is not guessed at
         if slot is None or not all(self.known(f) for f in self.shape(question)[1]):
@@ -2202,14 +2124,13 @@ class GraphArm:
 
         # in mind as an individual, said by its description; how it fits and what it
         # is asked for are what everyone knows, so they are read by its label
-        out: dict[str, tuple[float, float, float, float]] = {}
+        out: dict[str, tuple[float, float, float]] = {}
         for node, a in act.items():
             said, name = self.describe(node), self.label(node)
             if said_in(said, question):
                 continue
             was = out.get(said)
-            out[said] = (a + (was[0] if was else 0.0), fit(name), asked_for(name),
-                         self.schema(node, slot) if node.startswith("i:") else 1.0)
+            out[said] = (a + (was[0] if was else 0.0), fit(name), asked_for(name))
         return out
 
     def mark(self, name: str) -> str | None:

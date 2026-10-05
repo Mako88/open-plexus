@@ -91,7 +91,11 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
      late (`late`, after a parent's reminder, 0.484 against near 0.965; 0.686 with
      no reminder, since a retold sentence opens new individuals). Left, after item 5
      (John's, 2026-10-04: item 5 first, so every later reading is quick to take):
-     needing two told facts, and about what changed.
+     needing two told facts, and about what changed. And late's reminder as a person
+     gives one (John's, 2026-10-04): not the story's sentence retold but what set the
+     story apart ('Think back to the story with Lily and the lost red ball'), its words
+     chosen by the world as the story's nouns rarest across the others. It asks for an
+     episode recalled by its gist, and for a cue heard as a cue rather than a telling.
   5. NEXT. The walk first, then the schemas: the walk (below) as an arm beside
      today's stack, read on cloze, checks, far, late and CPU at 1,000 and 3,000
      stories, since its decay is what stops a question's cost growing with history;

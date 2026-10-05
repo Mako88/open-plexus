@@ -13,6 +13,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 import shutil
 import sys
 import tempfile
@@ -139,9 +140,29 @@ def run(arm, stories, reopen_every: int = 100) -> dict:
 LATE = 100
 
 
+def reminder(old, check, rarity: Counter) -> str | None:
+    """What a parent says to bring a story back (THE ORDER, harder checks, John's): not
+    a sentence of it but what set it apart, its two nouns said most in it and least in
+    the others (tf-idf). The check's own answer is never one of them."""
+    said = Counter(old.earlier)
+    picked = sorted((w for w in said if w.isalpha()
+                     and w not in {a.lower() for a in check.answers}),
+                    key=lambda w: -said[w] / rarity[w])[:2]
+    if len(picked) < 2:
+        return None
+    words = set(re.findall(r"\w+", " ".join(old.told + old.after)))
+
+    def phrase(w):
+        # a name is a noun the story only ever writes capitalised
+        return w.capitalize() if w not in words and w.capitalize() in words else f"the {w}"
+    return f"Think back to the story with {phrase(picked[0])} and {phrase(picked[1])}."
+
+
 def _stream(arm, stories, reopen_every, rows, sizes) -> int:
     turn = 0
     by_index = {s.index: s for s in stories}
+    # how many stories of the stream say each noun, as the world knows it
+    rarity = Counter(w for s in stories for w in set(s.earlier))
     # each story's break and its last turn, for a control that is handed an episode
     spans: dict[int, tuple[int, int]] = {}
     for s in stories:
@@ -178,6 +199,16 @@ def _stream(arm, stories, reopen_every, rows, sizes) -> int:
             if handed and getattr(arm, "at_ask", False):
                 arm.recall(*spans[old.index])
             rows.append(_ask(arm, turn, s, "late", check))
+            # and another of its checks after a reminder of what set it apart, as a
+            # cue heard as a cue rather than a telling
+            other = next((c for c in old.checks if c is not check), None)
+            said = reminder(old, other, rarity) if other is not None else None
+            if said is not None:
+                arm.tell(turn, BREAK)
+                turn += 1
+                arm.tell(turn, said)
+                turn += 1
+                rows.append(_ask(arm, turn, s, "cued", other))
         if (b := bucket(s.index)) != bucket(s.index + 1):
             sizes[b] = arm.dials()
     return turn
@@ -211,7 +242,7 @@ def _summary(arm, rows, sizes, turn, started, cpu) -> dict:
     arm.close()
     # `score` and `curve` stay the cloze's; each form is read as its own curve
     forms = {}
-    for form in ("cloze", "check", "far", "late"):
+    for form in ("cloze", "check", "far", "late", "cued"):
         rs = [r for r in rows if r["form"] == form]
         forms[form] = {"score": round(sum(r["correct"] for r in rs) / len(rs), 3)
                        if rs else None, "n": len(rs), "curve": _curve(rs, sizes)}

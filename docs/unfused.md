@@ -91,11 +91,8 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
      late (`late`, after a parent's reminder, 0.484 against near 0.965; 0.686 with
      no reminder, since a retold sentence opens new individuals). Left, after item 5
      (John's, 2026-10-04: item 5 first, so every later reading is quick to take):
-     needing two told facts, and about what changed. And late's reminder as a person
-     gives one (John's, 2026-10-04): not the story's sentence retold but what set the
-     story apart ('Think back to the story with Lily and the lost red ball'), its words
-     chosen by the world as the story's nouns rarest across the others. It asks for an
-     episode recalled by its gist, and for a cue heard as a cue rather than a telling.
+     needing two told facts, and about what changed. Late's reminder as a person
+     gives one is in (`cued`, John's).
   5. NEXT. The walk (John's): every node a question names fires at once, and what
      their activations meet at is the answer, as spreading activation does
      (Quillian; ACT-R), each node passing on activation divided by its fan so a hub
@@ -110,19 +107,12 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
      (Resnik), was refuted twice (the commit that took it out); what fit's link-alone
      term carries, and what else ranks a wrong kind first, is not yet read.
   6. An episode recalled by its gist (John's, 2026-10-05; hippocampal indexing, Teyler
-     and DiScenna). A late ask's answer is among focus's names a fifth of the time
-     (`e7d53f7c`): the old story is never in mind, and its retold sentence opens new
-     individuals, so the reminder costs (0.600 with it, 0.686 without). A boundary
-     changes what is in mind and erases nothing; reinstating an episode is the same
-     change run backwards. A cue's words, weighed by how rare they are across
-     episodes, choose the episode (or the likeliest few where the cue is ambiguous),
-     and it is put in mind, so the retold sentence's mentions join its individuals.
-     Its individuals come from it; kinds and slots are read from everything. The
-     control is in (`recalled`, the true episode handed over): recall by a cue is the
-     whole of late's failure, and using what is recalled is not. Left: the cue choosing
-     the episode itself, read against `recalled` and refuted if it closes little of the
-     gap; then item 4's cue reminder rides on it. Before item 5's retirements (John's,
-     2026-10-05).
+     and DiScenna). A boundary changes what is in mind and erases nothing; `remind`
+     runs it backwards, and the oracle arms (`recalled`, `asked`) say what is left is
+     which episode the cue picks, never when or how it is used. Left: the cue's misses
+     (late 0.855 against the oracle's 0.969), first by reading them; recalling the
+     likeliest few where the cue is ambiguous; and whether episodes recalled together
+     often become a category (OPEN FORKS, meta layers, John's 'dreaming').
   7. Predict, then learn from the error (John's, 2026-10-04; predictive processing,
      Rao and Ballard). Before each telling is stored, the system guesses its
      arguments from what is in mind and learns from what was said: a cloze on every

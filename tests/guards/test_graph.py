@@ -49,10 +49,12 @@ def test_a_word_held_every_time_is_frame_not_a_slot(tmp_path):
 def test_nothing_learnt_is_nothing_said(tmp_path):
     a = arm(tmp_path)
     a.hear(0, "Ada keeps the kettle in the shed.")
-    # asked with the telling's own verb, the question is matched against the episode;
-    # asked another way, only a lesson could say how the two wordings meet
+    # asked with the telling's own verb, in either voice, the question's names and verb
+    # meet at the telling; asked another way, only a lesson could say how the two
+    # wordings meet
     assert a.answer(q("Where does Ada keep the kettle?")) == "shed"
-    assert a.answer(q("Where is Ada's kettle kept?")) == "I don't know."
+    assert a.answer(q("Where is Ada's kettle kept?")) == "shed"
+    assert a.answer(q("Where is Ada's kettle?")) == "I don't know."
 
 
 def test_what_did_not_happen_or_only_might_is_marked_on_the_verb():
@@ -85,9 +87,9 @@ def test_a_conversation_teaches_with_nothing_labelled(tmp_path):
     a = arm(tmp_path)
     a.turn(0, "Ada keeps the kettle in the shed.")
     a.turn(1, "Bren keeps the rope in the attic.")
-    assert a.turn(2, "Where is Ada's kettle kept?") == "I don't know."
+    assert a.turn(2, "Where is Ada's kettle?") == "I don't know."
     a.turn(3, "No, it's the shed.")
-    assert a.turn(4, "Where is Bren's rope kept?") == "attic"
+    assert a.turn(4, "Where is Bren's rope?") == "attic"
     a.turn(5, "Yes, that's right.")
     # a question is never stored as a telling
     assert not a.db.execute("SELECT 1 FROM events WHERE heard LIKE '%?'").fetchone()
@@ -313,10 +315,10 @@ def test_a_question_is_matched_as_an_event_with_one_slot_free(tmp_path):
         a.hear(i, text)
     # a possessed noun is read through, a place asked by 'where' is any link of place,
     # and a name hanging off another argument ('with Ann') still has to be there
-    assert a.matched("Who loved her veil?") == "princess"
-    assert a.matched("Where did Roxy put the leaves?") == "feet"
-    assert a.matched("Who is cousins with Ann?") == "tom"
-    assert a.matched("Who hated her veil?") is None
+    assert a.met("Who loved her veil?") == "princess"
+    assert a.met("Where did Roxy put the leaves?") == "feet"
+    assert a.met("Who is cousins with Ann?") == "tom"
+    assert a.met("Who hated her veil?") is None
 
 
 def test_a_blank_is_read_as_the_slot_it_stands_in(tmp_path):

@@ -73,14 +73,10 @@ class Graphed:
     name = "graphed"
 
     def __init__(self, work: Path) -> None:
-        self.open = lambda: self.made(work)
-        self.arm = self.open()
-
-    @staticmethod
-    def made(work: Path):
         from unfused.graph import GraphArm
 
-        return GraphArm(work)
+        self.open = lambda: GraphArm(work)
+        self.arm = self.open()
 
     def reopen(self):
         self.arm.close()
@@ -101,16 +97,6 @@ class Graphed:
 
     def close(self):
         self.arm.close()
-
-
-class Walked(Graphed):
-    name = "walked"
-
-    @staticmethod
-    def made(work: Path):
-        from unfused.walk import WalkArm
-
-        return WalkArm(work)
 
 
 def run(arm, stories, reopen_every: int = 100) -> dict:
@@ -229,8 +215,8 @@ def main() -> None:
     stamp = datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")
     for name in args.arms.split(","):
         work = Path(tempfile.mkdtemp(prefix=f"unfused-stories-{name}-"))
-        arm = {"graphed": Graphed, "walked": Walked}[name](work) if name in (
-            "graphed", "walked") else {"blind": Blind, "frequent": Frequent}[name]()
+        arm = {"blind": Blind, "frequent": Frequent}[name]() if name != "graphed" \
+            else Graphed(work)
         out = run(arm, stories)
         shutil.rmtree(work, ignore_errors=True)
         reading = {"kind": "stories", "taken_at": stamp, "note": args.note,

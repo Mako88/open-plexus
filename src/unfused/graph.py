@@ -46,6 +46,9 @@ CREATE TABLE IF NOT EXISTS aliases (word TEXT NOT NULL, name TEXT NOT NULL,
 CREATE TABLE IF NOT EXISTS agreement (name TEXT NOT NULL, pronoun TEXT NOT NULL,
     n INTEGER NOT NULL, PRIMARY KEY (name, pronoun));
 CREATE TABLE IF NOT EXISTS boundaries (turn INTEGER PRIMARY KEY);
+CREATE TABLE IF NOT EXISTS episode_words (word TEXT NOT NULL, episode INTEGER NOT NULL,
+    PRIMARY KEY (word, episode));
+CREATE INDEX IF NOT EXISTS episode_words_by ON episode_words (episode);
 CREATE TABLE IF NOT EXISTS asks (wh TEXT NOT NULL, mark TEXT NOT NULL, n INTEGER NOT NULL,
     PRIMARY KEY (wh, mark));
 CREATE TABLE IF NOT EXISTS contexts (word TEXT PRIMARY KEY, names TEXT NOT NULL,
@@ -125,6 +128,9 @@ STEPS = 3
 PASS = 0.8
 FLOOR = 1e-3
 LEMMA = 300
+# a word more than this share of episodes held says nothing of which one a cue means, and
+# is not looked up
+COMMON = 0.2
 
 
 class Spent(Exception):
@@ -617,6 +623,9 @@ class GraphArm:
             for key in [k for k in self._steps if k.startswith("n:")]:
                 del self._steps[key]
             return
+        # the episode's index: each word it held, so a cue can find it again
+        self.db.executemany("INSERT OR IGNORE INTO episode_words VALUES (?, ?)",
+                            [(w, self.episode()) for w in set(_words(text))])
         events = self.read(text)
         resolved = {t: self.referent(t[2:]) for ev in events for _, t in ev["edges"]
                     if t.startswith("p:")}
@@ -1891,6 +1900,42 @@ class GraphArm:
         for key in [k for k in self._steps if k.startswith("n:")]:
             del self._steps[key]
 
+    def remind(self, question: str) -> None:
+        """Recall by a cue: an earlier episode that explains what this one heard and the
+        question better than this one does is put back in mind (hippocampal indexing).
+        Each word weighs by how few episodes held it, and a word most episodes held is
+        not looked up, so recall costs a few index lookups and never a scan. A story
+        being heard explains its own questions best, so this fires only when what is
+        asked is not here."""
+        ep = self.episode()
+        here = {w for (w,) in self.db.execute(
+            "SELECT word FROM episode_words WHERE episode = ?", (ep,))}
+        cue = here | set(_words(question))
+        episodes = self.db.execute("SELECT COUNT(*) FROM boundaries").fetchone()[0]
+        if not cue or episodes < 2:
+            return
+        weight = {}
+        for word, n in self.db.execute(
+                f"SELECT word, COUNT(*) FROM episode_words WHERE word IN "
+                f"({','.join('?' * len(cue))}) GROUP BY word", tuple(cue)):
+            if n <= episodes * COMMON:
+                weight[word] = math.log((episodes + 1) / (n + 1))
+        if not weight:
+            return
+        mine = sum(weight.get(w, 0.0) for w in here)
+        scores: Counter = Counter()
+        for word, other in self.db.execute(
+                f"SELECT word, episode FROM episode_words WHERE word IN "
+                f"({','.join('?' * len(weight))}) AND episode != ?", (*weight, ep)):
+            scores[other] += weight[word]
+        held = {lo for lo, *_ in self.recalled}
+        for other, score in scores.most_common(1):
+            if score <= mine or other in held:
+                return
+            end = self.db.execute("SELECT MIN(turn) FROM boundaries WHERE turn > ?",
+                                  (other,)).fetchone()[0]
+            self.recall(other, (end - 1) if end is not None else self.now())
+
     def held(self, turn: int) -> bool:
         """Whether a turn is in mind: in this episode or one recalled."""
         return turn > self.episode() or any(lo < turn <= hi for lo, hi, *_ in self.recalled)
@@ -2533,6 +2578,7 @@ class GraphArm:
         reaction naming nothing and not negated confirms the answer given. Every other
         turn is a telling."""
         if asked(text):
+            self.remind(text)
             said = self.answer(_Asked(text))
             self.pending = (text, said)
             return said
@@ -2630,6 +2676,10 @@ def _slot(doc) -> tuple[str, str] | None:
 
 def asked(text: str) -> bool:
     return text.rstrip().endswith("?")
+
+
+def _words(text: str) -> list[str]:
+    return re.findall(r"\w+", text.lower())
 
 
 class _Asked:

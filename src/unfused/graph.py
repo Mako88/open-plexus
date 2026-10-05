@@ -128,6 +128,8 @@ STEPS = 3
 PASS = 0.8
 FLOOR = 1e-3
 LEMMA = 300
+# how high focus must rank what a plan found for the plan's answer to stand
+TOP = 3
 # a word more than this share of episodes held says nothing of which one a cue means, and
 # is not looked up
 COMMON = 0.2
@@ -1859,8 +1861,13 @@ class GraphArm:
         given_up, self.spent = self.spent > EFFORT, None
         # what the plans found from outside focus is another conversation's, as often as
         # not; what is in focus and fits the asked slot comes first
-        planned, fit = said, self.focused(question.text)
-        if said is None or not self.in_focus(said):
+        # and what a plan found stands only where focus would also consider it: a plan
+        # reads a told event, and a sentence not yet told is predicted, not found
+        planned, scores = said, self.focus(question.text)
+        ranked = sorted(scores, key=lambda n: (math.prod(scores[n]), n),
+                        reverse=True) if scores else []
+        fit = ranked[0] if ranked else None
+        if said is None or not self.in_focus(said) or (ranked and said not in ranked[:TOP]):
             said = fit or said
         self.last_notes = (["(gave up)"] if given_up else []) + (
             ["(nothing)"] if said is None else ["(found)"]) + [

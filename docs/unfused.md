@@ -100,15 +100,14 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
      their activations meet at is the answer, as spreading activation does
      (Quillian; ACT-R), each node passing on activation divided by its fan so a hub
      passes almost none. `match` is retired for its meet (`met`, `7bc77a2e`). Left:
-     the walk retiring focus, joins and borrowing, each against a control, and what
-     its decay does to item 2's cost at 3,000 stories. Narrative schemas as focus's
-     factor were refuted (the commit that deletes them, with what would bring them
-     back). The cloze is still flat past 100 stories. Where to look (`e7d53f7c`,
-     `f16c57f8`): the answer is almost always among focus's names and no weighting of
-     its factors ranks it higher, and most misses are a wrong kind for the verb's slot
-     in words whose kind is known. Fit ranking by the verb's own slot, backed off
-     (Resnik), was refuted twice (the commit that took it out); what fit's link-alone
-     term carries, and what else ranks a wrong kind first, is not yet read.
+     the walk retiring joins and borrowing, each against a control. Not focus (John's,
+     2026-10-05): a cloze's sentence is not yet told, so answering it is prediction,
+     and the walk and plans recall what was told. The walk's activation alone ranked
+     focus's names at 0.23 (`f16c57f8`) and the walk as the whole stack read 0.244.
+     The cloze's lever is a better predictor. Refuted so far: weighting focus's
+     factors (`e7d53f7c`), narrative schemas, fit by the verb's own slot (Resnik).
+     Next: analogy, the told sentence most like the blank's and what filled the asked
+     slot there, as TinyStories repeats its own patterns.
   6. An episode recalled by its gist (John's, 2026-10-05; hippocampal indexing, Teyler
      and DiScenna). A boundary changes what is in mind and erases nothing; `remind`
      runs it backwards, and the oracle arms (`recalled`, `asked`) say what is left is

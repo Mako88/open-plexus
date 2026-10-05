@@ -83,7 +83,10 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
      still grow with history (fivefold from 300-1,000 to 1,000-3,000), through hubs
      and the taught shapes several ways of answering still scan. What is left rides
      on item 5's walk, whose decay bounds what a question touches (John's suggestion
-     taken, 2026-10-04); re-read the 3,000 reading once it lands.
+     taken, 2026-10-04); re-read the 3,000 reading once it lands. Held (John's,
+     2026-10-05): a change is read at 1,000 stories (about six minutes, 618 clozes
+     focus decides, flat past 100 stories), so 3,000 waits until a question needs
+     what only it shows.
   3. ~~A check that more than one telling answers accepts every answer they support~~.
      Struck 2026-10-04 (`_answers` in `exam/stories.py`).
   4. Harder checks, one at a time and each measured alone. Done: further from their
@@ -109,10 +112,12 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
   6. An episode recalled by its gist (John's, 2026-10-05; hippocampal indexing, Teyler
      and DiScenna). A boundary changes what is in mind and erases nothing; `remind`
      runs it backwards, and the oracle arms (`recalled`, `asked`) say what is left is
-     which episode the cue picks, never when or how it is used. Left: the cue's misses
-     (late 0.855 against the oracle's 0.969), first by reading them; recalling the
-     likeliest few where the cue is ambiguous; and whether episodes recalled together
-     often become a category (OPEN FORKS, meta layers, John's 'dreaming').
+     which episode the cue picks, never when or how it is used. Left, as later
+     improvements (John's, 2026-10-05: the cloze comes first): the cue's misses (late
+     0.855 against the oracle's 0.969), first by reading them; recalling the likeliest
+     few where the cue is ambiguous (worth at most about three points); and whether
+     episodes recalled together become a category (OPEN FORKS, meta layers, John's
+     'dreaming').
   7. Predict, then learn from the error (John's, 2026-10-04; predictive processing,
      Rao and Ballard). Before each telling is stored, the system guesses its
      arguments from what is in mind and learns from what was said: a cloze on every

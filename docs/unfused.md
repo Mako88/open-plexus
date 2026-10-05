@@ -103,7 +103,10 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
      the walk retiring focus, joins and borrowing, each against a control, and what
      its decay does to item 2's cost at 3,000 stories. Narrative schemas as focus's
      factor were refuted (the commit that deletes them, with what would bring them
-     back). The cloze is still flat past 100 stories.
+     back). The cloze is still flat past 100 stories. Where to look (`e7d53f7c`,
+     `f16c57f8`): the answer is almost always among focus's names and no weighting of
+     its factors ranks it higher, and most misses are a wrong kind for the verb's slot
+     in words whose kind is known, so fit's preference of a slot for a kind is next.
   6. Predict, then learn from the error (John's, 2026-10-04; predictive processing,
      Rao and Ballard). Before each telling is stored, the system guesses its
      arguments from what is in mind and learns from what was said: a cloze on every

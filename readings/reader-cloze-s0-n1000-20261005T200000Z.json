@@ -1,0 +1,1349 @@
+{
+ "kind": "reader",
+ "taken_at": "20261005T200000Z",
+ "note": "How predictable the cloze is: Claude, reading blind, answered 120 clozes sampled at random (seed 7) from the 1,000-story stream, given the story so far and the blanked sentence; answers kept in a file not read until scoring. The system is 180234Z on the same clozes.",
+ "stream": {
+  "source": "TinyStories-valid",
+  "seed": 0,
+  "stories": 1000,
+  "sample": 120,
+  "sample_seed": 7
+ },
+ "reader": 0.925,
+ "system": 0.5166666666666667,
+ "items": [
+  {
+   "story": 38,
+   "question": "From that day on, Max always made sure to stay close to what and never wander too far away?",
+   "answers": [
+    "friend",
+    "friends"
+   ],
+   "reader": "friends",
+   "reader_right": true,
+   "system": "little dog",
+   "system_right": false
+  },
+  {
+   "story": 40,
+   "question": "From that day on, who always tried to be helpful and kind to everyone he met?",
+   "answers": [
+    "timmy"
+   ],
+   "reader": "Timmy",
+   "reader_right": true,
+   "system": "timmy",
+   "system_right": true
+  },
+  {
+   "story": 47,
+   "question": "Soon, the ambulance took the man to a place where he could get better, and Kitty went back to her small house with what?",
+   "answers": [
+    "family"
+   ],
+   "reader": "family",
+   "reader_right": true,
+   "system": "big red ambulance",
+   "system_right": false
+  },
+  {
+   "story": 49,
+   "question": "Jim liked what what said and promised to practice every day?",
+   "answers": [
+    "neighbour"
+   ],
+   "reader": "neighbour",
+   "reader_right": true,
+   "system": "beautiful music",
+   "system_right": false
+  },
+  {
+   "story": 50,
+   "question": "What still had ice on it?",
+   "answers": [
+    "hand"
+   ],
+   "reader": "hand",
+   "reader_right": true,
+   "system": "mama",
+   "system_right": false
+  },
+  {
+   "story": 59,
+   "question": "From that day on, Timmy was no longer afraid of the hose and was eager to help his mom water what?",
+   "answers": [
+    "plant",
+    "plants"
+   ],
+   "reader": "plants",
+   "reader_right": true,
+   "system": "plants",
+   "system_right": true
+  },
+  {
+   "story": 60,
+   "question": "She ate all of what, every last bite?",
+   "answers": [
+    "lunch"
+   ],
+   "reader": "lunch",
+   "reader_right": true,
+   "system": "fun lunch",
+   "system_right": true
+  },
+  {
+   "story": 61,
+   "question": "She ate what and felt very happy?",
+   "answers": [
+    "dog"
+   ],
+   "reader": "hot dog",
+   "reader_right": true,
+   "system": "mom",
+   "system_right": false
+  },
+  {
+   "story": 63,
+   "question": "They both fell asleep, dreaming of all the fun they would have together the next what?",
+   "answers": [
+    "day"
+   ],
+   "reader": "day",
+   "reader_right": true,
+   "system": "day",
+   "system_right": true
+  },
+  {
+   "story": 64,
+   "question": "And with that, Lily went home, feeling happy and excited to play with who again?",
+   "answers": [
+    "timmy"
+   ],
+   "reader": "Timmy",
+   "reader_right": true,
+   "system": "friend",
+   "system_right": false
+  },
+  {
+   "story": 71,
+   "question": "But he also knew that there were always other things to enjoy, like the animals at what?",
+   "answers": [
+    "circus"
+   ],
+   "reader": "circus",
+   "reader_right": true,
+   "system": "clown",
+   "system_right": false
+  },
+  {
+   "story": 74,
+   "question": "From then on, the wild girl happily sold items at what every weekend?",
+   "answers": [
+    "market"
+   ],
+   "reader": "market",
+   "reader_right": true,
+   "system": "market",
+   "system_right": true
+  },
+  {
+   "story": 79,
+   "question": "The magical pipe was hers and who never had a terrible noise from it ever again?",
+   "answers": [
+    "elsie"
+   ],
+   "reader": "Elsie",
+   "reader_right": true,
+   "system": "elsie",
+   "system_right": true
+  },
+  {
+   "story": 83,
+   "question": "They kept their gifts and what in their hearts?",
+   "answers": [
+    "memories",
+    "memory"
+   ],
+   "reader": "memories",
+   "reader_right": true,
+   "system": "toy duck",
+   "system_right": false
+  },
+  {
+   "story": 88,
+   "question": "For the rest of the week, who practiced flapping her arms like wings and jumping off the couch?",
+   "answers": [
+    "lily"
+   ],
+   "reader": "Lily",
+   "reader_right": true,
+   "system": "lily",
+   "system_right": true
+  },
+  {
+   "story": 92,
+   "question": "The moral of the story is that it's important to trust your friends and share what?",
+   "answers": [
+    "toy",
+    "toys"
+   ],
+   "reader": "toys",
+   "reader_right": true,
+   "system": "toy",
+   "system_right": true
+  },
+  {
+   "story": 96,
+   "question": "They pretended to be kings and queens of what?",
+   "answers": [
+    "castle"
+   ],
+   "reader": "castle",
+   "reader_right": true,
+   "system": "wonderful castle",
+   "system_right": true
+  },
+  {
+   "story": 99,
+   "question": "They go back to what?",
+   "answers": [
+    "slide"
+   ],
+   "reader": "pool",
+   "reader_right": false,
+   "system": "ladder",
+   "system_right": false
+  },
+  {
+   "story": 105,
+   "question": "Who wasn't scared of butterflies?",
+   "answers": [
+    "jack"
+   ],
+   "reader": "Jack",
+   "reader_right": true,
+   "system": "jack",
+   "system_right": true
+  },
+  {
+   "story": 120,
+   "question": "She never wanted to see what again?",
+   "answers": [
+    "boy"
+   ],
+   "reader": "pin",
+   "reader_right": false,
+   "system": "little girl",
+   "system_right": false
+  },
+  {
+   "story": 126,
+   "question": "You are what?",
+   "answers": [
+    "friend",
+    "friends"
+   ],
+   "reader": "friends",
+   "reader_right": true,
+   "system": "big bear",
+   "system_right": false
+  },
+  {
+   "story": 138,
+   "question": "So the little girl sang and sang, making what come alive with music?",
+   "answers": [
+    "park"
+   ],
+   "reader": "park",
+   "reader_right": true,
+   "system": "dry park",
+   "system_right": true
+  },
+  {
+   "story": 149,
+   "question": "What is not empty anymore?",
+   "answers": [
+    "room"
+   ],
+   "reader": "floor",
+   "reader_right": false,
+   "system": "mom",
+   "system_right": false
+  },
+  {
+   "story": 156,
+   "question": "That way, she could always stay dry and enjoy what?",
+   "answers": [
+    "sunshine"
+   ],
+   "reader": "sunshine",
+   "reader_right": true,
+   "system": "own shade",
+   "system_right": false
+  },
+  {
+   "story": 157,
+   "question": "And so, who learned a lesson that day?",
+   "answers": [
+    "jack"
+   ],
+   "reader": "Jack",
+   "reader_right": true,
+   "system": "jack",
+   "system_right": true
+  },
+  {
+   "story": 170,
+   "question": "Agreeing to be more careful, Jimmy and his friends said goodbye to what and headed home?",
+   "answers": [
+    "guard"
+   ],
+   "reader": "guard",
+   "reader_right": true,
+   "system": "guard",
+   "system_right": true
+  },
+  {
+   "story": 186,
+   "question": "He loved how the cord had made what so serious and powerful?",
+   "answers": [
+    "sky"
+   ],
+   "reader": "sky",
+   "reader_right": true,
+   "system": "faint humming noise",
+   "system_right": false
+  },
+  {
+   "story": 187,
+   "question": "From that day on, Lily was more careful and never fell in what again?",
+   "answers": [
+    "drain"
+   ],
+   "reader": "drain",
+   "reader_right": true,
+   "system": "big drain",
+   "system_right": true
+  },
+  {
+   "story": 194,
+   "question": "He felt so proud of himself holding what?",
+   "answers": [
+    "medal"
+   ],
+   "reader": "medal",
+   "reader_right": true,
+   "system": "day",
+   "system_right": false
+  },
+  {
+   "story": 212,
+   "question": "They had a fun day at what?",
+   "answers": [
+    "beach"
+   ],
+   "reader": "beach",
+   "reader_right": true,
+   "system": "dolphin",
+   "system_right": false
+  },
+  {
+   "story": 221,
+   "question": "Timmy was so happy to find what and he played with it all day?",
+   "answers": [
+    "truck"
+   ],
+   "reader": "truck",
+   "reader_right": true,
+   "system": "toy box",
+   "system_right": false
+  },
+  {
+   "story": 228,
+   "question": "The prince was very happy and decided that he would always be stubborn, but if anyone ever tried to argue with him he would simply tap what and they would know that he was the king?",
+   "answers": [
+    "crown"
+   ],
+   "reader": "crown",
+   "reader_right": true,
+   "system": "beautiful crown",
+   "system_right": true
+  },
+  {
+   "story": 230,
+   "question": "From that day on, Lily never opened what in a taxi again?",
+   "answers": [
+    "window"
+   ],
+   "reader": "window",
+   "reader_right": true,
+   "system": "window",
+   "system_right": true
+  },
+  {
+   "story": 248,
+   "question": "After a few days, Timmy's knee started to heal and he was able to play outside with what again?",
+   "answers": [
+    "friend",
+    "friends"
+   ],
+   "reader": "friends",
+   "reader_right": true,
+   "system": "friends",
+   "system_right": true
+  },
+  {
+   "story": 251,
+   "question": "But every now and then, she would use what, so she could go at her own pace?",
+   "answers": [
+    "subway"
+   ],
+   "reader": "regular subway",
+   "reader_right": true,
+   "system": "regular subway",
+   "system_right": true
+  },
+  {
+   "story": 256,
+   "question": "Who never wanted to go back there again?",
+   "answers": [
+    "jimmy"
+   ],
+   "reader": "Jimmy",
+   "reader_right": true,
+   "system": "jimmy",
+   "system_right": true
+  },
+  {
+   "story": 296,
+   "question": "Whenever Alice traveled a new place, she would always remember to bring a book for what to read?",
+   "answers": [
+    "friend"
+   ],
+   "reader": "creature",
+   "reader_right": false,
+   "system": "train",
+   "system_right": false
+  },
+  {
+   "story": 298,
+   "question": "The rescue of what became a wonderful memory they would always remember?",
+   "answers": [
+    "dog"
+   ],
+   "reader": "dog",
+   "reader_right": true,
+   "system": "little girl",
+   "system_right": false
+  },
+  {
+   "story": 308,
+   "question": "What had a very special night?",
+   "answers": [
+    "girl"
+   ],
+   "reader": "girl",
+   "reader_right": true,
+   "system": "girl",
+   "system_right": true
+  },
+  {
+   "story": 309,
+   "question": "Her mom smiled and said it was what she had ever seen?",
+   "answers": [
+    "flower"
+   ],
+   "reader": "flower",
+   "reader_right": true,
+   "system": "small butterfly",
+   "system_right": false
+  },
+  {
+   "story": 317,
+   "question": "She was so happy to have the jam and so grateful what said yes?",
+   "answers": [
+    "mom"
+   ],
+   "reader": "mom",
+   "reader_right": true,
+   "system": "mom",
+   "system_right": true
+  },
+  {
+   "story": 323,
+   "question": "They played together with what and had a great day?",
+   "answers": [
+    "sword"
+   ],
+   "reader": "weapon",
+   "reader_right": false,
+   "system": "new weapon",
+   "system_right": false
+  },
+  {
+   "story": 333,
+   "question": "She likes to dance, but she likes to play with who more?",
+   "answers": [
+    "tom"
+   ],
+   "reader": "Tom",
+   "reader_right": true,
+   "system": "toys",
+   "system_right": false
+  },
+  {
+   "story": 350,
+   "question": "And he was very grateful to his friend, what?",
+   "answers": [
+    "monkey"
+   ],
+   "reader": "monkey",
+   "reader_right": true,
+   "system": "big strong elephant",
+   "system_right": false
+  },
+  {
+   "story": 352,
+   "question": "They share what?",
+   "answers": [
+    "mat"
+   ],
+   "reader": "mat",
+   "reader_right": true,
+   "system": "big mat",
+   "system_right": true
+  },
+  {
+   "story": 353,
+   "question": "I'll go play with what?",
+   "answers": [
+    "friend",
+    "friends"
+   ],
+   "reader": "friends",
+   "reader_right": true,
+   "system": "friends",
+   "system_right": true
+  },
+  {
+   "story": 360,
+   "question": "Who was so happy and proud of himself for playing golf?",
+   "answers": [
+    "timmy"
+   ],
+   "reader": "Timmy",
+   "reader_right": true,
+   "system": "timmy",
+   "system_right": true
+  },
+  {
+   "story": 372,
+   "question": "From that day on, Lily and Max would draw and color together, filling what with all their beautiful artwork?",
+   "answers": [
+    "folder"
+   ],
+   "reader": "folder",
+   "reader_right": true,
+   "system": "picture",
+   "system_right": false
+  },
+  {
+   "story": 376,
+   "question": "To what, there were two spoons?",
+   "answers": [
+    "surprise"
+   ],
+   "reader": "surprise",
+   "reader_right": true,
+   "system": "special silver spoon",
+   "system_right": false
+  },
+  {
+   "story": 383,
+   "question": "Mama smiled and hugged who?",
+   "answers": [
+    "papa"
+   ],
+   "reader": "Papa",
+   "reader_right": true,
+   "system": "new pants",
+   "system_right": false
+  },
+  {
+   "story": 406,
+   "question": "They played under the tree, and who realized that even though it rained, they still had fun?",
+   "answers": [
+    "lily"
+   ],
+   "reader": "Lily",
+   "reader_right": true,
+   "system": "lily",
+   "system_right": true
+  },
+  {
+   "story": 408,
+   "question": "Lily was happy to make a new friend and they walked together, enjoying the beauty of what?",
+   "answers": [
+    "forest"
+   ],
+   "reader": "forest",
+   "reader_right": true,
+   "system": "little rabbit",
+   "system_right": false
+  },
+  {
+   "story": 430,
+   "question": "He takes what?",
+   "answers": [
+    "cookie"
+   ],
+   "reader": "bite",
+   "reader_right": false,
+   "system": "bite",
+   "system_right": false
+  },
+  {
+   "story": 431,
+   "question": "They closed their eyes and dreamed of what?",
+   "answers": [
+    "camp"
+   ],
+   "reader": "camp",
+   "reader_right": true,
+   "system": "fun",
+   "system_right": false
+  },
+  {
+   "story": 433,
+   "question": "When it was time to go home, Lily was sad to say goodbye to the pool, but she was happy to have had such a fun day with what?",
+   "answers": [
+    "family"
+   ],
+   "reader": "family",
+   "reader_right": true,
+   "system": "little brother",
+   "system_right": false
+  },
+  {
+   "story": 436,
+   "question": "But the concert went well and everyone loved what?",
+   "answers": [
+    "music"
+   ],
+   "reader": "music",
+   "reader_right": true,
+   "system": "music",
+   "system_right": true
+  },
+  {
+   "story": 439,
+   "question": "And that was the end of what?",
+   "answers": [
+    "boat"
+   ],
+   "reader": "boat",
+   "reader_right": true,
+   "system": "new friends",
+   "system_right": false
+  },
+  {
+   "story": 446,
+   "question": "From that day on, Lily and who became good friends and they often played together in the garden?",
+   "answers": [
+    "tweet"
+   ],
+   "reader": "Tweet",
+   "reader_right": true,
+   "system": "tweet",
+   "system_right": true
+  },
+  {
+   "story": 461,
+   "question": "They both smile and enjoy their time in what?",
+   "answers": [
+    "pond"
+   ],
+   "reader": "pond",
+   "reader_right": true,
+   "system": "pond",
+   "system_right": true
+  },
+  {
+   "story": 466,
+   "question": "The wealthy man never spoke of what again?",
+   "answers": [
+    "box"
+   ],
+   "reader": "box",
+   "reader_right": true,
+   "system": "metal box",
+   "system_right": true
+  },
+  {
+   "story": 478,
+   "question": "From that day on, they played with their new wand every time they went to what?",
+   "answers": [
+    "park"
+   ],
+   "reader": "park",
+   "reader_right": true,
+   "system": "park",
+   "system_right": true
+  },
+  {
+   "story": 502,
+   "question": "After the meal, the children said goodbye to what?",
+   "answers": [
+    "waitress"
+   ],
+   "reader": "waitress",
+   "reader_right": true,
+   "system": "restaurant",
+   "system_right": false
+  },
+  {
+   "story": 508,
+   "question": "All the animals in the meadow asked him why he was so scared, and Lambikins told them what?",
+   "answers": [
+    "story"
+   ],
+   "reader": "wolves",
+   "reader_right": false,
+   "system": "wolves",
+   "system_right": false
+  },
+  {
+   "story": 510,
+   "question": "The skeleton saw a lot of amazing things during what?",
+   "answers": [
+    "drive"
+   ],
+   "reader": "drive",
+   "reader_right": true,
+   "system": "large skeleton",
+   "system_right": false
+  },
+  {
+   "story": 521,
+   "question": "The people were happy and forgave who?",
+   "answers": [
+    "sara"
+   ],
+   "reader": "Sara",
+   "reader_right": true,
+   "system": "silly things",
+   "system_right": false
+  },
+  {
+   "story": 526,
+   "question": "They both sat by what, enjoying the warmth and each other's company?",
+   "answers": [
+    "fireplace"
+   ],
+   "reader": "fireplace",
+   "reader_right": true,
+   "system": "warm fireplace",
+   "system_right": true
+  },
+  {
+   "story": 539,
+   "question": "They decide to swap what again, because they like to try new things?",
+   "answers": [
+    "toy",
+    "toys"
+   ],
+   "reader": "toys",
+   "reader_right": true,
+   "system": "mom",
+   "system_right": false
+  },
+  {
+   "story": 546,
+   "question": "From that day on, Lily always remembered to pay for what and to play outside to stay healthy?",
+   "answers": [
+    "juice"
+   ],
+   "reader": "juice",
+   "reader_right": true,
+   "system": "mommy",
+   "system_right": false
+  },
+  {
+   "story": 550,
+   "question": "In the end, designing what together made them even closer, and it was the start of many happy days?",
+   "answers": [
+    "hive"
+   ],
+   "reader": "hive",
+   "reader_right": true,
+   "system": "beautiful new home",
+   "system_right": false
+  },
+  {
+   "story": 555,
+   "question": "He was so happy to have found who bear that he quickly fell asleep?",
+   "answers": [
+    "teddy"
+   ],
+   "reader": "teddy",
+   "reader_right": true,
+   "system": "mighty coat",
+   "system_right": false
+  },
+  {
+   "story": 562,
+   "question": "Everyone in the class felt so happy and thankful for what that day?",
+   "answers": [
+    "help"
+   ],
+   "reader": "help",
+   "reader_right": true,
+   "system": "help",
+   "system_right": true
+  },
+  {
+   "story": 566,
+   "question": "The star continues to shine and make what sky beautiful?",
+   "answers": [
+    "night"
+   ],
+   "reader": "night",
+   "reader_right": true,
+   "system": "wire",
+   "system_right": false
+  },
+  {
+   "story": 572,
+   "question": "They played together in what every day?",
+   "answers": [
+    "forest"
+   ],
+   "reader": "forest",
+   "reader_right": true,
+   "system": "big forest",
+   "system_right": true
+  },
+  {
+   "story": 573,
+   "question": "So that is what who did?",
+   "answers": [
+    "jake"
+   ],
+   "reader": "Jake",
+   "reader_right": true,
+   "system": "dad",
+   "system_right": false
+  },
+  {
+   "story": 575,
+   "question": "He kept playing with what and listening to jazz, he was very happy?",
+   "answers": [
+    "truck"
+   ],
+   "reader": "truck",
+   "reader_right": true,
+   "system": "toy truck",
+   "system_right": true
+  },
+  {
+   "story": 579,
+   "question": "Lily felt sorry that her design didn't work for who, but she knew she could try again and make something better?",
+   "answers": [
+    "mittens"
+   ],
+   "reader": "Mittens",
+   "reader_right": true,
+   "system": "mittens",
+   "system_right": true
+  },
+  {
+   "story": 581,
+   "question": "Tim and Sam were happy that they could play with what together?",
+   "answers": [
+    "toy"
+   ],
+   "reader": "toy",
+   "reader_right": true,
+   "system": "big toy",
+   "system_right": true
+  },
+  {
+   "story": 586,
+   "question": "They enjoyed all their fun times together in what, just like they always did?",
+   "answers": [
+    "pond"
+   ],
+   "reader": "pond",
+   "reader_right": true,
+   "system": "perfect new pond",
+   "system_right": true
+  },
+  {
+   "story": 588,
+   "question": "They continued to fish and Timmy was careful with what?",
+   "answers": [
+    "hook"
+   ],
+   "reader": "hook",
+   "reader_right": true,
+   "system": "dad",
+   "system_right": false
+  },
+  {
+   "story": 590,
+   "question": "And from that day on, Tim always shared his popcorn with what?",
+   "answers": [
+    "mom"
+   ],
+   "reader": "mom",
+   "reader_right": true,
+   "system": "breakfast",
+   "system_right": false
+  },
+  {
+   "story": 592,
+   "question": "And so, Sammy brought the funny nut to who and they both had a good laugh?",
+   "answers": [
+    "timmy"
+   ],
+   "reader": "Timmy",
+   "reader_right": true,
+   "system": "looking nut",
+   "system_right": false
+  },
+  {
+   "story": 597,
+   "question": "Chubbs woke up and hopped away, and the bear curled up on what and went to sleep, all cozy and content?",
+   "answers": [
+    "log"
+   ],
+   "reader": "log",
+   "reader_right": true,
+   "system": "adventure",
+   "system_right": false
+  },
+  {
+   "story": 598,
+   "question": "They would play and read books together in what?",
+   "answers": [
+    "garage"
+   ],
+   "reader": "garage",
+   "reader_right": true,
+   "system": "garage",
+   "system_right": true
+  },
+  {
+   "story": 601,
+   "question": "Timmy was happy again and loaded his truck with all of what?",
+   "answers": [
+    "toy",
+    "toys"
+   ],
+   "reader": "toys",
+   "reader_right": true,
+   "system": "sister",
+   "system_right": false
+  },
+  {
+   "story": 610,
+   "question": "Who smiled through her tears and felt a little bit better?",
+   "answers": [
+    "lily"
+   ],
+   "reader": "Lily",
+   "reader_right": true,
+   "system": "lily",
+   "system_right": true
+  },
+  {
+   "story": 626,
+   "question": "She could not wait to tell her family about what she found?",
+   "answers": [
+    "circle"
+   ],
+   "reader": "circle",
+   "reader_right": true,
+   "system": "new big circle",
+   "system_right": true
+  },
+  {
+   "story": 636,
+   "question": "Tommy was so happy that what had surprised him with such a special pet?",
+   "answers": [
+    "mum"
+   ],
+   "reader": "mum",
+   "reader_right": true,
+   "system": "dream",
+   "system_right": false
+  },
+  {
+   "story": 645,
+   "question": "Who was laughing and having so much fun?",
+   "answers": [
+    "john"
+   ],
+   "reader": "John",
+   "reader_right": true,
+   "system": "john",
+   "system_right": true
+  },
+  {
+   "story": 648,
+   "question": "Together, she and her mom made what?",
+   "answers": [
+    "snowman"
+   ],
+   "reader": "snowman",
+   "reader_right": true,
+   "system": "warm clothes",
+   "system_right": false
+  },
+  {
+   "story": 657,
+   "question": "And every Christmas, she remembered the broken ornament and how telling the truth was what to do?",
+   "answers": [
+    "thing"
+   ],
+   "reader": "thing",
+   "reader_right": true,
+   "system": "day",
+   "system_right": false
+  },
+  {
+   "story": 669,
+   "question": "They learned their lesson and never rode to what again?",
+   "answers": [
+    "pond"
+   ],
+   "reader": "pond",
+   "reader_right": true,
+   "system": "big goose",
+   "system_right": false
+  },
+  {
+   "story": 687,
+   "question": "From that day on, the bird and what became good friends and they would often play together in the park?",
+   "answers": [
+    "girl"
+   ],
+   "reader": "girl",
+   "reader_right": true,
+   "system": "little girl",
+   "system_right": true
+  },
+  {
+   "story": 699,
+   "question": "They said goodbye, and who went home with a big smile on his face?",
+   "answers": [
+    "tim"
+   ],
+   "reader": "Tim",
+   "reader_right": true,
+   "system": "tim",
+   "system_right": true
+  },
+  {
+   "story": 701,
+   "question": "Katy was so happy that she could order what?",
+   "answers": [
+    "video"
+   ],
+   "reader": "video",
+   "reader_right": true,
+   "system": "video",
+   "system_right": true
+  },
+  {
+   "story": 714,
+   "question": "He felt so excited, as if he were playing in what for the very first time?",
+   "answers": [
+    "rain"
+   ],
+   "reader": "rain",
+   "reader_right": true,
+   "system": "rain",
+   "system_right": true
+  },
+  {
+   "story": 718,
+   "question": "What had such a great time, and it showed them that with patience, practice and help from others, anything is possible?",
+   "answers": [
+    "brother",
+    "brothers"
+   ],
+   "reader": "brothers",
+   "reader_right": true,
+   "system": "lily",
+   "system_right": false
+  },
+  {
+   "story": 732,
+   "question": "Timmy always remembered to bring his blue ball in his pocket when he went to what?",
+   "answers": [
+    "park"
+   ],
+   "reader": "park",
+   "reader_right": true,
+   "system": "park",
+   "system_right": true
+  },
+  {
+   "story": 749,
+   "question": "Max learned that it is good to listen to what?",
+   "answers": [
+    "owner"
+   ],
+   "reader": "Jane",
+   "reader_right": false,
+   "system": "owner",
+   "system_right": true
+  },
+  {
+   "story": 778,
+   "question": "From that day on, who never stopped exploring and learning new things?",
+   "answers": [
+    "tom"
+   ],
+   "reader": "Tom",
+   "reader_right": true,
+   "system": "tom",
+   "system_right": true
+  },
+  {
+   "story": 785,
+   "question": "But he learned that he should have listened to the man and not pushed what?",
+   "answers": [
+    "button"
+   ],
+   "reader": "button",
+   "reader_right": true,
+   "system": "big red button",
+   "system_right": true
+  },
+  {
+   "story": 798,
+   "question": "John was very careful to not forget what again?",
+   "answers": [
+    "coat"
+   ],
+   "reader": "coat",
+   "reader_right": true,
+   "system": "delicate coat",
+   "system_right": true
+  },
+  {
+   "story": 801,
+   "question": "They were both very thankful for the special needle that helped who to create something amazing?",
+   "answers": [
+    "anna"
+   ],
+   "reader": "Anna",
+   "reader_right": true,
+   "system": "anna",
+   "system_right": true
+  },
+  {
+   "story": 811,
+   "question": "Tim was happy that he helped the pig at what?",
+   "answers": [
+    "zoo"
+   ],
+   "reader": "zoo",
+   "reader_right": true,
+   "system": "big filthy pig",
+   "system_right": false
+  },
+  {
+   "story": 816,
+   "question": "When Lucy found herself in a difficult situation, what helped her out and ensured she arrived back safely?",
+   "answers": [
+    "man"
+   ],
+   "reader": "man",
+   "reader_right": true,
+   "system": "old man",
+   "system_right": true
+  },
+  {
+   "story": 838,
+   "question": "She missed the rest of what and wished she never slipped?",
+   "answers": [
+    "trip"
+   ],
+   "reader": "trip",
+   "reader_right": true,
+   "system": "fun",
+   "system_right": false
+  },
+  {
+   "story": 840,
+   "question": "Who felt happy and not tired anymore?",
+   "answers": [
+    "timmy"
+   ],
+   "reader": "Timmy",
+   "reader_right": true,
+   "system": "timmy",
+   "system_right": true
+  },
+  {
+   "story": 843,
+   "question": "He played with it for hours and even though what was still gloomy, he was happy?",
+   "answers": [
+    "sky"
+   ],
+   "reader": "sky",
+   "reader_right": true,
+   "system": "sky",
+   "system_right": true
+  },
+  {
+   "story": 849,
+   "question": "Who felt very sad and wished she had never played that terrible joke?",
+   "answers": [
+    "lily"
+   ],
+   "reader": "Lily",
+   "reader_right": true,
+   "system": "lily",
+   "system_right": true
+  },
+  {
+   "story": 882,
+   "question": "They even promised to watch what to celebrate every year?",
+   "answers": [
+    "television"
+   ],
+   "reader": "television",
+   "reader_right": true,
+   "system": "special day",
+   "system_right": false
+  },
+  {
+   "story": 899,
+   "question": "In the end, Johnny was proud of himself, and who was proud of him too?",
+   "answers": [
+    "mommy"
+   ],
+   "reader": "Mommy",
+   "reader_right": true,
+   "system": "mommy",
+   "system_right": true
+  },
+  {
+   "story": 926,
+   "question": "It was a great day at the park and Lily learned to behave and share her special coin with what?",
+   "answers": [
+    "friend",
+    "friends"
+   ],
+   "reader": "friends",
+   "reader_right": true,
+   "system": "friends",
+   "system_right": true
+  },
+  {
+   "story": 931,
+   "question": "From that moment on, who knew that he could always protect those he loved?",
+   "answers": [
+    "ted"
+   ],
+   "reader": "Ted",
+   "reader_right": true,
+   "system": "ted",
+   "system_right": true
+  },
+  {
+   "story": 934,
+   "question": "Sadly, Mr. Smith went home without what and felt very upset?",
+   "answers": [
+    "toy",
+    "toys"
+   ],
+   "reader": "sack",
+   "reader_right": false,
+   "system": "new family",
+   "system_right": false
+  },
+  {
+   "story": 951,
+   "question": "She loved to learn new things and share them with her friends, even if they were nosy like what?",
+   "answers": [
+    "squirrel"
+   ],
+   "reader": "squirrel",
+   "reader_right": true,
+   "system": "shiny zip",
+   "system_right": false
+  },
+  {
+   "story": 952,
+   "question": "What was so happy that he thanked the fair and hugged her tight?",
+   "answers": [
+    "bunny"
+   ],
+   "reader": "bunny",
+   "reader_right": true,
+   "system": "friendly bunny",
+   "system_right": true
+  },
+  {
+   "story": 964,
+   "question": "Molly waved to what as they said goodbye?",
+   "answers": [
+    "knob"
+   ],
+   "reader": "knob",
+   "reader_right": true,
+   "system": "park",
+   "system_right": false
+  },
+  {
+   "story": 973,
+   "question": "And when they left, what stayed standing in the cold?",
+   "answers": [
+    "snowman"
+   ],
+   "reader": "snowman",
+   "reader_right": true,
+   "system": "sarah",
+   "system_right": false
+  },
+  {
+   "story": 980,
+   "question": "From that day on, Chickie always filled her bowl with enough corn to share with what?",
+   "answers": [
+    "friend",
+    "friends"
+   ],
+   "reader": "friends",
+   "reader_right": true,
+   "system": "chicken friends",
+   "system_right": true
+  },
+  {
+   "story": 988,
+   "question": "From then on, Sam and Jane always looked for the witch in what?",
+   "answers": [
+    "garden"
+   ],
+   "reader": "garden",
+   "reader_right": true,
+   "system": "garden",
+   "system_right": true
+  },
+  {
+   "story": 993,
+   "question": "From then on, who never forgot the power of hard work and never gave into being selfish?",
+   "answers": [
+    "bill"
+   ],
+   "reader": "Bill",
+   "reader_right": true,
+   "system": "bill",
+   "system_right": true
+  }
+ ]
+}

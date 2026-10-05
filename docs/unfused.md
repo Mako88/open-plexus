@@ -117,6 +117,17 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
      its fan so a hub passes almost none, and along links weighted by the schemas'
      counts. One walk that could retire match, focus, joins and borrowing, each
      against a control.
+  6. Predict, then learn from the error (John's, 2026-10-04; predictive processing,
+     Rao and Ballard; a model's next-token objective). Before each telling is stored,
+     the system guesses its arguments from what is in mind, then compares the guesses
+     with what was said: a cloze on every sentence, with no teacher, about ten times
+     the lessons a story. What it learns first: how much each of focus's factors
+     counts. They are multiplied now with every exponent at 1, where a model learns
+     each weight of a dot product. They are learnt by multiplicative updates (Hedge,
+     Winnow), so the thinking is still not trained by gradient: a factor's weight
+     shrinks when it ranked a wrong answer first and grows when it ranked the right
+     one. The error is Phase 6's surprise too, and where event segmentation puts a
+     boundary. Refuted if the cloze reads no higher than with the weights fixed at 1.
   Then John's two nearest goals (2026-10-04): a conversation with the system (the
   mouth, the graphed arm's item 2), and worlds it acts in, its output heard back as
   input. The first world is TextWorld (Microsoft's text adventures), and saying

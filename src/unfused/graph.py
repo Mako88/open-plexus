@@ -1929,8 +1929,12 @@ class GraphArm:
                 f"({','.join('?' * len(weight))}) AND episode != ?", (*weight, ep)):
             scores[other] += weight[word]
         held = {lo for lo, *_ in self.recalled}
-        for other, score in scores.most_common(1):
-            if score <= mine or other in held:
+        # an earlier episode that explains the cue only as well as this one still holds
+        # what this one lacks: a retold sentence is all of the episode it came from, and
+        # a question adding nothing rare leaves the two tied. The latest wins a tie
+        if scores:
+            score, other = max((s, e) for e, s in scores.items())
+            if score < mine - 1e-9 or other in held:
                 return
             end = self.db.execute("SELECT MIN(turn) FROM boundaries WHERE turn > ?",
                                   (other,)).fetchone()[0]

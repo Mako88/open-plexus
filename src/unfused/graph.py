@@ -506,6 +506,10 @@ class GraphArm:
         self._replaced: dict = {}
         # taught shapes' signatures, rebuilt after a lesson; questions' parses
         self._sigs: list | None = None
+        # the taught shapes of each number of slots, indexed by their signatures' parts,
+        # and the nearest shapes already found for a signature; both until a lesson
+        self._by_slots: dict = {}
+        self._near: dict = {}
         # each stored plan's text, decoded (`read_plan`)
         self._read: dict[str, dict] = {}
         self._tokens: dict = {}
@@ -1318,17 +1322,33 @@ class GraphArm:
                 skip: str | None = None) -> tuple[float, list[str]]:
         """The taught shapes nearest a question no lesson was worded as: those of its
         number of slots whose signature overlaps the question's most, and by how much."""
-        mine = set(self.signature(question, fillers))
-        best, shapes = 0.0, []
-        for shape, sig in self.taught():
-            if shape.count("<") != len(fillers) or shape == skip:
-                continue
-            near = len(mine & sig) / len(mine | sig)
-            if near > best:
-                best, shapes = near, [shape]
-            elif near == best and shape not in shapes:
-                shapes.append(shape)
-        return best, shapes
+        mine = frozenset(self.signature(question, fillers))
+        key = (mine, len(fillers), skip)
+        got = self._near.get(key)
+        if got is None:
+            # each shape's overlap is counted through the index, so a shape sharing
+            # nothing with the question costs nothing, and scores 0
+            rows, index = self.taught_by(len(fillers))
+            shared = Counter(i for part in mine for i in index.get(part, ()))
+            near = [(shape, shared[i] / (len(mine) + len(sig) - shared[i]))
+                    for i, (shape, sig) in enumerate(rows) if shape != skip]
+            best = max((n for _, n in near), default=0.0)
+            got = self._near[key] = (best, list(dict.fromkeys(
+                shape for shape, n in near if n == best)))
+        return got[0], list(got[1])
+
+    def taught_by(self, slots: int) -> tuple[list, dict]:
+        """The taught shapes of this many slots with their signatures, in the order
+        `taught` gives them, and where each part of a signature is held among them."""
+        got = self._by_slots.get(slots)
+        if got is None:
+            rows = [(shape, sig) for shape, sig in self.taught() if shape.count("<") == slots]
+            index: dict = {}
+            for i, (_, sig) in enumerate(rows):
+                for part in sig:
+                    index.setdefault(part, []).append(i)
+            got = self._by_slots[slots] = (rows, index)
+        return got
 
     def borrowed(self, question: str,
                  skip: str | None = None) -> list[tuple[list[str], list[str]]]:
@@ -1471,7 +1491,7 @@ class GraphArm:
         if put != question:
             self.heard_at(put)
         question = put
-        self._sigs = None
+        self._sigs, self._by_slots, self._near = None, {}, {}
         shape, fillers = self.shape(question)
         for rowid, plan in self.db.execute("SELECT rowid, plan FROM learnt WHERE shape = ?",
                                            (shape,)).fetchall():
@@ -2166,6 +2186,16 @@ class GraphArm:
             return []
         start = f"n:{fillers[0]}"
         frontier, seen, found = [[start]], {start}, []
+        # whether an event is two steps or fewer from a name, asked of the same events
+        # for every way through them, so found once a question
+        near: dict = {}
+
+        def close(n: str, f: str) -> bool:
+            got = near.get((n, f))
+            if got is None:
+                got = near[(n, f)] = bool(self.paths(n, f"n:{f}", limit=2, most=1))
+            return got
+
         for _ in range(limit):
             nxt = []
             for path in frontier:
@@ -2177,7 +2207,7 @@ class GraphArm:
                     way = path + [(label, direction), node]
                     if (not node.startswith("e:") and direction == 1 and label in roles
                             and not said_in(self.describe(node), text) and all(
-                                any(self.paths(n, f"n:{f}", limit=2, most=1) for n in way[::2]
+                                any(close(n, f) for n in way[::2]
                                     if n.startswith("e:")) for f in fillers[1:])):
                         turns = [self.event(n)[1] for n in way[::2] if n.startswith("e:")]
                         found.append((self.describe(node), (max(turns, default=0),)))

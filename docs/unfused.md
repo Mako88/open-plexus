@@ -94,7 +94,14 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
      cloze, each individual of the episode is scored by how the slots it has filled
      predict the blank's. Learnt from counts, never written ('you find what was lost'
      is English by hand). Refuted if the cloze with schemas rises no more past 100
-     stories than the same run without them.
+     stories than the same run without them. Built as consolidation (John's): a
+     process over what is stored that finds what is common to the things in a slot,
+     and the walk learnt from it. The walk John proposed: every node a question names
+     fires at once and what their activations meet at is the answer, as spreading
+     activation (Quillian; ACT-R) does, each node passing on activation divided by
+     its fan so a hub passes almost none, and along links weighted by the schemas'
+     counts. One walk that could retire match, focus, joins and borrowing, each
+     against a control.
   Then John's two nearest goals (2026-10-04): a conversation with the system (the
   mouth, the graphed arm's item 2), and worlds it acts in, its output heard back as
   input. The first world is TextWorld (Microsoft's text adventures), and saying

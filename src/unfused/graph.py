@@ -720,6 +720,13 @@ class GraphArm:
         """The names heard, as labels of individuals or as words held themselves."""
         return [n for (n,) in self.db.execute("SELECT DISTINCT name FROM named")]
 
+    def names_in_mind(self) -> list[str]:
+        """The names heard in this episode: of the individuals opened in it, and the
+        words its events hold themselves."""
+        return [n for (n,) in self.db.execute(
+            "SELECT name FROM called WHERE turn > ? UNION SELECT substr(node, 3) FROM "
+            "edges WHERE event >= ? AND node LIKE 'n:%'", (self.episode(), self.first_event()))]
+
     def known(self, name: str) -> bool:
         return len(self.nodes(name)) > 1 or self.db.execute(
             "SELECT 1 FROM edges WHERE node = ? LIMIT 1", (f"n:{name}",)).fetchone() is not None
@@ -1701,7 +1708,9 @@ class GraphArm:
                 if bound:
                     here = {e for p in plans for e, _ in self.solve(p, bound, free)}
                 else:
-                    here = {n for n in self.names()
+                    # with nothing else to pin it, a new word is narrowed by the situation
+                    # it is heard in, never by every name ever heard
+                    here = {n for n in self.names_in_mind()
                             if any(self.solve(p, {free: n}, "a") for p in plans)}
                 here -= set(names)
                 if not here:

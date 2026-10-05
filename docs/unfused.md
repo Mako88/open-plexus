@@ -649,7 +649,11 @@ the store merges by id. Kill a third of the nodes mid-exam.
 - RAM against speed (John's, 2026-10-03): how much of the graph is kept in memory. Every
   name an input touches is loaded before it is walked, so a walk runs in memory wherever
   the dial allows. The intelligence is the same at every setting; only the hardware it
-  fits and what an answer costs change.
+  fits and what an answer costs change. Its first setting (John's, 2026-10-05): what
+  is in mind (the episode and those recalled) held as structures in memory, loaded at
+  a boundary or a recall, and read without SQL. SQLite's page cache already keeps hot
+  pages in RAM, so what it would save is the per-query cost of thousands of small
+  lookups, not disk reads; a profile says whether that is worth it. Down the road.
 
 ---
 

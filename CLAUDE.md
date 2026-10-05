@@ -58,6 +58,8 @@ what is open.
 
 ## The rules
 
+- **Run only what changes the next step.** Before any run, name the fork its result
+  decides. If every outcome leads to the same next step, do not run it (John's).
 - **Say what would refute an arm before running it**, in one line, in the commit and in the
   run's `--note`. Not the number you expect; a prediction anchors how the result is read.
 - **Correct the record in a sentence** when a reading refutes something said earlier, and carry

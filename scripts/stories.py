@@ -73,10 +73,14 @@ class Graphed:
     name = "graphed"
 
     def __init__(self, work: Path) -> None:
+        self.open = lambda: self.made(work)
+        self.arm = self.open()
+
+    @staticmethod
+    def made(work: Path):
         from unfused.graph import GraphArm
 
-        self.open = lambda: GraphArm(work)
-        self.arm = self.open()
+        return GraphArm(work)
 
     def reopen(self):
         self.arm.close()
@@ -97,6 +101,20 @@ class Graphed:
 
     def close(self):
         self.arm.close()
+
+
+class Unschemed(Graphed):
+    """The control for narrative schemas: the same system with the schema factor at 1."""
+
+    name = "unschemed"
+
+    @staticmethod
+    def made(work: Path):
+        from unfused.graph import GraphArm
+
+        arm = GraphArm(work)
+        arm.schema = lambda node, blank: 1.0
+        return arm
 
 
 def run(arm, stories, reopen_every: int = 100) -> dict:
@@ -215,8 +233,9 @@ def main() -> None:
     stamp = datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")
     for name in args.arms.split(","):
         work = Path(tempfile.mkdtemp(prefix=f"unfused-stories-{name}-"))
-        arm = {"blind": Blind, "frequent": Frequent}[name]() if name != "graphed" \
-            else Graphed(work)
+        made = {"graphed": Graphed, "unschemed": Unschemed}
+        arm = made[name](work) if name in made else \
+            {"blind": Blind, "frequent": Frequent}[name]()
         out = run(arm, stories)
         shutil.rmtree(work, ignore_errors=True)
         reading = {"kind": "stories", "taken_at": stamp, "note": args.note,

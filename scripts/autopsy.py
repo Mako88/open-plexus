@@ -66,10 +66,11 @@ class Traced(runner.Graphed):
             "gold_heard": bool(gold),
             "hops": hops,
             "focus_size": len(scores),
-            "rank": rank(scores, gold, lambda s: s[0] * s[1] * s[2]),
+            "rank": rank(scores, gold, lambda s: s[0] * s[1] * s[2] * s[3]),
             "rank_recency": rank(scores, gold, lambda s: s[0]),
             "rank_fit": rank(scores, gold, lambda s: s[1]),
             "rank_mark": rank(scores, gold, lambda s: s[2]),
+            "rank_schema": rank(scores, gold, lambda s: s[3]),
         })
         return super().ask(turn, story)
 
@@ -104,7 +105,12 @@ def _summarise(rows: list[dict]) -> dict:
             # of the misses with the answer in focus, which factor alone ranked it first
             "wrong_first_on": {
                 f: share(in_focus, lambda r, f=f: r[f"rank_{f}"] == 1)
-                for f in ("recency", "fit", "mark")},
+                for f in ("recency", "fit", "mark", "schema")},
+            # of every question with the answer in focus, which factor alone ranks it first
+            "first_on": {
+                f: share([r for r in rs if r["rank"] is not None],
+                         lambda r, f=f: r[f"rank_{f}"] == 1)
+                for f in ("recency", "fit", "mark", "schema")},
             "by": dict(Counter(r["notes"][-1] for r in rs if r["notes"])),
         }
     return out

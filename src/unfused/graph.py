@@ -625,7 +625,7 @@ class GraphArm:
             return
         # the episode's index: each word it held, so a cue can find it again
         self.db.executemany("INSERT OR IGNORE INTO episode_words VALUES (?, ?)",
-                            [(w, self.episode()) for w in set(_words(text))])
+                            [(w, self.episode()) for w in set(self.words(text))])
         events = self.read(text)
         resolved = {t: self.referent(t[2:]) for ev in events for _, t in ev["edges"]
                     if t.startswith("p:")}
@@ -1900,6 +1900,11 @@ class GraphArm:
         for key in [k for k in self._steps if k.startswith("n:")]:
             del self._steps[key]
 
+    def words(self, text: str) -> list[str]:
+        """A text's words as the parse lemmatises them, so a cue in other words of
+        the same kind ('find' for 'found') reaches the episode that heard them."""
+        return [t.lemma_.lower() for t in parse(self.model, text) if t.is_alpha]
+
     def remind(self, question: str) -> None:
         """Recall by a cue: an earlier episode that explains what this one heard and the
         question better than this one does is put back in mind (hippocampal indexing).
@@ -1910,7 +1915,7 @@ class GraphArm:
         ep = self.episode()
         here = {w for (w,) in self.db.execute(
             "SELECT word FROM episode_words WHERE episode = ?", (ep,))}
-        cue = here | set(_words(question))
+        cue = here | set(self.words(question))
         episodes = self.db.execute("SELECT COUNT(*) FROM boundaries").fetchone()[0]
         if not cue or episodes < 2:
             return
@@ -2680,10 +2685,6 @@ def _slot(doc) -> tuple[str, str] | None:
 
 def asked(text: str) -> bool:
     return text.rstrip().endswith("?")
-
-
-def _words(text: str) -> list[str]:
-    return re.findall(r"\w+", text.lower())
 
 
 class _Asked:

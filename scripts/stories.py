@@ -99,6 +99,15 @@ class Graphed:
         self.arm.close()
 
 
+class Recalled(Graphed):
+    """A control: at a late ask the world hands the system the old story's episode, put
+    back in mind before its sentence is retold, so what recall by a cue would buy is read
+    apart from finding the episode (THE ORDER, after the foundation, item 6)."""
+
+    def recall(self, lo, hi):
+        self.arm.recall(lo, hi)
+
+
 def run(arm, stories, reopen_every: int = 100) -> dict:
     rows, turn, sizes = [], 0, {}
     started = time.perf_counter()
@@ -126,12 +135,15 @@ LATE = 100
 def _stream(arm, stories, reopen_every, rows, sizes) -> int:
     turn = 0
     by_index = {s.index: s for s in stories}
+    # each story's break and its last turn, for a control that is handed an episode
+    spans: dict[int, tuple[int, int]] = {}
     for s in stories:
         if s.index and s.index % reopen_every == 0 and hasattr(arm, "reopen"):
             arm.reopen()
         # every story begins after a break, as a page or a title does; TinyStories marks
         # each boundary itself
         arm.tell(turn, BREAK)
+        start = turn
         turn += 1
         told = s.told + s.after
         for p in range(len(told) + 1):
@@ -143,6 +155,7 @@ def _stream(arm, stories, reopen_every, rows, sizes) -> int:
             if p < len(told):
                 arm.tell(turn, told[p])
                 turn += 1
+        spans[s.index] = (start, turn - 1)
         # a story told LATE stories ago, recalled as a parent recalls one: its first
         # sentence said again after a break, then one of its checks asked
         old = by_index.get(s.index - LATE)
@@ -150,6 +163,8 @@ def _stream(arm, stories, reopen_every, rows, sizes) -> int:
         if check is not None and old.told:
             arm.tell(turn, BREAK)
             turn += 1
+            if hasattr(arm, "recall") and old.index in spans:
+                arm.recall(*spans[old.index])
             arm.tell(turn, old.told[0])
             turn += 1
             rows.append(_ask(arm, turn, s, "late", check))
@@ -197,6 +212,9 @@ def _summary(arm, rows, sizes, turn, started, cpu) -> dict:
             "forms": forms, "rows": rows}
 
 
+ARMS = {"graphed": Graphed, "recalled": Recalled}
+
+
 def main() -> None:
     p = argparse.ArgumentParser()
     p.add_argument("--stories", type=int, default=300)
@@ -215,8 +233,8 @@ def main() -> None:
     stamp = datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")
     for name in args.arms.split(","):
         work = Path(tempfile.mkdtemp(prefix=f"unfused-stories-{name}-"))
-        arm = {"blind": Blind, "frequent": Frequent}[name]() if name != "graphed" \
-            else Graphed(work)
+        arm = {"blind": Blind, "frequent": Frequent}[name]() if name not in ARMS \
+            else ARMS[name](work)
         out = run(arm, stories)
         shutil.rmtree(work, ignore_errors=True)
         reading = {"kind": "stories", "taken_at": stamp, "note": args.note,

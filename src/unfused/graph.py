@@ -546,6 +546,10 @@ class GraphArm:
         # the kinds last read off the graph, and when: (episode, events then, kinds,
         # slots each kind filled, everything each kind filled)
         self._kinds: tuple | None = None
+        # episodes put back in mind beside the one heard now, each as (its break's turn,
+        # its last turn, its first event, its last event, how far its turns are moved
+        # on so it reads as heard just now); a break puts them all away
+        self.recalled: list[tuple[int, int, int, int, int]] = []
 
     # -- reading ---------------------------------------------------------------
 
@@ -608,6 +612,7 @@ class GraphArm:
         if not any(ch.isalnum() for ch in text):
             self.db.execute("INSERT OR IGNORE INTO boundaries VALUES (?)", (turn,))
             self.db.commit()
+            self.recalled = []
             # a name's steps are its individuals in mind, and a new episode has none
             for key in [k for k in self._steps if k.startswith("n:")]:
                 del self._steps[key]
@@ -694,8 +699,9 @@ class GraphArm:
         slot, agrees = pronoun.split("|", 1)
         subject = slot.startswith("nsubj")
         for node, label in self.db.execute(
-                "SELECT node, label FROM edges WHERE event >= ? AND node LIKE 'i:%' "
-                "ORDER BY event DESC LIMIT 200", (self.first_event(),)):
+                "SELECT node, label FROM edges WHERE "
+                f"{self._mind('event', events=True)} AND node LIKE 'i:%' "
+                "ORDER BY event DESC LIMIT 200", self._held(events=True)):
             if label.startswith("nsubj") != subject or label == "self":
                 continue
             called = self.agreed(self.label(node))
@@ -732,8 +738,9 @@ class GraphArm:
         """The names heard in this episode: of the individuals opened in it, and the
         words its events hold themselves."""
         return [n for (n,) in self.db.execute(
-            "SELECT name FROM called WHERE turn > ? UNION SELECT substr(node, 3) FROM "
-            "edges WHERE event >= ? AND node LIKE 'n:%'", (self.episode(), self.first_event()))]
+            f"SELECT name FROM called WHERE {self._mind('turn')} UNION SELECT "
+            f"substr(node, 3) FROM edges WHERE {self._mind('event', events=True)} AND node "
+            "LIKE 'n:%'", (*self._held(), *self._held(events=True)))]
 
     def known(self, name: str) -> bool:
         return len(self.nodes(name)) > 1 or self.db.execute(
@@ -867,8 +874,8 @@ class GraphArm:
         merges. Across episodes nothing joins until joining is learnt."""
         for (node,) in self.db.execute(
                 "SELECT edges.node FROM edges JOIN called ON called.node = edges.node WHERE "
-                "called.name = ? AND called.turn > ? GROUP BY edges.node "
-                "ORDER BY MAX(edges.event) DESC LIMIT 20", (name, self.episode())):
+                f"called.name = ? AND {self._mind('called.turn')} GROUP BY edges.node "
+                "ORDER BY MAX(edges.event) DESC LIMIT 20", (name, *self._held())):
             if set(mods) <= set(self.said_of(node)):
                 return node
         return None
@@ -876,9 +883,12 @@ class GraphArm:
     def individuals(self, name: str, episode: bool = False) -> list[str]:
         """The individuals a name labels, the latest first, this episode's alone with
         `episode`."""
+        if not episode:
+            return [n for (n,) in self.db.execute(
+                "SELECT node FROM called WHERE name = ? ORDER BY turn DESC", (name,))]
         return [n for (n,) in self.db.execute(
-            "SELECT node FROM called WHERE name = ? AND turn > ? ORDER BY turn DESC",
-            (name, self.episode() if episode else -2))]
+            f"SELECT node FROM called WHERE name = ? AND {self._mind('turn')} ORDER BY "
+            "turn DESC", (name, *self._held()))]
 
     def around(self, node: str) -> list[tuple[str, int, str]]:
         """Every step from a node: (label, direction, next node). Direction 1 goes from an
@@ -925,7 +935,7 @@ class GraphArm:
         if node.startswith("n:"):
             every = self.nodes(node[2:])
             mind = [n for n in every[1:] if n.startswith("i:")
-                    and int(n[2:].split(".")[0]) > self.episode()]
+                    and self.held(int(n[2:].split(".")[0]))]
             held = [every[0]] + list(dict.fromkeys(mind + every[1:1 + REACH]))
         else:
             held = [node]
@@ -1869,12 +1879,46 @@ class GraphArm:
         """The turn of the last break in the text: what was heard after it is in focus."""
         return self.db.execute("SELECT COALESCE(MAX(turn), -1) FROM boundaries").fetchone()[0]
 
+    def recall(self, lo: int, hi: int) -> None:
+        """Put an episode back in mind beside the one heard now: what was heard after
+        the break at turn `lo`, through turn `hi`. Its hearings read as if just heard,
+        and a mention joins its individuals as it joins this episode's."""
+        first, last = self.db.execute("SELECT MIN(id), MAX(id) FROM events WHERE turn > ? "
+                                      "AND turn <= ?", (lo, hi)).fetchone()
+        if first is None:
+            return
+        self.recalled.append((lo, hi, first, last, self.now() - hi))
+        for key in [k for k in self._steps if k.startswith("n:")]:
+            del self._steps[key]
+
+    def held(self, turn: int) -> bool:
+        """Whether a turn is in mind: in this episode or one recalled."""
+        return turn > self.episode() or any(lo < turn <= hi for lo, hi, *_ in self.recalled)
+
+    def moved(self, turn: int) -> int:
+        """A turn as it reads in mind: a recalled episode's as if it ended just now."""
+        for lo, hi, _, _, shift in self.recalled:
+            if lo < turn <= hi:
+                return turn + shift
+        return turn
+
+    def _mind(self, column: str, events: bool = False) -> str:
+        """SQL for a turn (or, with `events`, an event id) in mind, read with `_held`."""
+        here = f"{column} >= ?" if events else f"{column} > ?"
+        return "(" + " OR ".join([here] + [f"{column} BETWEEN ? AND ?"] * len(self.recalled)) + ")"
+
+    def _held(self, events: bool = False) -> tuple:
+        out = [self.first_event() if events else self.episode()]
+        for lo, hi, first, last, _ in self.recalled:
+            out += [first, last] if events else [lo + 1, hi]
+        return tuple(out)
+
     def in_focus(self, name: str) -> bool:
         held = self.nodes(name)
         return self.db.execute(
             "SELECT 1 FROM edges JOIN events ON events.id = edges.event WHERE edges.node IN "
-            f"({','.join('?' * len(held))}) AND events.turn > ? LIMIT 1",
-            (*held, self.episode())).fetchone() is not None
+            f"({','.join('?' * len(held))}) AND {self._mind('events.turn')} LIMIT 1",
+            (*held, *self._held())).fetchone() is not None
 
     def blank(self, question: str) -> tuple[str, str] | None:
         """The slot the question's wh-word stands in: ('eat', 'dobj') for 'Lily ate
@@ -1967,12 +2011,10 @@ class GraphArm:
         if not groups:
             return None
         spread, depth = zip(*[self.spread(g) for g in groups])
-        episode = self.episode()
-
         def reached(e: str) -> bool:
             # a verb alone meets nothing: an event of another story is read only where a
             # name the question says met it there
-            if not names and self.event(e)[1] <= episode:
+            if not names and not self.held(self.event(e)[1]):
                 return False
             return all(e in d and d[e] <= (0 if lemma is not None and i == len(depth) - 1
                                            else 2) for i, d in enumerate(depth))
@@ -2037,8 +2079,8 @@ class GraphArm:
         if lemma is not None:
             # a verb fires its events in mind the same way, and its latest where none is
             events = [f"e:{e}" for (e,) in self.db.execute(
-                "SELECT id FROM events WHERE lemma = ? AND mood = ? AND turn > ? ORDER BY id "
-                "DESC LIMIT ?", (lemma, mood_, self.episode(), LEMMA))] or [
+                f"SELECT id FROM events WHERE lemma = ? AND mood = ? AND {self._mind('turn')} "
+                "ORDER BY id DESC LIMIT ?", (lemma, mood_, *self._held(), LEMMA))] or [
                 f"e:{e}" for (e,) in self.db.execute(
                     "SELECT id FROM events WHERE lemma = ? AND mood = ? ORDER BY id DESC "
                     "LIMIT ?", (lemma, mood_, LEMMA))]
@@ -2094,9 +2136,9 @@ class GraphArm:
         act: dict[str, float] = {}
         for node, turn in self.db.execute(
                 "SELECT edges.node, events.turn FROM edges JOIN events ON events.id = "
-                "edges.event WHERE edges.event >= ? AND edges.node NOT LIKE 'e:%' AND "
-                "edges.node NOT LIKE 'f:%'", (self.first_event(),)):
-            act[node] = act.get(node, 0.0) + (now - turn + 1) ** -DECAY
+                f"edges.event WHERE {self._mind('edges.event', events=True)} AND edges.node "
+                "NOT LIKE 'e:%' AND edges.node NOT LIKE 'f:%'", self._held(events=True)):
+            act[node] = act.get(node, 0.0) + (now - self.moved(turn) + 1) ** -DECAY
         labels = self.db.execute("SELECT COUNT(DISTINCT link) FROM filled").fetchone()[0] or 1
         kind, slots, filled = self.concepts()
 
@@ -2163,8 +2205,8 @@ class GraphArm:
             return
         lemma, _, bound, _, mood_, wh = got
         for (eid,) in self.db.execute(
-                "SELECT id FROM events WHERE lemma = ? AND mood = ? AND turn > ? ORDER BY "
-                "id DESC LIMIT 50", (lemma, mood_, self.episode())).fetchall():
+                f"SELECT id FROM events WHERE lemma = ? AND mood = ? AND {self._mind('turn')} "
+                "ORDER BY id DESC LIMIT 50", (lemma, mood_, *self._held())).fetchall():
             edges = self.db.execute("SELECT label, node FROM edges WHERE event = ? AND node "
                                     "NOT LIKE 'f:%'", (eid,)).fetchall()
             if not all(any(lab == label and self.is_(n, f"n:{name}") for lab, n in edges)

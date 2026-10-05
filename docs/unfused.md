@@ -106,8 +106,24 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
      back). The cloze is still flat past 100 stories. Where to look (`e7d53f7c`,
      `f16c57f8`): the answer is almost always among focus's names and no weighting of
      its factors ranks it higher, and most misses are a wrong kind for the verb's slot
-     in words whose kind is known, so fit's preference of a slot for a kind is next.
-  6. Predict, then learn from the error (John's, 2026-10-04; predictive processing,
+     in words whose kind is known. Fit ranking by the verb's own slot, backed off
+     (Resnik), was refuted twice (the commit that took it out); what fit's link-alone
+     term carries, and what else ranks a wrong kind first, is not yet read.
+  6. An episode recalled by its gist (John's, 2026-10-05; hippocampal indexing, Teyler
+     and DiScenna). A late ask's answer is among focus's names a fifth of the time
+     (`e7d53f7c`): the old story is never in mind, and its retold sentence opens new
+     individuals, so the reminder costs (0.600 with it, 0.686 without). A boundary
+     changes what is in mind and erases nothing; reinstating an episode is the same
+     change run backwards. A cue's words, weighed by how rare they are across
+     episodes, choose the episode (or the likeliest few where the cue is ambiguous),
+     and it is put in mind, so the retold sentence's mentions join its individuals.
+     Its individuals come from it; kinds and slots are read from everything. The
+     control is in (`recalled`, the true episode handed over): recall by a cue is the
+     whole of late's failure, and using what is recalled is not. Left: the cue choosing
+     the episode itself, read against `recalled` and refuted if it closes little of the
+     gap; then item 4's cue reminder rides on it. Before item 5's retirements (John's,
+     2026-10-05).
+  7. Predict, then learn from the error (John's, 2026-10-04; predictive processing,
      Rao and Ballard). Before each telling is stored, the system guesses its
      arguments from what is in mind and learns from what was said: a cloze on every
      sentence, with no teacher. Learning focus's factor weights from it was refuted,
@@ -694,7 +710,7 @@ the store merges by id. Kill a third of the nodes mid-exam.
   encoded (orthogonal Procrustes), trusted once its error on held-out texts is read.
   First: `graph.py` split along reading, storage, individuals and answering.
 - **Concurrent walks, and sessions.** John's, 2026-10-04. Every walk has an id and
-  runs on its own: a question's answers now, and a prediction's (THE ORDER, item 6)
+  runs on its own: a question's answers now, and a prediction's (THE ORDER, item 7)
   runs beside it, as a brain predicts while it perceives, never in the answer's path.
   An answer reads the learnt state as of a version (MVCC), and an exam's stream waits
   at a checkpoint (a story's end) until that story's predictions land, so a reading
@@ -702,7 +718,7 @@ the store merges by id. Kill a third of the nodes mid-exam.
   (what is in mind, its episode) and shares the long-term store, so every
   conversation teaches the whole. What follows for learning: concurrent updates must
   merge without coordination, so what is learnt is kept as counts (DECIDED, counters
-  only rise) and weights are read from them. After item 6 shows predicting pays.
+  only rise) and weights are read from them. After item 7 shows predicting pays.
 - **A retryable buffer of saves.** John's, 2026-10-03, for stability at scale. Writes
   gather in memory and go to disk in batches that are retried until they land, sized by
   the RAM-against-speed dial, so a crash costs at most one buffer.

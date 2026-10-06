@@ -1,0 +1,327 @@
+{
+ "kind": "profile",
+ "taken_at": "20261006T031130Z",
+ "note": "cProfile of the 3,000-story reading stories-graphed-s0-n3000-20261006T031130Z (old world, stories-6), contended for part of its run by other readings; profiling slows it, so the shares matter, not the seconds. Total 5,523 s.",
+ "rows": [
+  {
+   "function": "answer",
+   "file": "graph.py",
+   "line": 1834,
+   "calls": 10156,
+   "own_s": 0.3,
+   "cumulative_s": 2512.7
+  },
+  {
+   "function": "teach",
+   "file": "graph.py",
+   "line": 1526,
+   "calls": 9085,
+   "own_s": 10.0,
+   "cumulative_s": 1531.8
+  },
+  {
+   "function": "answered",
+   "file": "graph.py",
+   "line": 2337,
+   "calls": 13846,
+   "own_s": 1.8,
+   "cumulative_s": 1264.9
+  },
+  {
+   "function": "focus",
+   "file": "graph.py",
+   "line": 2188,
+   "calls": 4174,
+   "own_s": 1.7,
+   "cumulative_s": 878.9
+  },
+  {
+   "function": "follow",
+   "file": "graph.py",
+   "line": 1223,
+   "calls": 587564,
+   "own_s": 70.3,
+   "cumulative_s": 870.8
+  },
+  {
+   "function": "said",
+   "file": "graph.py",
+   "line": 1512,
+   "calls": 572313,
+   "own_s": 1.8,
+   "cumulative_s": 791.6
+  },
+  {
+   "function": "paths",
+   "file": "graph.py",
+   "line": 1003,
+   "calls": 173498,
+   "own_s": 127.0,
+   "cumulative_s": 777.1
+  },
+  {
+   "function": "joined",
+   "file": "graph.py",
+   "line": 2428,
+   "calls": 12766,
+   "own_s": 2.6,
+   "cumulative_s": 679.0
+  },
+  {
+   "function": "replaced",
+   "file": "graph.py",
+   "line": 969,
+   "calls": 1266167,
+   "own_s": 4.1,
+   "cumulative_s": 650.3
+  },
+  {
+   "function": "holds",
+   "file": "graph.py",
+   "line": 1544,
+   "calls": 45753,
+   "own_s": 0.1,
+   "cumulative_s": 601.1
+  },
+  {
+   "function": "answers",
+   "file": "graph.py",
+   "line": 1416,
+   "calls": 31103,
+   "own_s": 0.4,
+   "cumulative_s": 557.6
+  },
+  {
+   "function": "_cluster",
+   "file": "kinds.py",
+   "line": 69,
+   "calls": 472,
+   "own_s": 309.5,
+   "cumulative_s": 520.7
+  },
+  {
+   "function": "around",
+   "file": "graph.py",
+   "line": 904,
+   "calls": 46968300,
+   "own_s": 26.5,
+   "cumulative_s": 476.4
+  },
+  {
+   "function": "_around",
+   "file": "graph.py",
+   "line": 933,
+   "calls": 2361420,
+   "own_s": 59.8,
+   "cumulative_s": 426.8
+  },
+  {
+   "function": "borrowed",
+   "file": "graph.py",
+   "line": 1397,
+   "calls": 13041,
+   "own_s": 2.6,
+   "cumulative_s": 395.0
+  },
+  {
+   "function": "nearest",
+   "file": "graph.py",
+   "line": 1365,
+   "calls": 245824,
+   "own_s": 54.4,
+   "cumulative_s": 386.8
+  },
+  {
+   "function": "_kept",
+   "file": "graph.py",
+   "line": 564,
+   "calls": 370943,
+   "own_s": 1.5,
+   "cumulative_s": 385.0
+  },
+  {
+   "function": "template",
+   "file": "graph.py",
+   "line": 1070,
+   "calls": 84692,
+   "own_s": 1.5,
+   "cumulative_s": 323.9
+  },
+  {
+   "function": "remind",
+   "file": "graph.py",
+   "line": 1915,
+   "calls": 10156,
+   "own_s": 136.2,
+   "cumulative_s": 271.5
+  },
+  {
+   "function": "read",
+   "file": "graph.py",
+   "line": 190,
+   "calls": 1591,
+   "own_s": 0.0,
+   "cumulative_s": 264.7
+  },
+  {
+   "function": "process",
+   "file": ".venv\\Lib\\site-packages\\stanza\\pipeline\\core.py",
+   "line": 390,
+   "calls": 1591,
+   "own_s": 0.1,
+   "cumulative_s": 263.9
+  },
+  {
+   "function": "__call__",
+   "file": ".venv\\Lib\\site-packages\\stanza\\pipeline\\core.py",
+   "line": 512,
+   "calls": 1591,
+   "own_s": 0.0,
+   "cumulative_s": 263.9
+  },
+  {
+   "function": "concepts",
+   "file": "graph.py",
+   "line": 848,
+   "calls": 3145,
+   "own_s": 5.9,
+   "cumulative_s": 247.6
+  },
+  {
+   "function": "shape",
+   "file": "graph.py",
+   "line": 1132,
+   "calls": 33395,
+   "own_s": 0.4,
+   "cumulative_s": 241.1
+  },
+  {
+   "function": "taught_by",
+   "file": "graph.py",
+   "line": 1384,
+   "calls": 70123,
+   "own_s": 86.2,
+   "cumulative_s": 215.6
+  },
+  {
+   "function": "names_in",
+   "file": "graph.py",
+   "line": 592,
+   "calls": 84692,
+   "own_s": 0.5,
+   "cumulative_s": 215.0
+  },
+  {
+   "function": "kinds",
+   "file": "kinds.py",
+   "line": 35,
+   "calls": 61,
+   "own_s": 12.9,
+   "cumulative_s": 209.9
+  },
+  {
+   "function": "_wrapped_call_impl",
+   "file": ".venv\\Lib\\site-packages\\torch\\nn\\modules\\module.py",
+   "line": 1779,
+   "calls": 1778776,
+   "own_s": 3.6,
+   "cumulative_s": 205.5
+  },
+  {
+   "function": "_call_impl",
+   "file": ".venv\\Lib\\site-packages\\torch\\nn\\modules\\module.py",
+   "line": 1787,
+   "calls": 1778776,
+   "own_s": 6.0,
+   "cumulative_s": 205.4
+  },
+  {
+   "function": "plan_of",
+   "file": "graph.py",
+   "line": 1143,
+   "calls": 18831,
+   "own_s": 1.1,
+   "cumulative_s": 201.7
+  },
+  {
+   "function": "related",
+   "file": "graph.py",
+   "line": 2444,
+   "calls": 1845,
+   "own_s": 32.9,
+   "cumulative_s": 198.8
+  },
+  {
+   "function": "followed",
+   "file": "graph.py",
+   "line": 1472,
+   "calls": 94648,
+   "own_s": 0.6,
+   "cumulative_s": 192.5
+  },
+  {
+   "function": "among",
+   "file": "graph.py",
+   "line": 1022,
+   "calls": 140785664,
+   "own_s": 71.9,
+   "cumulative_s": 150.9
+  },
+  {
+   "function": "kinded",
+   "file": "graph.py",
+   "line": 2380,
+   "calls": 1224,
+   "own_s": 21.7,
+   "cumulative_s": 150.7
+  },
+  {
+   "function": "apart",
+   "file": "graph.py",
+   "line": 2534,
+   "calls": 9760,
+   "own_s": 0.0,
+   "cumulative_s": 145.5
+  },
+  {
+   "function": "met",
+   "file": "graph.py",
+   "line": 2057,
+   "calls": 10156,
+   "own_s": 1.6,
+   "cumulative_s": 137.7
+  },
+  {
+   "function": "heard_in",
+   "file": "graph.py",
+   "line": 1725,
+   "calls": 10156,
+   "own_s": 0.1,
+   "cumulative_s": 134.2
+  },
+  {
+   "function": "_resolve_foreach_elementwise_overload",
+   "file": ".venv\\Lib\\site-packages\\torch\\distributed\\tensor\\_ops\\single_dim_strategy.py",
+   "line": 627,
+   "calls": 225,
+   "own_s": 0.0,
+   "cumulative_s": 134.1
+  },
+  {
+   "function": "solve",
+   "file": "graph.py",
+   "line": 2480,
+   "calls": 73925,
+   "own_s": 51.0,
+   "cumulative_s": 131.2
+  },
+  {
+   "function": "reaching",
+   "file": "graph.py",
+   "line": 1442,
+   "calls": 1989,
+   "own_s": 67.3,
+   "cumulative_s": 128.4
+  }
+ ]
+}

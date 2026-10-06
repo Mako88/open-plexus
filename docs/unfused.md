@@ -86,7 +86,10 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
      taken, 2026-10-04); re-read the 3,000 reading once it lands. Held (John's,
      2026-10-05): a change is read at 1,000 stories (about six minutes, 618 clozes
      focus decides, flat past 100 stories), so 3,000 waits until a question needs
-     what only it shows.
+     what only it shows. Profiled 2026-10-06 (`readings/profile-stories-*`), the
+     order to take them: plans (`follow`, `paths`, `replaced`, in answering and in
+     teaching alike), then focus, then recall by cue, then kinds. 10,000 stories are
+     parsed ahead.
   3. ~~A check that more than one telling answers accepts every answer they support~~.
      Struck 2026-10-04 (`_answers` in `exam/stories.py`).
   4. Harder checks, one at a time and each measured alone. Done: further from their

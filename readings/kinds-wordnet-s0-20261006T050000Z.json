@@ -1,0 +1,15 @@
+{
+  "kind": "kinds-wordnet",
+  "taken_at": "20261006T050000Z",
+  "note": "Kinds scored against WordNet's coarse noun categories (first sense; a name heard as PROPN a person), WordNet the yardstick only: pairwise precision and recall over the 300 nouns heard most, on a leftover stream graph of 149,829 argument rows and 3,763 labels. Arm: each label's MiniLM vector read beside its contexts, weighing PRIOR / (PRIOR + hearings). Refuted if it agreed with WordNet no better than kinds as they are.",
+  "graph": "unfused-stories-graphed-vcz6i95f (40,597 turns)",
+  "rows": [
+    {"arm": "as is", "precision": 0.588, "recall": 0.327, "f1": 0.420, "kinds_among_top_nouns": 187, "alone": 170},
+    {"arm": "prior 2", "precision": 0.588, "recall": 0.327, "f1": 0.420, "kinds_among_top_nouns": 187, "alone": 170},
+    {"arm": "prior 8", "precision": 0.573, "recall": 0.287, "f1": 0.383, "kinds_among_top_nouns": 194, "alone": 177},
+    {"arm": "prior 32", "precision": 0.561, "recall": 0.259, "f1": 0.355, "kinds_among_top_nouns": 199, "alone": 183},
+    {"arm": "MiniLM alone, near 0.5", "precision": 0.206, "recall": 0.198, "f1": 0.202, "kinds_among_top_nouns": 81, "alone": 43},
+    {"arm": "MiniLM alone, near 0.4", "precision": 0.127, "recall": 0.979, "f1": 0.224, "kinds_among_top_nouns": 4, "alone": 3},
+    {"arm": "MiniLM alone, near 0.3", "precision": 0.126, "recall": 0.985, "f1": 0.223, "kinds_among_top_nouns": 2, "alone": 1}
+  ]
+}

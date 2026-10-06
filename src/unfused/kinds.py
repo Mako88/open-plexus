@@ -88,6 +88,7 @@ def _cluster(labels: list[str], contexts: dict, near: float,
 
     centroids: list[dict] = []
     norms: list[float] = []
+    squares: list[float] = []
     # each context's kinds, so a label is compared only with kinds it shares one with
     where: dict = defaultdict(set)
     out: dict[str, int] = {}
@@ -103,11 +104,14 @@ def _cluster(labels: list[str], contexts: dict, near: float,
             best = len(centroids)
             centroids.append({})
             norms.append(0.0)
+            squares.append(0.0)
         cen = centroids[best]
         for c, x in v.items():
             cen[c] = cen.get(c, 0.0) + x
             where[c].add(best)
-        norms[best] = math.sqrt(sum(x * x for x in cen.values()))
+        # |cen + v|^2 from what is already known, never by summing the kind again
+        squares[best] += 2 * dots.get(best, 0.0) + sum(x * x for x in v.values())
+        norms[best] = math.sqrt(squares[best])
         out[w] = best
     return out if merge is None else _merged(labels, vectors, out, merge)
 
@@ -122,20 +126,23 @@ def _merged(labels: list[str], vectors: dict, kind: dict[str, int],
     import numpy as np
     from scipy.sparse import csr_matrix
 
+    # the labels' vectors as one matrix, built once; a kind's vector is the sum of its
+    # labels', so each round only regroups the rows
     index: dict = {}
-    for w in labels:
-        for c in vectors[w]:
-            index.setdefault(c, len(index))
+    rows, cols, vals = [], [], []
+    for r, w in enumerate(labels):
+        for c, x in vectors[w].items():
+            rows.append(r)
+            cols.append(index.setdefault(c, len(index)))
+            vals.append(x)
+    by_label = csr_matrix((vals, (rows, cols)), shape=(len(labels), len(index)))
     while True:
         ids = sorted(set(kind.values()))
         at = {k: i for i, k in enumerate(ids)}
-        rows, cols, vals = [], [], []
-        for w in labels:
-            for c, x in vectors[w].items():
-                rows.append(at[kind[w]])
-                cols.append(index[c])
-                vals.append(x)
-        m = csr_matrix((vals, (rows, cols)), shape=(len(ids), len(index)))
+        into_kind = csr_matrix((np.ones(len(labels)), ([at[kind[w]] for w in labels],
+                                                       range(len(labels)))),
+                               shape=(len(ids), len(labels)))
+        m = into_kind @ by_label
         norms = np.sqrt(np.asarray(m.multiply(m).sum(axis=1)).ravel())
         norms[norms == 0] = 1.0
         m = csr_matrix(m.multiply(1 / norms[:, None]))

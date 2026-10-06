@@ -518,8 +518,9 @@ class GraphArm:
         self.pending: tuple[str, str] | None = None
         # the words never heard and answers already counted towards an alias, this world
         self.aliased: set = set()
-        # events already found replaced by a later one, cleared whenever one is heard
-        self._replaced: dict = {}
+        # the latest turn of an event that happened with each set of arguments, read
+        # off the graph once when first asked and kept up as events are heard
+        self._latest: dict | None = None
         # taught shapes' signatures, rebuilt after a lesson; questions' parses
         self._sigs: list | None = None
         # the taught shapes of each number of slots, indexed by their signatures' parts,
@@ -614,7 +615,6 @@ class GraphArm:
         return [tuple(k) for k in kept]
 
     def hear(self, turn: int, text: str) -> None:
-        self._replaced = {}
         # a turn holding no words is a break in the text ('***', a new page): what is
         # heard after it is another episode
         if not any(ch.isalnum() for ch in text):
@@ -684,6 +684,10 @@ class GraphArm:
                     self._steps.pop(f"n:{name}", None)
                     self._marks.pop(name, None)
                     touched.update(name.split())
+        if self._latest is not None:
+            for ev, eid in zip(events, ids):
+                if not ev["mood"] and (got := self.args(eid)):
+                    self._latest[got] = max(self._latest.get(got, 0), turn)
         # a name or a description holding a word this sentence touched may stand for
         # something else now, and its steps are its individuals'
         for name in {n for w in touched for n in self._words.pop(w, ())}:
@@ -971,31 +975,35 @@ class GraphArm:
         prepositions aside: 'Mary dropped the football' replaces 'Mary picked up the
         football', 'Mary went to the hallway' replaces 'Mary went to the kitchen', and
         'Mary picked up the football' replaces neither, its arguments being others. The
-        turn of the latest that replaces it, or 0."""
-        if node not in self._replaced:
-            eid = int(node[2:])
+        turn of the latest that replaces it, or 0. Read from the latest turn each set of
+        arguments happened at, so it is a lookup, never a search of what came later."""
+        mine = self.args(int(node[2:]))
+        if not mine:
+            return 0
+        if self._latest is None:
+            by: dict = {}
+            for e, label, n in self.db.execute(
+                    "SELECT edges.event, edges.label, edges.node FROM edges JOIN events ON "
+                    "events.id = edges.event WHERE events.mood = '' AND edges.label NOT LIKE "
+                    "'prep:%' AND edges.node NOT LIKE 'f:%'"):
+                by.setdefault(e, set()).add((label, n))
+            turns = dict(self.db.execute("SELECT id, turn FROM events WHERE mood = ''"))
+            self._latest = {}
+            for e, got in by.items():
+                got = frozenset(got)
+                self._latest[got] = max(self._latest.get(got, 0), turns[e])
+        latest = self._latest.get(mine, 0)
+        return latest if latest > self.event(node)[1] else 0
 
-            def args(e: int) -> frozenset:
-                # what an event holds never changes once heard
-                got = self._args.get(e)
-                if got is None:
-                    got = self._args[e] = frozenset(self.db.execute(
-                        "SELECT label, node FROM edges WHERE event = ? AND label NOT LIKE "
-                        "'prep:%' AND node NOT LIKE 'f:%'", (e,)).fetchall())
-                return got
-
-            mine = args(eid)
-            turn = self.db.execute("SELECT turn FROM events WHERE id = ?", (eid,)).fetchone()[0]
-            later: dict = {}
-            if mine:
-                label, n = next(iter(mine))
-                later = dict(self.db.execute(
-                    "SELECT edges.event, events.turn FROM edges JOIN events ON events.id = "
-                    "edges.event WHERE edges.label = ? AND edges.node = ? AND events.turn > ?"
-                    " AND events.mood = ''", (label, n, turn)).fetchall())
-            self._replaced[node] = max((t for e, t in later.items() if args(e) == mine),
-                                       default=0)
-        return self._replaced[node]
+    def args(self, event: int) -> frozenset:
+        """An event's arguments, the prepositions aside, as (link, node); what an event
+        holds never changes once heard."""
+        got = self._args.get(event)
+        if got is None:
+            got = self._args[event] = frozenset(self.db.execute(
+                "SELECT label, node FROM edges WHERE event = ? AND label NOT LIKE "
+                "'prep:%' AND node NOT LIKE 'f:%'", (event,)).fetchall())
+        return got
 
     def mood(self, node: str) -> str:
         return self._event(node)[2]

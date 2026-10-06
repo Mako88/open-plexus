@@ -1,0 +1,647 @@
+{
+ "kind": "profile",
+ "taken_at": "20261006T061744Z",
+ "note": "cProfile of the 3,000-story reading stories-graphed-s0-n3000-20261006T061744Z (new world, after replaced and kinds were made faster); profiling slows it, so the shares matter. Total 4,087 s.",
+ "rows": [
+  {
+   "function": "answer",
+   "file": "graph.py",
+   "line": 1842,
+   "calls": 10156,
+   "own_s": 0.2,
+   "cumulative_s": 2156.2
+  },
+  {
+   "function": "answered",
+   "file": "graph.py",
+   "line": 2345,
+   "calls": 14304,
+   "own_s": 1.7,
+   "cumulative_s": 1034.1
+  },
+  {
+   "function": "tell",
+   "file": "stories.py",
+   "line": 86,
+   "calls": 61650,
+   "own_s": 0.1,
+   "cumulative_s": 986.2
+  },
+  {
+   "function": "teach",
+   "file": "graph.py",
+   "line": 1534,
+   "calls": 9085,
+   "own_s": 9.2,
+   "cumulative_s": 904.3
+  },
+  {
+   "function": "focus",
+   "file": "graph.py",
+   "line": 2196,
+   "calls": 4173,
+   "own_s": 1.6,
+   "cumulative_s": 859.5
+  },
+  {
+   "function": "react",
+   "file": "stories.py",
+   "line": 92,
+   "calls": 8857,
+   "own_s": 0.0,
+   "cumulative_s": 822.4
+  },
+  {
+   "function": "paths",
+   "file": "graph.py",
+   "line": 1011,
+   "calls": 179791,
+   "own_s": 122.9,
+   "cumulative_s": 745.4
+  },
+  {
+   "function": "_cluster",
+   "file": "kinds.py",
+   "line": 73,
+   "calls": 468,
+   "own_s": 283.3,
+   "cumulative_s": 594.4
+  },
+  {
+   "function": "hear",
+   "file": "graph.py",
+   "line": 617,
+   "calls": 60053,
+   "own_s": 94.8,
+   "cumulative_s": 573.2
+  },
+  {
+   "function": "turn",
+   "file": "graph.py",
+   "line": 2607,
+   "calls": 79363,
+   "own_s": 1.5,
+   "cumulative_s": 568.0
+  },
+  {
+   "function": "joined",
+   "file": "graph.py",
+   "line": 2436,
+   "calls": 12796,
+   "own_s": 2.2,
+   "cumulative_s": 506.7
+  },
+  {
+   "function": "answers",
+   "file": "graph.py",
+   "line": 1424,
+   "calls": 32066,
+   "own_s": 0.4,
+   "cumulative_s": 458.1
+  },
+  {
+   "function": "around",
+   "file": "graph.py",
+   "line": 908,
+   "calls": 46903249,
+   "own_s": 25.3,
+   "cumulative_s": 450.2
+  },
+  {
+   "function": "concepts",
+   "file": "graph.py",
+   "line": 852,
+   "calls": 3148,
+   "own_s": 6.7,
+   "cumulative_s": 414.2
+  },
+  {
+   "function": "_around",
+   "file": "graph.py",
+   "line": 937,
+   "calls": 2379975,
+   "own_s": 58.0,
+   "cumulative_s": 403.5
+  },
+  {
+   "function": "_ask",
+   "file": "stories.py",
+   "line": 217,
+   "calls": 8856,
+   "own_s": 0.1,
+   "cumulative_s": 377.0
+  },
+  {
+   "function": "borrowed",
+   "file": "graph.py",
+   "line": 1405,
+   "calls": 13547,
+   "own_s": 2.1,
+   "cumulative_s": 337.7
+  },
+  {
+   "function": "nearest",
+   "file": "graph.py",
+   "line": 1373,
+   "calls": 243415,
+   "own_s": 45.3,
+   "cumulative_s": 327.3
+  },
+  {
+   "function": "kinds",
+   "file": "kinds.py",
+   "line": 38,
+   "calls": 61,
+   "own_s": 17.9,
+   "cumulative_s": 306.2
+  },
+  {
+   "function": "follow",
+   "file": "graph.py",
+   "line": 1231,
+   "calls": 575544,
+   "own_s": 63.6,
+   "cumulative_s": 302.0
+  },
+  {
+   "function": "said",
+   "file": "graph.py",
+   "line": 1520,
+   "calls": 560294,
+   "own_s": 1.6,
+   "cumulative_s": 274.8
+  },
+  {
+   "function": "ask",
+   "file": "stories.py",
+   "line": 89,
+   "calls": 8856,
+   "own_s": 0.0,
+   "cumulative_s": 269.3
+  },
+  {
+   "function": "taught_by",
+   "file": "graph.py",
+   "line": 1392,
+   "calls": 67274,
+   "own_s": 77.5,
+   "cumulative_s": 196.4
+  },
+  {
+   "function": "template",
+   "file": "graph.py",
+   "line": 1078,
+   "calls": 85659,
+   "own_s": 1.4,
+   "cumulative_s": 191.7
+  },
+  {
+   "function": "plan_of",
+   "file": "graph.py",
+   "line": 1151,
+   "calls": 18787,
+   "own_s": 1.0,
+   "cumulative_s": 191.0
+  },
+  {
+   "function": "related",
+   "file": "graph.py",
+   "line": 2452,
+   "calls": 1860,
+   "own_s": 27.8,
+   "cumulative_s": 183.1
+  },
+  {
+   "function": "_merged",
+   "file": "kinds.py",
+   "line": 119,
+   "calls": 468,
+   "own_s": 37.6,
+   "cumulative_s": 154.7
+  },
+  {
+   "function": "followed",
+   "file": "graph.py",
+   "line": 1480,
+   "calls": 94812,
+   "own_s": 0.6,
+   "cumulative_s": 150.8
+  },
+  {
+   "function": "kinded",
+   "file": "graph.py",
+   "line": 2388,
+   "calls": 1227,
+   "own_s": 21.0,
+   "cumulative_s": 149.7
+  },
+  {
+   "function": "read",
+   "file": "graph.py",
+   "line": 190,
+   "calls": 848,
+   "own_s": 0.0,
+   "cumulative_s": 144.2
+  },
+  {
+   "function": "among",
+   "file": "graph.py",
+   "line": 1030,
+   "calls": 142032067,
+   "own_s": 69.0,
+   "cumulative_s": 144.1
+  },
+  {
+   "function": "solve",
+   "file": "graph.py",
+   "line": 2488,
+   "calls": 72732,
+   "own_s": 58.1,
+   "cumulative_s": 141.3
+  },
+  {
+   "function": "shape",
+   "file": "graph.py",
+   "line": 1140,
+   "calls": 33858,
+   "own_s": 0.3,
+   "cumulative_s": 132.3
+  },
+  {
+   "function": "apart",
+   "file": "graph.py",
+   "line": 2542,
+   "calls": 9814,
+   "own_s": 0.0,
+   "cumulative_s": 129.4
+  },
+  {
+   "function": "holds",
+   "file": "graph.py",
+   "line": 1552,
+   "calls": 45750,
+   "own_s": 0.1,
+   "cumulative_s": 128.6
+  },
+  {
+   "function": "reaching",
+   "file": "graph.py",
+   "line": 1450,
+   "calls": 2008,
+   "own_s": 55.1,
+   "cumulative_s": 111.3
+  },
+  {
+   "function": "walk",
+   "file": "graph.py",
+   "line": 1060,
+   "calls": 9936453,
+   "own_s": 52.0,
+   "cumulative_s": 105.0
+  },
+  {
+   "function": "met",
+   "file": "graph.py",
+   "line": 2065,
+   "calls": 10156,
+   "own_s": 1.5,
+   "cumulative_s": 104.3
+  },
+  {
+   "function": "is_goal",
+   "file": "graph.py",
+   "line": 1024,
+   "calls": 152650640,
+   "own_s": 61.6,
+   "cumulative_s": 99.2
+  },
+  {
+   "function": "names_in",
+   "file": "graph.py",
+   "line": 593,
+   "calls": 85659,
+   "own_s": 0.5,
+   "cumulative_s": 92.5
+  },
+  {
+   "function": "nodes",
+   "file": "graph.py",
+   "line": 780,
+   "calls": 4474804,
+   "own_s": 4.7,
+   "cumulative_s": 90.4
+  },
+  {
+   "function": "recall",
+   "file": "graph.py",
+   "line": 1906,
+   "calls": 2684,
+   "own_s": 43.8,
+   "cumulative_s": 80.4
+  },
+  {
+   "function": "vector",
+   "file": "kinds.py",
+   "line": 78,
+   "calls": 805855,
+   "own_s": 49.7,
+   "cumulative_s": 78.7
+  },
+  {
+   "function": "make",
+   "file": "stories.py",
+   "line": 113,
+   "calls": 2000,
+   "own_s": 0.4,
+   "cumulative_s": 76.5
+  },
+  {
+   "function": "heard_in",
+   "file": "graph.py",
+   "line": 1733,
+   "calls": 10156,
+   "own_s": 0.1,
+   "cumulative_s": 75.4
+  },
+  {
+   "function": "taught",
+   "file": "graph.py",
+   "line": 1362,
+   "calls": 18950,
+   "own_s": 37.0,
+   "cumulative_s": 72.7
+  },
+  {
+   "function": "<genexpr>",
+   "file": "graph.py",
+   "line": 2423,
+   "calls": 351666,
+   "own_s": 0.3,
+   "cumulative_s": 71.4
+  },
+  {
+   "function": "<genexpr>",
+   "file": "graph.py",
+   "line": 2424,
+   "calls": 639412,
+   "own_s": 0.6,
+   "cumulative_s": 70.8
+  },
+  {
+   "function": "close",
+   "file": "graph.py",
+   "line": 2407,
+   "calls": 457790,
+   "own_s": 0.7,
+   "cumulative_s": 69.9
+  },
+  {
+   "function": "known",
+   "file": "graph.py",
+   "line": 760,
+   "calls": 323549,
+   "own_s": 0.4,
+   "cumulative_s": 67.1
+  },
+  {
+   "function": "said_of",
+   "file": "graph.py",
+   "line": 811,
+   "calls": 1229661,
+   "own_s": 6.0,
+   "cumulative_s": 61.4
+  },
+  {
+   "function": "hooked",
+   "file": "graph.py",
+   "line": 1243,
+   "calls": 8854888,
+   "own_s": 7.0,
+   "cumulative_s": 58.9
+  },
+  {
+   "function": "_event",
+   "file": "graph.py",
+   "line": 962,
+   "calls": 51410044,
+   "own_s": 22.2,
+   "cumulative_s": 56.1
+  },
+  {
+   "function": "spread",
+   "file": "graph.py",
+   "line": 2164,
+   "calls": 17068,
+   "own_s": 4.5,
+   "cumulative_s": 52.5
+  },
+  {
+   "function": "_held",
+   "file": "graph.py",
+   "line": 1979,
+   "calls": 148133,
+   "own_s": 0.2,
+   "cumulative_s": 52.1
+  },
+  {
+   "function": "first_event",
+   "file": "graph.py",
+   "line": 1889,
+   "calls": 43783,
+   "own_s": 0.1,
+   "cumulative_s": 50.9
+  },
+  {
+   "function": "replaced",
+   "file": "graph.py",
+   "line": 973,
+   "calls": 1265783,
+   "own_s": 40.7,
+   "cumulative_s": 50.5
+  },
+  {
+   "function": "<genexpr>",
+   "file": "graph.py",
+   "line": 1244,
+   "calls": 9995875,
+   "own_s": 5.9,
+   "cumulative_s": 47.8
+  },
+  {
+   "function": "mood",
+   "file": "graph.py",
+   "line": 1008,
+   "calls": 33239175,
+   "own_s": 13.8,
+   "cumulative_s": 46.5
+  },
+  {
+   "function": "referent",
+   "file": "graph.py",
+   "line": 707,
+   "calls": 40494,
+   "own_s": 1.2,
+   "cumulative_s": 46.3
+  },
+  {
+   "function": "unheard",
+   "file": "graph.py",
+   "line": 1650,
+   "calls": 24679,
+   "own_s": 0.2,
+   "cumulative_s": 46.3
+  },
+  {
+   "function": "among",
+   "file": "graph.py",
+   "line": 844,
+   "calls": 38510485,
+   "own_s": 20.1,
+   "cumulative_s": 43.5
+  },
+  {
+   "function": "<lambda>",
+   "file": "kinds.py",
+   "line": 102,
+   "calls": 185032262,
+   "own_s": 42.5,
+   "cumulative_s": 42.5
+  },
+  {
+   "function": "label",
+   "file": "graph.py",
+   "line": 766,
+   "calls": 17481451,
+   "own_s": 16.3,
+   "cumulative_s": 42.2
+  },
+  {
+   "function": "sources",
+   "file": "graph.py",
+   "line": 2126,
+   "calls": 10156,
+   "own_s": 30.7,
+   "cumulative_s": 41.8
+  },
+  {
+   "function": "reaches",
+   "file": "graph.py",
+   "line": 1185,
+   "calls": 1140999,
+   "own_s": 8.9,
+   "cumulative_s": 41.8
+  },
+  {
+   "function": "describe",
+   "file": "graph.py",
+   "line": 820,
+   "calls": 12745862,
+   "own_s": 11.8,
+   "cumulative_s": 37.3
+  },
+  {
+   "function": "around_as",
+   "file": "graph.py",
+   "line": 924,
+   "calls": 3993711,
+   "own_s": 6.7,
+   "cumulative_s": 33.4
+  },
+  {
+   "function": "event",
+   "file": "graph.py",
+   "line": 969,
+   "calls": 18170869,
+   "own_s": 9.3,
+   "cumulative_s": 32.6
+  },
+  {
+   "function": "words",
+   "file": "graph.py",
+   "line": 1918,
+   "calls": 64482,
+   "own_s": 0.9,
+   "cumulative_s": 29.5
+  },
+  {
+   "function": "parse",
+   "file": "graph.py",
+   "line": 218,
+   "calls": 67552,
+   "own_s": 6.2,
+   "cumulative_s": 29.2
+  },
+  {
+   "function": "remind",
+   "file": "graph.py",
+   "line": 1923,
+   "calls": 10155,
+   "own_s": 122.9,
+   "cumulative_s": 28.7
+  },
+  {
+   "function": "episode",
+   "file": "graph.py",
+   "line": 1902,
+   "calls": 3508342,
+   "own_s": 3.4,
+   "cumulative_s": 28.0
+  },
+  {
+   "function": "held",
+   "file": "graph.py",
+   "line": 1963,
+   "calls": 2861358,
+   "own_s": 3.0,
+   "cumulative_s": 26.7
+  },
+  {
+   "function": "_kept",
+   "file": "graph.py",
+   "line": 565,
+   "calls": 372359,
+   "own_s": 1.6,
+   "cumulative_s": 25.1
+  },
+  {
+   "function": "labelled",
+   "file": "graph.py",
+   "line": 807,
+   "calls": 87512,
+   "own_s": 3.0,
+   "cumulative_s": 24.4
+  },
+  {
+   "function": "said_in",
+   "file": "graph.py",
+   "line": 2719,
+   "calls": 1007912,
+   "own_s": 1.4,
+   "cumulative_s": 23.9
+  },
+  {
+   "function": "alias",
+   "file": "graph.py",
+   "line": 1797,
+   "calls": 9085,
+   "own_s": 0.1,
+   "cumulative_s": 23.9
+  },
+  {
+   "function": "in_focus",
+   "file": "graph.py",
+   "line": 1985,
+   "calls": 3019,
+   "own_s": 0.0,
+   "cumulative_s": 21.1
+  },
+  {
+   "function": "read_plan",
+   "file": "graph.py",
+   "line": 1350,
+   "calls": 14518365,
+   "own_s": 5.4,
+   "cumulative_s": 20.7
+  }
+ ]
+}

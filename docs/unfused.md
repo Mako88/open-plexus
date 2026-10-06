@@ -135,7 +135,10 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
         (John's episode layer, item 6). After a and b say how much is left. Its
         control refuted it as salience (`462288d7`), and vectors as the slot fit are
         refuted on GloVe and our counts too (`195f20d6`): the room is world
-        knowledge, so item 2's size comes first, to read the cloze at 10,000 stories.
+        knowledge. More stories do not bring it as the system is: the cloze reads
+        0.496 at 300-1,000 and 0.483 at 1,000-3,000 (`061744Z`). What hearing more
+        should improve is the predictor itself, which is item 7's and John's to
+        shape.
   6. An episode recalled by its gist (John's, 2026-10-05; hippocampal indexing, Teyler
      and DiScenna). A boundary changes what is in mind and erases nothing; `remind`
      runs it backwards, and the oracle arms (`recalled`, `asked`) say what is left is

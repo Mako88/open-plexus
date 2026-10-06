@@ -11,7 +11,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-COUNT = 9
+COUNT = 8
 
 
 @dataclass(frozen=True)
@@ -98,16 +98,6 @@ OBJECTIONS = [
         settled_by="A form with two places told for one thing and no move between them, "
                    "asked for both. Kept until the system says both, which is the mouth's "
                    "lists in the mouth's item of THE ORDER.",
-    ),
-    Objection(
-        what="The stream's cloze asks 'who' for a proper name and 'what' for anything else.",
-        why="So 'hugged what back?' wants 'mommy', and the wh-word carries the part of "
-            "speech, not the meaning. Focus's mark factor reads that rule straight off, and "
-            "no kind that means 'a person' can beat it: WordNet's true categories read 0.433 "
-            "where the mark reads 0.491 (021256Z). A reader would ask 'who' of mommy.",
-        settled_by="John's call, since it changes the world: a cloze asking 'who' of a "
-                   "person however written. Then the mark and the oracle kinds read again; "
-                   "if the oracle wins, learnt kinds are worth building for 5b.",
     ),
 ]
 

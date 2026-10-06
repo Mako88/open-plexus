@@ -121,9 +121,12 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
         stories they hold every person in one kind and most common nouns alone. WordNet's
         true categories in their place lose as well (0.433, `021256Z`): the stream asks
         'who' of a proper name and 'what' of anything else, so the mark reads the exam's
-        own rule (`tests/pushback.py`). Kinds that group things are still owed (OPEN
-        FORKS, meta layers), but this cloze cannot show them paying until John settles
-        that objection.
+        own rule. John's (2026-10-06): the cloze now asks 'who' of a person however
+        written (`stories-7`, baseline 0.486). With that, WordNet's categories read
+        0.494 (`040416Z`), 77 fixed and 69 lost: perfect kinds are worth about a point
+        here, so the cloze's room is not in the kind a question asks for. Kinds that
+        group things are still owed for the loop (OPEN FORKS, meta layers), judged
+        elsewhere than this factor.
      c. What the story is about (its setting and thread: the circus, the camp trip),
         a layer over the episode's individuals, as a reader holds a story's gist
         (John's episode layer, item 6). After a and b say how much is left.

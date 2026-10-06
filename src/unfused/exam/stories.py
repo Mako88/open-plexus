@@ -24,7 +24,7 @@ from pathlib import Path
 DATA = Path(__file__).resolve().parents[3] / "data" / "tinystories"
 # each story as made, kept by its text and how it is made: bump on any change to `make`
 CACHE = Path(__file__).resolve().parents[3] / "state" / "stories.sqlite"
-MADE = "stories-6"
+MADE = "stories-7"
 VALID = DATA / "TinyStories-valid.txt"
 URL = "https://huggingface.co/datasets/roneneldan/TinyStories/resolve/main/TinyStories-valid.txt"
 
@@ -93,9 +93,26 @@ def _parser():
     return spacy.load("en_core_web_sm")
 
 
+def person(noun: str) -> bool:
+    """Whether a common noun is a person by WordNet's commonest sense, so the cloze asks
+    'who' of 'mommy' as a reader would (John's, 2026-10-06), where it asked 'who' of a
+    name alone. The world's knowledge, never the system's. Its sense order misses a few
+    ('mum' is a flower first, 'queen' an animal, 'bunny' a person)."""
+    from nltk.corpus import wordnet as wn
+
+    try:
+        got = wn.synsets(wn.morphy(noun, wn.NOUN) or noun, pos=wn.NOUN)
+    except LookupError:
+        import nltk
+
+        nltk.download("wordnet", quiet=True)
+        got = wn.synsets(wn.morphy(noun, wn.NOUN) or noun, pos=wn.NOUN)
+    return bool(got) and got[0].lexname() == "noun.person"
+
+
 def make(text: str, index: int, nlp) -> Story:
     """The story's last sentence, after its first three, that names a noun the story told
-    before it, unquoted, asked with that noun's phrase replaced by 'what' or 'who'."""
+    before it, unquoted, asked with that noun's phrase replaced by 'who' for a name or a person, else 'what'."""
     sents = sentences(text)
     docs = list(nlp.pipe(sents))
     seen: list[set] = []
@@ -119,7 +136,7 @@ def make(text: str, index: int, nlp) -> Story:
         chunk = next((c for c in d.noun_chunks if c.start <= t.i < c.end), d[t.i:t.i + 1])
         if chunk.root.i != t.i:
             continue
-        wh = "who" if t.pos_ == "PROPN" else "what"
+        wh = "who" if t.pos_ == "PROPN" or person(t.lemma_.lower()) else "what"
         before = d[:chunk.start].text_with_ws
         rest = d[chunk.end:].text_with_ws.rstrip()
         rest = re.sub(r"[.!]+$", "", rest).rstrip()

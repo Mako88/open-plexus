@@ -118,10 +118,12 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
         kinds already learnt, as counts; rank by it in place of the wh-word's mark.
         Built and refuted 2026-10-06 (the commit that deletes it): the frame adds
         nothing over the wh-word, and the kinds cost twelve points, because at 1,000
-        stories they hold every person in one kind and most common nouns alone. The
-        loop's second turn is only as good as its first, so what is owed is kinds that
-        group things, split and merged where prediction says (OPEN FORKS, meta
-        layers); this comes back once they do.
+        stories they hold every person in one kind and most common nouns alone. WordNet's
+        true categories in their place lose as well (0.433, `021256Z`): the stream asks
+        'who' of a proper name and 'what' of anything else, so the mark reads the exam's
+        own rule (`tests/pushback.py`). Kinds that group things are still owed (OPEN
+        FORKS, meta layers), but this cloze cannot show them paying until John settles
+        that objection.
      c. What the story is about (its setting and thread: the circus, the camp trip),
         a layer over the episode's individuals, as a reader holds a story's gist
         (John's episode layer, item 6). After a and b say how much is left.

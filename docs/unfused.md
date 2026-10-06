@@ -116,6 +116,12 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
         which is why fit by the verb's slot lost. Learn, from each lesson's answer,
         which kind each question frame (wh-word with its preposition) brings, by the
         kinds already learnt, as counts; rank by it in place of the wh-word's mark.
+        Built and refuted 2026-10-06 (the commit that deletes it): the frame adds
+        nothing over the wh-word, and the kinds cost twelve points, because at 1,000
+        stories they hold every person in one kind and most common nouns alone. The
+        loop's second turn is only as good as its first, so what is owed is kinds that
+        group things, split and merged where prediction says (OPEN FORKS, meta
+        layers); this comes back once they do.
      c. What the story is about (its setting and thread: the circus, the camp trip),
         a layer over the episode's individuals, as a reader holds a story's gist
         (John's episode layer, item 6). After a and b say how much is left.

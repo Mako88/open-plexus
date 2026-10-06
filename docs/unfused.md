@@ -109,8 +109,8 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
      analogy, Erk's preference by MiniLM. A reader gets 0.925 where the system gets
      0.517 (`readings/reader-cloze-*`), so the cloze has room. From its misses, in
      order, each measured alone:
-     a. The question's own thing given back ('helped the pig at what?' answered the
-        pig): a candidate is dropped by its description, not by its individual. A bug.
+     a. ~~The question's own thing given back~~. Struck 2026-10-06: dropped by the
+        individual its name finds (`readings/stories-graphed-*-20261006T014853Z`).
      b. The kind the question asks for (John's: these are one fault, not knowing
         categories). 'who' wants a person and 'at what' a place whatever the verb,
         which is why fit by the verb's slot lost. Learn, from each lesson's answer,
@@ -716,6 +716,14 @@ the store merges by id. Kill a third of the nodes mid-exam.
   is built as the same refinement over its own output, not a counter of its own. A node
   is minted where it lowers prediction's error (item 7), so the loop has a reason to
   stop. Refuted if the same code run a turn higher pays nothing the turn below did not.
+  Agreed the same night: categories reshape as evidence comes, splitting as a toddler's
+  'doggie' does and merging where two predict alike, so a category is a view read from
+  counts and never a stored thing, and reshaping it loses nothing (Anderson's rational
+  model; Kemp and Tenenbaum's structural form). Layers send guesses down as well as up,
+  so a higher one can regroup a lower. First test with a known answer: a word heard for
+  two kinds of thing, which the loop has to split on its own. Higher turns need more
+  text: TinyStories at 10,000 and 100,000 stories first, then the Children's Book Test
+  (Hill et al., a cloze on real children's books) and the BabyLM corpus.
 - **Pieces behind interfaces, and versioned representations.** John's, 2026-10-04. The
   parser, the store and the encoder each swappable alone, and every derived row stamped
   with the version that made it, read through a converter that does nothing for its own

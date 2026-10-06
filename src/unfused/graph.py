@@ -2225,12 +2225,21 @@ class GraphArm:
             mark = self.mark(name)
             return 0.5 if mark is None else (asks.get(mark, 0) + 1) / (sum(asks.values()) + 2)
 
+        # the question's own things are not its answer: each of its names finds the
+        # individual most in mind of those it labels, as a reader's 'the pig' finds the
+        # pig the story is about, whatever more was said of it. A word that is no
+        # individual ('red') is its own description
+        own = set()
+        for f in self.shape(question)[1]:
+            found = [n for n in self.nodes(f) if n in act and n.startswith("i:")]
+            if found:
+                own.add(max(found, key=act.get))
         # in mind as an individual, said by its description; how it fits and what it
         # is asked for are what everyone knows, so they are read by its label
         out: dict[str, tuple[float, float, float]] = {}
         for node, a in act.items():
             said, name = self.describe(node), self.label(node)
-            if said_in(said, question):
+            if node in own or (not node.startswith("i:") and said_in(said, question)):
                 continue
             was = out.get(said)
             out[said] = (a + (was[0] if was else 0.0), fit(name), asked_for(name))

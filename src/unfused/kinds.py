@@ -30,9 +30,13 @@ NEAR = 0.5
 ROUNDS = 4
 # how much each finer grain of context weighs beside the one coarser
 GRAIN = 0.5
+# how alike two kinds must be, as wholes, to be merged into one (cosine): the likeness a
+# label needs to join a kind; None merges none
+MERGE = NEAR
 
 
-def kinds(rows, near: float = NEAR, rounds: int = ROUNDS) -> dict[str, int]:
+def kinds(rows, near: float = NEAR, rounds: int = ROUNDS,
+          merge: float | None = MERGE) -> dict[str, int]:
     """Each label's kind, from (event, lemma, link, label) for every argument of every
     event that names something."""
     by_event: dict = defaultdict(list)
@@ -54,19 +58,20 @@ def kinds(rows, near: float = NEAR, rounds: int = ROUNDS) -> dict[str, int]:
                         contexts[label][(link, other)] += 1
                         contexts[label][(r, link, other)] += 1
                         contexts[label][(r, link, other, kind[w])] += 1
-        nxt = _cluster(labels, contexts, near)
+        nxt = _cluster(labels, contexts, near, merge)
         joins: dict[str, Counter] = defaultdict(Counter)
         for args in by_event.values():
             for lemma, link, label in args:
                 joins[lemma][(link, nxt[label])] += 1
-        relation_nxt = _cluster(verbs, joins, near)
+        relation_nxt = _cluster(verbs, joins, near, merge)
         if _same(kind, nxt) and _same(relation, relation_nxt):
             break
         kind, relation = nxt, relation_nxt
     return kind
 
 
-def _cluster(labels: list[str], contexts: dict, near: float) -> dict[str, int]:
+def _cluster(labels: list[str], contexts: dict, near: float,
+             merge: float | None = None) -> dict[str, int]:
     holders = Counter(c for w in labels for c in contexts[w])
     n = len(labels)
 
@@ -86,8 +91,9 @@ def _cluster(labels: list[str], contexts: dict, near: float) -> dict[str, int]:
     # each context's kinds, so a label is compared only with kinds it shares one with
     where: dict = defaultdict(set)
     out: dict[str, int] = {}
+    vectors: dict = {}
     for w in labels:
-        v = vector(w)
+        v = vectors[w] = vector(w)
         dots: dict[int, float] = defaultdict(float)
         for c, x in v.items():
             for k in where[c]:
@@ -103,7 +109,51 @@ def _cluster(labels: list[str], contexts: dict, near: float) -> dict[str, int]:
             where[c].add(best)
         norms[best] = math.sqrt(sum(x * x for x in cen.values()))
         out[w] = best
-    return out
+    return out if merge is None else _merged(labels, vectors, out, merge)
+
+
+def _merged(labels: list[str], vectors: dict, kind: dict[str, int],
+            merge: float) -> dict[str, int]:
+    """Kinds merged where they are alike as wholes: one pass opens a kind for a label
+    unlike every kind so far and never looks back, so two kinds that grew alike stay
+    apart, as a toddler's first words do until they are seen to be used alike. Each
+    round, every kind whose likest is likest back, at `merge` or more, is merged with it
+    (a matching, so no chain runs through the middling), until none is."""
+    import numpy as np
+    from scipy.sparse import csr_matrix
+
+    index: dict = {}
+    for w in labels:
+        for c in vectors[w]:
+            index.setdefault(c, len(index))
+    while True:
+        ids = sorted(set(kind.values()))
+        at = {k: i for i, k in enumerate(ids)}
+        rows, cols, vals = [], [], []
+        for w in labels:
+            for c, x in vectors[w].items():
+                rows.append(at[kind[w]])
+                cols.append(index[c])
+                vals.append(x)
+        m = csr_matrix((vals, (rows, cols)), shape=(len(ids), len(index)))
+        norms = np.sqrt(np.asarray(m.multiply(m).sum(axis=1)).ravel())
+        norms[norms == 0] = 1.0
+        m = csr_matrix(m.multiply(1 / norms[:, None]))
+        sim = (m @ m.T).toarray()
+        np.fill_diagonal(sim, -1.0)
+        best = sim.argmax(axis=1)
+        into = {}
+        for i, j in enumerate(best):
+            if best[j] == i and i < j and sim[i, j] >= merge:
+                into[ids[j]] = ids[i]
+        if not into:
+            break
+        kind = {w: into.get(k, k) for w, k in kind.items()}
+    # numbered by the first label of each, as one pass numbers them
+    first: dict = {}
+    for w in labels:
+        first.setdefault(kind[w], len(first))
+    return {w: first[kind[w]] for w in labels}
 
 
 def _same(a: dict, b: dict) -> bool:

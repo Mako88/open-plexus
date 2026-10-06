@@ -710,6 +710,12 @@ the store merges by id. Kill a third of the nodes mid-exam.
   production compilation). `commitments`' rung five was the same idea (`docs/history/`);
   its lesson holds, that the vocabulary grows under the learner, never a controller
   tuning it from above. After item 5, since schemas are the first thing to mint.
+  John's, 2026-10-05: the goal is one loop that runs at every layer, which is learning
+  to learn. Item 5b is its second turn: a kind is a class of things by their contexts,
+  and the kind a frame asks for is a class of frames by contexts made of kinds, so 5b
+  is built as the same refinement over its own output, not a counter of its own. A node
+  is minted where it lowers prediction's error (item 7), so the loop has a reason to
+  stop. Refuted if the same code run a turn higher pays nothing the turn below did not.
 - **Pieces behind interfaces, and versioned representations.** John's, 2026-10-04. The
   parser, the store and the encoder each swappable alone, and every derived row stamped
   with the version that made it, read through a converter that does nothing for its own

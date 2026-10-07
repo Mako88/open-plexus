@@ -88,13 +88,22 @@ class GraphArm:
     trace = False
 
     def __init__(self, directory: Path, model: str = PARSER,
-                 known: dict | None = None, cache: Path | None = CACHE) -> None:
+                 known: dict | None = None, cache: Path | None = CACHE,
+                 predicting: str = "") -> None:
         directory.mkdir(parents=True, exist_ok=True)
         self.store = Store(directory, known)
         # the connection the rest of the graph's tables are read through
         self.db = self.store.db
         # what was being heard when each word was heard, folded over the stream
         self.situations = Situations(self.db)
+        # the slow memory, a predictor from the situation (item 7f), and how focus reads
+        # it: "" not at all, "alone" as focus's score, "mixed" beside focus's factors
+        self.predicting = predicting
+        self.predictor = None
+        if predicting:
+            from unfused.predictor import Predictor
+
+            self.predictor = Predictor(directory)
         self.model = model
         self.cache = cache
         self.last_notes: list[str] = []
@@ -204,6 +213,8 @@ class GraphArm:
         if not any(ch.isalnum() for ch in text):
             self.db.execute("INSERT OR IGNORE INTO boundaries VALUES (?)", (turn,))
             self.situations.ended()
+            if self.predictor is not None:
+                self.predictor.ended()
             self.store.written(True)
             self.recalled = []
             # a name's steps are its individuals in mind, and a new episode has none
@@ -250,6 +261,8 @@ class GraphArm:
         for ev in events:
             ids.append(self.store.new_event(turn, ev["lemma"], text, ev["mood"]))
         for ev, eid in zip(events, ids):
+            # the event as the predictor hears it: its head, then its arguments' words
+            items = [("head", ev["lemma"])]
             for (label, t), m in zip(ev["edges"], ev.get("mentions", [None] * len(ev["edges"]))):
                 node = (f"e:{ids[int(t[2:])]}" if t.startswith("e:") else
                         who[str(m)] if m is not None else resolved.get(t, t))
@@ -260,6 +273,7 @@ class GraphArm:
                     name = self.label(node)
                     if name:
                         heard.append((label, name))
+                        items.append((label, name))
                     self.db.execute("INSERT INTO filled VALUES (?, ?, ?, 1) ON CONFLICT(name, "
                                     "lemma, link) DO UPDATE SET n = n + 1",
                                     (name, ev["lemma"], label))
@@ -272,6 +286,8 @@ class GraphArm:
                     self._steps.pop(f"n:{name}", None)
                     self._marks.pop(name, None)
                     touched.update(name.split())
+            if self.predictor is not None:
+                self.predictor.heard(items)
         self.situations.heard(heard, [ev["lemma"] for ev in events])
         if self._latest is not None:
             for ev, eid in zip(events, ids):
@@ -1809,6 +1825,17 @@ class GraphArm:
                 continue
             was = out.get(said)
             out[said] = (a + (was[0] if was else 0.0), fit(name), asked_for(name))
+        if self.predictor is not None and out:
+            # the predictor's chance for each name, given the question's event and the
+            # story so far: focus's score alone, or beside its factors
+            got = self.pattern(question)
+            items = [("head", slot[0])] + (list(got[2]) if got else [])
+            named = {said: self.label(n) or said for n in act for said in [self.describe(n)]
+                     if said in out}
+            chance = self.predictor.predict(slot[1], items, sorted(set(named.values())))
+            for said, (a, f, w) in out.items():
+                p = chance.get(named.get(said, said), 0.0)
+                out[said] = (p, 1.0, 1.0) if self.predicting == "alone" else (a * p, f, w)
         return out
 
     def mark(self, name: str) -> str | None:
@@ -2236,6 +2263,8 @@ class GraphArm:
 
     def close(self) -> None:
         self.situations.save()
+        if self.predictor is not None:
+            self.predictor.save()
         self.store.close()
         if hasattr(self, "_cdb"):
             self._cdb.close()

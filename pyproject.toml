@@ -52,6 +52,14 @@ explicit = true
 line-length = 100
 target-version = "py312"
 
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F", "I"]
+
+[tool.ruff.lint.per-file-ignores]
+# a script sets `os.environ` and `sys.path` before it imports the package, and so its
+# imports are neither at the top nor in the order a sorter would give them
+"scripts/*" = ["E402", "I001"]
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 # `pushback.py` IS COLLECTED ON PURPOSE. It is not named `test_*` because it is

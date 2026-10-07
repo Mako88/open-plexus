@@ -210,10 +210,14 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
         tens of facts at 1,024 wide, summed never, learnt only a hub's; and no likeness
         of words, the exact counts' own included, predicts a pairing not yet heard
         better than the role's commonest fillers. The exact store stays the store.
-     f. NEXT, John's to choose: the slow memory's unit is not the word. A predictor
-        that conditions on the whole situation (the event and what is in mind), as the
-        transformer control does, learnt by replay at each story's end (item c's
-        teacher). Its read is the cloze, against the control's 0.271 at 500 stories.
+     f. NEXT. The split (DECIDED, vectors hold a moment): a predictor from the
+        situation to what comes next, learnt by replay, its guess cleaned up by the
+        graph. First offline, on the saved stream graph (`scripts/situation.py`): held-out
+        events' fillers predicted from the event's other items and the story so far,
+        against the exact counts backed off to the role's commonest, by passes of
+        replay. Refuted at this size if no conditioning clears the counts on unheard
+        fillers; then the slow memory waits on more stories, not on its shape. Then, if
+        it clears, into focus as its score, read on the cloze.
      Refuted if, with all of it, the cloze still reads no higher at 1,000-3,000 than
      at 300-1,000.
   Then John's two nearest goals (2026-10-04): a conversation with the system (the
@@ -460,6 +464,14 @@ commit.
     sooner: the true kind still leaves three or four names after one hearing
     (`readings/context-oracle-*`). MiniLM is a vote at a word's first hearing; the
     meaning learnt from hearings decides once there are enough of them.
+- **Vectors hold a moment; the graph holds a lifetime.** John's, 2026-10-07, from item 7e's
+  reading. A vector holds tens of facts exactly and blurs past that, so the graph stays the
+  store: every telling, the individuals, the counts, one hearing and exact. Vectors carry
+  what they are good at: a word's likeness (its position, learnt slowly from its record by
+  replay against prediction's error), and the situation of the moment (a few things bound
+  together, built fresh), which is the cue a predictor reads. The predictor's guess is
+  cleaned up against the graph, which names the word or individual. The system's own
+  vectors, learnt, so the meaning bullet above holds.
 - **The TinyStories stream is the target; the houses and bAbI are regression checks.**
   John's, 2026-10-03, replacing the house as target. The house has about fifty words and
   three or four frames a kind, so it runs out of things to learn, and work fitted to it

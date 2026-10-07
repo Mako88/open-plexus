@@ -1406,6 +1406,12 @@ class GraphArm:
         if meet:
             self.last_notes = ["(found)", f"meet:{meet}", "by:meet"]
             return meet
+        # a phrase holding a relative clause is what its clause names: asked of the walk
+        # first, it leaves a question the walk can answer
+        put = self.resolved(question.text)
+        if put != question.text and (meet := self.met(put)):
+            self.last_notes = ["(found)", f"meet:{meet}", "by:relative"]
+            return meet
         put = self.unaliased(question.text)
         said, self.spent = None, 0
         try:
@@ -2146,6 +2152,37 @@ class GraphArm:
                 a = text.index(" ", a) + 1
             found.append((b - a, a, b))
         return [(a, b) for _, a, b in sorted(found)]
+
+    def resolved(self, text: str) -> str:
+        """The question with a phrase holding a relative clause ('the one who found a
+        shell') put as the individual its clause names. A relative clause is a question
+        about the noun it hangs from, so its own words, the relative word first, are asked
+        of the walk ('who found a shell?') and what they meet stands in the phrase's place.
+        The relative word is the parse's (`PronType=Rel`); a clause the walk cannot answer
+        leaves the question as it was."""
+        doc = list(parse(self.model, text))
+        for verb in doc:
+            if not verb.dep_.startswith("acl") or not any(asking(c) for c in verb.children):
+                continue
+            noun = verb.head
+
+            def under(tok) -> list:
+                out = [tok]
+                for c in tok.children:
+                    out += under(c)
+                return out
+
+            phrase = sorted(under(noun), key=lambda x: x.i)
+            clause = sorted(under(verb), key=lambda x: x.i)
+            # the question's own wh-word is never inside the phrase it asks about
+            if phrase[0].i == 0 or len(phrase) >= len(doc) - 2:
+                continue
+            end = clause[-1].idx + len(clause[-1].text)
+            who = self.met(text[clause[0].idx:end] + "?")
+            if who:
+                a, b = phrase[0].idx, phrase[-1].idx + len(phrase[-1].text)
+                return text[:a] + who.title() + text[b:]
+        return text
 
     def spans(self, text: str) -> list:
         """A sentence's parse with where each word sits: offset, word, tag, link, head, and

@@ -114,12 +114,10 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
      stories asked late (`late`, after a parent's reminder, 0.484 against near 0.965;
      0.686 with no reminder, since a retold sentence opens new individuals). Late's
      reminder as a person gives one is in (`cued`, John's). Two told facts put
-     together is in (`joined`: the doer named by another thing told of them, 0.523
-     against check's 0.972; its clauses resolve only through taught shapes, which
-     the stream rarely meets). Next: a relative clause read as a question about its
-     antecedent (the parse marks it `PronType=Rel`), answered as checks are. Left, in
-     order: about what changed (where a thing is now, after it moved), and why
-     something happened. The information is in the story, so these read
+     together is in (`joined`: the doer named by another thing told of them), 0.899
+     with a relative clause read as a question about its noun and answered by the
+     walk (`resolved`; 0.523 before). Next: about what changed (where a thing is now,
+     after it moved), then why something happened. The information is in the story, so these read
      understanding apart from knowledge; scale should not be what they need.
      Beside them, knowledge asked fairly (John's, 2026-10-07): the cloze banded by how
      many earlier stories told its answer in its slot (`scripts/heard.py`), and a form

@@ -51,49 +51,7 @@ from unfused.parsing import (  # noqa: F401
     vectors,
 )
 from unfused.situations import Situations
-
-SCHEMA = """
-CREATE TABLE IF NOT EXISTS events (id INTEGER PRIMARY KEY, turn INTEGER NOT NULL,
-    lemma TEXT NOT NULL, heard TEXT NOT NULL, mood TEXT NOT NULL DEFAULT '');
-CREATE TABLE IF NOT EXISTS edges (event INTEGER NOT NULL, label TEXT NOT NULL,
-    node TEXT NOT NULL);
-CREATE INDEX IF NOT EXISTS edges_event ON edges (event);
-CREATE INDEX IF NOT EXISTS edges_node ON edges (node);
-CREATE INDEX IF NOT EXISTS events_turn ON events (turn);
-CREATE INDEX IF NOT EXISTS events_lemma ON events (lemma, mood);
-CREATE TABLE IF NOT EXISTS learnt (shape TEXT NOT NULL, plan TEXT NOT NULL,
-    hits INTEGER NOT NULL, misses INTEGER NOT NULL, PRIMARY KEY (shape, plan));
-CREATE TABLE IF NOT EXISTS positions (template TEXT NOT NULL, pos INTEGER NOT NULL,
-    filler TEXT NOT NULL, n INTEGER NOT NULL, PRIMARY KEY (template, pos, filler));
-CREATE TABLE IF NOT EXISTS aliases (word TEXT NOT NULL, name TEXT NOT NULL,
-    hits REAL NOT NULL, found INTEGER NOT NULL, PRIMARY KEY (word, name));
-CREATE TABLE IF NOT EXISTS agreement (name TEXT NOT NULL, pronoun TEXT NOT NULL,
-    n INTEGER NOT NULL, PRIMARY KEY (name, pronoun));
-CREATE TABLE IF NOT EXISTS boundaries (turn INTEGER PRIMARY KEY);
-CREATE TABLE IF NOT EXISTS episode_words (word TEXT NOT NULL, episode INTEGER NOT NULL,
-    PRIMARY KEY (word, episode));
-CREATE INDEX IF NOT EXISTS episode_words_by ON episode_words (episode);
-CREATE TABLE IF NOT EXISTS asks (wh TEXT NOT NULL, mark TEXT NOT NULL, n INTEGER NOT NULL,
-    PRIMARY KEY (wh, mark));
-CREATE TABLE IF NOT EXISTS contexts (word TEXT PRIMARY KEY, names TEXT NOT NULL,
-    heard INTEGER NOT NULL);
-CREATE TABLE IF NOT EXISTS called (node TEXT NOT NULL, name TEXT NOT NULL,
-    turn INTEGER NOT NULL, PRIMARY KEY (node, name));
-CREATE INDEX IF NOT EXISTS called_name ON called (name);
-CREATE TABLE IF NOT EXISTS heard_as (name TEXT NOT NULL, pos TEXT NOT NULL,
-    n INTEGER NOT NULL, PRIMARY KEY (name, pos));
-CREATE TABLE IF NOT EXISTS circumstances (wh TEXT NOT NULL, link TEXT NOT NULL,
-    n INTEGER NOT NULL, PRIMARY KEY (wh, link));
-CREATE TABLE IF NOT EXISTS named (word TEXT NOT NULL, name TEXT NOT NULL,
-    PRIMARY KEY (word, name));
-CREATE TABLE IF NOT EXISTS filled (name TEXT NOT NULL, lemma TEXT NOT NULL,
-    link TEXT NOT NULL, n INTEGER NOT NULL, PRIMARY KEY (name, lemma, link));
-CREATE TABLE IF NOT EXISTS counts (shape TEXT NOT NULL, walk TEXT NOT NULL,
-    word TEXT NOT NULL, size INTEGER NOT NULL);
-"""
-# what a taught arm carries to the next conversation: no facts, only how to read and ask
-CARRIED = ("learnt", "positions")
-
+from unfused.storage import CARRIED, Store
 
 # how much nearer a word's likest candidate must be than the next for a vote: right picks'
 # gaps sat at 0.14 to 0.21 and wrong ones' at 0.02 to 0.06 (readings/unheard-*)
@@ -102,12 +60,6 @@ MARGIN = 0.08
 DECAY = 0.5
 # how many of a node's steps of one label a walk follows, the latest first
 REACH = 100
-# how many writes a commit waits for, a story's end aside (not the parser's `BATCH`)
-WRITES = 64
-# how many of a name's steps are returned, the latest first, as recall by a cue returns a
-# few and never everything: adjectives as nodes of their own ('little', 'big') are hubs
-# every story's things hang off, and a path search fanned out across all of them
-HUB = 300
 # how many nodes' steps one question may look at before its plans give up
 EFFORT = 200_000
 # how many hearings a kind's fit is worth beside a name's own (a Dirichlet prior's weight)
@@ -139,17 +91,9 @@ class GraphArm:
     def __init__(self, directory: Path, model: str = PARSER,
                  known: dict | None = None, cache: Path | None = CACHE) -> None:
         directory.mkdir(parents=True, exist_ok=True)
-        self.db = sqlite3.connect(str(directory / "graph.db"))
-        # what is written is kept in batches (`written`), and written ahead, without
-        # waiting on the disk for each commit
-        self.db.execute("PRAGMA journal_mode=WAL")
-        self.db.execute("PRAGMA synchronous=NORMAL")
-        self.db.executescript(SCHEMA)
-        for table, rows in (known or {}).items():
-            self.db.executemany(f"INSERT OR IGNORE INTO {table} VALUES (?, ?, ?, ?)",
-                                [tuple(x) for x in rows])
-        self.db.commit()
-        self._unwritten = 0
+        self.store = Store(directory, known)
+        # the connection the rest of the graph's tables are read through
+        self.db = self.store.db
         # what was being heard when each word was heard, folded over the stream
         self.situations = Situations(self.db)
         self.model = model
@@ -181,16 +125,8 @@ class GraphArm:
         self._steps: dict = {}
         # each node's steps by label and direction, kept beside the steps they sort
         self._labelled: dict = {}
-        # the RAM dial: each node's latest edges and each event's arguments, kept in memory
-        # and added to as a sentence is heard, so a walk reads them without a query. The
-        # table stays the store of record, and a node never read since the arm was opened
-        # is loaded from it once
-        self._into: dict = {}
-        self._outs: dict = {}
         # each node's steps' next nodes, as a tuple in order and a set, beside the steps
         self._reached: dict = {}
-        # every event's lemma, turn and mood, kept for good: what was heard never changes
-        self._events: dict = {}
         # every name's mark, dropped only for names a sentence names
         self._marks: dict = {}
         # each individual's label and how it is said, and each name's individuals
@@ -200,9 +136,8 @@ class GraphArm:
         # each word's names and descriptions held in those caches, so a sentence drops
         # only those sharing a word with what it touched, never by scanning them all
         self._words: dict[str, set] = {}
-        # each label's agreement with pronouns, and each event's arguments
+        # each label's agreement with pronouns
         self._agreed: dict = {}
-        self._args: dict = {}
         # steps looked at by the question being answered, or None outside answering
         self.spent: int | None = None
         # the kinds last read off the graph, and when: (episode, events then, kinds,
@@ -267,23 +202,13 @@ class GraphArm:
             self._keep(key, kept)
         return [tuple(k) for k in kept]
 
-    def written(self, now: bool = False) -> None:
-        """Make what was written durable: at each break between stories, and otherwise
-        once in `WRITES` calls, not after every sentence, where the commits were the largest
-        single cost of a run. The connection reads its own writes, so no answer waits on
-        a commit; `close` makes the rest durable."""
-        self._unwritten += 1
-        if now or self._unwritten >= WRITES:
-            self.db.commit()
-            self._unwritten = 0
-
     def hear(self, turn: int, text: str) -> None:
         # a turn holding no words is a break in the text ('***', a new page): what is
         # heard after it is another episode
         if not any(ch.isalnum() for ch in text):
             self.db.execute("INSERT OR IGNORE INTO boundaries VALUES (?)", (turn,))
             self.situations.ended()
-            self.written(True)
+            self.store.written(True)
             self.recalled = []
             # a name's steps are its individuals in mind, and a new episode has none
             for key in [k for k in self._steps if k.startswith("n:")]:
@@ -317,8 +242,7 @@ class GraphArm:
             if node is None:
                 node, fresh = f"i:{turn}.{fresh}", fresh + 1
                 self.db.execute("INSERT INTO called VALUES (?, ?, ?)", (node, name, turn))
-                # nothing has an edge to it yet
-                self._into[node] = []
+                self.store.opened(node)
             here.append((name, set(mods), node))
             who[m] = node
         ids = []
@@ -328,19 +252,14 @@ class GraphArm:
         # the sentence's arguments by the links they hang by, for the situations
         heard: list[tuple[str, str]] = []
         for ev in events:
-            cur = self.db.execute("INSERT INTO events (turn, lemma, heard, mood) VALUES "
-                                  "(?, ?, ?, ?)", (turn, ev["lemma"], text, ev["mood"]))
-            ids.append(cur.lastrowid)
-            self._outs[cur.lastrowid] = []
-            self._into[f"e:{cur.lastrowid}"] = []
+            ids.append(self.store.new_event(turn, ev["lemma"], text, ev["mood"]))
         for ev, eid in zip(events, ids):
             for (label, t), m in zip(ev["edges"], ev.get("mentions", [None] * len(ev["edges"]))):
                 node = (f"e:{ids[int(t[2:])]}" if t.startswith("e:") else
                         who[str(m)] if m is not None else resolved.get(t, t))
                 if node is None:
                     continue
-                self.db.execute("INSERT INTO edges VALUES (?, ?, ?)", (eid, label, node))
-                self.keep_edge(eid, label, node)
+                self.store.add_edge(eid, label, node)
                 if node[:2] in ("i:", "n:"):
                     name = self.label(node)
                     if name:
@@ -360,7 +279,7 @@ class GraphArm:
         self.situations.heard(heard, [ev["lemma"] for ev in events])
         if self._latest is not None:
             for ev, eid in zip(events, ids):
-                if not ev["mood"] and (got := self.args(eid)):
+                if not ev["mood"] and (got := self.store.args(eid)):
                     self._latest[got] = max(self._latest.get(got, 0), turn)
         # a name or a description holding a word this sentence touched may stand for
         # something else now, and its steps are its individuals'
@@ -376,7 +295,7 @@ class GraphArm:
                                 "pronoun) DO UPDATE SET n = n + 1",
                                 (f"n:{self.label(node)}", t[2:].split("|", 1)[1]))
                 self._agreed.pop(self.label(node), None)
-        self.written()
+        self.store.written()
 
     def referent(self, pronoun: str) -> str | None:
         """What a pronoun refers to, from this episode: the latest individual in the slot
@@ -616,12 +535,7 @@ class GraphArm:
     def _around(self, node: str) -> list[tuple[str, int, str]]:
         if node.startswith("e:"):
             eid = int(node[2:])
-            got = self._outs.get(eid)
-            if got is None:
-                got = self._outs[eid] = self.db.execute(
-                    "SELECT label, node FROM edges WHERE event = ? AND node NOT LIKE 'f:%'",
-                    (eid,)).fetchall()
-            out = [(label, 1, n) for label, n in got]
+            out = [(label, 1, n) for label, n in self.store.outs(eid)]
         else:
             out = []
         # the latest first, so a walk cut short keeps what was heard most recently. A
@@ -636,47 +550,11 @@ class GraphArm:
             held = [every[0]] + list(dict.fromkeys(mind + every[1:1 + REACH]))
         else:
             held = [node]
-        out += [(label, -1, f"e:{e}") for e, label in self.latest_into(held)]
+        out += [(label, -1, f"e:{e}") for e, label in self.store.latest_into(held)]
         return out
 
-    def keep_edge(self, event: int, label: str, node: str) -> None:
-        """An edge just written, added to what is kept in memory. An event is only ever
-        given edges as it is heard, so nothing kept for it is stale."""
-        if not node.startswith("f:"):
-            self._outs[event].append((label, node))
-        kept = self._into.get(node)
-        if kept is not None:
-            kept.append((event, label))
-            # only the latest `HUB` can be read, with every edge of the event they begin in
-            if len(kept) > 2 * HUB:
-                self._into[node] = kept[trimmed(kept):]
-
-    def edges_into(self, node: str) -> list[tuple[int, str]]:
-        """The (event, label) of a node's latest edges, oldest first, as they were written."""
-        kept = self._into.get(node)
-        if kept is None:
-            kept = self._into[node] = self.db.execute(
-                "SELECT event, label FROM edges WHERE node = ? AND event >= COALESCE((SELECT "
-                "event FROM edges WHERE node = ? ORDER BY rowid DESC LIMIT 1 OFFSET ?), 0) "
-                "ORDER BY rowid", (node, node, HUB - 1)).fetchall()
-        return kept
-
-    def latest_into(self, held: list[str]) -> list[tuple[int, str]]:
-        """The latest `HUB` edges into any of these nodes, newest event first; among one
-        event's, the nodes' in order and each node's as written, as the table gives them."""
-        every = [e for n in sorted(set(held)) for e in self.edges_into(n)]
-        every.sort(key=lambda e: e[0], reverse=True)
-        return every[:HUB]
-
-    def _event(self, node: str) -> tuple[str, int, str]:
-        got = self._events.get(node)
-        if got is None:
-            got = self._events[node] = self.db.execute(
-                "SELECT lemma, turn, mood FROM events WHERE id = ?", (int(node[2:]),)).fetchone()
-        return got
-
     def event(self, node: str) -> tuple[str, int]:
-        lemma, turn, _ = self._event(node)
+        lemma, turn, _ = self.store.event_row(node)
         return lemma, turn
 
     def replaced(self, node: str) -> int:
@@ -686,7 +564,7 @@ class GraphArm:
         'Mary picked up the football' replaces neither, its arguments being others. The
         turn of the latest that replaces it, or 0. Read from the latest turn each set of
         arguments happened at, so it is a lookup, never a search of what came later."""
-        mine = self.args(int(node[2:]))
+        mine = self.store.args(int(node[2:]))
         if not mine:
             return 0
         if self._latest is None:
@@ -704,18 +582,8 @@ class GraphArm:
         latest = self._latest.get(mine, 0)
         return latest if latest > self.event(node)[1] else 0
 
-    def args(self, event: int) -> frozenset:
-        """An event's arguments, the prepositions aside, as (link, node); what an event
-        holds never changes once heard."""
-        got = self._args.get(event)
-        if got is None:
-            got = self._args[event] = frozenset(self.db.execute(
-                "SELECT label, node FROM edges WHERE event = ? AND label NOT LIKE "
-                "'prep:%' AND node NOT LIKE 'f:%'", (event,)).fetchall())
-        return got
-
     def mood(self, node: str) -> str:
-        return self._event(node)[2]
+        return self.store.event_row(node)[2]
 
     def paths(self, start: str, goal: str, limit: int = 8, avoid: set | None = None,
               most: int | None = None) -> list[list]:
@@ -1325,7 +1193,7 @@ class GraphArm:
         goals = self.holding(want)
         self.learn_circumstance(question, want)
         if not fillers:
-            self.written()
+            self.store.written()
             return
         if not goals and not want.isdigit():
             # an answer nothing heard holds may be a number word, whose worth is learnt
@@ -1373,7 +1241,7 @@ class GraphArm:
                 stored["sig"] = self.signature(question, fillers)
                 self.db.execute("INSERT OR IGNORE INTO learnt VALUES (?, ?, 1, 0)",
                                 (shape, json.dumps(stored)))
-        self.written()
+        self.store.written()
 
     # -- words never heard ----------------------------------------------------
 
@@ -1497,7 +1365,7 @@ class GraphArm:
                     here &= set(json.loads(row[0]))
                 self.db.execute("INSERT OR REPLACE INTO contexts VALUES (?, ?, ?)",
                                 (w, json.dumps(sorted(here)), (row[1] if row else 0) + 1))
-        self.written()
+        self.store.written()
 
     def pinned(self, word: str) -> str | None:
         """The one name every hearing of a word left, where two or more agreed: one
@@ -2415,8 +2283,7 @@ class GraphArm:
 
     def close(self) -> None:
         self.situations.save()
-        self.db.commit()
-        self.db.close()
+        self.store.close()
         if hasattr(self, "_cdb"):
             self._cdb.close()
 
@@ -2451,15 +2318,6 @@ def asked(text: str) -> bool:
 class _Asked:
     def __init__(self, text: str) -> None:
         self.text = text
-
-
-def trimmed(kept: list[tuple[int, str]]) -> int:
-    """Where the edges worth keeping begin: the latest `HUB`, and the rest of the event the
-    earliest of them is in, so which of its edges a read takes never depends on the cut."""
-    at = len(kept) - HUB
-    while at > 0 and kept[at - 1][0] == kept[at][0]:
-        at -= 1
-    return at
 
 
 def said_in(answer: str, question: str) -> bool:

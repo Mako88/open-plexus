@@ -7,8 +7,8 @@ import ast
 from pathlib import Path
 
 SRC = Path(__file__).resolve().parents[2] / "src" / "unfused"
-# the graph and the reading it is built from
-SOURCES = [SRC / "graph.py", SRC / "parsing.py"]
+# the graph and the modules it is built from
+SOURCES = [SRC / "graph.py", SRC / "parsing.py", SRC / "storage.py"]
 
 # words of one language that rules in the system have named: pronouns, wh-words, the
 # prepositions of place, refusals, negation, number words and the stand-in for a blank
@@ -31,4 +31,4 @@ def test_no_word_of_one_language_is_held_by_hand():
                    and node.value.lower() in ENGLISH})
     capitals = sum(path.read_text("utf-8").count(".isupper()") for path in SOURCES)
     assert not held and not capitals, (
-        f"graph.py and parsing.py name English words {held} and read capitals {capitals} times")
+        f"the graph names English words {held} and read capitals {capitals} times")

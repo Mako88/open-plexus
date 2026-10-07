@@ -112,6 +112,21 @@ class GraphArm:
         self._latest: dict | None = None
         # taught shapes' signatures, rebuilt after a lesson; questions' parses
         self._sigs: list | None = None
+        # how many times `learnt` has been written, and the plans of every followed shape
+        # as of the last count `related` read them at
+        self._lessons = 0
+        self._followed: tuple | None = None
+        # how many times a lesson changed which plans are followed, or added one, and the
+        # count the taught shapes' caches were last rebuilt at; a lesson marks them stale,
+        # and they are rebuilt at the next read only if that count moved
+        self._shapes = 0
+        self._built = 0
+        self._stale = False
+        # the episode index in memory, as the table has it: each word's episodes oldest
+        # first (as an array beside, once read), and each episode's words in the order they
+        # were first written; read from the table once, then added to as sentences are heard
+        self._posted: dict = {}
+        self._episode_words: dict = {}
         # the taught shapes of each number of slots, indexed by their signatures' parts,
         # and the nearest shapes already found for a signature; both until a lesson
         self._by_slots: dict = {}
@@ -132,6 +147,7 @@ class GraphArm:
         # each individual's label and how it is said, and each name's individuals
         self._labels: dict = {}
         self._described: dict = {}
+        self._said: dict = {}
         self._nodes: dict = {}
         # each word's names and descriptions held in those caches, so a sentence drops
         # only those sharing a word with what it touched, never by scanning them all
@@ -215,8 +231,10 @@ class GraphArm:
                 del self._steps[key]
             return
         # the episode's index: each word it held, so a cue can find it again
-        self.db.executemany("INSERT OR IGNORE INTO episode_words VALUES (?, ?)",
-                            [(w, self.episode()) for w in set(self.words(text))])
+        ep = self.episode()
+        new = [(w, ep) for w in set(self.words(text))]
+        self.db.executemany("INSERT OR IGNORE INTO episode_words VALUES (?, ?)", new)
+        self.keep_words(ep, [w for w, _ in new])
         events = self.read(text)
         resolved = {t: self.referent(t[2:]) for ev in events for _, t in ev["edges"]
                     if t.startswith("p:")}
@@ -260,6 +278,10 @@ class GraphArm:
                 if node is None:
                     continue
                 self.store.add_edge(eid, label, node)
+                # what is said of any node of this event may have changed
+                self._said.pop(node, None)
+                for _, other in self.store.outs(eid):
+                    self._said.pop(other, None)
                 if node[:2] in ("i:", "n:"):
                     name = self.label(node)
                     if name:
@@ -404,11 +426,15 @@ class GraphArm:
     def said_of(self, node: str) -> list[str]:
         """What was said of an individual, the latest first: the adjectives it was heard
         with, and what a clause made it or called it ('painted the ball blue', 'the ball
-        was red'), by the links the parse gives those."""
-        return [n[2:] for (n,) in self.db.execute(
-            "SELECT b.node FROM edges a JOIN edges b ON a.event = b.event WHERE a.node = ? "
-            "AND b.label IN ('amod', 'compound', 'flat', 'acomp', 'xcomp') AND b.node LIKE 'n:%' "
-            "GROUP BY b.node ORDER BY MAX(b.event) DESC", (node,))]
+        was red'), by the links the parse gives those. Kept until an event holding the node
+        is given another edge."""
+        got = self._said.get(node)
+        if got is None:
+            got = self._said[node] = [n[2:] for (n,) in self.db.execute(
+                "SELECT b.node FROM edges a JOIN edges b ON a.event = b.event WHERE a.node = ? "
+                "AND b.label IN ('amod', 'compound', 'flat', 'acomp', 'xcomp') "
+                "AND b.node LIKE 'n:%' GROUP BY b.node ORDER BY MAX(b.event) DESC", (node,))]
+        return list(got)
 
     def describe(self, node: str) -> str:
         """How an individual is said: its own words in the order first heard, then its
@@ -957,8 +983,18 @@ class GraphArm:
             got = self._read[text] = json.loads(text)
         return got
 
+    def settled(self) -> None:
+        """After a lesson, the taught shapes are read again at the next use, unless the
+        lesson changed none of the plans followed, which is all they are read from."""
+        if self._stale:
+            self._stale = False
+            if self._built != self._shapes:
+                self._sigs, self._by_slots, self._near = None, {}, {}
+                self._built = self._shapes
+
     def taught(self) -> list[tuple[str, set]]:
         """Every taught shape's plans' signatures, rebuilt after a lesson."""
+        self.settled()
         if self._sigs is None:
             self._sigs = []
             for shape, plan in self.db.execute(
@@ -974,6 +1010,7 @@ class GraphArm:
         number of slots whose signature overlaps the question's most, and by how much."""
         mine = frozenset(self.signature(question, fillers))
         key = (mine, len(fillers), skip)
+        self.settled()
         got = self._near.get(key)
         if got is None:
             # each shape's overlap is counted through the index, so a shape sharing
@@ -990,6 +1027,7 @@ class GraphArm:
     def taught_by(self, slots: int) -> tuple[list, dict]:
         """The taught shapes of this many slots with their signatures, in the order
         `taught` gives them, and where each part of a signature is held among them."""
+        self.settled()
         got = self._by_slots.get(slots)
         if got is None:
             rows = [(shape, sig) for shape, sig in self.taught() if shape.count("<") == slots]
@@ -1141,7 +1179,7 @@ class GraphArm:
         if put != question:
             self.heard_at(put)
         question = put
-        self._sigs, self._by_slots, self._near = None, {}, {}
+        self._stale = True
         shape, fillers = self.shape(question)
         for rowid, plan in self.db.execute("SELECT rowid, plan FROM learnt WHERE shape = ?",
                                            (shape,)).fetchall():
@@ -1170,6 +1208,7 @@ class GraphArm:
                     into[1] += 1
                 self.db.execute("UPDATE learnt SET plan = ? WHERE rowid = ?",
                                 (json.dumps(plan), rowid))
+                self._lessons += 1
             # whether the plan asks about the present, counted on every lesson where
             # reading only what is still so and reading everything differ
             # right over no answer over wrong: reading the present and finding nothing
@@ -1184,12 +1223,15 @@ class GraphArm:
                 plan["present"] = tally
                 self.db.execute("UPDATE learnt SET plan = ? WHERE rowid = ?",
                                 (json.dumps(plan), rowid))
+                self._lessons += 1
             held = holds(None)
             if held is None:
                 continue
             column = "hits" if held else "misses"
             self.db.execute(f"UPDATE learnt SET {column} = {column} + 1 WHERE rowid = ?",
                             (rowid,))
+            self._lessons += 1
+            self._shapes += 1
         goals = self.holding(want)
         self.learn_circumstance(question, want)
         if not fillers:
@@ -1234,6 +1276,8 @@ class GraphArm:
                         into[lemma] = [was[0] + b, was[1] + a]
                 self.db.execute("UPDATE learnt SET plan = ?, hits = hits + 1 WHERE rowid = ?",
                                 (json.dumps(kept), rid))
+                self._lessons += 1
+                self._shapes += 1
             else:
                 for pair, ev in plan["evidence"].items():
                     self.ordered.add((shape, k, pair, ev))
@@ -1241,6 +1285,8 @@ class GraphArm:
                 stored["sig"] = self.signature(question, fillers)
                 self.db.execute("INSERT OR IGNORE INTO learnt VALUES (?, ?, 1, 0)",
                                 (shape, json.dumps(stored)))
+                self._lessons += 1
+                self._shapes += 1
         self.store.written()
 
     # -- words never heard ----------------------------------------------------
@@ -1521,6 +1567,38 @@ class GraphArm:
         the same kind ('find' for 'found') reaches the episode that heard them."""
         return [t.lemma_.lower() for t in parse(self.model, text) if t.is_alpha]
 
+    def words_of(self, episode: int) -> list[str]:
+        """The words an episode held, in the order they were first written."""
+        got = self._episode_words.get(episode)
+        if got is None:
+            got = self._episode_words[episode] = [w for (w,) in self.db.execute(
+                "SELECT word FROM episode_words WHERE episode = ?", (episode,))]
+        return got
+
+    def episodes_of(self, word: str) -> list:
+        """The episodes that held a word, oldest first, and the same as an array."""
+        got = self._posted.get(word)
+        if got is None:
+            import numpy as np
+
+            rows = [e for (e,) in self.db.execute(
+                "SELECT episode FROM episode_words WHERE word = ? ORDER BY episode", (word,))]
+            got = self._posted[word] = [rows, np.array(rows, dtype=np.int64)]
+        return got
+
+    def keep_words(self, episode: int, words: list[str]) -> None:
+        """Words just written for an episode, added to what is kept in memory."""
+        mine = self._episode_words.get(episode)
+        for w in words:
+            if mine is not None and w not in mine:
+                mine.append(w)
+            got = self._posted.get(w)
+            if got is not None and (not got[0] or got[0][-1] != episode):
+                import numpy as np
+
+                got[0].append(episode)
+                got[1] = np.append(got[1], episode)
+
     def remind(self, question: str) -> None:
         """Recall by a cue: an earlier episode that explains what this one heard and the
         question better than this one does is put back in mind (hippocampal indexing).
@@ -1528,33 +1606,36 @@ class GraphArm:
         not looked up, so recall costs a few index lookups and never a scan. A story
         being heard explains its own questions best, so this fires only when what is
         asked is not here."""
+        import numpy as np
+
         ep = self.episode()
-        here = {w for (w,) in self.db.execute(
-            "SELECT word FROM episode_words WHERE episode = ?", (ep,))}
+        here = {w for w in self.words_of(ep)}
         cue = here | set(self.words(question))
         episodes = self.db.execute("SELECT COUNT(*) FROM boundaries").fetchone()[0]
         if not cue or episodes < 2:
             return
         weight = {}
-        for word, n in self.db.execute(
-                f"SELECT word, COUNT(*) FROM episode_words WHERE word IN "
-                f"({','.join('?' * len(cue))}) GROUP BY word", tuple(cue)):
-            if n <= episodes * COMMON:
+        for word in sorted(cue):
+            n = len(self.episodes_of(word)[0])
+            if n and n <= episodes * COMMON:
                 weight[word] = math.log((episodes + 1) / (n + 1))
         if not weight:
             return
         mine = sum(weight.get(w, 0.0) for w in here)
-        scores: Counter = Counter()
-        for word, other in self.db.execute(
-                f"SELECT word, episode FROM episode_words WHERE word IN "
-                f"({','.join('?' * len(weight))}) AND episode != ?", (*weight, ep)):
-            scores[other] += weight[word]
+        # each episode's score, summed word by word in the order the words are read, as
+        # the rows came; a word names an episode once, so one add per episode is the sum
+        scores = np.zeros(ep + 1)
+        for word, w in weight.items():
+            eps = self.episodes_of(word)[1]
+            eps = eps[eps != ep]
+            scores[eps] += w
         held = {lo for lo, *_ in self.recalled}
         # an earlier episode that explains the cue only as well as this one still holds
         # what this one lacks: a retold sentence is all of the episode it came from, and
         # a question adding nothing rare leaves the two tied. The latest wins a tie
-        if scores:
-            score, other = max((s, e) for e, s in scores.items())
+        top = scores.max()
+        if top > 0:
+            score, other = float(top), int(np.flatnonzero(scores == top)[-1])
             if score < mine - 1e-9 or other in held:
                 return
             end = self.db.execute("SELECT MIN(turn) FROM boundaries WHERE turn > ?",
@@ -2060,13 +2141,16 @@ class GraphArm:
         to reach anything finds, latest first."""
         from itertools import combinations, permutations
 
-        rows: dict[str, list] = {}
-        for shape, plan in self.db.execute(
-                "SELECT shape, plan FROM learnt WHERE hits > misses "
-                "ORDER BY hits - misses DESC, hits DESC").fetchall():
-            rows.setdefault(shape, []).append(self.read_plan(plan))
-        sigs = {shape: next((set(p["sig"]) for p in plans if p.get("sig")), set())
-                for shape, plans in rows.items()}
+        if self._followed is None or self._followed[0] != self._lessons:
+            rows: dict[str, list] = {}
+            for shape, plan in self.db.execute(
+                    "SELECT shape, plan FROM learnt WHERE hits > misses "
+                    "ORDER BY hits - misses DESC, hits DESC").fetchall():
+                rows.setdefault(shape, []).append(self.read_plan(plan))
+            sigs = {shape: next((set(p["sig"]) for p in plans if p.get("sig")), set())
+                    for shape, plans in rows.items()}
+            self._followed = (self._lessons, rows, sigs)
+        _, rows, sigs = self._followed
         shapes = []
         for k in range(len(names), 0, -1):
             for chosen in combinations(names, k):

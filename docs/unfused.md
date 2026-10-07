@@ -89,17 +89,23 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
      what only it shows. Profiled 2026-10-06 (`readings/profile-stories-*`), the
      order to take them: plans (`follow`, `paths`, `replaced`, in answering and in
      teaching alike), then focus, then recall by cue, then kinds. 10,000 stories are
-     parsed ahead.
+     parsed ahead. Taken 2026-10-06: `replaced` a lookup (`b005e196`) and kinds'
+     merge (`79dd3ab8`), 1,000 stories 428 to 325 cpu s, every answer the same. Next
+     (John's, 2026-10-06: fast iteration first): `paths`, then teaching; the
+     refuted factors stripped from `scripts/weights.py`; independent arms run in
+     parallel processes. Read at 1,000; 3,000 only where growth with stories is the
+     question.
   3. ~~A check that more than one telling answers accepts every answer they support~~.
      Struck 2026-10-04 (`_answers` in `exam/stories.py`).
   4. Harder checks, one at a time and each measured alone. Done: further from their
      sentence (`far`, not harder: an episode is held whole) and early stories asked
      late (`late`, after a parent's reminder, 0.484 against near 0.965; 0.686 with
-     no reminder, since a retold sentence opens new individuals). Left, after item 5
-     (John's, 2026-10-04: item 5 first, so every later reading is quick to take):
-     needing two told facts, and about what changed. Late's reminder as a person
+     no reminder, since a retold sentence opens new individuals). Left, after item 7
+     (John's, 2026-10-04 put item 5 first so every later reading is quick to take;
+     the cloze's lever has since moved to item 7): needing two told facts, and about
+     what changed. Late's reminder as a person
      gives one is in (`cued`, John's).
-  5. NEXT. The walk (John's): every node a question names fires at once, and what
+  5. The walk (John's): every node a question names fires at once, and what
      their activations meet at is the answer, as spreading activation does
      (Quillian; ACT-R), each node passing on activation divided by its fan so a hub
      passes almost none. `match` is retired for its meet (`met`, `7bc77a2e`). Left:
@@ -137,8 +143,13 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
         refuted on GloVe and our counts too (`195f20d6`): the room is world
         knowledge. More stories do not bring it as the system is: the cloze reads
         0.496 at 300-1,000 and 0.483 at 1,000-3,000 (`061744Z`). What hearing more
-        should improve is the predictor itself, which is item 7's and John's to
-        shape.
+        should improve is the predictor itself: item 7.
+     Also refuted 2026-10-06: fit by the whole event (verb, slot and co-arguments)
+     and John's veto, dropping what cannot fit (`41183049`: a point at most, and it
+     dropped the right answer in one cloze in eight, since counts this sparse say
+     only what was never heard). Owed: the veto with WordNet's categories beside
+     ours, and each focus decision traced by stage (the funnel), stopped for item 7's
+     control; its patch was not kept.
   6. An episode recalled by its gist (John's, 2026-10-05; hippocampal indexing, Teyler
      and DiScenna). A boundary changes what is in mind and erases nothing; `remind`
      runs it backwards, and the oracle arms (`recalled`, `asked`) say what is left is
@@ -148,20 +159,52 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
      few where the cue is ambiguous (worth at most about three points); and whether
      episodes recalled together become a category (OPEN FORKS, meta layers, John's
      'dreaming').
-  7. Predict, then learn from the error (John's, 2026-10-04; predictive processing,
-     Rao and Ballard). Before each telling is stored, the system guesses its
-     arguments from what is in mind and learns from what was said: a cloze on every
-     sentence, with no teacher. Learning focus's factor weights from it was refuted,
-     and learning them from lessons alone too (the commit that deletes them), though
-     the guesses themselves improved. Left: a target the questions share with the
-     guesses, and the error as Phase 6's surprise and where event segmentation puts
-     a boundary. Refuted if the cloze reads no higher than without it.
+  7. NEXT. A slow memory that generalises (John's, 2026-10-06; complementary learning
+     systems, McClelland, McNaughton and O'Reilly). The graph is the fast memory, one
+     hearing and every episode kept apart, which is why the checks read 0.97. What is
+     missing is the slow one, whose representations overlap so what is learnt of one
+     thing reaches the things like it, fed by replay. The control (`e4c2351d`): a
+     small transformer from nothing reads the cloze at 0.271 from the same 500
+     stories where the system reads 0.501, and at 0.655 from 21,000, where the system
+     is flat from 300 stories to 3,000. In order, each judged by whether the cloze
+     rises with stories heard (1,000-3,000 against 300-1,000):
+     a. Situations (`c1988b38`, John's): each word's meaning is the contexts it was
+        heard in, folded over the stream at several rates and at the story's end, as
+        event sourcing projects a stream; vectors of the system's own, fixed by name
+        and spelling, bound to their links, read centred. As focus's factors: no lift
+        at 1,000 (`014523Z`); the 3,000 reading decides. If it earns, the situational
+        match becomes focus's main score, a joint fit of everything at once, rather
+        than one more factor.
+     b. Scales set by their worth (John's): folds added, removed and moved at a
+        story's end by what each adds to prediction.
+     c. Consolidation at each story's end, predict then learn from the error (John's,
+        2026-10-04; predictive processing, Rao and Ballard): replay the episode,
+        predict each telling's arguments from the meanings, and correct them where
+        the prediction missed, since meanings shaped by prediction beat counted ones
+        (Baroni et al. 2014); a local rule, no gradient. Its earlier form, learning
+        focus's factor weights from the guesses, was refuted (the commit that deletes
+        them). The error is also Phase 6's surprise and where event segmentation
+        puts a boundary.
+     d. Schemas with roles, minted where a pattern recurs and pays (OPEN FORKS, meta
+        layers): the units the next layer builds on.
+     Refuted if, with all of it, the cloze still reads no higher at 1,000-3,000 than
+     at 300-1,000.
   Then John's two nearest goals (2026-10-04): a conversation with the system (the
   mouth, the graphed arm's item 2), and worlds it acts in, its output heard back as
   input. The first world is TextWorld (Microsoft's text adventures), and saying
-  commands is its prerequisite, which a conversation brings. Beside both, idle inference that feeds itself (OPEN FORKS), its conclusions
-  marked as derived and kept only while later tellings bear them out, so a loop that
-  hears itself does not harden its own mistakes.
+  commands is its prerequisite, which a conversation brings. Beside both, idle
+  inference that feeds itself (OPEN FORKS), its conclusions marked as derived and kept
+  only while later tellings bear them out, so a loop that hears itself does not harden
+  its own mistakes. A conversation comes before reading Wikipedia (John's,
+  2026-10-06), so what it read can be asked. Where nothing is asked, what to say is
+  chosen as a contribution: relevant to what is in mind (the situations) and not yet
+  shared (common ground, Clark: the graph knows who was told what), in the move that
+  fits the turn before (an answer to a question, a reaction to news), learnt from the
+  dialogue the stories hold as schemas, and taught by the other's reactions. It
+  starts one from what consolidation turns up (a failed prediction, a new schema, a
+  contradiction, a gap), the likeliest to teach it first (curiosity as expected
+  information gain, Oudeyer; Gottlieb). Measured first by yes-or-no questions and the
+  mouth's round trip, then by exchanges with John scored as agreed with him.
 - **The stream.** John's, 2026-10-03. The target is the TinyStories stream (THE
   STREAM, below); the houses and bAbI are regression checks, and their items further down
   wait behind these. In order:
@@ -286,7 +329,18 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
      questions, half true, some about what was never told. Refuted if yes-or-no accuracy
      is no better than half, or if no reply joins two fragments when the path has two
      edges. The bare node cannot be the bar, since the contains-match scorer gives a
-     sentence holding it the same credit.
+     sentence holding it the same credit. How a thought becomes words (John's,
+     2026-10-06): a thought is a piece of graph, an event with its arguments by link,
+     which is a dependency tree without its order, so saying it is surface
+     realisation (the SR'18 and SR'19 shared tasks): ordered by counts of which side
+     of its head each link falls, learnt from every parse heard, and inflected from
+     the parse's morphology. A sentence is said only if the system's own ear parses
+     it back to the graph it meant, so the ear checks the mouth, and the share that
+     comes back whole is the mouth's measure. If that is not fluent enough, a small
+     realiser (a word-level model trained here on heard text, as `scripts/small_lm.py`
+     trains one) may choose only order and function words with the content locked,
+     checked the same way. That relaxes DECIDED's no language model in the system, so
+     it is John's to open.
   3. Counts, which hold phase 4 of the red set: count is below blind on every seed. A
      count plan counts one walk's ends, so one wording of the place. Counting a
      relation's solutions instead was tried and dropped (see the commit that says so),
@@ -698,7 +752,18 @@ the store merges by id. Kill a third of the nodes mid-exam.
   word's meaning as what is known about it, which is the symbol encoder's raw material.
   Needs first: pronouns bound across sentences, and a graph that walks at a million edges.
   A first reading: a few hundred Simple English articles on one subject, read whole, then
-  asked questions in shapes the house taught.
+  asked questions in shapes the house taught. Then all of Simple English Wikipedia, and
+  English Wikipedia after a conversation exists (John's, 2026-10-06): about 200 million
+  sentences, so a week needs hearing at about 330 a second against about 100 today.
+  What buys it: a faster parser, what is in mind held in RAM (DIALS), and shards read
+  by processes in parallel and merged, the graph by union and the situations by
+  addition, which no order changes.
+- **Other languages.** John's, 2026-10-06. The situations hang on labels, so a new
+  language's words start unrelated to the known ones, and meet only through the
+  situations both are heard in, as a bilingual child's do. A shortcut: a word given as
+  a direct translation starts from the known word's meaning and then moves with its
+  own hearings, since one-to-one translations are rarer than they look ('know' is
+  savoir and connaître).
 - **Spark-234K as a far world.** John's, 2026-10-02 (`OpenDataArena/Spark-234K` on Hugging
   Face): 234K research-level science problems from recent papers, each self-contained,
   each answer a worked derivation of 2.5K to 44K characters. Nothing here can attempt one:
@@ -717,24 +782,29 @@ the store merges by id. Kill a third of the nodes mid-exam.
 - **Hyperdimensional vectors for symbols and assertions**, each symbol a random bipolar vector
   seeded by a hash of its name so every node agrees without coordinating. They buy a
   fixed-size memory that merges by addition and forgets by interference; they have to earn
-  that against the exact tables in Phase 8, or not be built.
+  that against the exact tables in Phase 8, or not be built. Taken for meaning as the
+  situations (THE ORDER, item 7a), beside the exact tables, not in their place.
 - **Episode boundaries the system sets itself.** John's, 2026-10-03. A boundary is a turn
   with no words in it, so once the system has input of its own it can mark one, and
   manage its memory by where episodes end. Event segmentation theory sets them where
   prediction fails, so Phase 6's surprise signal is the likely trigger.
 - **Idle-time inference**: the system composes and writes derived assertions when no input is
-  arriving, so a chain is found once rather than per question.
+  arriving, so a chain is found once rather than per question. What it thinks about is
+  chosen by a signal of its own (John's, 2026-10-06): what it expects to learn most
+  from, read off consolidation's errors (Phase 6's body); it is what a conversation's
+  first move comes from.
 - **Meta layers, minted rather than built.** John's, 2026-10-04. A pattern that recurs and
   pays (a schema, 'lose, search, find') becomes a node of its own, and patterns are learnt
   over those nodes in turn, with no fixed number of layers: chunking (Soar; ACT-R's
   production compilation). `commitments`' rung five was the same idea (`docs/history/`);
   its lesson holds, that the vocabulary grows under the learner, never a controller
-  tuning it from above. After item 5, since schemas are the first thing to mint.
+  tuning it from above. Schemas are the first thing to mint (THE ORDER, item 7d).
   John's, 2026-10-05: the goal is one loop that runs at every layer, which is learning
-  to learn. Item 5b is its second turn: a kind is a class of things by their contexts,
-  and the kind a frame asks for is a class of frames by contexts made of kinds, so 5b
-  is built as the same refinement over its own output, not a counter of its own. A node
-  is minted where it lowers prediction's error (item 7), so the loop has a reason to
+  to learn. Item 5b was built as its second turn (a kind is a class of things by their
+  contexts, and the kind a frame asks for a class of frames by contexts made of kinds,
+  the same refinement over its own output) and refuted as built (`73e84186`); the next
+  turn is item 7's, over the situations rather than one kind per word. A node is
+  minted where it lowers prediction's error (item 7c), so the loop has a reason to
   stop. Refuted if the same code run a turn higher pays nothing the turn below did not.
   Agreed the same night: categories reshape as evidence comes, splitting as a toddler's
   'doggie' does and merging where two predict alike, so a category is a view read from

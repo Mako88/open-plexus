@@ -11,7 +11,6 @@ from __future__ import annotations
 
 import hashlib
 import json
-from pathlib import Path
 
 from unfused.home import home
 

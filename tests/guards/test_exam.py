@@ -76,21 +76,16 @@ def test_linked_recall_reaches_a_fragment_through_a_shared_name(tmp_path):
     assert notes == sorted(notes, key=lambda n: int(n.split("]")[0].split()[-1]))
 
 
-def test_a_number_is_matched_whole():
+def test_a_number_is_matched_in_either_form_and_whole():
     count = Question("How many people keep things in the attic?", "2", "count", "count", 5, 9)
     assert judge(count, "2 people.")["correct"]
     assert not judge(count, "12 people.")["correct"]
 
-
-def test_a_number_is_matched_in_either_form_and_whole():
-    from unfused.exam.run import judge
-    from unfused.exam.world import Question
-
-    def q(a):
+    def n(a):
         return Question("How many?", a, "k", "f", 0, 0)
 
-    assert judge(q("two"), "2")["correct"] and judge(q("2"), "There are two.")["correct"]
-    assert not judge(q("12"), "2")["correct"] and not judge(q("one"), "none")["correct"]
+    assert judge(n("two"), "2")["correct"] and judge(n("2"), "There are two.")["correct"]
+    assert not judge(n("12"), "2")["correct"] and not judge(n("one"), "none")["correct"]
 
 
 
@@ -103,7 +98,9 @@ def test_a_story_is_asked_about_what_it_told_before():
             "fence. Mr. Brown was not happy. Then Tom found the ball under the big tree.")
     assert sentences(text)[1] == "Mr. Brown lived next door."
     s = make(text, 0, spacy.load("en_core_web_sm"))
-    assert s.answer in ("ball", "tree", "tom") and "what" in s.question.lower() + "who"
+    # the blank is a wh-word standing where the answer was, as a word of its own
+    assert s.answer in ("ball", "tree", "tom")
+    assert {"what", "who"} & set(s.question.lower().strip("?").split())
     assert s.answer not in s.question.lower().split()
     assert right(s.answers, f"It was the {s.answer}.") and not right(s.answers, "the moon")
 

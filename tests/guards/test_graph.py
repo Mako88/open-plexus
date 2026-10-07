@@ -224,10 +224,16 @@ def test_a_compound_whose_first_word_is_a_known_name_is_two_names(tmp_path):
 
 
 def test_a_word_spelt_like_the_encoder_key_is_a_vector():
+    import numpy as np
+
     from unfused.graph import vectors
 
+    # 'model' is also the key the loaded encoder is kept under, and was once read as it
     w, m = vectors(["boat", "model"])
-    assert w.shape == m.shape
+    for v in (w, m):
+        assert isinstance(v, np.ndarray) and v.ndim == 1 and v.dtype == np.float32
+        assert v.shape == (384,) and float(np.linalg.norm(v)) > 0
+    assert not np.array_equal(w, m)
 
 
 def test_a_blank_is_filled_from_what_is_in_focus(tmp_path):

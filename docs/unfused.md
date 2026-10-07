@@ -93,8 +93,10 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
      merge (`79dd3ab8`), 1,000 stories 428 to 325 cpu s, every answer the same. Next
      (John's, 2026-10-06: fast iteration first): `paths`, then teaching; the
      refuted factors stripped from `scripts/weights.py`; independent arms run in
-     parallel processes. Read at 1,000; 3,000 only where growth with stories is the
-     question. Done by agents in their own worktrees (John's, 2026-10-06), one PR a
+     parallel processes. Profile at 100-300 stories (proportions are all a profile
+     needs), check every answer the same once at 1,000, and read growth from the
+     1,000 reading's bands; 3,000 only where those bands cannot show the change
+     (John's, 2026-10-07). Done by agents in their own worktrees (John's, 2026-10-06), one PR a
      fix, each held to every answer the same, while the core work goes on: `paths`,
      the gitignored caches found by a setting rather than linked into worktrees,
      teaching; then parallelism and a fast weight sweep; then measurement that does

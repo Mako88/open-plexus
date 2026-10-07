@@ -2,7 +2,8 @@
 
     uv run python scripts/autopsy.py --stories 300 --note "..."
 
-For every question, before it is answered: whether a plan was ever learnt for its exact
+For every question, as its answer saw the graph (recall by a cue has run, nothing has been
+taught from it yet): whether a plan was ever learnt for its exact
 shape; whether any path joins one of its names to the right answer in the graph, and how
 short; and where the right answer ranked in focus, on each of focus's factors alone and
 on all three. The reading says whether the plans had anything to find, and which factor
@@ -45,6 +46,10 @@ class Traced(runner.Graphed):
         self.traces: list[dict] = []
 
     def ask(self, turn, story):
+        # read once the question is answered: recall by a cue runs inside the answer and
+        # puts an earlier episode in mind, so what the answer weighed is what is read here
+        # (the answer teaches nothing, so the plans are as they were)
+        said = super().ask(turn, story)
         a = self.arm
         shape, fillers = a.shape(story.question)
         gold = {n[2:] for w in story.answers for n in a.holding(w)}
@@ -71,7 +76,7 @@ class Traced(runner.Graphed):
             "rank_fit": rank(scores, gold, lambda s: s[1]),
             "rank_mark": rank(scores, gold, lambda s: s[2]),
         })
-        return super().ask(turn, story)
+        return said
 
 
 def summarise(rows: list[dict]) -> dict:

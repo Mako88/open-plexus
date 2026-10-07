@@ -141,6 +141,7 @@ def test_a_second_house_count_is_asked_after_every_passing_on_that_changes_it():
     house = generate_second_house(0)
     passes = [t for t, text in enumerate(house.turns)
               if "passed the" in text or "any more" in text]
+    assert passes
     for q in (q for q in house.questions if q.form == "count"):
         who = q.text.split(" does ")[1].split(" have")[0]
         assert all(q.asked_at > t for t in passes if who in house.turns[t])

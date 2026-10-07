@@ -1,6 +1,6 @@
 """Nothing of one language held by hand, out of the red set once it held (THE ORDER,
 the foundation's item 4). With the foundation's other parts, in `test_individuals.py`,
-`test_kept_whole.py` and `test_kinds.py`, it is what the system stands on (John's,
+and `test_kept_whole.py`, it is what the system stands on (John's,
 2026-10-04)."""
 
 import ast

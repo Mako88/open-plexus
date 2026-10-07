@@ -26,8 +26,6 @@ import sqlite3
 from collections import Counter
 from pathlib import Path
 
-from unfused.kinds import kinds
-
 # the scripts and the guards read BLANKS, PARSER, extract, nlp, parse_many and vectors through
 # this module, so they are named here whether or not it uses them
 from unfused.parsing import (  # noqa: F401
@@ -62,7 +60,8 @@ DECAY = 0.5
 REACH = 100
 # how many nodes' steps one question may look at before its plans give up
 EFFORT = 200_000
-# how many hearings a kind's fit is worth beside a name's own (a Dirichlet prior's weight)
+# how many hearings a name's fit is shrunk by towards nothing, so one hearing is not a
+# certainty
 PRIOR = 2.0
 # the walk a question's names and verb spread by (`met`): how many steps, what is passed
 # on at each, the activation below which nothing spreads on, and the latest events a
@@ -140,9 +139,6 @@ class GraphArm:
         self._agreed: dict = {}
         # steps looked at by the question being answered, or None outside answering
         self.spent: int | None = None
-        # the kinds last read off the graph, and when: (episode, events then, kinds,
-        # slots each kind filled, everything each kind filled)
-        self._kinds: tuple | None = None
         # episodes put back in mind beside the one heard now, each as (its break's turn,
         # its last turn, its first event, its last event, how far its turns are moved
         # on so it reads as heard just now); a break puts them all away
@@ -439,45 +435,6 @@ class GraphArm:
         that finds it, so a walk from 'lily' does not come back through a Lily."""
         return node in nodes or (node.startswith("i:") and (
             f"n:{self.label(node)}" in nodes or f"n:{self.describe(node)}" in nodes))
-
-    # -- concepts ---------------------------------------------------------------
-
-    def concepts(self) -> tuple[dict, Counter, Counter]:
-        """Each label's kind (`kinds`), with what each kind filled: by (kind, verb, link)
-        and in all. Kinds are what everyone knows, so they are read again once the
-        graph has grown by a quarter, not with each episode. The sizes they are read at
-        are fixed (each a quarter past the last, counted from nothing), so what reads
-        them, and when, never moves where they change."""
-        events = self.db.execute("SELECT COUNT(*) FROM events").fetchone()[0]
-        stage = int(math.log(events, 1.25)) if events else -1
-        got = self._kinds
-        if got is None or stage != got[1]:
-            # read from the stage's own events and none heard since, so they are the same
-            # kinds whenever in the stage they are read, a reopening included
-            last = self.db.execute("SELECT id FROM events ORDER BY id LIMIT 1 OFFSET ?",
-                                   (max(0, min(events, math.ceil(1.25 ** stage)) - 1),)).fetchone()
-            rows = self.arguments(last[0] if last else 0)
-            kind = kinds(rows)
-            slots, filled = Counter(), Counter()
-            for _, lemma, link, label in rows:
-                slots[(kind[label], lemma, link)] += 1
-                filled[kind[label]] += 1
-            got = self._kinds = (self.episode(), stage, kind, slots, filled)
-        return got[2], got[3], got[4]
-
-    def arguments(self, upto: int | None = None) -> list[tuple[int, str, str, str]]:
-        """Every argument of every event that names something, as (event, lemma, link,
-        label), of the events up to `upto` where it is given: what `kinds` reads."""
-        where = "" if upto is None else " AND edges.event <= ?"
-        return [(e, lemma, link, self.label(n)) for e, lemma, link, n in self.db.execute(
-            "SELECT edges.event, events.lemma, edges.label, edges.node FROM edges JOIN "
-            "events ON events.id = edges.event WHERE edges.node NOT LIKE 'e:%' AND "
-            f"edges.node NOT LIKE 'f:%'{where}", () if upto is None else (upto,))]
-
-    def kind_of(self, word: str) -> int | None:
-        """The kind a label is of, learnt from how it connects; None for one never
-        heard."""
-        return self.concepts()[0].get(word)
 
     def in_mind(self, name: str, mods=()) -> str | None:
         """The individual a mention joins: the one with this label, opened in this
@@ -1814,20 +1771,16 @@ class GraphArm:
                 "NOT LIKE 'e:%' AND edges.node NOT LIKE 'f:%'", self._held(events=True)):
             act[node] = act.get(node, 0.0) + (now - self.moved(turn) + 1) ** -DECAY
         labels = self.db.execute("SELECT COUNT(DISTINCT link) FROM filled").fetchone()[0] or 1
-        kind, slots, filled = self.concepts()
 
         def fit(name: str) -> float:
             # a share of what the name filled: in the asked verb's slot, and, much less,
-            # by the link alone, so a slot no one here filled still ranks. A name heard
-            # little fits as its kind does until its own hearings decide
-            k = kind.get(name)
-            prior = slots[(k, *slot)] / filled[k] if filled[k] else 0.0
+            # by the link alone, so a slot no one here filled still ranks
             rows = self.db.execute("SELECT link, lemma = ?, n FROM filled WHERE name = ?",
                                    (slot[0], name)).fetchall()
             total = sum(n for _, _, n in rows)
             here = sum(n for lab, verb, n in rows if lab == slot[1] and verb)
             link = sum(n for lab, _, n in rows if lab == slot[1])
-            return ((here + PRIOR * prior) / (total + PRIOR)
+            return (here / (total + PRIOR)
                     + 0.1 * (link + 0.5) / (total + 0.5 * labels))
 
         asks = dict(self.db.execute("SELECT mark, n FROM asks WHERE wh = ?",

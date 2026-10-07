@@ -200,12 +200,8 @@ class Recorded(runner.Graphed):
                   for n, f in scores.items()}
         notes = self.arm.last_notes
         # one entry an ask, in the order the runner's rows come, to be joined with them
-        # whether each right name's label had a kind when asked: a word first heard since
-        # kinds were last read has none, and fits as nothing
-        kinded = [self.arm.kind_of(story.answer) is not None] if scores else []
         self.records.append({"candidates": [[list(f), right(story.answers, name)]
                                             for name, f in scores.items()],
-                             "kinded": kinded[0] if kinded else None,
                              "correct": right(story.answers, said)}
                             if notes and notes[-1] == "by:focus" and scores else None)
         return said
@@ -316,10 +312,6 @@ def main() -> int:
                 FACTORS, [tuple(int(i == j) for j in range(len(FACTORS)))
                           for i in range(len(FACTORS))])},
             "top": [[a, list(w)] for a, w in swept[:10]],
-            # the answer's word had a kind when asked, among focus's misses and its hits
-            "kinded": {k: (lambda xs: [sum(1 for x in xs if x["kinded"]), len(xs)])(
-                [r for r in rs if r["correct"] == want and r["kinded"] is not None])
-                for k, want in (("missed", False), ("hit", True))},
         }
     path = ROOT / "readings" / f"weights-s{args.seed}-n{args.stories}-{stamp}.json"
     path.write_text(json.dumps(reading, indent=1), encoding="utf-8")

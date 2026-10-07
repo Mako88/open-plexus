@@ -57,10 +57,10 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
   2. ~~Nothing the parse gives dropped~~. Struck 2026-10-04 (`203e5829`). Plans learning
      which of the kept links matter is still to come. Refuted if neither the stream
      nor the many-worded house reads higher with everything kept than with `SKIP`.
-  3. ~~Concepts~~. Struck 2026-10-04 (`51ad1e33`, `kinds.py`). Kinds read right on the
-     stream and enter only focus's slot fit, where they tie. Where else they enter
-     (plans' loose walks, a join's free variable, a borrowed shape's answer, THE ORDER
-     below) is what is left of them.
+  3. ~~Concepts~~. Struck 2026-10-04 (`51ad1e33`). Kinds by the fixed point of
+     relations were deleted 2026-10-07 (John's): they entered only focus's slot fit,
+     and they cost a fifth of a run's CPU for nothing. Kinds come back from item 7e's
+     vectors, or rebuilt where a reading shows a wrong kind is the fault.
   4. No English by hand (the red set's last test: 41 words and 4 readings of capitals).
      The parser marks some of what is needed in any language: pronouns' `Gender`,
      `Number`, `Person` and `Case`, proper names' part of speech. It marks nothing for

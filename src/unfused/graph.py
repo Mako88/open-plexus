@@ -1185,10 +1185,13 @@ class GraphArm:
             if held is None:
                 continue
             column = "hits" if held else "misses"
-            self.db.execute(f"UPDATE learnt SET {column} = {column} + 1 WHERE rowid = ?",
-                            (rowid,))
+            (hits, misses), = self.db.execute(
+                f"UPDATE learnt SET {column} = {column} + 1 WHERE rowid = ? "
+                "RETURNING hits, misses", (rowid,)).fetchall()
             self._lessons += 1
-            self._shapes += 1
+            # a plan is followed where it held more often than it failed
+            if (hits - held > misses - (not held)) != (hits > misses):
+                self._shapes += 1
         goals = self.holding(want)
         self.learn_circumstance(question, want)
         if not fillers:
@@ -1231,10 +1234,12 @@ class GraphArm:
                     for lemma, (b, a) in by_lemma.items():
                         was = into.get(lemma, [0, 0])
                         into[lemma] = [was[0] + b, was[1] + a]
-                self.db.execute("UPDATE learnt SET plan = ?, hits = hits + 1 WHERE rowid = ?",
-                                (json.dumps(kept), rid))
+                (hits, misses), = self.db.execute(
+                    "UPDATE learnt SET plan = ?, hits = hits + 1 WHERE rowid = ? "
+                    "RETURNING hits, misses", (json.dumps(kept), rid)).fetchall()
                 self._lessons += 1
-                self._shapes += 1
+                if (hits - 1 > misses) != (hits > misses):
+                    self._shapes += 1
             else:
                 for pair, ev in plan["evidence"].items():
                     self.ordered.add((shape, k, pair, ev))

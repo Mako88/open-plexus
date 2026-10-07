@@ -498,6 +498,9 @@ def extract(doc) -> list[dict]:
 
 class GraphArm:
     name = "graphed"
+    # whether an answer keeps the names focus weighed for it, with their factors, in
+    # `traced`: the scores it computed anyway, so an instrument need not ask focus again
+    trace = False
 
     def __init__(self, directory: Path, model: str = PARSER,
                  known: dict | None = None, cache: Path | None = CACHE) -> None:
@@ -518,6 +521,7 @@ class GraphArm:
         self.model = model
         self.cache = cache
         self.last_notes: list[str] = []
+        self.traced: dict | None = None
         self.parsed = 0
         # the pairs of events already counted towards a plan's order, this world
         self.ordered: set = set()
@@ -1889,6 +1893,7 @@ class GraphArm:
         # what the plans of either wording's own shape find comes before anything
         # borrowed or joined: a wording taught before an alias settled holds the lessons
         self.heard_in(question.text)
+        self.traced = None
         # what the question's names and verb meet at, read from its grammar, is the
         # answer whatever else is found, so it is asked first and nothing else is asked
         # when it answers: most checks are answered so, and paid for every plan before it
@@ -1918,6 +1923,8 @@ class GraphArm:
         # and what a plan found stands only where focus would also consider it: a plan
         # reads a told event, and a sentence not yet told is predicted, not found
         planned, scores = said, self.focus(question.text)
+        if self.trace:
+            self.traced = scores
         ranked = sorted(scores, key=lambda n: (math.prod(scores[n]), n),
                         reverse=True) if scores else []
         fit = ranked[0] if ranked else None

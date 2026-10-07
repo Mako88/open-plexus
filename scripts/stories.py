@@ -201,7 +201,9 @@ def _stream(arm, stories, reopen_every, rows, sizes) -> int:
             rows.append(_ask(arm, turn, s, "late", check))
             # and another of its checks after a reminder of what set it apart, as a
             # cue heard as a cue rather than a telling
-            other = next((c for c in old.checks if c is not check), None)
+            # (one about a single told fact, as it was before the joined checks came)
+            other = next((c for c in old.checks if c is not check and c.form != "joined"),
+                         None)
             said = reminder(old, other, rarity) if other is not None else None
             if said is not None:
                 arm.tell(turn, BREAK)
@@ -242,7 +244,7 @@ def _summary(arm, rows, sizes, turn, started, cpu) -> dict:
     arm.close()
     # `score` and `curve` stay the cloze's; each form is read as its own curve
     forms = {}
-    for form in ("cloze", "check", "far", "late", "cued"):
+    for form in ("cloze", "check", "far", "late", "cued", "joined"):
         rs = [r for r in rows if r["form"] == form]
         forms[form] = {"score": round(sum(r["correct"] for r in rs) / len(rs), 3)
                        if rs else None, "n": len(rs), "curve": _curve(rs, sizes)}

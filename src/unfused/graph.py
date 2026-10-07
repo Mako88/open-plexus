@@ -115,8 +115,8 @@ MARGIN = 0.08
 DECAY = 0.5
 # how many of a node's steps of one label a walk follows, the latest first
 REACH = 100
-# how many writes a commit waits for, a story's end aside
-BATCH = 64
+# how many writes a commit waits for, a story's end aside (not the parser's `BATCH`)
+WRITES = 64
 # how many of a name's steps are returned, the latest first, as recall by a cue returns a
 # few and never everything: adjectives as nodes of their own ('little', 'big') are hubs
 # every story's things hang off, and a path search fanned out across all of them
@@ -625,11 +625,11 @@ class GraphArm:
 
     def written(self, now: bool = False) -> None:
         """Make what was written durable: at each break between stories, and otherwise
-        once in `BATCH` calls, not after every sentence, where the commits were the largest
+        once in `WRITES` calls, not after every sentence, where the commits were the largest
         single cost of a run. The connection reads its own writes, so no answer waits on
         a commit; `close` makes the rest durable."""
         self._unwritten += 1
-        if now or self._unwritten >= BATCH:
+        if now or self._unwritten >= WRITES:
             self.db.commit()
             self._unwritten = 0
 

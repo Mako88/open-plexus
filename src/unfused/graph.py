@@ -547,6 +547,12 @@ class GraphArm:
         self._steps: dict = {}
         # each node's steps by label and direction, kept beside the steps they sort
         self._labelled: dict = {}
+        # the RAM dial: each node's latest edges and each event's arguments, kept in memory
+        # and added to as a sentence is heard, so a walk reads them without a query. The
+        # table stays the store of record, and a node never read since the arm was opened
+        # is loaded from it once
+        self._into: dict = {}
+        self._outs: dict = {}
         # each node's steps' next nodes, as a tuple in order and a set, beside the steps
         self._reached: dict = {}
         # every event's lemma, turn and mood, kept for good: what was heard never changes
@@ -677,6 +683,8 @@ class GraphArm:
             if node is None:
                 node, fresh = f"i:{turn}.{fresh}", fresh + 1
                 self.db.execute("INSERT INTO called VALUES (?, ?, ?)", (node, name, turn))
+                # nothing has an edge to it yet
+                self._into[node] = []
             here.append((name, set(mods), node))
             who[m] = node
         ids = []
@@ -689,6 +697,8 @@ class GraphArm:
             cur = self.db.execute("INSERT INTO events (turn, lemma, heard, mood) VALUES "
                                   "(?, ?, ?, ?)", (turn, ev["lemma"], text, ev["mood"]))
             ids.append(cur.lastrowid)
+            self._outs[cur.lastrowid] = []
+            self._into[f"e:{cur.lastrowid}"] = []
         for ev, eid in zip(events, ids):
             for (label, t), m in zip(ev["edges"], ev.get("mentions", [None] * len(ev["edges"]))):
                 node = (f"e:{ids[int(t[2:])]}" if t.startswith("e:") else
@@ -696,6 +706,7 @@ class GraphArm:
                 if node is None:
                     continue
                 self.db.execute("INSERT INTO edges VALUES (?, ?, ?)", (eid, label, node))
+                self.keep_edge(eid, label, node)
                 if node[:2] in ("i:", "n:"):
                     name = self.label(node)
                     if name:
@@ -971,9 +982,12 @@ class GraphArm:
     def _around(self, node: str) -> list[tuple[str, int, str]]:
         if node.startswith("e:"):
             eid = int(node[2:])
-            out = [(label, 1, n) for label, n in self.db.execute(
-                "SELECT label, node FROM edges WHERE event = ? AND node NOT LIKE 'f:%'",
-                (eid,))]
+            got = self._outs.get(eid)
+            if got is None:
+                got = self._outs[eid] = self.db.execute(
+                    "SELECT label, node FROM edges WHERE event = ? AND node NOT LIKE 'f:%'",
+                    (eid,)).fetchall()
+            out = [(label, 1, n) for label, n in got]
         else:
             out = []
         # the latest first, so a walk cut short keeps what was heard most recently. A
@@ -988,10 +1002,37 @@ class GraphArm:
             held = [every[0]] + list(dict.fromkeys(mind + every[1:1 + REACH]))
         else:
             held = [node]
-        out += [(label, -1, f"e:{e}") for e, label in self.db.execute(
-            f"SELECT event, label FROM edges WHERE node IN ({','.join('?' * len(held))}) "
-            "ORDER BY event DESC LIMIT ?", (*held, HUB))]
+        out += [(label, -1, f"e:{e}") for e, label in self.latest_into(held)]
         return out
+
+    def keep_edge(self, event: int, label: str, node: str) -> None:
+        """An edge just written, added to what is kept in memory. An event is only ever
+        given edges as it is heard, so nothing kept for it is stale."""
+        if not node.startswith("f:"):
+            self._outs[event].append((label, node))
+        kept = self._into.get(node)
+        if kept is not None:
+            kept.append((event, label))
+            # only the latest `HUB` can be read, with every edge of the event they begin in
+            if len(kept) > 2 * HUB:
+                self._into[node] = kept[trimmed(kept):]
+
+    def edges_into(self, node: str) -> list[tuple[int, str]]:
+        """The (event, label) of a node's latest edges, oldest first, as they were written."""
+        kept = self._into.get(node)
+        if kept is None:
+            kept = self._into[node] = self.db.execute(
+                "SELECT event, label FROM edges WHERE node = ? AND event >= COALESCE((SELECT "
+                "event FROM edges WHERE node = ? ORDER BY rowid DESC LIMIT 1 OFFSET ?), 0) "
+                "ORDER BY rowid", (node, node, HUB - 1)).fetchall()
+        return kept
+
+    def latest_into(self, held: list[str]) -> list[tuple[int, str]]:
+        """The latest `HUB` edges into any of these nodes, newest event first; among one
+        event's, the nodes' in order and each node's as written, as the table gives them."""
+        every = [e for n in sorted(set(held)) for e in self.edges_into(n)]
+        every.sort(key=lambda e: e[0], reverse=True)
+        return every[:HUB]
 
     def _event(self, node: str) -> tuple[str, int, str]:
         got = self._events.get(node)
@@ -2776,6 +2817,15 @@ def asked(text: str) -> bool:
 class _Asked:
     def __init__(self, text: str) -> None:
         self.text = text
+
+
+def trimmed(kept: list[tuple[int, str]]) -> int:
+    """Where the edges worth keeping begin: the latest `HUB`, and the rest of the event the
+    earliest of them is in, so which of its edges a read takes never depends on the cut."""
+    at = len(kept) - HUB
+    while at > 0 and kept[at - 1][0] == kept[at][0]:
+        at -= 1
+    return at
 
 
 def said_in(answer: str, question: str) -> bool:

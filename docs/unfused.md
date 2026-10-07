@@ -205,19 +205,15 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
         only front-loads what counting reaches anyway.
      d. Schemas with roles, minted where a pattern recurs and pays (OPEN FORKS, meta
         layers): the units the next layer builds on.
-     e. NEXT. How much a vector holds (John's, 2026-10-07): summed vectors washed out
-        because a vector holds a bounded number of things (about its width over the
-        log of what it must tell apart; Plate, Kanerva) and a word's sum held
-        hundreds (`eda1b2a6`). Before building more into the system, an experiment
-        apart from it, on the saved stream graph: each word's experience encoded
-        three ways, summed (as now), bound (role bound to filler and added, read back
-        by unbinding, as vector symbolic architectures store structure in one
-        hearing), and learnt by prediction (a skip-gram's word and context tables),
-        each scored by how well a word and a role give back the words it was heard
-        with, against facts held and width. The aim is an encoding that learns as
-        fast as hearing, read back exactly by the graph as its clean-up memory: the
-        exact store answers until the vectors answer better (John's, the fast and
-        slow memories of item 7).
+     e. ~~How much a vector holds~~ (John's, 2026-10-07). Struck 2026-10-07
+        (`scripts/capacity.py`): bound vectors hold a word's experience exactly up to
+        tens of facts at 1,024 wide, summed never, learnt only a hub's; and no likeness
+        of words, the exact counts' own included, predicts a pairing not yet heard
+        better than the role's commonest fillers. The exact store stays the store.
+     f. NEXT, John's to choose: the slow memory's unit is not the word. A predictor
+        that conditions on the whole situation (the event and what is in mind), as the
+        transformer control does, learnt by replay at each story's end (item c's
+        teacher). Its read is the cloze, against the control's 0.271 at 500 stories.
      Refuted if, with all of it, the cloze still reads no higher at 1,000-3,000 than
      at 300-1,000.
   Then John's two nearest goals (2026-10-04): a conversation with the system (the

@@ -94,7 +94,13 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
      (John's, 2026-10-06: fast iteration first): `paths`, then teaching; the
      refuted factors stripped from `scripts/weights.py`; independent arms run in
      parallel processes. Read at 1,000; 3,000 only where growth with stories is the
-     question.
+     question. Done by agents in their own worktrees (John's, 2026-10-06), one PR a
+     fix, each held to every answer the same, while the core work goes on: `paths`,
+     the gitignored caches found by a setting rather than linked into worktrees,
+     teaching; then parallelism; then rounds of review (duplication into shared
+     helpers, vacuous tests, dead code from refuted arms, names); and once a piece
+     stops changing, its hot kernel moved to native code (the graph store, the
+     walks).
   3. ~~A check that more than one telling answers accepts every answer they support~~.
      Struck 2026-10-04 (`_answers` in `exam/stories.py`).
   4. Harder checks, one at a time and each measured alone. Done: further from their

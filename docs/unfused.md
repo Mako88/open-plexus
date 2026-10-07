@@ -180,10 +180,14 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
      a. Situations (`c1988b38`, John's): each word's meaning is the contexts it was
         heard in, folded over the stream at several rates and at the story's end, as
         event sourcing projects a stream; vectors of the system's own, fixed by name
-        and spelling, bound to their links, read centred. As focus's factors: no lift
-        at 1,000 (`014523Z`); the 3,000 reading decides. If it earns, the situational
-        match becomes focus's main score, a joint fit of everything at once, rather
-        than one more factor.
+        and spelling, bound to their links, read centred. At 3,000 (`situations-
+        buckets-*`) they are the first part whose worth grows with stories (the slow
+        folds alone 0.094, 0.151, 0.191 by bucket) but beside recency, fit and mark
+        they add nothing yet (0.482 without, at most 0.486 with): they still mostly
+        know what fit knows, and alone stay under it (0.23 against 0.37). Kept as the
+        substrate; nothing reads them. If one day they earn, the situational match
+        becomes focus's main score, a joint fit of everything at once, rather than
+        one more factor.
      b. Scales set by their worth (John's): folds added, removed and moved at a
         story's end by what each adds to prediction.
      c. Consolidation at each story's end, predict then learn from the error (John's,
@@ -193,7 +197,12 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
         (Baroni et al. 2014); a local rule, no gradient. Its earlier form, learning
         focus's factor weights from the guesses, was refuted (the commit that deletes
         them). The error is also Phase 6's surprise and where event segmentation
-        puts a boundary.
+        puts a boundary. Built over the situations as Rescorla and Wagner's rule
+        (`2a9b18a5`) and refuted at 3,000 (the commit that deletes it): it learns the
+        folds sooner (the slowest 0.170 at 300-1,000 against counting's 0.151) but no
+        further (0.193 against 0.191 at 1,000-3,000), and all scales together end
+        lower. Prediction as the teacher stays the idea; this rule over these vectors
+        only front-loads what counting reaches anyway.
      d. Schemas with roles, minted where a pattern recurs and pays (OPEN FORKS, meta
         layers): the units the next layer builds on.
      Refuted if, with all of it, the cloze still reads no higher at 1,000-3,000 than

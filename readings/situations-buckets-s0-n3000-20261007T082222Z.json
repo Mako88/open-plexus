@@ -1,0 +1,148 @@
+{
+ "kind": "situations-buckets",
+ "taken_at": "20261007T082222Z",
+ "note": "Consolidation (2a9b18a5: the folds replayed at each story's end, each word predicted among the story's words and every meaning moved by its error, CONSOLIDATE 1, the story's end not replayed) against counting (CONSOLIDATE 0), both through one instrument (every question answered by focus's own pick after its recall; schemas and echo not computed), from state/weights-records-s0-n3000-c0.json and -c1.json (weights-s0-n3000-20261007T082220Z and 082222Z). Each factor's share of clozes it ranks right alone, by stories heard (0-300, 300-1,000, 1,000-3,000), and beside recency, fit and mark fitted on 300-1,000 and read on 1,000-3,000. Counting reproduces 052143Z exactly.",
+ "clozes": {
+  "0-300": 298,
+  "300-1000": 695,
+  "1000-3000": 1988
+ },
+ "counting": {
+  "alone": {
+   "sentence": [
+    0.161,
+    0.134,
+    0.124
+   ],
+   "fold0.5": [
+    0.138,
+    0.145,
+    0.152
+   ],
+   "fold0.8": [
+    0.128,
+    0.155,
+    0.195
+   ],
+   "fold0.95": [
+    0.094,
+    0.151,
+    0.191
+   ],
+   "story": [
+    0.158,
+    0.213,
+    0.217
+   ],
+   "situation": [
+    0.164,
+    0.196,
+    0.227
+   ],
+   "fit": [
+    0.315,
+    0.361,
+    0.369
+   ],
+   "recency": [
+    0.312,
+    0.299,
+    0.302
+   ]
+  },
+  "beside": {
+   "without": [
+    0.486,
+    0.482
+   ],
+   "sentence": [
+    0.492,
+    0.486
+   ],
+   "fold0.5": [
+    0.494,
+    0.484
+   ],
+   "fold0.8": [
+    0.498,
+    0.482
+   ],
+   "fold0.95": [
+    0.499,
+    0.484
+   ],
+   "story": [
+    0.492,
+    0.479
+   ],
+   "situation": [
+    0.496,
+    0.478
+   ]
+  }
+ },
+ "consolidation": {
+  "alone": {
+   "sentence": [
+    0.148,
+    0.15,
+    0.14
+   ],
+   "fold0.5": [
+    0.138,
+    0.155,
+    0.152
+   ],
+   "fold0.8": [
+    0.134,
+    0.16,
+    0.192
+   ],
+   "fold0.95": [
+    0.101,
+    0.17,
+    0.193
+   ],
+   "story": [
+    0.158,
+    0.213,
+    0.217
+   ],
+   "situation": [
+    0.161,
+    0.193,
+    0.212
+   ]
+  },
+  "beside": {
+   "without": [
+    0.486,
+    0.482
+   ],
+   "sentence": [
+    0.489,
+    0.484
+   ],
+   "fold0.5": [
+    0.491,
+    0.481
+   ],
+   "fold0.8": [
+    0.494,
+    0.485
+   ],
+   "fold0.95": [
+    0.494,
+    0.483
+   ],
+   "story": [
+    0.492,
+    0.479
+   ],
+   "situation": [
+    0.492,
+    0.483
+   ]
+  }
+ }
+}

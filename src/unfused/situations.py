@@ -21,6 +21,14 @@ other, and read raw every word's nearest is 'fun' or 'happy'. A meaning is read 
 mean context less the mean of every context heard, so what is left is what is the
 word's own.
 
+Counted, a meaning only grows, and grows slowly (THE ORDER, item 7c). So at a story's end
+the story is replayed: each word heard is predicted from the context it was heard in,
+among the words the story named, and every meaning is moved by its error, the word heard
+towards that context by how far short its prediction fell, each other word away by how
+far it was predicted (Rescorla and Wagner's rule; meanings shaped by prediction beat
+counted ones, Baroni et al. 2014). A local rule over one layer: nothing is trained
+through anything else. A story predicted well teaches little.
+
 The scales are kept apart and read apart, so what each is worth can be weighed; which
 scales there are is set by what they are worth (to come). Nothing here is trained by
 gradient: hearing is addition."""
@@ -41,6 +49,12 @@ DIM = 1024
 RATES = (0.0, 0.5, 0.8, 0.95)
 # the share of a word's own vector its spelling's trigrams hold
 SPELLING = 0.5
+# how far a story's replay moves each meaning by its error, in hearings: at 1 a word
+# wholly unexpected moves as far as hearing it once more did, so a meaning settles as
+# hearings accumulate, as a rate of one over its hearings would; 0 replays nothing
+CONSOLIDATE = 1.0
+# how sharply a replay's prediction picks among the story's words (cosines, softmax)
+SHARPNESS = 0.1
 # where the sum of every context heard is kept, beside the labels' own
 EVERY = "\x00every"
 
@@ -94,6 +108,8 @@ class Situations:
         self._counts: dict[str, int] = {}
         self._dirty: set[str] = set()
         self._episode: Counter = Counter()
+        # each word heard this story with the contexts it was heard in, for its replay
+        self._told: list[tuple[str, list[np.ndarray]]] = []
 
     def meaning(self, label: str) -> np.ndarray:
         got = self._meanings.get(label)
@@ -122,9 +138,11 @@ class Situations:
         whole = np.sum(parts, axis=0)
         for i, (_, label) in enumerate(args):
             m = self.meaning(label)
-            m[0] += _unit(whole - parts[i])
-            for k in range(1, len(RATES)):
-                m[k] += _unit(self.contexts[k])
+            heard_in = [_unit(whole - parts[i])] + [_unit(self.contexts[k])
+                                                    for k in range(1, len(RATES))]
+            for k, c in enumerate(heard_in):
+                m[k] += c
+            self._told.append((label, heard_in))
             self._counts[label] += 1
             self._dirty.add(label)
             self._episode[label] += 1
@@ -145,9 +163,42 @@ class Situations:
         for label, n in self._episode.items():
             self.meaning(label)[-1] += n * gist
             self.meaning(EVERY)[-1] += n * gist
+        if CONSOLIDATE:
+            self.replay()
+        self._told.clear()
         self._episode.clear()
         self.contexts[:] = 0
         self.save()
+
+    def replay(self) -> None:
+        """The story replayed: each word heard predicted, at each scale it was heard in,
+        among the words the story named, from the context it was heard in, and each
+        meaning moved by its error. Not the story's end: every word of a story was heard
+        in that one context, so it cannot say which of them was heard, and replayed it
+        only moved the story's words against one another (063405Z). The predictions are
+        read from the meanings as the story left them, so the order of the replay changes
+        nothing."""
+        labels = sorted({label for label, _ in self._told})
+        if len(labels) < 2:
+            return
+        at = {label: i for i, label in enumerate(labels)}
+        mean = self.meaning(EVERY) / max(1, self._counts[EVERY])
+        heard = [max(1, self._counts[label]) for label in labels]
+        for k in range(len(RATES)):
+            known = np.stack([_unit(self.meaning(label)[k] / n - mean[k])
+                              for label, n in zip(labels, heard)])
+            moved = np.zeros_like(known)
+            for label, heard_in in self._told:
+                c = _unit(heard_in[k] - mean[k])
+                said = known @ c / SHARPNESS
+                guess = np.exp(said - said.max())
+                guess /= guess.sum()
+                error = -guess
+                error[at[label]] += 1
+                moved += np.outer(error, c)
+            for label, step in zip(labels, moved):
+                self.meaning(label)[k] += CONSOLIDATE * step
+                self._dirty.add(label)
 
     def fit(self, labels: list[str], args: list[tuple[str, str]],
             verbs: list[str]) -> dict[str, list[float]]:

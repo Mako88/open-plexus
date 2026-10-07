@@ -26,7 +26,7 @@ from unfused.home import home
 DATA = home() / "data" / "tinystories"
 # each story as made, kept by its text and how it is made: bump on any change to `make`
 CACHE = home() / "state" / "stories.sqlite"
-MADE = "stories-7"
+MADE = "stories-8"
 VALID = DATA / "TinyStories-valid.txt"
 URL = "https://huggingface.co/datasets/roneneldan/TinyStories/resolve/main/TinyStories-valid.txt"
 
@@ -47,7 +47,8 @@ class Check:
     answer: str
     answers: tuple[str, ...]
     earlier: list[str]  # the story's nouns told before it is asked
-    # 'check' a few sentences on; 'far' once the story is told, FAR or more sentences on
+    # 'check' a few sentences on; 'far' once the story is told, FAR or more sentences on;
+    # 'joined' a few sentences on, its doer named by another thing told of them
     form: str = "check"
 
 
@@ -277,7 +278,44 @@ def _checks(text, sents, docs, held) -> list[Check]:
             continue
         used |= {j, q}
         far.append(_check(q, t, what, len(sents), "far", tellings, docs))
-    return sorted(out + far, key=lambda c: c.at)
+    return sorted(out + far + _joined(sents, docs, found, tellings), key=lambda c: c.at)
+
+
+def _joined(sents, docs, found, tellings) -> list[Check]:
+    """Up to CHECKS questions that need two told facts (THE ORDER, harder checks): one
+    told sentence's question about a named doer, the doer named instead by what another
+    told sentence says they did. After 'Lily found a shell' and 'Lily saw a crab', 'What
+    did the one who found a shell see?' is answered by finding who found the shell, then
+    what they saw. The describing sentence comes first and picks out one doer alone; the
+    question is asked GAP sentences after the later of the two."""
+    clauses = {}
+    for _, j, q, t, what in found:
+        if what[0] == "who" and t.pos_ == "PROPN":
+            clauses.setdefault(j, []).append((q[len("Who "):-1], t.text, what))
+    out, used = [], set()
+    for _, j, q, t, what in sorted(found):
+        if what[0] not in ("dobj", "where") or len(out) == CHECKS or j in used:
+            continue
+        doer = what[2][0]
+        for k in sorted(clauses):
+            if k >= j:
+                break
+            for clause, name, describes in clauses[k]:
+                # the description is of this doer, of no one else the story has told, and
+                # does not hold the answer
+                doers = {u.text.lower() for i, u, told in tellings
+                         if i < j and _answers(describes, told)}
+                if (name.lower() != doer or doers != {doer} or t.text.lower() in
+                        clause.lower() or f" did {name} " not in q):
+                    continue
+                asked = q.replace(f" did {name} ", f" did the one who {clause} ", 1)
+                out.append(_check(asked, t, what, min(j + 1 + GAP, len(sents)), "joined",
+                                  tellings, docs))
+                used.add(j)
+                break
+            if j in used:
+                break
+    return out
 
 
 def _check(q, t, what, at, form, tellings, docs) -> Check:

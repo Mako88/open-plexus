@@ -27,6 +27,7 @@ from collections import Counter, deque
 from pathlib import Path
 
 from unfused.kinds import kinds
+from unfused.situations import Situations
 
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS events (id INTEGER PRIMARY KEY, turn INTEGER NOT NULL,
@@ -508,6 +509,8 @@ class GraphArm:
             self.db.executemany(f"INSERT OR IGNORE INTO {table} VALUES (?, ?, ?, ?)",
                                 [tuple(x) for x in rows])
         self.db.commit()
+        # what was being heard when each word was heard, folded over the stream
+        self.situations = Situations(self.db)
         self.model = model
         self.cache = cache
         self.last_notes: list[str] = []
@@ -619,6 +622,7 @@ class GraphArm:
         # heard after it is another episode
         if not any(ch.isalnum() for ch in text):
             self.db.execute("INSERT OR IGNORE INTO boundaries VALUES (?)", (turn,))
+            self.situations.ended()
             self.db.commit()
             self.recalled = []
             # a name's steps are its individuals in mind, and a new episode has none
@@ -659,6 +663,8 @@ class GraphArm:
         # the words of what this sentence touched: a name or a description holding none
         # of them stands for what it stood for before
         touched: set[str] = set()
+        # the sentence's arguments by the links they hang by, for the situations
+        heard: list[tuple[str, str]] = []
         for ev in events:
             cur = self.db.execute("INSERT INTO events (turn, lemma, heard, mood) VALUES "
                                   "(?, ?, ?, ?)", (turn, ev["lemma"], text, ev["mood"]))
@@ -672,6 +678,8 @@ class GraphArm:
                 self.db.execute("INSERT INTO edges VALUES (?, ?, ?)", (eid, label, node))
                 if node[:2] in ("i:", "n:"):
                     name = self.label(node)
+                    if name:
+                        heard.append((label, name))
                     self.db.execute("INSERT INTO filled VALUES (?, ?, ?, 1) ON CONFLICT(name, "
                                     "lemma, link) DO UPDATE SET n = n + 1",
                                     (name, ev["lemma"], label))
@@ -684,6 +692,7 @@ class GraphArm:
                     self._steps.pop(f"n:{name}", None)
                     self._marks.pop(name, None)
                     touched.update(name.split())
+        self.situations.heard(heard, [ev["lemma"] for ev in events])
         if self._latest is not None:
             for ev, eid in zip(events, ids):
                 if not ev["mood"] and (got := self.args(eid)):
@@ -2679,6 +2688,8 @@ class GraphArm:
                 .fetchone()[0], "parsed": self.parsed}
 
     def close(self) -> None:
+        self.situations.save()
+        self.db.commit()
         self.db.close()
         if hasattr(self, "_cdb"):
             self._cdb.close()

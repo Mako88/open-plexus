@@ -199,15 +199,59 @@ class Recorded(runner.Graphed):
         return said
 
 
-def accuracy(records: list[dict], weights) -> float:
+_STACKED: dict = {}
+
+
+def stacked(records: list[dict]):
+    """The records' candidates as arrays, built once: each factor's log (read with
+    `math.log`, as the sum was), a row a record, padded with candidates that never win."""
+    import numpy as np
+    kept = _STACKED.get(id(records))
+    if kept is not None and kept[0] is records and kept[1] == len(records):
+        return kept[2]
+    width = max((len(r["candidates"]) for r in records), default=0)
+    depth = max((len(c[0]) for r in records for c in r["candidates"]), default=0)
+    logs = np.zeros((depth, len(records), width))
+    real = np.zeros((len(records), width), dtype=bool)
+    right_ = np.zeros((len(records), width), dtype=np.int64)
+    for i, r in enumerate(records):
+        for j, (f, ok) in enumerate(r["candidates"]):
+            real[i, j] = True
+            right_[i, j] = ok
+            for k, x in enumerate(f):
+                logs[k, i, j] = math.log(x)
+    _STACKED[id(records)] = (records, len(records), (logs, real, right_))
+    return logs, real, right_
+
+
+def accuracies(records: list[dict], sweep) -> list[float]:
+    """`accuracy` at each of many weights at once. Each candidate's score is summed one
+    factor at a time in the order `accuracy` sums them, a factor at weight 0 left out, so
+    every score is the float it was; the first best candidate of a record wins a tie."""
+    import numpy as np
+    sweep = list(sweep)
     if not records:
-        return 0.0
-    hit = 0
-    for r in records:
-        best = max(r["candidates"], key=lambda c: sum(
-            w * math.log(f) for w, f in zip(weights, c[0]) if w))
-        hit += best[1]
-    return hit / len(records)
+        return [0.0] * len(sweep)
+    logs, real, right_ = stacked(records)
+    out: list[float] = []
+    for at in range(0, len(sweep), 64):
+        group = sweep[at:at + 64]
+        score = np.zeros((len(group), *real.shape))
+        for k in range(logs.shape[0]):
+            w = np.array([ws[k] if k < len(ws) else 0.0 for ws in group])
+            used = w != 0
+            if used.any():
+                score[used] += w[used, None, None] * logs[k]
+        score[:, ~real] = -np.inf
+        best = score.argmax(axis=2)
+        hit = np.take_along_axis(np.broadcast_to(right_, score.shape), best[..., None],
+                                 axis=2)[..., 0].sum(axis=1)
+        out += [int(h) / len(records) for h in hit]
+    return out
+
+
+def accuracy(records: list[dict], weights) -> float:
+    return accuracies(records, [weights])[0]
 
 
 def main() -> int:
@@ -237,12 +281,12 @@ def main() -> int:
         reachable = [sum(any(c[1] for c in r["candidates"]) for r in x) / len(x) if x
                      else None for x in (fit_on, read_on)]
         # schemas are refuted at any weight (e7d53f7c), so they are held at 0 here
-        swept = sorted(((accuracy(fit_on, w), w) for w in
-                        ((r, f, m, 0.0, e) for r, f, m, e in itertools.product(GRID, repeat=4))
-                        if any(w)), reverse=True)
-        without = max(((accuracy(fit_on, w), w) for w in
-                       ((r, f, m, 0.0, 0.0) for r, f, m in itertools.product(GRID, repeat=3))
-                       if any(w)), default=None)
+        grid = [w for w in ((r, f, m, 0.0, e) for r, f, m, e in
+                            itertools.product(GRID, repeat=4)) if any(w)]
+        swept = sorted(zip(accuracies(fit_on, grid), grid), reverse=True)
+        grid = [w for w in ((r, f, m, 0.0, 0.0) for r, f, m in
+                            itertools.product(GRID, repeat=3)) if any(w)]
+        without = max(zip(accuracies(fit_on, grid), grid), default=None)
         best = swept[0][1] if swept else None
         reading["forms"][form] = {
             "n": [len(fit_on), len(read_on)],

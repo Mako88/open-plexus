@@ -27,9 +27,9 @@ import argparse
 import json
 import re
 from collections import defaultdict
-from datetime import UTC, datetime
 from pathlib import Path
 
+from unfused.reading import utc_stamp
 from unfused.exam.world import _OBJECT_SYNONYMS, _ROOM_SYNONYMS, generate_house
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -103,7 +103,7 @@ def main() -> None:
         for k, row in r["by_hearing"].items():
             print(f"  hearing {k}: {row}")
         out.append(r)
-    taken = datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")
+    taken = utc_stamp()
     path = ROOT / "readings" / f"context-{taken}.json"
     path.write_text(json.dumps({
         "kind": "context", "taken_at": taken, "note": args.note,

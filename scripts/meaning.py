@@ -19,11 +19,12 @@ import argparse
 import hashlib
 import json
 from collections import Counter, defaultdict
-from datetime import UTC, datetime
 from itertools import combinations
 from pathlib import Path
 
 import numpy as np
+
+from unfused.reading import utc_stamp
 
 ROOT = Path(__file__).resolve().parents[1]
 SLOTS = ("subject", "object", "place", "quantity")
@@ -135,7 +136,7 @@ def main() -> None:
                          "kinds": len(set(kinds.values())), "auc": scores})
         print(source, len(kinds), "wordings", scores)
 
-    taken = datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")
+    taken = utc_stamp()
     out = ROOT / "readings" / f"meaning-{taken}.json"
     out.write_text(json.dumps({
         "kind": "meaning", "taken_at": taken, "note": args.note,

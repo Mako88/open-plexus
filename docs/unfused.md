@@ -205,6 +205,19 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
         only front-loads what counting reaches anyway.
      d. Schemas with roles, minted where a pattern recurs and pays (OPEN FORKS, meta
         layers): the units the next layer builds on.
+     e. NEXT. How much a vector holds (John's, 2026-10-07): summed vectors washed out
+        because a vector holds a bounded number of things (about its width over the
+        log of what it must tell apart; Plate, Kanerva) and a word's sum held
+        hundreds (`eda1b2a6`). Before building more into the system, an experiment
+        apart from it, on the saved stream graph: each word's experience encoded
+        three ways, summed (as now), bound (role bound to filler and added, read back
+        by unbinding, as vector symbolic architectures store structure in one
+        hearing), and learnt by prediction (a skip-gram's word and context tables),
+        each scored by how well a word and a role give back the words it was heard
+        with, against facts held and width. The aim is an encoding that learns as
+        fast as hearing, read back exactly by the graph as its clean-up memory: the
+        exact store answers until the vectors answer better (John's, the fast and
+        slow memories of item 7).
      Refuted if, with all of it, the cloze still reads no higher at 1,000-3,000 than
      at 300-1,000.
   Then John's two nearest goals (2026-10-04): a conversation with the system (the
@@ -839,7 +852,11 @@ the store merges by id. Kill a third of the nodes mid-exam.
   representation that cannot be converted exactly (one parser's relations to another's)
   is read again from it; a vector space can be, by a map fitted on texts both versions
   encoded (orthogonal Procrustes), trusted once its error on held-out texts is read.
-  First: `graph.py` split along reading, storage, individuals and answering.
+  First: `graph.py` split along reading, storage, individuals and answering. John's
+  (2026-10-07): by single responsibility, each job a class of its own with a narrow
+  interface that `GraphArm` holds (composition, not mixins over one shared state),
+  one pure move a PR with every answer the same; a job that is one large
+  responsibility may stay whole. Parsing and storage first.
 - **Concurrent walks, and sessions.** John's, 2026-10-04. Every walk has an id and
   runs on its own: a question's answers now, and a prediction's (THE ORDER, item 7)
   runs beside it, as a brain predicts while it perceives, never in the answer's path.

@@ -21,9 +21,11 @@ from collections import Counter
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
 
-DATA = Path(__file__).resolve().parents[3] / "data" / "tinystories"
+from unfused.home import home
+
+DATA = home() / "data" / "tinystories"
 # each story as made, kept by its text and how it is made: bump on any change to `make`
-CACHE = Path(__file__).resolve().parents[3] / "state" / "stories.sqlite"
+CACHE = home() / "state" / "stories.sqlite"
 MADE = "stories-7"
 VALID = DATA / "TinyStories-valid.txt"
 URL = "https://huggingface.co/datasets/roneneldan/TinyStories/resolve/main/TinyStories-valid.txt"

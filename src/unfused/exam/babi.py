@@ -13,9 +13,11 @@ import hashlib
 import json
 from pathlib import Path
 
+from unfused.home import home
+
 from .world import House, Question, modal_answers  # noqa: F401
 
-DATA = Path(__file__).resolve().parents[3] / "data" / "babi"
+DATA = home() / "data" / "babi"
 
 TASKS = {
     1: "single supporting fact", 2: "two supporting facts", 3: "three supporting facts",

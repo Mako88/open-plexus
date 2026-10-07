@@ -26,6 +26,7 @@ import sqlite3
 from collections import Counter, deque
 from pathlib import Path
 
+from unfused.home import home
 from unfused.kinds import kinds
 from unfused.situations import Situations
 
@@ -73,12 +74,12 @@ CARRIED = ("learnt", "positions")
 
 # every extraction kept across runs: the parser is deterministic, and the version is in
 # the key so a change to what is extracted re-reads every sentence
-CACHE = Path(__file__).resolve().parents[2] / "state" / "parses.sqlite"
+CACHE = home() / "state" / "parses.sqlite"
 VERSION = "graph-14"
 # every text MiniLM has encoded, by its text
-VECTORS = Path(__file__).resolve().parents[2] / "state" / "vectors.sqlite"
+VECTORS = home() / "state" / "vectors.sqlite"
 # every text the parser has read, as its reading, by model and text
-DOCS = Path(__file__).resolve().parents[2] / "state" / "docs.sqlite"
+DOCS = home() / "state" / "docs.sqlite"
 
 # a clause's links that are not arguments, as Universal Dependencies names them: each is
 # kept as a link to a function word's node, which walks skip
@@ -100,7 +101,7 @@ PACKAGES = {"stanza": "default", "stanza-accurate": "default_accurate"}
 # how many texts the parser reads in one batch: 256 stalled for over fifteen minutes on a
 # card a game was sharing, its memory full
 BATCH = 64
-STANZA = Path(__file__).resolve().parents[2] / "state" / "stanza"
+STANZA = home() / "state" / "stanza"
 
 _NLP: dict = {}
 # texts read this run, and the open store of readings

@@ -1,0 +1,4523 @@
+{
+ "kind": "small-lm",
+ "taken_at": "20261007T001500Z",
+ "note": "The same small transformer trained on every story of the validation split outside the 1,000-story stream (about 21,000, some forty times what the system had heard), scored on the same clozes of stories 500-999. Fork: if it rises well above the system, experience is what the cloze rewards and a generalising memory fed more text is the lever; if it stays near, more text alone does not buy it. Look for how far it moves from the 500-story model's 0.271.",
+ "stream": {
+  "source": "TinyStories-valid",
+  "seed": 0,
+  "stories": 1000,
+  "fingerprint": "170ca1ce96cf",
+  "tested": "500-1000"
+ },
+ "train": "outside",
+ "trained_on": 20956,
+ "model": {
+  "layers": 4,
+  "width": 256,
+  "heads": 4,
+  "context": 256,
+  "dropout": 0.2,
+  "rare": 2,
+  "vocab": 9124,
+  "words": 4258540,
+  "held_out_loss": 2.4142163038253783,
+  "epochs": 25
+ },
+ "score": 0.655310621242485,
+ "n": 499,
+ "in_pool": 1.0,
+ "seconds": 2229.3,
+ "rows": [
+  {
+   "story": 500,
+   "question": "I had fun waiting for what with you?",
+   "answer": "pigeons",
+   "said": "day",
+   "correct": false,
+   "pool": 13,
+   "in_pool": true
+  },
+  {
+   "story": 501,
+   "question": "She had found the perfect thing to make what come true?",
+   "answer": "dream",
+   "said": "dream",
+   "correct": true,
+   "pool": 17,
+   "in_pool": true
+  },
+  {
+   "story": 502,
+   "question": "After the meal, the children said goodbye to who?",
+   "answer": "waitress",
+   "said": "safari",
+   "correct": false,
+   "pool": 18,
+   "in_pool": true
+  },
+  {
+   "story": 503,
+   "question": "And who lived happily ever after?",
+   "answer": "max",
+   "said": "max",
+   "correct": true,
+   "pool": 15,
+   "in_pool": true
+  },
+  {
+   "story": 504,
+   "question": "They play with what?",
+   "answer": "toys",
+   "said": "mom",
+   "correct": false,
+   "pool": 23,
+   "in_pool": true
+  },
+  {
+   "story": 505,
+   "question": "He thanked what for his help and they both flew off, ready for their next adventure?",
+   "answer": "bee",
+   "said": "pigeon",
+   "correct": false,
+   "pool": 12,
+   "in_pool": true
+  },
+  {
+   "story": 506,
+   "question": "When they got home, they were so glad because they knew they could get back to what soon?",
+   "answer": "market",
+   "said": "car",
+   "correct": false,
+   "pool": 17,
+   "in_pool": true
+  },
+  {
+   "story": 507,
+   "question": "So the two friends put the marble in Bob's pocket and ran home, looking forward to what?",
+   "answer": "game",
+   "said": "day",
+   "correct": false,
+   "pool": 13,
+   "in_pool": true
+  },
+  {
+   "story": 508,
+   "question": "All the animals in the meadow asked him why he was so scared, and Lambikins told them what?",
+   "answer": "story",
+   "said": "story",
+   "correct": true,
+   "pool": 25,
+   "in_pool": true
+  },
+  {
+   "story": 509,
+   "question": "And that is the story of how Daisy learned about what?",
+   "answer": "law",
+   "said": "law",
+   "correct": true,
+   "pool": 14,
+   "in_pool": true
+  },
+  {
+   "story": 510,
+   "question": "The skeleton saw a lot of amazing things during what?",
+   "answer": "drive",
+   "said": "car",
+   "correct": false,
+   "pool": 14,
+   "in_pool": true
+  },
+  {
+   "story": 511,
+   "question": "She wished she never prepared what?",
+   "answer": "mop",
+   "said": "mop",
+   "correct": true,
+   "pool": 25,
+   "in_pool": true
+  },
+  {
+   "story": 512,
+   "question": "He wished he had never painted on what?",
+   "answer": "wall",
+   "said": "wall",
+   "correct": true,
+   "pool": 10,
+   "in_pool": true
+  },
+  {
+   "story": 513,
+   "question": "She loved her flute and who?",
+   "answer": "mom",
+   "said": "flute",
+   "correct": false,
+   "pool": 25,
+   "in_pool": true
+  },
+  {
+   "story": 514,
+   "question": "From that day on, Daisy never played with who again?",
+   "answer": "benny",
+   "said": "daisy",
+   "correct": false,
+   "pool": 16,
+   "in_pool": true
+  },
+  {
+   "story": 515,
+   "question": "From that day onwards what were much happier?",
+   "answer": "woods",
+   "said": "mole",
+   "correct": false,
+   "pool": 8,
+   "in_pool": true
+  },
+  {
+   "story": 516,
+   "question": "They hope what will be nicer next time?",
+   "answer": "bird",
+   "said": "bird",
+   "correct": true,
+   "pool": 16,
+   "in_pool": true
+  },
+  {
+   "story": 517,
+   "question": "Be respectful and share with who?",
+   "answer": "friends",
+   "said": "doll",
+   "correct": false,
+   "pool": 22,
+   "in_pool": true
+  },
+  {
+   "story": 518,
+   "question": "Although she was sad to go, she knew she would come back to what one day?",
+   "answer": "kingdom",
+   "said": "attic",
+   "correct": false,
+   "pool": 11,
+   "in_pool": true
+  },
+  {
+   "story": 519,
+   "question": "He marched all the way home, eating what and feeling satisfied?",
+   "answer": "melon",
+   "said": "melon",
+   "correct": true,
+   "pool": 8,
+   "in_pool": true
+  },
+  {
+   "story": 520,
+   "question": "No matter how strong you think you are, it's always important to be careful with what that is special to you?",
+   "answer": "stuff",
+   "said": "one",
+   "correct": false,
+   "pool": 12,
+   "in_pool": true
+  },
+  {
+   "story": 521,
+   "question": "The people were happy and forgave who?",
+   "answer": "sara",
+   "said": "sara",
+   "correct": true,
+   "pool": 13,
+   "in_pool": true
+  },
+  {
+   "story": 522,
+   "question": "He was already thinking about what he and who could do tomorrow?",
+   "answer": "mama",
+   "said": "mama",
+   "correct": true,
+   "pool": 20,
+   "in_pool": true
+  },
+  {
+   "story": 523,
+   "question": "When it was time for who to go, she hugged the mermaid goodbye and skipped all the way home with a big smile on her face, knowing she had made a special new friend?",
+   "answer": "molly",
+   "said": "molly",
+   "correct": true,
+   "pool": 23,
+   "in_pool": true
+  },
+  {
+   "story": 524,
+   "question": "It was what ever?",
+   "answer": "day",
+   "said": "day",
+   "correct": true,
+   "pool": 13,
+   "in_pool": true
+  },
+  {
+   "story": 525,
+   "question": "What in their hearts?",
+   "answer": "kind",
+   "said": "man",
+   "correct": false,
+   "pool": 32,
+   "in_pool": true
+  },
+  {
+   "story": 526,
+   "question": "They both sat by what, enjoying the warmth and each other's company?",
+   "answer": "fireplace",
+   "said": "fireplace",
+   "correct": true,
+   "pool": 19,
+   "in_pool": true
+  },
+  {
+   "story": 527,
+   "question": "He was the happiest crab in what?",
+   "answer": "sea",
+   "said": "sea",
+   "correct": true,
+   "pool": 8,
+   "in_pool": true
+  },
+  {
+   "story": 528,
+   "question": "John felt relieved and thanked his dad for unlocking what?",
+   "answer": "surprise",
+   "said": "leak",
+   "correct": false,
+   "pool": 16,
+   "in_pool": true
+  },
+  {
+   "story": 529,
+   "question": "They forgot about what?",
+   "answer": "dreams",
+   "said": "pool",
+   "correct": false,
+   "pool": 24,
+   "in_pool": true
+  },
+  {
+   "story": 530,
+   "question": "From that day on, the girl made sure to dress in what every day?",
+   "answer": "clothes",
+   "said": "dress",
+   "correct": false,
+   "pool": 17,
+   "in_pool": true
+  },
+  {
+   "story": 531,
+   "question": "They smile with what?",
+   "answer": "eyes",
+   "said": "hand",
+   "correct": false,
+   "pool": 11,
+   "in_pool": true
+  },
+  {
+   "story": 532,
+   "question": "It was a bad ending to what?",
+   "answer": "day",
+   "said": "day",
+   "correct": true,
+   "pool": 13,
+   "in_pool": true
+  },
+  {
+   "story": 533,
+   "question": "Emma kept what safe, and she never forgot her promise to never swim alone?",
+   "answer": "medal",
+   "said": "medal",
+   "correct": true,
+   "pool": 19,
+   "in_pool": true
+  },
+  {
+   "story": 534,
+   "question": "Tim smiled when he saw what looking over at him?",
+   "answer": "mum",
+   "said": "mum",
+   "correct": true,
+   "pool": 10,
+   "in_pool": true
+  },
+  {
+   "story": 535,
+   "question": "Bill and Jane jumped up and down with joy, happy that they could now play together on the other side of what?",
+   "answer": "river",
+   "said": "bridge",
+   "correct": false,
+   "pool": 22,
+   "in_pool": true
+  },
+  {
+   "story": 536,
+   "question": "They do not play in what anymore?",
+   "answer": "park",
+   "said": "park",
+   "correct": true,
+   "pool": 15,
+   "in_pool": true
+  },
+  {
+   "story": 537,
+   "question": "He was happy and was glad he was at what with his family?",
+   "answer": "park",
+   "said": "park",
+   "correct": true,
+   "pool": 17,
+   "in_pool": true
+  },
+  {
+   "story": 538,
+   "question": "She knew it would be just as beautiful, and she couldn't wait to spend more time in what?",
+   "answer": "classroom",
+   "said": "classroom",
+   "correct": true,
+   "pool": 18,
+   "in_pool": true
+  },
+  {
+   "story": 539,
+   "question": "They decide to swap what again, because they like to try new things?",
+   "answer": "toys",
+   "said": "lunch",
+   "correct": false,
+   "pool": 30,
+   "in_pool": true
+  },
+  {
+   "story": 540,
+   "question": "Together they ended what?",
+   "answer": "fight",
+   "said": "fight",
+   "correct": true,
+   "pool": 14,
+   "in_pool": true
+  },
+  {
+   "story": 541,
+   "question": "They spent the rest of their time at what happily playing together?",
+   "answer": "park",
+   "said": "park",
+   "correct": true,
+   "pool": 13,
+   "in_pool": true
+  },
+  {
+   "story": 542,
+   "question": "They think it is what ever?",
+   "answer": "lemonade",
+   "said": "spoon",
+   "correct": false,
+   "pool": 21,
+   "in_pool": true
+  },
+  {
+   "story": 543,
+   "question": "Unlucky for who, eating that mushroom had made her very sick?",
+   "answer": "nina",
+   "said": "time",
+   "correct": false,
+   "pool": 11,
+   "in_pool": true
+  },
+  {
+   "story": 544,
+   "question": "Jane was sad to leave the photo, but she knew that who would look after it?",
+   "answer": "harry",
+   "said": "jane",
+   "correct": false,
+   "pool": 9,
+   "in_pool": true
+  },
+  {
+   "story": 545,
+   "question": "From that day on, they shared what and played together every day?",
+   "answer": "bucket",
+   "said": "bucket",
+   "correct": true,
+   "pool": 10,
+   "in_pool": true
+  },
+  {
+   "story": 546,
+   "question": "From that day on, Lily always remembered to pay for what and to play outside to stay healthy?",
+   "answer": "juice",
+   "said": "mommy",
+   "correct": false,
+   "pool": 16,
+   "in_pool": true
+  },
+  {
+   "story": 547,
+   "question": "Who shouted with joy?",
+   "answer": "jack",
+   "said": "jack",
+   "correct": true,
+   "pool": 16,
+   "in_pool": true
+  },
+  {
+   "story": 548,
+   "question": "From that day forward, Ruby and what were always friends?",
+   "answer": "dolphin",
+   "said": "dolphin",
+   "correct": true,
+   "pool": 14,
+   "in_pool": true
+  },
+  {
+   "story": 549,
+   "question": "Then, she and who hugged and had a big squeeze?",
+   "answer": "dad",
+   "said": "dad",
+   "correct": true,
+   "pool": 17,
+   "in_pool": true
+  },
+  {
+   "story": 550,
+   "question": "In the end, designing what together made them even closer, and it was the start of many happy days?",
+   "answer": "hive",
+   "said": "hive",
+   "correct": true,
+   "pool": 19,
+   "in_pool": true
+  },
+  {
+   "story": 551,
+   "question": "Lily wore what every day and felt happy and confident in it?",
+   "answer": "costume",
+   "said": "costume",
+   "correct": true,
+   "pool": 16,
+   "in_pool": true
+  },
+  {
+   "story": 552,
+   "question": "What was enormous, and he had no idea where it would end - and he was very excited to find out?",
+   "answer": "path",
+   "said": "turtle",
+   "correct": false,
+   "pool": 10,
+   "in_pool": true
+  },
+  {
+   "story": 553,
+   "question": "What flew up?",
+   "answer": "stone",
+   "said": "stone",
+   "correct": true,
+   "pool": 5,
+   "in_pool": true
+  },
+  {
+   "story": 554,
+   "question": "That night, he tucked what under his arm and sang to himself until he felt better?",
+   "answer": "plane",
+   "said": "car",
+   "correct": false,
+   "pool": 8,
+   "in_pool": true
+  },
+  {
+   "story": 555,
+   "question": "He was so happy to have found who bear that he quickly fell asleep?",
+   "answer": "teddy",
+   "said": "teddy",
+   "correct": true,
+   "pool": 10,
+   "in_pool": true
+  },
+  {
+   "story": 556,
+   "question": "And that made what a better place to live?",
+   "answer": "town",
+   "said": "town",
+   "correct": true,
+   "pool": 11,
+   "in_pool": true
+  },
+  {
+   "story": 557,
+   "question": "Lily was happy to share her favorite doll with who?",
+   "answer": "friend",
+   "said": "doll",
+   "correct": false,
+   "pool": 11,
+   "in_pool": true
+  },
+  {
+   "story": 558,
+   "question": "From that day on, the oyster and its friends lived happily in what?",
+   "answer": "sea",
+   "said": "sea",
+   "correct": true,
+   "pool": 9,
+   "in_pool": true
+  },
+  {
+   "story": 559,
+   "question": "The knight looked sadly at what and wished he would have kept it safe at home and not taken it with him on this journey?",
+   "answer": "sword",
+   "said": "sword",
+   "correct": true,
+   "pool": 14,
+   "in_pool": true
+  },
+  {
+   "story": 560,
+   "question": "After a while, what was over?",
+   "answer": "storm",
+   "said": "storm",
+   "correct": true,
+   "pool": 19,
+   "in_pool": true
+  },
+  {
+   "story": 561,
+   "question": "Who and the couple were best friends and they were very happy together?",
+   "answer": "snowy",
+   "said": "snowy",
+   "correct": true,
+   "pool": 12,
+   "in_pool": true
+  },
+  {
+   "story": 562,
+   "question": "Everyone in the class felt so happy and thankful for what that day?",
+   "answer": "help",
+   "said": "class",
+   "correct": false,
+   "pool": 12,
+   "in_pool": true
+  },
+  {
+   "story": 563,
+   "question": "What smiled and felt better after her long journey of burning?",
+   "answer": "figure",
+   "said": "figure",
+   "correct": true,
+   "pool": 9,
+   "in_pool": true
+  },
+  {
+   "story": 564,
+   "question": "They decide to play with what?",
+   "answer": "machines",
+   "said": "train",
+   "correct": false,
+   "pool": 22,
+   "in_pool": true
+  },
+  {
+   "story": 565,
+   "question": "The woman was glad that she invited who over?",
+   "answer": "friend",
+   "said": "friend",
+   "correct": true,
+   "pool": 6,
+   "in_pool": true
+  },
+  {
+   "story": 566,
+   "question": "The star continues to shine and make what sky beautiful?",
+   "answer": "night",
+   "said": "night",
+   "correct": true,
+   "pool": 14,
+   "in_pool": true
+  },
+  {
+   "story": 567,
+   "question": "When they arrived at what, they found a big tree with rough bark to sit under?",
+   "answer": "park",
+   "said": "park",
+   "correct": true,
+   "pool": 10,
+   "in_pool": true
+  },
+  {
+   "story": 568,
+   "question": "Leah was glad that her mom allowed her to get a closer look at what?",
+   "answer": "beehive",
+   "said": "gate",
+   "correct": false,
+   "pool": 15,
+   "in_pool": true
+  },
+  {
+   "story": 569,
+   "question": "And they learned to be more careful and respectful when they explored what?",
+   "answer": "park",
+   "said": "park",
+   "correct": true,
+   "pool": 41,
+   "in_pool": true
+  },
+  {
+   "story": 570,
+   "question": "They drank what and felt very happy?",
+   "answer": "water",
+   "said": "water",
+   "correct": true,
+   "pool": 6,
+   "in_pool": true
+  },
+  {
+   "story": 571,
+   "question": "The moral of the story is that hard work and helping others makes what a better place?",
+   "answer": "world",
+   "said": "world",
+   "correct": true,
+   "pool": 14,
+   "in_pool": true
+  },
+  {
+   "story": 572,
+   "question": "They played together in what every day?",
+   "answer": "forest",
+   "said": "forest",
+   "correct": true,
+   "pool": 11,
+   "in_pool": true
+  },
+  {
+   "story": 573,
+   "question": "So that is what who did?",
+   "answer": "jake",
+   "said": "jake",
+   "correct": true,
+   "pool": 13,
+   "in_pool": true
+  },
+  {
+   "story": 574,
+   "question": "From that day on, Lily always tried to help who whenever they needed it?",
+   "answer": "friends",
+   "said": "mom",
+   "correct": false,
+   "pool": 13,
+   "in_pool": true
+  },
+  {
+   "story": 575,
+   "question": "He kept playing with what and listening to jazz, he was very happy?",
+   "answer": "truck",
+   "said": "truck",
+   "correct": true,
+   "pool": 9,
+   "in_pool": true
+  },
+  {
+   "story": 576,
+   "question": "From that day on, who knew that if she wanted something, she had to ask nicely and be grateful when she got it?",
+   "answer": "lily",
+   "said": "lily",
+   "correct": true,
+   "pool": 10,
+   "in_pool": true
+  },
+  {
+   "story": 577,
+   "question": "And they both enjoyed what together?",
+   "answer": "dinner",
+   "said": "dinner",
+   "correct": true,
+   "pool": 12,
+   "in_pool": true
+  },
+  {
+   "story": 578,
+   "question": "Emily smiled, feeling happy and safe knowing that she had someone to who and love her?",
+   "answer": "hug",
+   "said": "hug",
+   "correct": true,
+   "pool": 13,
+   "in_pool": true
+  },
+  {
+   "story": 579,
+   "question": "Lily felt sorry that her design didn't work for who, but she knew she could try again and make something better?",
+   "answer": "mittens",
+   "said": "mittens",
+   "correct": true,
+   "pool": 15,
+   "in_pool": true
+  },
+  {
+   "story": 580,
+   "question": "They had a lot of fun together and Julia never ever forgot to wear what?",
+   "answer": "dress",
+   "said": "dress",
+   "correct": true,
+   "pool": 11,
+   "in_pool": true
+  },
+  {
+   "story": 581,
+   "question": "Tim and Sam were happy that they could play with what together?",
+   "answer": "toy",
+   "said": "toy",
+   "correct": true,
+   "pool": 10,
+   "in_pool": true
+  },
+  {
+   "story": 582,
+   "question": "They left the well and what alone?",
+   "answer": "frog",
+   "said": "frog",
+   "correct": true,
+   "pool": 17,
+   "in_pool": true
+  },
+  {
+   "story": 583,
+   "question": "So, they prayed together and who took a bite of broccoli?",
+   "answer": "lily",
+   "said": "lily",
+   "correct": true,
+   "pool": 12,
+   "in_pool": true
+  },
+  {
+   "story": 584,
+   "question": "From that day on, Timmy always kept an eye out for sad animals in what and tried to help them feel better?",
+   "answer": "park",
+   "said": "park",
+   "correct": true,
+   "pool": 12,
+   "in_pool": true
+  },
+  {
+   "story": 585,
+   "question": "So Jenny took what of bark home and made something amazing with it?",
+   "answer": "piece",
+   "said": "piece",
+   "correct": true,
+   "pool": 7,
+   "in_pool": true
+  },
+  {
+   "story": 586,
+   "question": "They enjoyed all their fun times together in what, just like they always did?",
+   "answer": "pond",
+   "said": "pond",
+   "correct": true,
+   "pool": 8,
+   "in_pool": true
+  },
+  {
+   "story": 587,
+   "question": "He felt so proud of himself for learning how to use what?",
+   "answer": "machine",
+   "said": "machine",
+   "correct": true,
+   "pool": 17,
+   "in_pool": true
+  },
+  {
+   "story": 588,
+   "question": "They continued to fish and Timmy was careful with what?",
+   "answer": "hook",
+   "said": "dad",
+   "correct": false,
+   "pool": 12,
+   "in_pool": true
+  },
+  {
+   "story": 589,
+   "question": "It was what ever?",
+   "answer": "day",
+   "said": "day",
+   "correct": true,
+   "pool": 13,
+   "in_pool": true
+  },
+  {
+   "story": 590,
+   "question": "And from that day on, Tim always shared his popcorn with who?",
+   "answer": "mom",
+   "said": "mom",
+   "correct": true,
+   "pool": 8,
+   "in_pool": true
+  },
+  {
+   "story": 591,
+   "question": "Who and Tom nod?",
+   "answer": "jill",
+   "said": "mom",
+   "correct": false,
+   "pool": 22,
+   "in_pool": true
+  },
+  {
+   "story": 592,
+   "question": "And so, Sammy brought the funny nut to who and they both had a good laugh?",
+   "answer": "timmy",
+   "said": "sammy",
+   "correct": false,
+   "pool": 9,
+   "in_pool": true
+  },
+  {
+   "story": 593,
+   "question": "But soon enough, he would be off wandering again and what would begin once more?",
+   "answer": "adventures",
+   "said": "face",
+   "correct": false,
+   "pool": 13,
+   "in_pool": true
+  },
+  {
+   "story": 594,
+   "question": "Finally, Bobby turned away from what?",
+   "answer": "window",
+   "said": "tree",
+   "correct": false,
+   "pool": 15,
+   "in_pool": true
+  },
+  {
+   "story": 595,
+   "question": "The train traveled back on what?",
+   "answer": "tracks",
+   "said": "train",
+   "correct": false,
+   "pool": 10,
+   "in_pool": true
+  },
+  {
+   "story": 596,
+   "question": "Who had learned that even when sadness strikes, something wonderful can always come from it?",
+   "answer": "girl",
+   "said": "girl",
+   "correct": true,
+   "pool": 16,
+   "in_pool": true
+  },
+  {
+   "story": 597,
+   "question": "Chubbs woke up and hopped away, and the bear curled up on what and went to sleep, all cozy and content?",
+   "answer": "log",
+   "said": "log",
+   "correct": true,
+   "pool": 10,
+   "in_pool": true
+  },
+  {
+   "story": 598,
+   "question": "They would play and read books together in what?",
+   "answer": "garage",
+   "said": "garage",
+   "correct": true,
+   "pool": 12,
+   "in_pool": true
+  },
+  {
+   "story": 599,
+   "question": "They were happy and tired from their fun day at what?",
+   "answer": "park",
+   "said": "park",
+   "correct": true,
+   "pool": 13,
+   "in_pool": true
+  },
+  {
+   "story": 600,
+   "question": "She knew that her mom would always be there to help her, even when she dropped what?",
+   "answer": "cup",
+   "said": "cup",
+   "correct": true,
+   "pool": 11,
+   "in_pool": true
+  },
+  {
+   "story": 601,
+   "question": "Timmy was happy again and loaded his truck with all of what?",
+   "answer": "toys",
+   "said": "truck",
+   "correct": false,
+   "pool": 12,
+   "in_pool": true
+  },
+  {
+   "story": 602,
+   "question": "What had made her so jolly?",
+   "answer": "jam",
+   "said": "jam",
+   "correct": true,
+   "pool": 13,
+   "in_pool": true
+  },
+  {
+   "story": 603,
+   "question": "And so, Timmy started stacking what again, feeling jolly once more?",
+   "answer": "blocks",
+   "said": "tower",
+   "correct": false,
+   "pool": 13,
+   "in_pool": true
+  },
+  {
+   "story": 604,
+   "question": "From that day on, who made sure to always be kind to others, no matter what?",
+   "answer": "lily",
+   "said": "lily",
+   "correct": true,
+   "pool": 15,
+   "in_pool": true
+  },
+  {
+   "story": 605,
+   "question": "They made it to what and had a great adventure, but they never forgot the silly elevator ride?",
+   "answer": "floor",
+   "said": "floor",
+   "correct": true,
+   "pool": 13,
+   "in_pool": true
+  },
+  {
+   "story": 606,
+   "question": "Who was so happy that she didn't even remember to worry anymore?",
+   "answer": "lily",
+   "said": "lily",
+   "correct": true,
+   "pool": 16,
+   "in_pool": true
+  },
+  {
+   "story": 607,
+   "question": "They play together with the tank and what?",
+   "answer": "doll",
+   "said": "tank",
+   "correct": false,
+   "pool": 20,
+   "in_pool": true
+  },
+  {
+   "story": 608,
+   "question": "On the way home, the bald man thought about what he had experienced?",
+   "answer": "changes",
+   "said": "thing",
+   "correct": false,
+   "pool": 14,
+   "in_pool": true
+  },
+  {
+   "story": 609,
+   "question": "Jimmy was happy, Tweety was who?",
+   "answer": "friend",
+   "said": "friend",
+   "correct": true,
+   "pool": 16,
+   "in_pool": true
+  },
+  {
+   "story": 610,
+   "question": "Who smiled through her tears and felt a little bit better?",
+   "answer": "lily",
+   "said": "lily",
+   "correct": true,
+   "pool": 10,
+   "in_pool": true
+  },
+  {
+   "story": 611,
+   "question": "From that day on, Jack and who became friends?",
+   "answer": "dragon",
+   "said": "dragon",
+   "correct": true,
+   "pool": 12,
+   "in_pool": true
+  },
+  {
+   "story": 612,
+   "question": "They picked it, put it in what, and sailed home?",
+   "answer": "boat",
+   "said": "boat",
+   "correct": true,
+   "pool": 17,
+   "in_pool": true
+  },
+  {
+   "story": 613,
+   "question": "The crane flew away into what?",
+   "answer": "sky",
+   "said": "sky",
+   "correct": true,
+   "pool": 16,
+   "in_pool": true
+  },
+  {
+   "story": 614,
+   "question": "From then on, who was happy and she learned how to relax so she could stay healthy and safe?",
+   "answer": "girl",
+   "said": "girl",
+   "correct": true,
+   "pool": 12,
+   "in_pool": true
+  },
+  {
+   "story": 615,
+   "question": "They all held what up and cheered with joy?",
+   "answer": "trophy",
+   "said": "trophy",
+   "correct": true,
+   "pool": 11,
+   "in_pool": true
+  },
+  {
+   "story": 616,
+   "question": "They were lost in the terrible season, and they never found what back home?",
+   "answer": "way",
+   "said": "way",
+   "correct": true,
+   "pool": 13,
+   "in_pool": true
+  },
+  {
+   "story": 618,
+   "question": "They were tired but happy, and who felt lucky to have such a great friend to play with?",
+   "answer": "timmy",
+   "said": "timmy",
+   "correct": true,
+   "pool": 17,
+   "in_pool": true
+  },
+  {
+   "story": 619,
+   "question": "Lily and her family had a great time at what?",
+   "answer": "zoo",
+   "said": "zoo",
+   "correct": true,
+   "pool": 14,
+   "in_pool": true
+  },
+  {
+   "story": 620,
+   "question": "He makes them snap what and run and jump?",
+   "answer": "tails",
+   "said": "tail",
+   "correct": true,
+   "pool": 25,
+   "in_pool": true
+  },
+  {
+   "story": 621,
+   "question": "He always listened to what the queen said and the people in what were so proud of him?",
+   "answer": "kingdom",
+   "said": "kingdom",
+   "correct": true,
+   "pool": 12,
+   "in_pool": true
+  },
+  {
+   "story": 622,
+   "question": "He loved what and helping people get where they needed to go?",
+   "answer": "job",
+   "said": "taxi",
+   "correct": false,
+   "pool": 14,
+   "in_pool": true
+  },
+  {
+   "story": 623,
+   "question": "They wanted to play together again but they forgot what, which was now gone forever?",
+   "answer": "football",
+   "said": "football",
+   "correct": true,
+   "pool": 15,
+   "in_pool": true
+  },
+  {
+   "story": 624,
+   "question": "She thanked who for being so persistent and helping her to finish it?",
+   "answer": "boy",
+   "said": "boy",
+   "correct": true,
+   "pool": 13,
+   "in_pool": true
+  },
+  {
+   "story": 625,
+   "question": "Finally, Grace put away her crayons and had a seat on what?",
+   "answer": "floor",
+   "said": "floor",
+   "correct": true,
+   "pool": 13,
+   "in_pool": true
+  },
+  {
+   "story": 626,
+   "question": "She could not wait to tell her family about what she found?",
+   "answer": "circle",
+   "said": "thing",
+   "correct": false,
+   "pool": 10,
+   "in_pool": true
+  },
+  {
+   "story": 627,
+   "question": "It was what he ever had?",
+   "answer": "pear",
+   "said": "pear",
+   "correct": true,
+   "pool": 9,
+   "in_pool": true
+  },
+  {
+   "story": 628,
+   "question": "Finally, Tom and his mum said goodbye to what?",
+   "answer": "animals",
+   "said": "cow",
+   "correct": false,
+   "pool": 15,
+   "in_pool": true
+  },
+  {
+   "story": 629,
+   "question": "Who agreed and the two ran off to find something else to do?",
+   "answer": "tom",
+   "said": "tom",
+   "correct": true,
+   "pool": 14,
+   "in_pool": true
+  },
+  {
+   "story": 630,
+   "question": "He then ran home with what in hand, ready to show his family what a wonderful day he'd had?",
+   "answer": "treat",
+   "said": "butterfly",
+   "correct": false,
+   "pool": 17,
+   "in_pool": true
+  },
+  {
+   "story": 631,
+   "question": "They both laughed as they swung back and forth, and the boy gave who one last kiss before they ran back home?",
+   "answer": "girl",
+   "said": "boy",
+   "correct": false,
+   "pool": 16,
+   "in_pool": true
+  },
+  {
+   "story": 632,
+   "question": "It was what ever?",
+   "answer": "day",
+   "said": "surprise",
+   "correct": false,
+   "pool": 14,
+   "in_pool": true
+  },
+  {
+   "story": 633,
+   "question": "She smiled, knowing that who was just as amazing as it always was?",
+   "answer": "wednesday",
+   "said": "lily",
+   "correct": false,
+   "pool": 12,
+   "in_pool": true
+  },
+  {
+   "story": 634,
+   "question": "Who was ready for a nap and a snack?",
+   "answer": "mary",
+   "said": "mary",
+   "correct": true,
+   "pool": 16,
+   "in_pool": true
+  },
+  {
+   "story": 635,
+   "question": "Daisy hugged who bears close and imagined all the fun adventures they would have together?",
+   "answer": "teddy",
+   "said": "teddy",
+   "correct": true,
+   "pool": 15,
+   "in_pool": true
+  },
+  {
+   "story": 636,
+   "question": "Tommy was so happy that what had surprised him with such a special pet?",
+   "answer": "mum",
+   "said": "mum",
+   "correct": true,
+   "pool": 17,
+   "in_pool": true
+  },
+  {
+   "story": 637,
+   "question": "He was happy with his fun day of zipping around in what?",
+   "answer": "plane",
+   "said": "plane",
+   "correct": true,
+   "pool": 22,
+   "in_pool": true
+  },
+  {
+   "story": 638,
+   "question": "It became what?",
+   "answer": "game",
+   "said": "game",
+   "correct": true,
+   "pool": 10,
+   "in_pool": true
+  },
+  {
+   "story": 639,
+   "question": "So Amy and her Dad watched what to see what would happen?",
+   "answer": "box",
+   "said": "room",
+   "correct": false,
+   "pool": 12,
+   "in_pool": true
+  },
+  {
+   "story": 640,
+   "question": "It knew who loved it?",
+   "answer": "boy",
+   "said": "boy",
+   "correct": true,
+   "pool": 12,
+   "in_pool": true
+  },
+  {
+   "story": 641,
+   "question": "Finally, the flood stopped and what was safe?",
+   "answer": "family",
+   "said": "family",
+   "correct": true,
+   "pool": 14,
+   "in_pool": true
+  },
+  {
+   "story": 642,
+   "question": "Susie couldn't wait for the next time she could go to what to get some more candy?",
+   "answer": "park",
+   "said": "park",
+   "correct": true,
+   "pool": 13,
+   "in_pool": true
+  },
+  {
+   "story": 643,
+   "question": "What were not worth it?",
+   "answer": "berries",
+   "said": "bush",
+   "correct": false,
+   "pool": 12,
+   "in_pool": true
+  },
+  {
+   "story": 644,
+   "question": "They wished he had stayed near what?",
+   "answer": "shore",
+   "said": "shore",
+   "correct": true,
+   "pool": 15,
+   "in_pool": true
+  },
+  {
+   "story": 645,
+   "question": "Who was laughing and having so much fun?",
+   "answer": "john",
+   "said": "john",
+   "correct": true,
+   "pool": 13,
+   "in_pool": true
+  },
+  {
+   "story": 646,
+   "question": "They both had lots of fun together playing with what?",
+   "answer": "figure",
+   "said": "figure",
+   "correct": true,
+   "pool": 10,
+   "in_pool": true
+  },
+  {
+   "story": 647,
+   "question": "Who was very sorry, but she knew she would always have the memory of that special screen?",
+   "answer": "lucy",
+   "said": "lucy",
+   "correct": true,
+   "pool": 10,
+   "in_pool": true
+  },
+  {
+   "story": 648,
+   "question": "Together, she and her mom made what?",
+   "answer": "snowman",
+   "said": "day",
+   "correct": false,
+   "pool": 17,
+   "in_pool": true
+  },
+  {
+   "story": 649,
+   "question": "Who was so happy to see him and ran to give him a big hug?",
+   "answer": "lily",
+   "said": "lily",
+   "correct": true,
+   "pool": 15,
+   "in_pool": true
+  },
+  {
+   "story": 650,
+   "question": "So, Timmy and mommy tidied up what and then he was allowed to go back outside and play?",
+   "answer": "toys",
+   "said": "knee",
+   "correct": false,
+   "pool": 12,
+   "in_pool": true
+  },
+  {
+   "story": 651,
+   "question": "He thanked who and gave her a big hug?",
+   "answer": "mom",
+   "said": "mom",
+   "correct": true,
+   "pool": 10,
+   "in_pool": true
+  },
+  {
+   "story": 652,
+   "question": "From that day on, Timmy never dared who to do anything dangerous again?",
+   "answer": "mittens",
+   "said": "mittens",
+   "correct": true,
+   "pool": 14,
+   "in_pool": true
+  },
+  {
+   "story": 653,
+   "question": "They had never seen something so beautiful and what stayed with them forever?",
+   "answer": "jar",
+   "said": "light",
+   "correct": false,
+   "pool": 17,
+   "in_pool": true
+  },
+  {
+   "story": 654,
+   "question": "Listen to your parents and who?",
+   "answer": "guard",
+   "said": "supervision",
+   "correct": false,
+   "pool": 43,
+   "in_pool": true
+  },
+  {
+   "story": 655,
+   "question": "The girl knew that no matter what changes happened, her doll would always be who?",
+   "answer": "friend",
+   "said": "friend",
+   "correct": true,
+   "pool": 8,
+   "in_pool": true
+  },
+  {
+   "story": 656,
+   "question": "They help her clean up what?",
+   "answer": "floor",
+   "said": "mess",
+   "correct": false,
+   "pool": 23,
+   "in_pool": true
+  },
+  {
+   "story": 657,
+   "question": "And every Christmas, she remembered the broken ornament and how telling the truth was what to do?",
+   "answer": "thing",
+   "said": "thing",
+   "correct": true,
+   "pool": 15,
+   "in_pool": true
+  },
+  {
+   "story": 658,
+   "question": "From that day, she always kept the bowl to herself, but was happy to share it with who sometimes?",
+   "answer": "friends",
+   "said": "mum",
+   "correct": false,
+   "pool": 10,
+   "in_pool": true
+  },
+  {
+   "story": 659,
+   "question": "And so, Lily went home and made what, feeling proud and happy?",
+   "answer": "statue",
+   "said": "statue",
+   "correct": true,
+   "pool": 17,
+   "in_pool": true
+  },
+  {
+   "story": 660,
+   "question": "The elephant thanked what and they went their separate ways, but they would often gather together and have pears ever since?",
+   "answer": "rooster",
+   "said": "elephant",
+   "correct": false,
+   "pool": 10,
+   "in_pool": true
+  },
+  {
+   "story": 661,
+   "question": "The girl was so proud of what?",
+   "answer": "plant",
+   "said": "plant",
+   "correct": true,
+   "pool": 15,
+   "in_pool": true
+  },
+  {
+   "story": 662,
+   "question": "It was what ever and he couldn't wait to fly again?",
+   "answer": "day",
+   "said": "day",
+   "correct": true,
+   "pool": 16,
+   "in_pool": true
+  },
+  {
+   "story": 663,
+   "question": "And the well was always there, increasing its water and making what happy?",
+   "answer": "people",
+   "said": "people",
+   "correct": true,
+   "pool": 8,
+   "in_pool": true
+  },
+  {
+   "story": 664,
+   "question": "He chose what again?",
+   "answer": "cream",
+   "said": "cream",
+   "correct": true,
+   "pool": 13,
+   "in_pool": true
+  },
+  {
+   "story": 665,
+   "question": "But they both knew they would meet again under what?",
+   "answer": "tree",
+   "said": "tree",
+   "correct": true,
+   "pool": 11,
+   "in_pool": true
+  },
+  {
+   "story": 666,
+   "question": "Now the fat onion is never lonely and loves his new home with who?",
+   "answer": "friends",
+   "said": "time",
+   "correct": false,
+   "pool": 11,
+   "in_pool": true
+  },
+  {
+   "story": 667,
+   "question": "He played jazz on what and got better and better?",
+   "answer": "drum",
+   "said": "drum",
+   "correct": true,
+   "pool": 16,
+   "in_pool": true
+  },
+  {
+   "story": 668,
+   "question": "Lily was so happy she decided to keep what forever?",
+   "answer": "bell",
+   "said": "bell",
+   "correct": true,
+   "pool": 17,
+   "in_pool": true
+  },
+  {
+   "story": 669,
+   "question": "They learned their lesson and never rode to what again?",
+   "answer": "pond",
+   "said": "goose",
+   "correct": false,
+   "pool": 25,
+   "in_pool": true
+  },
+  {
+   "story": 670,
+   "question": "Who learned that it's important to stay warm and take care of yourself?",
+   "answer": "lily",
+   "said": "lily",
+   "correct": true,
+   "pool": 11,
+   "in_pool": true
+  },
+  {
+   "story": 671,
+   "question": "He was happy to have saved what and knew he was even braver than before?",
+   "answer": "reef",
+   "said": "reef",
+   "correct": true,
+   "pool": 17,
+   "in_pool": true
+  },
+  {
+   "story": 672,
+   "question": "They made it to what?",
+   "answer": "zoo",
+   "said": "zoo",
+   "correct": true,
+   "pool": 35,
+   "in_pool": true
+  },
+  {
+   "story": 673,
+   "question": "The friends both agreed and laughed together, enjoying their day with what?",
+   "answer": "bowl",
+   "said": "bowl",
+   "correct": true,
+   "pool": 7,
+   "in_pool": true
+  },
+  {
+   "story": 674,
+   "question": "Jack and who hugged each other and said goodbye, each one of them happy to have had such a fun and unusual pretend adventure?",
+   "answer": "jane",
+   "said": "jane",
+   "correct": true,
+   "pool": 20,
+   "in_pool": true
+  },
+  {
+   "story": 675,
+   "question": "He was very sad, but he still liked to jog around the park and pretend that what was full of toys again?",
+   "answer": "box",
+   "said": "box",
+   "correct": true,
+   "pool": 16,
+   "in_pool": true
+  },
+  {
+   "story": 676,
+   "question": "After the mouse left, the bear continued stirring what?",
+   "answer": "food",
+   "said": "pot",
+   "correct": false,
+   "pool": 14,
+   "in_pool": true
+  },
+  {
+   "story": 677,
+   "question": "Then, they hugged one last time and Molly went back to the table to finish what?",
+   "answer": "dinner",
+   "said": "dinner",
+   "correct": true,
+   "pool": 9,
+   "in_pool": true
+  },
+  {
+   "story": 678,
+   "question": "They went to look for what?",
+   "answer": "blocks",
+   "said": "mom",
+   "correct": false,
+   "pool": 26,
+   "in_pool": true
+  },
+  {
+   "story": 679,
+   "question": "He looked in the mirror and was very happy with what?",
+   "answer": "haircut",
+   "said": "hair",
+   "correct": false,
+   "pool": 19,
+   "in_pool": true
+  },
+  {
+   "story": 680,
+   "question": "The old lady smiled and waved goodbye to Max, happy that her harmless little mouse had found a home and a way to stay safe in what?",
+   "answer": "woods",
+   "said": "house",
+   "correct": false,
+   "pool": 14,
+   "in_pool": true
+  },
+  {
+   "story": 681,
+   "question": "From then on, Lily made sure to be more careful when playing with who?",
+   "answer": "rosie",
+   "said": "lily",
+   "correct": false,
+   "pool": 12,
+   "in_pool": true
+  },
+  {
+   "story": 682,
+   "question": "They use what to make a car and a slide?",
+   "answer": "box",
+   "said": "box",
+   "correct": true,
+   "pool": 16,
+   "in_pool": true
+  },
+  {
+   "story": 683,
+   "question": "Her mother was so amazed that she said she'd get her what in the shop the next day?",
+   "answer": "toy",
+   "said": "toy",
+   "correct": true,
+   "pool": 17,
+   "in_pool": true
+  },
+  {
+   "story": 684,
+   "question": "JoJo was so happy that her little pen had helped her to part the snow and find what?",
+   "answer": "lake",
+   "said": "lake",
+   "correct": true,
+   "pool": 19,
+   "in_pool": true
+  },
+  {
+   "story": 685,
+   "question": "He had conquered his fear and he had found a special switch that could turn on what?",
+   "answer": "lights",
+   "said": "switch",
+   "correct": false,
+   "pool": 12,
+   "in_pool": true
+  },
+  {
+   "story": 686,
+   "question": "She was happy to have helped what?",
+   "answer": "bird",
+   "said": "bird",
+   "correct": true,
+   "pool": 13,
+   "in_pool": true
+  },
+  {
+   "story": 687,
+   "question": "From that day on, the bird and who became good friends and they would often play together in the park?",
+   "answer": "girl",
+   "said": "bird",
+   "correct": false,
+   "pool": 10,
+   "in_pool": true
+  },
+  {
+   "story": 688,
+   "question": "They would play together every day and what helped keep everyone safe?",
+   "answer": "plastic",
+   "said": "family",
+   "correct": false,
+   "pool": 7,
+   "in_pool": true
+  },
+  {
+   "story": 689,
+   "question": "The family went ahead and laid out the picnic and included what in the centre?",
+   "answer": "plant",
+   "said": "plant",
+   "correct": true,
+   "pool": 15,
+   "in_pool": true
+  },
+  {
+   "story": 690,
+   "question": "Lily was very happy to have what again?",
+   "answer": "phone",
+   "said": "phone",
+   "correct": true,
+   "pool": 8,
+   "in_pool": true
+  },
+  {
+   "story": 691,
+   "question": "Max kept whistling as he walked, and his happy little tune filled what?",
+   "answer": "air",
+   "said": "air",
+   "correct": true,
+   "pool": 13,
+   "in_pool": true
+  },
+  {
+   "story": 692,
+   "question": "Everyone clapped and cheered for what?",
+   "answer": "fireman",
+   "said": "fireman",
+   "correct": true,
+   "pool": 16,
+   "in_pool": true
+  },
+  {
+   "story": 693,
+   "question": "He was so proud of himself for finding all the available things on what?",
+   "answer": "ground",
+   "said": "ground",
+   "correct": true,
+   "pool": 11,
+   "in_pool": true
+  },
+  {
+   "story": 694,
+   "question": "They continued to explore what and had a wonderful day together?",
+   "answer": "zoo",
+   "said": "zoo",
+   "correct": true,
+   "pool": 14,
+   "in_pool": true
+  },
+  {
+   "story": 695,
+   "question": "Tim, his mom, and his dad had a great day at what?",
+   "answer": "beach",
+   "said": "beach",
+   "correct": true,
+   "pool": 11,
+   "in_pool": true
+  },
+  {
+   "story": 696,
+   "question": "Benny smiled and hopped away, happy to have shared his special find with who?",
+   "answer": "friend",
+   "said": "friend",
+   "correct": true,
+   "pool": 12,
+   "in_pool": true
+  },
+  {
+   "story": 697,
+   "question": "He said goodbye to who, thanked him for the ride, and then went back home?",
+   "answer": "ostrich",
+   "said": "ostrich",
+   "correct": true,
+   "pool": 9,
+   "in_pool": true
+  },
+  {
+   "story": 698,
+   "question": "What had made them feel so small and helpless, but together they were strong?",
+   "answer": "earthquake",
+   "said": "girl",
+   "correct": false,
+   "pool": 10,
+   "in_pool": true
+  },
+  {
+   "story": 699,
+   "question": "They said goodbye, and who went home with a big smile on his face?",
+   "answer": "tim",
+   "said": "tim",
+   "correct": true,
+   "pool": 8,
+   "in_pool": true
+  },
+  {
+   "story": 700,
+   "question": "The little girl was sad that what had gone?",
+   "answer": "sheet",
+   "said": "sheet",
+   "correct": true,
+   "pool": 7,
+   "in_pool": true
+  },
+  {
+   "story": 701,
+   "question": "Katy was so happy that she could order what?",
+   "answer": "video",
+   "said": "video",
+   "correct": true,
+   "pool": 11,
+   "in_pool": true
+  },
+  {
+   "story": 702,
+   "question": "They both slept and dreamed of more rolling adventures for what?",
+   "answer": "day",
+   "said": "day",
+   "correct": true,
+   "pool": 10,
+   "in_pool": true
+  },
+  {
+   "story": 703,
+   "question": "What smiled and winked at them?",
+   "answer": "moon",
+   "said": "moon",
+   "correct": true,
+   "pool": 15,
+   "in_pool": true
+  },
+  {
+   "story": 704,
+   "question": "I love you, who?",
+   "answer": "lily",
+   "said": "daddy",
+   "correct": false,
+   "pool": 21,
+   "in_pool": true
+  },
+  {
+   "story": 705,
+   "question": "She plays with what all day?",
+   "answer": "dolls",
+   "said": "doll",
+   "correct": true,
+   "pool": 19,
+   "in_pool": true
+  },
+  {
+   "story": 706,
+   "question": "They started playing with what and had a lot of fun?",
+   "answer": "balloons",
+   "said": "balloon",
+   "correct": true,
+   "pool": 14,
+   "in_pool": true
+  },
+  {
+   "story": 707,
+   "question": "Anna and who are sorry?",
+   "answer": "ben",
+   "said": "ben",
+   "correct": true,
+   "pool": 43,
+   "in_pool": true
+  },
+  {
+   "story": 708,
+   "question": "They decide to play with something else, not what?",
+   "answer": "stone",
+   "said": "bird",
+   "correct": false,
+   "pool": 14,
+   "in_pool": true
+  },
+  {
+   "story": 709,
+   "question": "So, they started working and by the end of the day they had made what ever?",
+   "answer": "blanket",
+   "said": "yarn",
+   "correct": false,
+   "pool": 12,
+   "in_pool": true
+  },
+  {
+   "story": 710,
+   "question": "From then on they made sure they showed they valued what they had and kept what close to their hearts?",
+   "answer": "view",
+   "said": "garden",
+   "correct": false,
+   "pool": 13,
+   "in_pool": true
+  },
+  {
+   "story": 711,
+   "question": "When it was time to go home, Tommy decided to take what with him?",
+   "answer": "triangle",
+   "said": "triangle",
+   "correct": true,
+   "pool": 9,
+   "in_pool": true
+  },
+  {
+   "story": 712,
+   "question": "Ben and who cried and said they were sorry?",
+   "answer": "lily",
+   "said": "lily",
+   "correct": true,
+   "pool": 43,
+   "in_pool": true
+  },
+  {
+   "story": 713,
+   "question": "Who felt happy and proud too?",
+   "answer": "lily",
+   "said": "lily",
+   "correct": true,
+   "pool": 12,
+   "in_pool": true
+  },
+  {
+   "story": 714,
+   "question": "He felt so excited, as if he were playing in what for the very first time?",
+   "answer": "rain",
+   "said": "rain",
+   "correct": true,
+   "pool": 17,
+   "in_pool": true
+  },
+  {
+   "story": 715,
+   "question": "From then on, the family used the orange cupboard for storing all their oranges and would never forget what it used to sign?",
+   "answer": "song",
+   "said": "day",
+   "correct": false,
+   "pool": 10,
+   "in_pool": true
+  },
+  {
+   "story": 716,
+   "question": "Every time he passes what, he remembers her kindness and how careful she was to serve him?",
+   "answer": "house",
+   "said": "snack",
+   "correct": false,
+   "pool": 13,
+   "in_pool": true
+  },
+  {
+   "story": 717,
+   "question": "Ducky and Froggy were happy to have each other as friends and couldn't wait to play in what again?",
+   "answer": "pond",
+   "said": "pond",
+   "correct": true,
+   "pool": 14,
+   "in_pool": true
+  },
+  {
+   "story": 718,
+   "question": "Who had such a great time, and it showed them that with patience, practice and help from others, anything is possible?",
+   "answer": "brothers",
+   "said": "brother",
+   "correct": true,
+   "pool": 7,
+   "in_pool": true
+  },
+  {
+   "story": 719,
+   "question": "They put the cookie on what and saw that it weighed one ounce?",
+   "answer": "scale",
+   "said": "scale",
+   "correct": true,
+   "pool": 17,
+   "in_pool": true
+  },
+  {
+   "story": 720,
+   "question": "As she rested, she thought about how much fun it was to soar through the sky and find new things to add to what?",
+   "answer": "nest",
+   "said": "nest",
+   "correct": true,
+   "pool": 13,
+   "in_pool": true
+  },
+  {
+   "story": 721,
+   "question": "The animal friends were so happy and thanked who for his compassion?",
+   "answer": "sam",
+   "said": "sam",
+   "correct": true,
+   "pool": 15,
+   "in_pool": true
+  },
+  {
+   "story": 722,
+   "question": "They hug who and go home?",
+   "answer": "moms",
+   "said": "mom",
+   "correct": true,
+   "pool": 24,
+   "in_pool": true
+  },
+  {
+   "story": 723,
+   "question": "What was so happy that night?",
+   "answer": "family",
+   "said": "family",
+   "correct": true,
+   "pool": 15,
+   "in_pool": true
+  },
+  {
+   "story": 724,
+   "question": "Who learned to listen next time?",
+   "answer": "tim",
+   "said": "tim",
+   "correct": true,
+   "pool": 7,
+   "in_pool": true
+  },
+  {
+   "story": 725,
+   "question": "They became even more popular amongst who when they spun?",
+   "answer": "classmates",
+   "said": "fun",
+   "correct": false,
+   "pool": 10,
+   "in_pool": true
+  },
+  {
+   "story": 726,
+   "question": "He never touched what again?",
+   "answer": "pot",
+   "said": "pot",
+   "correct": true,
+   "pool": 18,
+   "in_pool": true
+  },
+  {
+   "story": 727,
+   "question": "What loved it?",
+   "answer": "doggy",
+   "said": "doggy",
+   "correct": true,
+   "pool": 17,
+   "in_pool": true
+  },
+  {
+   "story": 728,
+   "question": "Who was never lazy again?",
+   "answer": "man",
+   "said": "man",
+   "correct": true,
+   "pool": 13,
+   "in_pool": true
+  },
+  {
+   "story": 729,
+   "question": "She knew that Grandma was going to arrive soon and she couldn't wait to give her who?",
+   "answer": "hug",
+   "said": "hug",
+   "correct": true,
+   "pool": 13,
+   "in_pool": true
+  },
+  {
+   "story": 730,
+   "question": "She was so happy and excited, she couldn't help but rub what together with joy?",
+   "answer": "hands",
+   "said": "hand",
+   "correct": true,
+   "pool": 17,
+   "in_pool": true
+  },
+  {
+   "story": 731,
+   "question": "But who never got better and stayed hurt for a long time?",
+   "answer": "grandad",
+   "said": "billy",
+   "correct": false,
+   "pool": 12,
+   "in_pool": true
+  },
+  {
+   "story": 732,
+   "question": "Timmy always remembered to bring his blue ball in his pocket when he went to what?",
+   "answer": "park",
+   "said": "park",
+   "correct": true,
+   "pool": 13,
+   "in_pool": true
+  },
+  {
+   "story": 733,
+   "question": "From that day on, every time it rained, Lily would sit by what and gaze outside, hoping to see another rainbow?",
+   "answer": "window",
+   "said": "rainbow",
+   "correct": false,
+   "pool": 11,
+   "in_pool": true
+  },
+  {
+   "story": 734,
+   "question": "Who felt better and was happy to spend time with her family?",
+   "answer": "lily",
+   "said": "lily",
+   "correct": true,
+   "pool": 21,
+   "in_pool": true
+  },
+  {
+   "story": 735,
+   "question": "From that day on, Lily was more careful with what and always searched for them when they went missing?",
+   "answer": "things",
+   "said": "mommy",
+   "correct": false,
+   "pool": 15,
+   "in_pool": true
+  },
+  {
+   "story": 736,
+   "question": "The little girl was so happy to have her teddy bear back that she gave who a big hug?",
+   "answer": "timmy",
+   "said": "timmy",
+   "correct": true,
+   "pool": 13,
+   "in_pool": true
+  },
+  {
+   "story": 737,
+   "question": "After they shared the cream, Tom hugged who, and they started to play?",
+   "answer": "friend",
+   "said": "friend",
+   "correct": true,
+   "pool": 28,
+   "in_pool": true
+  },
+  {
+   "story": 738,
+   "question": "She stayed until what went down, then she said goodbye and went home?",
+   "answer": "sun",
+   "said": "sun",
+   "correct": true,
+   "pool": 9,
+   "in_pool": true
+  },
+  {
+   "story": 739,
+   "question": "She cuddled with who and felt grateful for her loving family?",
+   "answer": "mittens",
+   "said": "mittens",
+   "correct": true,
+   "pool": 16,
+   "in_pool": true
+  },
+  {
+   "story": 740,
+   "question": "From then on, the handle with the signs on it was only for who?",
+   "answer": "children",
+   "said": "child",
+   "correct": true,
+   "pool": 8,
+   "in_pool": true
+  },
+  {
+   "story": 741,
+   "question": "But Lily was determined to try it, so who bought it for her?",
+   "answer": "mom",
+   "said": "mom",
+   "correct": true,
+   "pool": 9,
+   "in_pool": true
+  },
+  {
+   "story": 742,
+   "question": "What licked their hands?",
+   "answer": "dog",
+   "said": "dog",
+   "correct": true,
+   "pool": 38,
+   "in_pool": true
+  },
+  {
+   "story": 743,
+   "question": "Daisy was so happy that her mum liked her design and she couldn't wait to finish what?",
+   "answer": "bathroom",
+   "said": "bathroom",
+   "correct": true,
+   "pool": 14,
+   "in_pool": true
+  },
+  {
+   "story": 744,
+   "question": "Jack kept who safe and they stayed friends forever?",
+   "answer": "fancy",
+   "said": "jack",
+   "correct": false,
+   "pool": 19,
+   "in_pool": true
+  },
+  {
+   "story": 745,
+   "question": "I was so happy and relief when we saw who coming back?",
+   "answer": "dad",
+   "said": "dad",
+   "correct": true,
+   "pool": 10,
+   "in_pool": true
+  },
+  {
+   "story": 746,
+   "question": "Then he was known as who, the one who settled disputes with a whip?",
+   "answer": "bearby",
+   "said": "animal",
+   "correct": false,
+   "pool": 15,
+   "in_pool": true
+  },
+  {
+   "story": 747,
+   "question": "They took turns zooming it around what and had lots of fun together?",
+   "answer": "house",
+   "said": "house",
+   "correct": true,
+   "pool": 10,
+   "in_pool": true
+  },
+  {
+   "story": 748,
+   "question": "Each day when it flew around what, it always remembered her smiling face and waving hand?",
+   "answer": "garden",
+   "said": "garden",
+   "correct": true,
+   "pool": 14,
+   "in_pool": true
+  },
+  {
+   "story": 749,
+   "question": "Max learned that it is good to listen to who?",
+   "answer": "owner",
+   "said": "owner",
+   "correct": true,
+   "pool": 7,
+   "in_pool": true
+  },
+  {
+   "story": 750,
+   "question": "They would often have movie nights and family time on what, and make the most of their cosy home?",
+   "answer": "furniture",
+   "said": "house",
+   "correct": false,
+   "pool": 6,
+   "in_pool": true
+  },
+  {
+   "story": 751,
+   "question": "The next day, the sky was brighter and everyone knew what had arrived to help them?",
+   "answer": "lightning",
+   "said": "man",
+   "correct": false,
+   "pool": 11,
+   "in_pool": true
+  },
+  {
+   "story": 752,
+   "question": "Mary hugged what even tighter and smiled at it?",
+   "answer": "toy",
+   "said": "toy",
+   "correct": true,
+   "pool": 15,
+   "in_pool": true
+  },
+  {
+   "story": 753,
+   "question": "John was confused but he was also filled with joy for the fun game he just played with what?",
+   "answer": "insect",
+   "said": "insect",
+   "correct": true,
+   "pool": 8,
+   "in_pool": true
+  },
+  {
+   "story": 754,
+   "question": "We love who and we love each other?",
+   "answer": "ruby",
+   "said": "mom",
+   "correct": false,
+   "pool": 13,
+   "in_pool": true
+  },
+  {
+   "story": 755,
+   "question": "The moral of the story is: Respect the temple and what, and you will find joy and enlightenment?",
+   "answer": "people",
+   "said": "people",
+   "correct": true,
+   "pool": 36,
+   "in_pool": true
+  },
+  {
+   "story": 756,
+   "question": "She never forgot the big purple arms of who?",
+   "answer": "mom",
+   "said": "day",
+   "correct": false,
+   "pool": 13,
+   "in_pool": true
+  },
+  {
+   "story": 757,
+   "question": "They go back to playing with what?",
+   "answer": "phone",
+   "said": "phone",
+   "correct": true,
+   "pool": 21,
+   "in_pool": true
+  },
+  {
+   "story": 758,
+   "question": "Who wanted to play with them?",
+   "answer": "kids",
+   "said": "time",
+   "correct": false,
+   "pool": 16,
+   "in_pool": true
+  },
+  {
+   "story": 759,
+   "question": "They all smiled and played together on what?",
+   "answer": "beach",
+   "said": "beach",
+   "correct": true,
+   "pool": 18,
+   "in_pool": true
+  },
+  {
+   "story": 760,
+   "question": "They looked at who and smiled?",
+   "answer": "mom",
+   "said": "mom",
+   "correct": true,
+   "pool": 34,
+   "in_pool": true
+  },
+  {
+   "story": 761,
+   "question": "That was what ever?",
+   "answer": "reward",
+   "said": "day",
+   "correct": false,
+   "pool": 14,
+   "in_pool": true
+  },
+  {
+   "story": 762,
+   "question": "As the sky turned dark, Sally and who stood hand in hand, feeling the sweet joy of friendship?",
+   "answer": "steve",
+   "said": "steve",
+   "correct": true,
+   "pool": 27,
+   "in_pool": true
+  },
+  {
+   "story": 763,
+   "question": "They saw one, two, three and more; exactly the same number as the man had counted on what?",
+   "answer": "street",
+   "said": "ground",
+   "correct": false,
+   "pool": 13,
+   "in_pool": true
+  },
+  {
+   "story": 764,
+   "question": "And then, let's change what?",
+   "answer": "clothes",
+   "said": "vase",
+   "correct": false,
+   "pool": 22,
+   "in_pool": true
+  },
+  {
+   "story": 765,
+   "question": "When Ben finally got home, he handed the jacket back to his big sister who and thanked her for lending it to him?",
+   "answer": "sara",
+   "said": "house",
+   "correct": false,
+   "pool": 15,
+   "in_pool": true
+  },
+  {
+   "story": 766,
+   "question": "Even though Ellie was enormous and heavy, she was still a great friend to who?",
+   "answer": "mickey",
+   "said": "ellie",
+   "correct": false,
+   "pool": 12,
+   "in_pool": true
+  },
+  {
+   "story": 767,
+   "question": "Finally, they found what out and went home happy?",
+   "answer": "way",
+   "said": "way",
+   "correct": true,
+   "pool": 12,
+   "in_pool": true
+  },
+  {
+   "story": 768,
+   "question": "What learned that sometimes, when there is a problem, you can push something to make it better?",
+   "answer": "duck",
+   "said": "duck",
+   "correct": true,
+   "pool": 10,
+   "in_pool": true
+  },
+  {
+   "story": 769,
+   "question": "The brave little swan immediately knew it had made the right choice to explore what and had made some new, special friends?",
+   "answer": "lake",
+   "said": "cave",
+   "correct": false,
+   "pool": 14,
+   "in_pool": true
+  },
+  {
+   "story": 770,
+   "question": "They enjoyed the rest of the day in what, playing and laughing?",
+   "answer": "garden",
+   "said": "garden",
+   "correct": true,
+   "pool": 25,
+   "in_pool": true
+  },
+  {
+   "story": 771,
+   "question": "They watch what and eat popcorn?",
+   "answer": "movie",
+   "said": "movie",
+   "correct": true,
+   "pool": 23,
+   "in_pool": true
+  },
+  {
+   "story": 772,
+   "question": "He knew it would always be there to help him stir up what and make little adventures?",
+   "answer": "ground",
+   "said": "cane",
+   "correct": false,
+   "pool": 8,
+   "in_pool": true
+  },
+  {
+   "story": 773,
+   "question": "She was so excited to write about her new friend and wondered what other creatures she could meet in her calm spot under what?",
+   "answer": "tree",
+   "said": "tree",
+   "correct": true,
+   "pool": 9,
+   "in_pool": true
+  },
+  {
+   "story": 774,
+   "question": "He couldn't wait for what?",
+   "answer": "haircut",
+   "said": "haircut",
+   "correct": true,
+   "pool": 13,
+   "in_pool": true
+  },
+  {
+   "story": 775,
+   "question": "From then on, who was always careful and he always looked out for it when he was playing?",
+   "answer": "tom",
+   "said": "tom",
+   "correct": true,
+   "pool": 5,
+   "in_pool": true
+  },
+  {
+   "story": 776,
+   "question": "From that day on, every time there was a fireworks show, Lily would remember that jolly night at what?",
+   "answer": "park",
+   "said": "park",
+   "correct": true,
+   "pool": 16,
+   "in_pool": true
+  },
+  {
+   "story": 777,
+   "question": "And they were happy and full after what?",
+   "answer": "dinner",
+   "said": "dinner",
+   "correct": true,
+   "pool": 13,
+   "in_pool": true
+  },
+  {
+   "story": 778,
+   "question": "From that day on, who never stopped exploring and learning new things?",
+   "answer": "tom",
+   "said": "tom",
+   "correct": true,
+   "pool": 17,
+   "in_pool": true
+  },
+  {
+   "story": 779,
+   "question": "And now when they go to the park, they always remember to look both ways before crossing what?",
+   "answer": "road",
+   "said": "road",
+   "correct": true,
+   "pool": 12,
+   "in_pool": true
+  },
+  {
+   "story": 780,
+   "question": "She knew she had an important job to take care of what and to keep it safe?",
+   "answer": "world",
+   "said": "bird",
+   "correct": false,
+   "pool": 14,
+   "in_pool": true
+  },
+  {
+   "story": 781,
+   "question": "Everyone smiled and said goodbye to who?",
+   "answer": "man",
+   "said": "man",
+   "correct": true,
+   "pool": 12,
+   "in_pool": true
+  },
+  {
+   "story": 782,
+   "question": "Who never bothered them again?",
+   "answer": "witch",
+   "said": "witch",
+   "correct": true,
+   "pool": 28,
+   "in_pool": true
+  },
+  {
+   "story": 783,
+   "question": "From that day on, who was very careful about who she played with?",
+   "answer": "lily",
+   "said": "lily",
+   "correct": true,
+   "pool": 9,
+   "in_pool": true
+  },
+  {
+   "story": 784,
+   "question": "Lily forgot all about what and was happy again?",
+   "answer": "knee",
+   "said": "knee",
+   "correct": true,
+   "pool": 15,
+   "in_pool": true
+  },
+  {
+   "story": 785,
+   "question": "But he learned that he should have listened to the man and not pushed what?",
+   "answer": "button",
+   "said": "man",
+   "correct": false,
+   "pool": 10,
+   "in_pool": true
+  },
+  {
+   "story": 786,
+   "question": "After playing on the slide, Timmy and who rested on a bench?",
+   "answer": "mommy",
+   "said": "mommy",
+   "correct": true,
+   "pool": 11,
+   "in_pool": true
+  },
+  {
+   "story": 787,
+   "question": "Sue was happy that her sleepy cat liked what, and they both had a good nap?",
+   "answer": "picture",
+   "said": "picture",
+   "correct": true,
+   "pool": 16,
+   "in_pool": true
+  },
+  {
+   "story": 788,
+   "question": "The ant went off on her walk and the mint stayed on what, waiting for something else exciting to happen?",
+   "answer": "ground",
+   "said": "ground",
+   "correct": true,
+   "pool": 15,
+   "in_pool": true
+  },
+  {
+   "story": 789,
+   "question": "They put on the sunglasses and play in what?",
+   "answer": "sun",
+   "said": "sun",
+   "correct": true,
+   "pool": 15,
+   "in_pool": true
+  },
+  {
+   "story": 790,
+   "question": "Lily was happy she could help make what strong and clean?",
+   "answer": "house",
+   "said": "chair",
+   "correct": false,
+   "pool": 14,
+   "in_pool": true
+  },
+  {
+   "story": 791,
+   "question": "Rita was very happy to see what happy, and she smiled too?",
+   "answer": "gorilla",
+   "said": "gorilla",
+   "correct": true,
+   "pool": 12,
+   "in_pool": true
+  },
+  {
+   "story": 792,
+   "question": "He roared loudly and ate Jane and who?",
+   "answer": "bunny",
+   "said": "bunny",
+   "correct": true,
+   "pool": 8,
+   "in_pool": true
+  },
+  {
+   "story": 793,
+   "question": "But, who made sure she took her special ornament home with her?",
+   "answer": "bobbie",
+   "said": "bobbie",
+   "correct": true,
+   "pool": 15,
+   "in_pool": true
+  },
+  {
+   "story": 794,
+   "question": "He was so happy that he could make the light come back, and he played happily in what each day, shining with creativity?",
+   "answer": "room",
+   "said": "room",
+   "correct": true,
+   "pool": 13,
+   "in_pool": true
+  },
+  {
+   "story": 795,
+   "question": "What saved the day?",
+   "answer": "saw",
+   "said": "tree",
+   "correct": false,
+   "pool": 7,
+   "in_pool": true
+  },
+  {
+   "story": 796,
+   "question": "He followed some rules and did what?",
+   "answer": "thing",
+   "said": "ball",
+   "correct": false,
+   "pool": 14,
+   "in_pool": true
+  },
+  {
+   "story": 797,
+   "question": "She was determined to fly the next day, so she got up early and made sure to get what ready for another adventure?",
+   "answer": "wagon",
+   "said": "wagon",
+   "correct": true,
+   "pool": 15,
+   "in_pool": true
+  },
+  {
+   "story": 798,
+   "question": "John was very careful to not forget what again?",
+   "answer": "coat",
+   "said": "coat",
+   "correct": true,
+   "pool": 12,
+   "in_pool": true
+  },
+  {
+   "story": 799,
+   "question": "She drank her milk from the glass and went back to playing with what?",
+   "answer": "toys",
+   "said": "toy",
+   "correct": true,
+   "pool": 12,
+   "in_pool": true
+  },
+  {
+   "story": 800,
+   "question": "From that day onward, who knew that with hard work and determination, he could catch anything?",
+   "answer": "man",
+   "said": "man",
+   "correct": true,
+   "pool": 10,
+   "in_pool": true
+  },
+  {
+   "story": 801,
+   "question": "They were both very thankful for the special needle that helped who to create something amazing?",
+   "answer": "anna",
+   "said": "anna",
+   "correct": true,
+   "pool": 16,
+   "in_pool": true
+  },
+  {
+   "story": 802,
+   "question": "The boy was relieved when he arrived at what and felt confident that he had been careful?",
+   "answer": "park",
+   "said": "park",
+   "correct": true,
+   "pool": 15,
+   "in_pool": true
+  },
+  {
+   "story": 803,
+   "question": "Timmy was so happy to play with what?",
+   "answer": "seal",
+   "said": "seal",
+   "correct": true,
+   "pool": 11,
+   "in_pool": true
+  },
+  {
+   "story": 804,
+   "question": "From that day on, Lily made sure to eat what carefully so she wouldn't get jam on her clothes again?",
+   "answer": "sandwich",
+   "said": "jam",
+   "correct": false,
+   "pool": 13,
+   "in_pool": true
+  },
+  {
+   "story": 805,
+   "question": "Timmy learned that it's important to listen to who and study for tests?",
+   "answer": "mom",
+   "said": "mom",
+   "correct": true,
+   "pool": 8,
+   "in_pool": true
+  },
+  {
+   "story": 806,
+   "question": "What is sad when their stay at camp comes to an end, but they know they will return next year?",
+   "answer": "family",
+   "said": "family",
+   "correct": true,
+   "pool": 24,
+   "in_pool": true
+  },
+  {
+   "story": 807,
+   "question": "They went back to what, where they felt happy and safe?",
+   "answer": "swings",
+   "said": "park",
+   "correct": false,
+   "pool": 29,
+   "in_pool": true
+  },
+  {
+   "story": 808,
+   "question": "She had turned what into a beautiful song?",
+   "answer": "flute",
+   "said": "flute",
+   "correct": true,
+   "pool": 8,
+   "in_pool": true
+  },
+  {
+   "story": 809,
+   "question": "It was the song of what?",
+   "answer": "piano",
+   "said": "song",
+   "correct": false,
+   "pool": 28,
+   "in_pool": true
+  },
+  {
+   "story": 810,
+   "question": "Nature can provide us with all we need if we take what to look, even on the coldest of days?",
+   "answer": "time",
+   "said": "time",
+   "correct": true,
+   "pool": 22,
+   "in_pool": true
+  },
+  {
+   "story": 811,
+   "question": "Tim was happy that he helped the pig at what?",
+   "answer": "zoo",
+   "said": "pig",
+   "correct": false,
+   "pool": 10,
+   "in_pool": true
+  },
+  {
+   "story": 812,
+   "question": "She had managed what by herself?",
+   "answer": "rail",
+   "said": "button",
+   "correct": false,
+   "pool": 9,
+   "in_pool": true
+  },
+  {
+   "story": 813,
+   "question": "He was so happy he could make who laugh?",
+   "answer": "mom",
+   "said": "mom",
+   "correct": true,
+   "pool": 14,
+   "in_pool": true
+  },
+  {
+   "story": 814,
+   "question": "She used what she liked?",
+   "answer": "colors",
+   "said": "picture",
+   "correct": false,
+   "pool": 22,
+   "in_pool": true
+  },
+  {
+   "story": 815,
+   "question": "They played what many times and had lots of fun?",
+   "answer": "game",
+   "said": "back",
+   "correct": false,
+   "pool": 12,
+   "in_pool": true
+  },
+  {
+   "story": 816,
+   "question": "When Lucy found herself in a difficult situation, who helped her out and ensured she arrived back safely?",
+   "answer": "man",
+   "said": "man",
+   "correct": true,
+   "pool": 16,
+   "in_pool": true
+  },
+  {
+   "story": 817,
+   "question": "This made who happy?",
+   "answer": "amy",
+   "said": "amy",
+   "correct": true,
+   "pool": 13,
+   "in_pool": true
+  },
+  {
+   "story": 818,
+   "question": "In the end, the otter won the race and the log was very proud of what?",
+   "answer": "race",
+   "said": "race",
+   "correct": true,
+   "pool": 10,
+   "in_pool": true
+  },
+  {
+   "story": 819,
+   "question": "Eliana\u2019s trunk was fixed and she could swing like what?",
+   "answer": "elephants",
+   "said": "eliana",
+   "correct": false,
+   "pool": 11,
+   "in_pool": true
+  },
+  {
+   "story": 820,
+   "question": "From then on, they stuck to eating green beans and who never had an adventurous meal again?",
+   "answer": "timmy",
+   "said": "timmy",
+   "correct": true,
+   "pool": 15,
+   "in_pool": true
+  },
+  {
+   "story": 821,
+   "question": "So, they took out what and tried it?",
+   "answer": "snack",
+   "said": "oven",
+   "correct": false,
+   "pool": 15,
+   "in_pool": true
+  },
+  {
+   "story": 822,
+   "question": "From that day on, who knew that making presents was something she loved to do?",
+   "answer": "lily",
+   "said": "lily",
+   "correct": true,
+   "pool": 16,
+   "in_pool": true
+  },
+  {
+   "story": 823,
+   "question": "From that day on, what knew how to be brave when it met something dangerous?",
+   "answer": "spider",
+   "said": "spider",
+   "correct": true,
+   "pool": 8,
+   "in_pool": true
+  },
+  {
+   "story": 824,
+   "question": "Thank you, who?",
+   "answer": "lily",
+   "said": "lily",
+   "correct": true,
+   "pool": 15,
+   "in_pool": true
+  },
+  {
+   "story": 825,
+   "question": "Remy and who were very happy that they organized a fun party for everyone?",
+   "answer": "blue",
+   "said": "blue",
+   "correct": true,
+   "pool": 11,
+   "in_pool": true
+  },
+  {
+   "story": 826,
+   "question": "In the end, who got even sicker and had to go to the hospital?",
+   "answer": "timmy",
+   "said": "timmy",
+   "correct": true,
+   "pool": 8,
+   "in_pool": true
+  },
+  {
+   "story": 827,
+   "question": "And that is the story of Lucy and what?",
+   "answer": "jewel",
+   "said": "family",
+   "correct": false,
+   "pool": 14,
+   "in_pool": true
+  },
+  {
+   "story": 828,
+   "question": "Who learned that even when you're polite, accidents can still happen?",
+   "answer": "benny",
+   "said": "benny",
+   "correct": true,
+   "pool": 15,
+   "in_pool": true
+  },
+  {
+   "story": 829,
+   "question": "From that day on, Lily practiced being flexible like the man she saw at what?",
+   "answer": "party",
+   "said": "park",
+   "correct": false,
+   "pool": 16,
+   "in_pool": true
+  },
+  {
+   "story": 830,
+   "question": "She had resisted her brother and taken back what?",
+   "answer": "lotion",
+   "said": "hair",
+   "correct": false,
+   "pool": 11,
+   "in_pool": true
+  },
+  {
+   "story": 831,
+   "question": "The girl was happy that she was able to share her useful toy with who?",
+   "answer": "friend",
+   "said": "friend",
+   "correct": true,
+   "pool": 6,
+   "in_pool": true
+  },
+  {
+   "story": 832,
+   "question": "They hoped that who would bake another pie someday?",
+   "answer": "mom",
+   "said": "mom",
+   "correct": true,
+   "pool": 40,
+   "in_pool": true
+  },
+  {
+   "story": 833,
+   "question": "The little girl was so proud of her efforts, and was so happy that she knew how to raise something from what?",
+   "answer": "garden",
+   "said": "mom",
+   "correct": false,
+   "pool": 13,
+   "in_pool": true
+  },
+  {
+   "story": 834,
+   "question": "From that day on, who would always remember to be brave?",
+   "answer": "jack",
+   "said": "jack",
+   "correct": true,
+   "pool": 14,
+   "in_pool": true
+  },
+  {
+   "story": 835,
+   "question": "She learned her lesson and never missed what again?",
+   "answer": "lesson",
+   "said": "lesson",
+   "correct": true,
+   "pool": 13,
+   "in_pool": true
+  },
+  {
+   "story": 836,
+   "question": "The little boy smiled and then ran back home to tell his friends all about his exciting adventure with what?",
+   "answer": "cactus",
+   "said": "cactus",
+   "correct": true,
+   "pool": 14,
+   "in_pool": true
+  },
+  {
+   "story": 837,
+   "question": "From that day on, the frog spent what both jumping and swimming?",
+   "answer": "time",
+   "said": "day",
+   "correct": false,
+   "pool": 7,
+   "in_pool": true
+  },
+  {
+   "story": 838,
+   "question": "She missed the rest of what and wished she never slipped?",
+   "answer": "trip",
+   "said": "hotel",
+   "correct": false,
+   "pool": 16,
+   "in_pool": true
+  },
+  {
+   "story": 839,
+   "question": "Soon enough, what was far away and safe?",
+   "answer": "tire",
+   "said": "tire",
+   "correct": true,
+   "pool": 6,
+   "in_pool": true
+  },
+  {
+   "story": 840,
+   "question": "Who felt happy and not tired anymore?",
+   "answer": "timmy",
+   "said": "timmy",
+   "correct": true,
+   "pool": 11,
+   "in_pool": true
+  },
+  {
+   "story": 841,
+   "question": "Sophia was very polite and thanked her for bringing in what?",
+   "answer": "lamp",
+   "said": "lamp",
+   "correct": true,
+   "pool": 17,
+   "in_pool": true
+  },
+  {
+   "story": 842,
+   "question": "Sally felt happy that she had completed what?",
+   "answer": "project",
+   "said": "classroom",
+   "correct": false,
+   "pool": 13,
+   "in_pool": true
+  },
+  {
+   "story": 843,
+   "question": "He played with it for hours and even though what was still gloomy, he was happy?",
+   "answer": "sky",
+   "said": "car",
+   "correct": false,
+   "pool": 10,
+   "in_pool": true
+  },
+  {
+   "story": 844,
+   "question": "That made what and interesting?",
+   "answer": "fun",
+   "said": "try",
+   "correct": false,
+   "pool": 13,
+   "in_pool": true
+  },
+  {
+   "story": 845,
+   "question": "The family was very sad and they missed what?",
+   "answer": "car",
+   "said": "car",
+   "correct": true,
+   "pool": 17,
+   "in_pool": true
+  },
+  {
+   "story": 846,
+   "question": "Who hug them and say they are proud of them?",
+   "answer": "parents",
+   "said": "people",
+   "correct": false,
+   "pool": 40,
+   "in_pool": true
+  },
+  {
+   "story": 847,
+   "question": "The man was relieved when the collar weighed the same as before and he finally let who go?",
+   "answer": "dot",
+   "said": "time",
+   "correct": false,
+   "pool": 12,
+   "in_pool": true
+  },
+  {
+   "story": 848,
+   "question": "They had such a great time and Teddy was the most charming bear in what?",
+   "answer": "forest",
+   "said": "forest",
+   "correct": true,
+   "pool": 18,
+   "in_pool": true
+  },
+  {
+   "story": 849,
+   "question": "Who felt very sad and wished she had never played that terrible joke?",
+   "answer": "lily",
+   "said": "lily",
+   "correct": true,
+   "pool": 20,
+   "in_pool": true
+  },
+  {
+   "story": 850,
+   "question": "What was so happy?",
+   "answer": "frog",
+   "said": "frog",
+   "correct": true,
+   "pool": 10,
+   "in_pool": true
+  },
+  {
+   "story": 851,
+   "question": "Tate thanked what for giving him a place to heal and he promised to come back soon?",
+   "answer": "tree",
+   "said": "turtle",
+   "correct": false,
+   "pool": 11,
+   "in_pool": true
+  },
+  {
+   "story": 852,
+   "question": "Who waved goodbye and ran home with a big smile on her face?",
+   "answer": "bella",
+   "said": "bella",
+   "correct": true,
+   "pool": 11,
+   "in_pool": true
+  },
+  {
+   "story": 853,
+   "question": "The two brothers never want to open what again after that day?",
+   "answer": "refrigerator",
+   "said": "refrigerator",
+   "correct": true,
+   "pool": 18,
+   "in_pool": true
+  },
+  {
+   "story": 854,
+   "question": "What was happy and not upset anymore?",
+   "answer": "animal",
+   "said": "animal",
+   "correct": true,
+   "pool": 11,
+   "in_pool": true
+  },
+  {
+   "story": 855,
+   "question": "They share what and books?",
+   "answer": "toys",
+   "said": "tent",
+   "correct": false,
+   "pool": 14,
+   "in_pool": true
+  },
+  {
+   "story": 856,
+   "question": "Sally smiled and continued to clean with her toy mop until what was spotless?",
+   "answer": "room",
+   "said": "mom",
+   "correct": false,
+   "pool": 10,
+   "in_pool": true
+  },
+  {
+   "story": 857,
+   "question": "They got some crayons and drew a pretty picture on what?",
+   "answer": "box",
+   "said": "paper",
+   "correct": false,
+   "pool": 15,
+   "in_pool": true
+  },
+  {
+   "story": 858,
+   "question": "From that day on, Lily always remembered to wear her helmet and never forgot that she needed a license to ride her bike on what?",
+   "answer": "road",
+   "said": "bike",
+   "correct": false,
+   "pool": 16,
+   "in_pool": true
+  },
+  {
+   "story": 859,
+   "question": "In the end, who realized that sharing is important and it made her feel happy too?",
+   "answer": "lily",
+   "said": "lily",
+   "correct": true,
+   "pool": 11,
+   "in_pool": true
+  },
+  {
+   "story": 860,
+   "question": "He wishes he had not broken what?",
+   "answer": "snowman",
+   "said": "carrot",
+   "correct": false,
+   "pool": 17,
+   "in_pool": true
+  },
+  {
+   "story": 861,
+   "question": "After a while, the car was clean and shiny again, and who was very happy?",
+   "answer": "lily",
+   "said": "lily",
+   "correct": true,
+   "pool": 11,
+   "in_pool": true
+  },
+  {
+   "story": 862,
+   "question": "The dog was happy he had helped what, gave him a big smile and they both went on their merry way?",
+   "answer": "bird",
+   "said": "bird",
+   "correct": true,
+   "pool": 10,
+   "in_pool": true
+  },
+  {
+   "story": 863,
+   "question": "Timmy's mom was happy that he listened to her and minded what?",
+   "answer": "weather",
+   "said": "weather",
+   "correct": true,
+   "pool": 10,
+   "in_pool": true
+  },
+  {
+   "story": 864,
+   "question": "Who had a great time, feeling so happy and free?",
+   "answer": "boy",
+   "said": "boy",
+   "correct": true,
+   "pool": 9,
+   "in_pool": true
+  },
+  {
+   "story": 865,
+   "question": "Then the knight and who became good friends?",
+   "answer": "dragon",
+   "said": "dragon",
+   "correct": true,
+   "pool": 13,
+   "in_pool": true
+  },
+  {
+   "story": 866,
+   "question": "Who felt happy knowing that her family was there to make her feel better?",
+   "answer": "lily",
+   "said": "lily",
+   "correct": true,
+   "pool": 13,
+   "in_pool": true
+  },
+  {
+   "story": 867,
+   "question": "Who learned that even if he made a mistake, he could make things right by being helpful and obedient?",
+   "answer": "max",
+   "said": "max",
+   "correct": true,
+   "pool": 14,
+   "in_pool": true
+  },
+  {
+   "story": 868,
+   "question": "Benny was happy and thanked who for his help?",
+   "answer": "ollie",
+   "said": "ollie",
+   "correct": true,
+   "pool": 17,
+   "in_pool": true
+  },
+  {
+   "story": 869,
+   "question": "She realized that small things can have a big impact, just like her blanket had for what?",
+   "answer": "jellyfish",
+   "said": "jellyfish",
+   "correct": true,
+   "pool": 13,
+   "in_pool": true
+  },
+  {
+   "story": 870,
+   "question": "Lily had so much fun swinging and playing at what?",
+   "answer": "park",
+   "said": "park",
+   "correct": true,
+   "pool": 14,
+   "in_pool": true
+  },
+  {
+   "story": 871,
+   "question": "They hoped who would behave next time?",
+   "answer": "rex",
+   "said": "mom",
+   "correct": false,
+   "pool": 18,
+   "in_pool": true
+  },
+  {
+   "story": 872,
+   "question": "The mystery was solved, and who could sleep well again?",
+   "answer": "lucy",
+   "said": "lucy",
+   "correct": true,
+   "pool": 16,
+   "in_pool": true
+  },
+  {
+   "story": 873,
+   "question": "Dave's struggles were all in vain, and what came to an end?",
+   "answer": "journey",
+   "said": "life",
+   "correct": false,
+   "pool": 16,
+   "in_pool": true
+  },
+  {
+   "story": 874,
+   "question": "Who learned that with practice and help from friends, anything is possible?",
+   "answer": "tim",
+   "said": "tim",
+   "correct": true,
+   "pool": 10,
+   "in_pool": true
+  },
+  {
+   "story": 875,
+   "question": "Who proved that with a little bit of effort and strong will, it is possible to succeed?",
+   "answer": "jim",
+   "said": "jim",
+   "correct": true,
+   "pool": 13,
+   "in_pool": true
+  },
+  {
+   "story": 876,
+   "question": "John thanked what and said goodbye?",
+   "answer": "journal",
+   "said": "journal",
+   "correct": true,
+   "pool": 13,
+   "in_pool": true
+  },
+  {
+   "story": 877,
+   "question": "From that day on, what always added a bit of cheese to all his powder snacks?",
+   "answer": "mouse",
+   "said": "mouse",
+   "correct": true,
+   "pool": 19,
+   "in_pool": true
+  },
+  {
+   "story": 878,
+   "question": "And thank you, who, for helping me?",
+   "answer": "god",
+   "said": "dad",
+   "correct": false,
+   "pool": 21,
+   "in_pool": true
+  },
+  {
+   "story": 879,
+   "question": "From then on, who was always careful when trying to do something that was dangerous?",
+   "answer": "annie",
+   "said": "annie",
+   "correct": true,
+   "pool": 9,
+   "in_pool": true
+  },
+  {
+   "story": 880,
+   "question": "The partner agreed and together they flew high in what?",
+   "answer": "sky",
+   "said": "sky",
+   "correct": true,
+   "pool": 7,
+   "in_pool": true
+  },
+  {
+   "story": 881,
+   "question": "He realized that what was special, and he would never forget how important it was for him to have it and how it made awesome things happen?",
+   "answer": "stamp",
+   "said": "stamp",
+   "correct": true,
+   "pool": 9,
+   "in_pool": true
+  },
+  {
+   "story": 882,
+   "question": "They even promised to watch what to celebrate every year?",
+   "answer": "television",
+   "said": "bear",
+   "correct": false,
+   "pool": 15,
+   "in_pool": true
+  },
+  {
+   "story": 883,
+   "question": "Lily and her mom ate sandwiches with who and talked about their adventure?",
+   "answer": "man",
+   "said": "balloon",
+   "correct": false,
+   "pool": 15,
+   "in_pool": true
+  },
+  {
+   "story": 884,
+   "question": "He went to bed happy, dreaming of sailing on what?",
+   "answer": "yacht",
+   "said": "boat",
+   "correct": false,
+   "pool": 12,
+   "in_pool": true
+  },
+  {
+   "story": 885,
+   "question": "Who was very proud of what he had done?",
+   "answer": "chris",
+   "said": "chris",
+   "correct": true,
+   "pool": 14,
+   "in_pool": true
+  },
+  {
+   "story": 886,
+   "question": "From that day on, Max and what lived together and had many fun adventures?",
+   "answer": "rabbit",
+   "said": "cat",
+   "correct": false,
+   "pool": 13,
+   "in_pool": true
+  },
+  {
+   "story": 887,
+   "question": "She decided to wear what everyday and never take it off?",
+   "answer": "crown",
+   "said": "crown",
+   "correct": true,
+   "pool": 16,
+   "in_pool": true
+  },
+  {
+   "story": 888,
+   "question": "And so, Lily and her mom went home, happy and tired from a fun day at what?",
+   "answer": "park",
+   "said": "park",
+   "correct": true,
+   "pool": 15,
+   "in_pool": true
+  },
+  {
+   "story": 889,
+   "question": "So they will keep on praying and helping others in need, so that they all can continue to feel what of prayer?",
+   "answer": "power",
+   "said": "power",
+   "correct": true,
+   "pool": 16,
+   "in_pool": true
+  },
+  {
+   "story": 890,
+   "question": "Tom smiled and hugged who back?",
+   "answer": "jack",
+   "said": "tom",
+   "correct": false,
+   "pool": 14,
+   "in_pool": true
+  },
+  {
+   "story": 891,
+   "question": "And she never forgot about what that caused her harm?",
+   "answer": "scissors",
+   "said": "one",
+   "correct": false,
+   "pool": 14,
+   "in_pool": true
+  },
+  {
+   "story": 892,
+   "question": "They both stepped outside together and played in what?",
+   "answer": "garden",
+   "said": "garden",
+   "correct": true,
+   "pool": 15,
+   "in_pool": true
+  },
+  {
+   "story": 893,
+   "question": "And they never lost a spoon again because they always remembered what?",
+   "answer": "numbers",
+   "said": "spoon",
+   "correct": false,
+   "pool": 13,
+   "in_pool": true
+  },
+  {
+   "story": 894,
+   "question": "He thanked the cone for what before flying off into the sky?",
+   "answer": "help",
+   "said": "help",
+   "correct": true,
+   "pool": 11,
+   "in_pool": true
+  },
+  {
+   "story": 895,
+   "question": "The balloon flew away and who cheered with joy?",
+   "answer": "jimmy",
+   "said": "jimmy",
+   "correct": true,
+   "pool": 12,
+   "in_pool": true
+  },
+  {
+   "story": 896,
+   "question": "She took what, and went home to her mother, ready for the next adventure?",
+   "answer": "bear",
+   "said": "time",
+   "correct": false,
+   "pool": 24,
+   "in_pool": true
+  },
+  {
+   "story": 897,
+   "question": "Jon and Katy laughed and smiled as they spent the day enjoying what that they designed?",
+   "answer": "shade",
+   "said": "day",
+   "correct": false,
+   "pool": 14,
+   "in_pool": true
+  },
+  {
+   "story": 898,
+   "question": "From that day on, Tim loved to go out and play when what was shining?",
+   "answer": "sun",
+   "said": "sun",
+   "correct": true,
+   "pool": 11,
+   "in_pool": true
+  },
+  {
+   "story": 899,
+   "question": "In the end, Johnny was proud of himself, and who was proud of him too?",
+   "answer": "mommy",
+   "said": "johnny",
+   "correct": false,
+   "pool": 11,
+   "in_pool": true
+  },
+  {
+   "story": 900,
+   "question": "He thinks he will be a successful newspaper seller like who when he grows up?",
+   "answer": "dad",
+   "said": "dad",
+   "correct": true,
+   "pool": 15,
+   "in_pool": true
+  },
+  {
+   "story": 901,
+   "question": "The clock kept ticking, but who felt mighty too for doing a good deed?",
+   "answer": "boy",
+   "said": "bird",
+   "correct": false,
+   "pool": 9,
+   "in_pool": true
+  },
+  {
+   "story": 902,
+   "question": "Ted thanked the farmer and never strayed from home again - at least not without what?",
+   "answer": "basket",
+   "said": "ted",
+   "correct": false,
+   "pool": 16,
+   "in_pool": true
+  },
+  {
+   "story": 903,
+   "question": "The mom and siblings soon joined in and what was filled with music and joy?",
+   "answer": "room",
+   "said": "room",
+   "correct": true,
+   "pool": 19,
+   "in_pool": true
+  },
+  {
+   "story": 904,
+   "question": "He was happy that he got to ride on the fast boat, and he didn't want what to end?",
+   "answer": "day",
+   "said": "boat",
+   "correct": false,
+   "pool": 16,
+   "in_pool": true
+  },
+  {
+   "story": 905,
+   "question": "She was safe and happy with who?",
+   "answer": "dad",
+   "said": "mom",
+   "correct": false,
+   "pool": 17,
+   "in_pool": true
+  },
+  {
+   "story": 906,
+   "question": "But who wasn't worried?",
+   "answer": "girl",
+   "said": "girl",
+   "correct": true,
+   "pool": 18,
+   "in_pool": true
+  },
+  {
+   "story": 907,
+   "question": "He was filled with stories to tell and ready for what?",
+   "answer": "adventure",
+   "said": "adventure",
+   "correct": true,
+   "pool": 20,
+   "in_pool": true
+  },
+  {
+   "story": 908,
+   "question": "The little girl was so happy that she could help what?",
+   "answer": "bird",
+   "said": "bird",
+   "correct": true,
+   "pool": 13,
+   "in_pool": true
+  },
+  {
+   "story": 909,
+   "question": "Who was sad?",
+   "answer": "man",
+   "said": "man",
+   "correct": true,
+   "pool": 8,
+   "in_pool": true
+  },
+  {
+   "story": 910,
+   "question": "Tim felt happy too, and they both enjoyed what together?",
+   "answer": "room",
+   "said": "box",
+   "correct": false,
+   "pool": 14,
+   "in_pool": true
+  },
+  {
+   "story": 911,
+   "question": "Lily was very happy to have what back and decided to be more careful when playing with it?",
+   "answer": "bracelet",
+   "said": "bracelet",
+   "correct": true,
+   "pool": 10,
+   "in_pool": true
+  },
+  {
+   "story": 912,
+   "question": "From that day on, Timmy always thanked the bus driver for managing what?",
+   "answer": "smell",
+   "said": "bus",
+   "correct": false,
+   "pool": 11,
+   "in_pool": true
+  },
+  {
+   "story": 913,
+   "question": "From that day on, whenever it rained, Lily and what would play together and create new adventures?",
+   "answer": "frog",
+   "said": "frog",
+   "correct": true,
+   "pool": 11,
+   "in_pool": true
+  },
+  {
+   "story": 914,
+   "question": "Jack felt much better, he was so happy he could finally play with who?",
+   "answer": "girl",
+   "said": "girl",
+   "correct": true,
+   "pool": 12,
+   "in_pool": true
+  },
+  {
+   "story": 915,
+   "question": "What flew away?",
+   "answer": "fly",
+   "said": "fly",
+   "correct": true,
+   "pool": 11,
+   "in_pool": true
+  },
+  {
+   "story": 916,
+   "question": "He realized that life was better when he was happy and with who?",
+   "answer": "friends",
+   "said": "friend",
+   "correct": true,
+   "pool": 12,
+   "in_pool": true
+  },
+  {
+   "story": 917,
+   "question": "She liked to think of it as her friend and every night she would look up to what and think of all the possibilities in outer space?",
+   "answer": "sky",
+   "said": "sky",
+   "correct": true,
+   "pool": 14,
+   "in_pool": true
+  },
+  {
+   "story": 918,
+   "question": "Who smiled and felt happy?",
+   "answer": "timmy",
+   "said": "timmy",
+   "correct": true,
+   "pool": 10,
+   "in_pool": true
+  },
+  {
+   "story": 919,
+   "question": "They ended up having a fun day playing with who in the grass instead?",
+   "answer": "max",
+   "said": "lily",
+   "correct": false,
+   "pool": 16,
+   "in_pool": true
+  },
+  {
+   "story": 920,
+   "question": "And so Katie was able to keep what and she loved wearing it every day?",
+   "answer": "suit",
+   "said": "dress",
+   "correct": false,
+   "pool": 14,
+   "in_pool": true
+  },
+  {
+   "story": 921,
+   "question": "Timmy and Billy thanked who and went home with a valuable lesson learned?",
+   "answer": "man",
+   "said": "man",
+   "correct": true,
+   "pool": 16,
+   "in_pool": true
+  },
+  {
+   "story": 922,
+   "question": "He put his pillow under what?",
+   "answer": "head",
+   "said": "pillow",
+   "correct": false,
+   "pool": 13,
+   "in_pool": true
+  },
+  {
+   "story": 923,
+   "question": "Finally, the new television arrived and Timmy was able to watch what again?",
+   "answer": "show",
+   "said": "television",
+   "correct": false,
+   "pool": 10,
+   "in_pool": true
+  },
+  {
+   "story": 924,
+   "question": "John thanked the bird and said goodbye and continued to do what?",
+   "answer": "task",
+   "said": "task",
+   "correct": true,
+   "pool": 7,
+   "in_pool": true
+  },
+  {
+   "story": 925,
+   "question": "Billy smiled back at who?",
+   "answer": "mom",
+   "said": "billy",
+   "correct": false,
+   "pool": 8,
+   "in_pool": true
+  },
+  {
+   "story": 926,
+   "question": "It was a great day at the park and Lily learned to behave and share her special coin with who?",
+   "answer": "friends",
+   "said": "mom",
+   "correct": false,
+   "pool": 15,
+   "in_pool": true
+  },
+  {
+   "story": 927,
+   "question": "They love what and their friendship?",
+   "answer": "fort",
+   "said": "dragon",
+   "correct": false,
+   "pool": 29,
+   "in_pool": true
+  },
+  {
+   "story": 928,
+   "question": "It was what ever?",
+   "answer": "celebration",
+   "said": "day",
+   "correct": false,
+   "pool": 15,
+   "in_pool": true
+  },
+  {
+   "story": 929,
+   "question": "Jack smiled and thanked the man for what?",
+   "answer": "telescope",
+   "said": "mustache",
+   "correct": false,
+   "pool": 12,
+   "in_pool": true
+  },
+  {
+   "story": 930,
+   "question": "He was happy to have learned this important lesson and never made the mistake of getting too close to what again?",
+   "answer": "sun",
+   "said": "sun",
+   "correct": true,
+   "pool": 15,
+   "in_pool": true
+  },
+  {
+   "story": 931,
+   "question": "From that moment on, who knew that he could always protect those he loved?",
+   "answer": "ted",
+   "said": "ted",
+   "correct": true,
+   "pool": 16,
+   "in_pool": true
+  },
+  {
+   "story": 932,
+   "question": "From that day, the animal made sure not to wander off too far; it drew a line on the ground, so it would always be available when who was looking for it?",
+   "answer": "mommy",
+   "said": "mommy",
+   "correct": true,
+   "pool": 7,
+   "in_pool": true
+  },
+  {
+   "story": 933,
+   "question": "He got to the door and he kicked what one last time?",
+   "answer": "heels",
+   "said": "heel",
+   "correct": true,
+   "pool": 9,
+   "in_pool": true
+  },
+  {
+   "story": 934,
+   "question": "Sadly, Mr. Smith went home without what and felt very upset?",
+   "answer": "toys",
+   "said": "sack",
+   "correct": false,
+   "pool": 16,
+   "in_pool": true
+  },
+  {
+   "story": 935,
+   "question": "The ball was happy, and from that day on, the boy and the restless ball rolled and played together in what, always happy and never alone?",
+   "answer": "nation",
+   "said": "tree",
+   "correct": false,
+   "pool": 11,
+   "in_pool": true
+  },
+  {
+   "story": 936,
+   "question": "She thanked who and they all went to do something else?",
+   "answer": "mom",
+   "said": "mom",
+   "correct": true,
+   "pool": 10,
+   "in_pool": true
+  },
+  {
+   "story": 937,
+   "question": "From that day onwards, who always went on bouncing adventures to find new and magical things?",
+   "answer": "girl",
+   "said": "girl",
+   "correct": true,
+   "pool": 9,
+   "in_pool": true
+  },
+  {
+   "story": 938,
+   "question": "She always had a smile on her face whenever what would ring?",
+   "answer": "bell",
+   "said": "bell",
+   "correct": true,
+   "pool": 9,
+   "in_pool": true
+  },
+  {
+   "story": 939,
+   "question": "Finally, Bubbles found what and ate them all up?",
+   "answer": "carrots",
+   "said": "stick",
+   "correct": false,
+   "pool": 12,
+   "in_pool": true
+  },
+  {
+   "story": 940,
+   "question": "From then on, he continued to explore the ocean, always staying away from who?",
+   "answer": "collector",
+   "said": "collector",
+   "correct": true,
+   "pool": 14,
+   "in_pool": true
+  },
+  {
+   "story": 941,
+   "question": "He was happy that he could make Mommy happy by increasing the size of what?",
+   "answer": "garage",
+   "said": "garage",
+   "correct": true,
+   "pool": 11,
+   "in_pool": true
+  },
+  {
+   "story": 942,
+   "question": "What was never able to be completed?",
+   "answer": "parade",
+   "said": "parade",
+   "correct": true,
+   "pool": 6,
+   "in_pool": true
+  },
+  {
+   "story": 943,
+   "question": "She knew what was safe and warm?",
+   "answer": "frog",
+   "said": "frog",
+   "correct": true,
+   "pool": 10,
+   "in_pool": true
+  },
+  {
+   "story": 944,
+   "question": "From that day on, the little rabbit drove what and made his own choices?",
+   "answer": "life",
+   "said": "life",
+   "correct": true,
+   "pool": 12,
+   "in_pool": true
+  },
+  {
+   "story": 945,
+   "question": "And Lily felt happy again, knowing that she could always go back to what and have fun?",
+   "answer": "park",
+   "said": "park",
+   "correct": true,
+   "pool": 12,
+   "in_pool": true
+  },
+  {
+   "story": 946,
+   "question": "She had found what and she would never forget this special day?",
+   "answer": "ocean",
+   "said": "tunnel",
+   "correct": false,
+   "pool": 15,
+   "in_pool": true
+  },
+  {
+   "story": 947,
+   "question": "So, the fish and what were best friends and they swam and flew around the ocean together, having a lot of fun?",
+   "answer": "bird",
+   "said": "fish",
+   "correct": false,
+   "pool": 10,
+   "in_pool": true
+  },
+  {
+   "story": 948,
+   "question": "From that day on, who learned that sharing is important and it makes her feel happy when she does?",
+   "answer": "lily",
+   "said": "lily",
+   "correct": true,
+   "pool": 11,
+   "in_pool": true
+  },
+  {
+   "story": 949,
+   "question": "They would visit often and feed who all kinds of tasty treats?",
+   "answer": "ash",
+   "said": "people",
+   "correct": false,
+   "pool": 20,
+   "in_pool": true
+  },
+  {
+   "story": 950,
+   "question": "The ship stayed there for a while and then it went away, but who never forgot how much he admired it?",
+   "answer": "boy",
+   "said": "boy",
+   "correct": true,
+   "pool": 14,
+   "in_pool": true
+  },
+  {
+   "story": 951,
+   "question": "She loved to learn new things and share them with her friends, even if they were nosy like what?",
+   "answer": "squirrel",
+   "said": "squirrel",
+   "correct": true,
+   "pool": 14,
+   "in_pool": true
+  },
+  {
+   "story": 952,
+   "question": "Who was so happy that he thanked the fair and hugged her tight?",
+   "answer": "bunny",
+   "said": "bunny",
+   "correct": true,
+   "pool": 9,
+   "in_pool": true
+  },
+  {
+   "story": 953,
+   "question": "Who was no longer a poor, sad boy?",
+   "answer": "timmy",
+   "said": "timmy",
+   "correct": true,
+   "pool": 17,
+   "in_pool": true
+  },
+  {
+   "story": 954,
+   "question": "He discovered that in order to truly enjoy something, you have to settle what and anxieties first?",
+   "answer": "frustrations",
+   "said": "time",
+   "correct": false,
+   "pool": 15,
+   "in_pool": true
+  },
+  {
+   "story": 955,
+   "question": "They love to jog with Mom in what?",
+   "answer": "park",
+   "said": "park",
+   "correct": true,
+   "pool": 33,
+   "in_pool": true
+  },
+  {
+   "story": 956,
+   "question": "Sue hugged her doll and they both went to sleep, excited to play together again the next what?",
+   "answer": "day",
+   "said": "day",
+   "correct": true,
+   "pool": 11,
+   "in_pool": true
+  },
+  {
+   "story": 957,
+   "question": "He waved what and wished for a lollipop which appeared in his hand?",
+   "answer": "wand",
+   "said": "wand",
+   "correct": true,
+   "pool": 19,
+   "in_pool": true
+  },
+  {
+   "story": 958,
+   "question": "What now reminds us all that wisdom can help us escape any trouble?",
+   "answer": "bird",
+   "said": "bird",
+   "correct": true,
+   "pool": 16,
+   "in_pool": true
+  },
+  {
+   "story": 959,
+   "question": "Who thought this was so cool?",
+   "answer": "john",
+   "said": "john",
+   "correct": true,
+   "pool": 11,
+   "in_pool": true
+  },
+  {
+   "story": 960,
+   "question": "She knew then that remembering to forgive is what of all?",
+   "answer": "present",
+   "said": "thing",
+   "correct": false,
+   "pool": 16,
+   "in_pool": true
+  },
+  {
+   "story": 961,
+   "question": "You always make sure that everyone, including what, have enough to eat?",
+   "answer": "animals",
+   "said": "food",
+   "correct": false,
+   "pool": 19,
+   "in_pool": true
+  },
+  {
+   "story": 962,
+   "question": "Who realized that he was lucky to have experienced this same view in two very different ways?",
+   "answer": "jack",
+   "said": "jack",
+   "correct": true,
+   "pool": 25,
+   "in_pool": true
+  },
+  {
+   "story": 963,
+   "question": "She loves what?",
+   "answer": "dolphin",
+   "said": "dolphin",
+   "correct": true,
+   "pool": 30,
+   "in_pool": true
+  },
+  {
+   "story": 964,
+   "question": "Molly waved to what as they said goodbye?",
+   "answer": "knob",
+   "said": "knob",
+   "correct": true,
+   "pool": 18,
+   "in_pool": true
+  },
+  {
+   "story": 965,
+   "question": "From then on, Jack kept what close because he knew he would never?",
+   "answer": "toy",
+   "said": "toy",
+   "correct": true,
+   "pool": 18,
+   "in_pool": true
+  },
+  {
+   "story": 966,
+   "question": "From that day on, Lily always made sure to keep herself clean and what fitting perfectly?",
+   "answer": "shoes",
+   "said": "hair",
+   "correct": false,
+   "pool": 16,
+   "in_pool": true
+  },
+  {
+   "story": 967,
+   "question": "From that day on, she always made sure to stay close to who or tell her where she was going?",
+   "answer": "aunt",
+   "said": "aunt",
+   "correct": true,
+   "pool": 10,
+   "in_pool": true
+  },
+  {
+   "story": 968,
+   "question": "Who happily mailed Peter carrots and lettuce from then on?",
+   "answer": "jane",
+   "said": "jane",
+   "correct": true,
+   "pool": 12,
+   "in_pool": true
+  },
+  {
+   "story": 969,
+   "question": "Who smiled and said she would?",
+   "answer": "rosemary",
+   "said": "jeff",
+   "correct": false,
+   "pool": 14,
+   "in_pool": true
+  },
+  {
+   "story": 970,
+   "question": "From that day on, Timmy and his dad took care of the bunny together and used what to water its food?",
+   "answer": "hose",
+   "said": "bunny",
+   "correct": false,
+   "pool": 15,
+   "in_pool": true
+  },
+  {
+   "story": 971,
+   "question": "Sally loved her new toy and always kept it safe in what?",
+   "answer": "box",
+   "said": "box",
+   "correct": true,
+   "pool": 11,
+   "in_pool": true
+  },
+  {
+   "story": 972,
+   "question": "Tom couldn't believe his luck as he had asked for adventure, and what had granted his request?",
+   "answer": "goose",
+   "said": "goose",
+   "correct": true,
+   "pool": 14,
+   "in_pool": true
+  },
+  {
+   "story": 973,
+   "question": "And when they left, what stayed standing in the cold?",
+   "answer": "snowman",
+   "said": "snowman",
+   "correct": true,
+   "pool": 18,
+   "in_pool": true
+  },
+  {
+   "story": 974,
+   "question": "She said good night to what?",
+   "answer": "pictures",
+   "said": "mom",
+   "correct": false,
+   "pool": 27,
+   "in_pool": true
+  },
+  {
+   "story": 975,
+   "question": "She was so thankful for the things who taught her?",
+   "answer": "mommy",
+   "said": "mommy",
+   "correct": true,
+   "pool": 14,
+   "in_pool": true
+  },
+  {
+   "story": 976,
+   "question": "She read the novel many times and was happy her mom had allowed her to borrow it from what?",
+   "answer": "library",
+   "said": "library",
+   "correct": true,
+   "pool": 13,
+   "in_pool": true
+  },
+  {
+   "story": 977,
+   "question": "He says that he loves who?",
+   "answer": "mom",
+   "said": "car",
+   "correct": false,
+   "pool": 27,
+   "in_pool": true
+  },
+  {
+   "story": 978,
+   "question": "Who had to make a decision?",
+   "answer": "girl",
+   "said": "girl",
+   "correct": true,
+   "pool": 10,
+   "in_pool": true
+  },
+  {
+   "story": 979,
+   "question": "They both smiled, and had a lot of fun taking turns with the truck and what?",
+   "answer": "bucket",
+   "said": "truck",
+   "correct": false,
+   "pool": 15,
+   "in_pool": true
+  },
+  {
+   "story": 980,
+   "question": "From that day on, Chickie always filled her bowl with enough corn to share with who?",
+   "answer": "friends",
+   "said": "friend",
+   "correct": true,
+   "pool": 9,
+   "in_pool": true
+  },
+  {
+   "story": 981,
+   "question": "And so Emily took the jet for a lovely ride around what?",
+   "answer": "sky",
+   "said": "jet",
+   "correct": false,
+   "pool": 13,
+   "in_pool": true
+  },
+  {
+   "story": 982,
+   "question": "They share the sugar with who?",
+   "answer": "friends",
+   "said": "sugar",
+   "correct": false,
+   "pool": 18,
+   "in_pool": true
+  },
+  {
+   "story": 983,
+   "question": "Mommy and the little girl happily went home and discussed what?",
+   "answer": "day",
+   "said": "day",
+   "correct": true,
+   "pool": 23,
+   "in_pool": true
+  },
+  {
+   "story": 984,
+   "question": "Tommy wished he had listened to who?",
+   "answer": "driver",
+   "said": "driver",
+   "correct": true,
+   "pool": 16,
+   "in_pool": true
+  },
+  {
+   "story": 985,
+   "question": "She had a wonderful time exploring what?",
+   "answer": "park",
+   "said": "park",
+   "correct": true,
+   "pool": 13,
+   "in_pool": true
+  },
+  {
+   "story": 986,
+   "question": "She was making a happy memory in what?",
+   "answer": "park",
+   "said": "park",
+   "correct": true,
+   "pool": 11,
+   "in_pool": true
+  },
+  {
+   "story": 987,
+   "question": "From that day on, Lily always made sure to be good and take care of who?",
+   "answer": "snuggles",
+   "said": "snuggles",
+   "correct": true,
+   "pool": 17,
+   "in_pool": true
+  },
+  {
+   "story": 988,
+   "question": "From then on, Sam and Jane always looked for the witch in what?",
+   "answer": "garden",
+   "said": "garden",
+   "correct": true,
+   "pool": 14,
+   "in_pool": true
+  },
+  {
+   "story": 989,
+   "question": "Who learned a valuable lesson that day - that it was important to forgive and forget?",
+   "answer": "mary",
+   "said": "mary",
+   "correct": true,
+   "pool": 16,
+   "in_pool": true
+  },
+  {
+   "story": 990,
+   "question": "Lily felt happy that she could make who feel better?",
+   "answer": "friend",
+   "said": "friend",
+   "correct": true,
+   "pool": 16,
+   "in_pool": true
+  },
+  {
+   "story": 991,
+   "question": "The old man knew he had found a way to keep what warm and bright?",
+   "answer": "room",
+   "said": "finger",
+   "correct": false,
+   "pool": 12,
+   "in_pool": true
+  },
+  {
+   "story": 992,
+   "question": "The little boy was so happy that he could help what?",
+   "answer": "mum",
+   "said": "mum",
+   "correct": true,
+   "pool": 15,
+   "in_pool": true
+  },
+  {
+   "story": 993,
+   "question": "From then on, who never forgot the power of hard work and never gave into being selfish?",
+   "answer": "bill",
+   "said": "bill",
+   "correct": true,
+   "pool": 10,
+   "in_pool": true
+  },
+  {
+   "story": 994,
+   "question": "He felt much better after his nap and was ready to play with who?",
+   "answer": "kids",
+   "said": "time",
+   "correct": false,
+   "pool": 8,
+   "in_pool": true
+  },
+  {
+   "story": 995,
+   "question": "From then on, Sally always remembered to keep what clean and tidy?",
+   "answer": "ears",
+   "said": "eye",
+   "correct": false,
+   "pool": 15,
+   "in_pool": true
+  },
+  {
+   "story": 996,
+   "question": "The bad ending was that Dave and who never played together again?",
+   "answer": "jay",
+   "said": "dave",
+   "correct": false,
+   "pool": 7,
+   "in_pool": true
+  },
+  {
+   "story": 997,
+   "question": "Who smiles and nods?",
+   "answer": "man",
+   "said": "man",
+   "correct": true,
+   "pool": 34,
+   "in_pool": true
+  },
+  {
+   "story": 998,
+   "question": "Wherever she went, what followed?",
+   "answer": "wave",
+   "said": "wave",
+   "correct": true,
+   "pool": 12,
+   "in_pool": true
+  },
+  {
+   "story": 999,
+   "question": "But the snake was too fast, and he caught who in his mouth?",
+   "answer": "tweetie",
+   "said": "tweetie",
+   "correct": true,
+   "pool": 7,
+   "in_pool": true
+  }
+ ]
+}

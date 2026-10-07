@@ -256,7 +256,58 @@ def _summary(arm, rows, sizes, turn, started, cpu) -> dict:
 ARMS = {"graphed": Graphed, "recalled": Recalled, "asked": Asked}
 
 
-def main() -> None:
+def one(name: str, args, stories, asked: int, checks: int, stamp: str) -> int:
+    """One arm through the stream, its reading written and its curve printed."""
+    work = Path(tempfile.mkdtemp(prefix=f"unfused-stories-{name}-"))
+    arm = {"blind": Blind, "frequent": Frequent}[name]() if name not in ARMS         else ARMS[name](work)
+    out = run(arm, stories)
+    shutil.rmtree(work, ignore_errors=True)
+    reading = {"kind": "stories", "taken_at": stamp, "note": args.note,
+               "stream": {"source": "TinyStories-valid", "seed": args.seed,
+                          "stories": args.stories, "skip": args.skip,
+                          "questions": asked, "checks": checks,
+                          "fingerprint": fingerprint(stories)},
+               **out}
+    skip = f"-k{args.skip}" if args.skip else ""
+    path = ROOT / "readings" / f"stories-{name}-s{args.seed}-n{args.stories}{skip}-{stamp}.json"
+    path.write_text(json.dumps(reading, indent=1), encoding="utf-8")
+    for form, f in out["forms"].items():
+        curve = "  ".join(f"{b}:{c['score']}" for b, c in f["curve"].items())
+        print(f"{name:9} {form:5} {f['score']}  {curve}", flush=True)
+    print(f"{name:9} {out['seconds']}s (cpu {out.get('cpu_seconds')}s) -> {path.name}",
+          flush=True)
+    if "crashed" in out:
+        print(out["crashed"], flush=True)
+        return 1
+    return 0
+
+
+def apart(names: list[str], args, stamp: str) -> int:
+    """Arms that do not depend on one another, each in a process of its own (its own work
+    directory, as ever), `args.jobs` at a time. Each arm's output is printed whole when it
+    ends, in the order the arms were named, and its reading is the one a lone run writes."""
+    import subprocess
+    from concurrent.futures import ThreadPoolExecutor
+
+    def child(name: str) -> subprocess.CompletedProcess:
+        cmd = [sys.executable, str(Path(__file__).resolve()), "--stories", str(args.stories),
+               "--seed", str(args.seed), "--arms", name, "--note", args.note,
+               "--skip", str(args.skip), "--stamp", stamp, "--jobs", "1"]
+        return subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8")
+
+    failed = 0
+    with ThreadPoolExecutor(max_workers=args.jobs) as pool:
+        for done in [pool.submit(child, n) for n in names]:
+            got = done.result()
+            # the stream's size is printed once, above
+            print("".join(got.stdout.splitlines(keepends=True)[1:]), end="", flush=True)
+            if got.returncode:
+                print(got.stderr[-2000:], flush=True)
+                failed = 1
+    return failed
+
+
+def main() -> int:
     p = argparse.ArgumentParser()
     p.add_argument("--stories", type=int, default=300)
     p.add_argument("--seed", type=int, default=0)
@@ -265,36 +316,25 @@ def main() -> None:
     # a control: memory starts empty at this story, so a late bucket is read without
     # everything heard before it
     p.add_argument("--skip", type=int, default=0)
+    # how many arms run at once, each in a process of its own: one fewer than the cores
+    # by default, and never more than the arms
+    p.add_argument("--jobs", type=int, default=0)
+    p.add_argument("--stamp", default="", help=argparse.SUPPRESS)
     args = p.parse_args()
 
     stories = [s for s in stream(args.stories, args.seed) if s.index >= args.skip]
     asked = sum(s.question is not None for s in stories)
     checks = sum(len(s.checks) for s in stories)
     print(f"{len(stories)} stories, {asked} cloze, {checks} checks", flush=True)
-    stamp = datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")
-    for name in args.arms.split(","):
-        work = Path(tempfile.mkdtemp(prefix=f"unfused-stories-{name}-"))
-        arm = {"blind": Blind, "frequent": Frequent}[name]() if name not in ARMS \
-            else ARMS[name](work)
-        out = run(arm, stories)
-        shutil.rmtree(work, ignore_errors=True)
-        reading = {"kind": "stories", "taken_at": stamp, "note": args.note,
-                   "stream": {"source": "TinyStories-valid", "seed": args.seed,
-                              "stories": args.stories, "skip": args.skip,
-                              "questions": asked, "checks": checks,
-                              "fingerprint": fingerprint(stories)},
-                   **out}
-        skip = f"-k{args.skip}" if args.skip else ""
-        path = ROOT / "readings" / f"stories-{name}-s{args.seed}-n{args.stories}{skip}-{stamp}.json"
-        path.write_text(json.dumps(reading, indent=1), encoding="utf-8")
-        for form, f in out["forms"].items():
-            curve = "  ".join(f"{b}:{c['score']}" for b, c in f["curve"].items())
-            print(f"{name:9} {form:5} {f['score']}  {curve}", flush=True)
-        print(f"{name:9} {out['seconds']}s (cpu {out.get('cpu_seconds')}s) -> {path.name}",
-              flush=True)
-        if "crashed" in out:
-            print(out["crashed"], flush=True)
+    stamp = args.stamp or datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")
+    names = args.arms.split(",")
+    args.jobs = min(args.jobs or max(1, (os.cpu_count() or 1) - 1), len(names))
+    if args.jobs > 1:
+        return apart(names, args, stamp)
+    for name in names:
+        if one(name, args, stories, asked, checks, stamp):
             return 1
+    return 0
 
 
 if __name__ == "__main__":

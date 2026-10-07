@@ -1,0 +1,87 @@
+{
+ "kind": "situations-buckets",
+ "taken_at": "20261007T052143Z",
+ "note": "From state/weights-records-s0-n3000.json (weights-s0-n3000-20261007T052143Z: every question answered by focus's own pick, no plans, schemas or echo not computed). Each factor's share of clozes it ranks right alone, by stories heard, and beside recency, fit and mark with weights fitted on 300-1,000 and read on 1,000-3,000. The fork: does what a scale adds grow with stories heard.",
+ "clozes": {
+  "0-300": 298,
+  "300-1000": 695,
+  "1000-3000": 1988
+ },
+ "alone": {
+  "recency": [
+   0.312,
+   0.299,
+   0.302
+  ],
+  "fit": [
+   0.315,
+   0.361,
+   0.369
+  ],
+  "mark": [
+   0.087,
+   0.056,
+   0.124
+  ],
+  "sentence": [
+   0.161,
+   0.134,
+   0.124
+  ],
+  "fold0.5": [
+   0.138,
+   0.145,
+   0.152
+  ],
+  "fold0.8": [
+   0.128,
+   0.155,
+   0.195
+  ],
+  "fold0.95": [
+   0.094,
+   0.151,
+   0.191
+  ],
+  "story": [
+   0.158,
+   0.213,
+   0.217
+  ],
+  "situation": [
+   0.164,
+   0.196,
+   0.227
+  ]
+ },
+ "beside": {
+  "without": [
+   0.486,
+   0.482
+  ],
+  "sentence": [
+   0.492,
+   0.486
+  ],
+  "fold0.5": [
+   0.494,
+   0.484
+  ],
+  "fold0.8": [
+   0.498,
+   0.482
+  ],
+  "fold0.95": [
+   0.499,
+   0.484
+  ],
+  "story": [
+   0.492,
+   0.479
+  ],
+  "situation": [
+   0.496,
+   0.478
+  ]
+ }
+}

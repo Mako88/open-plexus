@@ -539,6 +539,8 @@ class GraphArm:
         self._steps: dict = {}
         # each node's steps by label and direction, kept beside the steps they sort
         self._labelled: dict = {}
+        # each node's steps' next nodes, as a tuple in order and a set, beside the steps
+        self._reached: dict = {}
         # every event's lemma, turn and mood, kept for good: what was heard never changes
         self._events: dict = {}
         # every name's mark, dropped only for names a sentence names
@@ -1024,38 +1026,59 @@ class GraphArm:
         nodes' steps are kept. Distances come first, from a search that copies no path;
         then only the ways along which each node is at its distance are followed, so a
         hub that joins every story costs its steps once, not once a path through it."""
-        # `is_` and `among`, with what they look up for the goal and for each individual
-        # read once a search: a search asks them millions of times of the same few
+        # what is the goal, read once a search: a name's goal is the name and each
+        # individual it finds, as `is_` asks, and a search asks of millions of nodes
         if goal.startswith("n:"):
             self.nodes(goal[2:])
-            found_by = self._nodes[("set", goal[2:])]
-
-            def is_goal(n: str) -> bool:
-                return n == goal or (n.startswith("i:") and n in found_by)
+            goals = self._nodes[("set", goal[2:])]
         else:
-            is_goal = goal.__eq__
+            goals = {goal}
         names: dict = {}
+        tracked = self.spent is not None
+        steps_of, reached_of = self._steps.get, self._reached
 
-        def among(n: str, where) -> bool:
-            if n in where:
-                return True
-            if not n.startswith("i:"):
-                return False
-            got = names.get(n)
-            if got is None:
-                got = names[n] = (f"n:{self.label(n)}", f"n:{self.describe(n)}")
-            return got[0] in where or got[1] in where
+        def reach(node: str) -> tuple:
+            """A node's steps, counted as `around` counts them, and with them the nodes
+            they lead to, each once, kept beside the steps they are read from."""
+            steps = self.around(node) if tracked else steps_of(node)
+            if steps is None:
+                steps = self.around(node)
+            kept = reached_of.get(node)
+            if kept is None or kept[0] is not steps:
+                nexts = tuple(dict.fromkeys(n for _, _, n in steps))
+                kept = reached_of[node] = (steps, nexts, frozenset(nexts))
+            return kept
 
         dist, layer, best = {start: 0}, [start], None
         for depth in range(1, limit + 1):
             nxt_layer = []
             for node in layer:
-                for _, _, nxt in self.around(node):
-                    if is_goal(nxt):
-                        best = depth
-                    elif not among(nxt, dist) and not (avoid and among(nxt, avoid)):
-                        dist[nxt] = depth
-                        nxt_layer.append(nxt)
+                _, nexts, every = reach(node)
+                # once a node of the layer leads to the goal the rest of it, and the layer
+                # it would make, are never read: they are only counted, above. Nor is the
+                # last layer, which can only find the goal
+                if best is not None:
+                    continue
+                if not goals.isdisjoint(every):
+                    best = depth
+                    continue
+                if depth == limit:
+                    continue
+                for nxt in nexts:
+                    if nxt in dist:
+                        continue
+                    if nxt.startswith("i:"):
+                        got = names.get(nxt)
+                        if got is None:
+                            got = names[nxt] = (f"n:{self.label(nxt)}", f"n:{self.describe(nxt)}")
+                        if got[0] in dist or got[1] in dist:
+                            continue
+                        if avoid and (nxt in avoid or got[0] in avoid or got[1] in avoid):
+                            continue
+                    elif avoid and nxt in avoid:
+                        continue
+                    dist[nxt] = depth
+                    nxt_layer.append(nxt)
             if best is not None or not nxt_layer:
                 break
             layer = nxt_layer
@@ -1068,10 +1091,10 @@ class GraphArm:
 
         def walk(path: list, depth: int) -> None:
             had = len(found)
-            for label, direction, nxt in self.around(path[-1]):
+            for label, direction, nxt in reach(path[-1])[0]:
                 if most is not None and len(found) >= most:
                     return
-                if is_goal(nxt):
+                if nxt in goals:
                     if depth + 1 == best:
                         found.append(path + [(label, direction), nxt])
                 elif depth + 1 < best and dist.get(nxt) == depth + 1 and nxt not in dead:

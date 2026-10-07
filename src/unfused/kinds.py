@@ -52,12 +52,12 @@ def kinds(rows, near: float = NEAR, rounds: int = ROUNDS,
         contexts: dict[str, Counter] = defaultdict(Counter)
         for args in by_event.values():
             for lemma, link, label in args:
+                r, mine = relation[lemma], contexts[label]
                 for _, other, w in args:
                     if w != label or other != link:
-                        r = relation[lemma]
-                        contexts[label][(link, other)] += 1
-                        contexts[label][(r, link, other)] += 1
-                        contexts[label][(r, link, other, kind[w])] += 1
+                        mine[(link, other)] += 1
+                        mine[(r, link, other)] += 1
+                        mine[(r, link, other, kind[w])] += 1
         nxt = _cluster(labels, contexts, near, merge)
         joins: dict[str, Counter] = defaultdict(Counter)
         for args in by_event.values():
@@ -74,11 +74,12 @@ def _cluster(labels: list[str], contexts: dict, near: float,
              merge: float | None = None) -> dict[str, int]:
     holders = Counter(c for w in labels for c in contexts[w])
     n = len(labels)
+    rarity = {c: math.log(1 + n / h) for c, h in holders.items()}
 
     def vector(w: str) -> dict:
         # each grain normalised on its own and weighted, coarse first, so the many rare
         # fine contexts refine the coarse likeness rather than drown it
-        v = {c: math.log1p(k) * math.log(1 + n / holders[c]) for c, k in contexts[w].items()}
+        v = {c: math.log1p(k) * rarity[c] for c, k in contexts[w].items()}
         grains: dict = defaultdict(float)
         for c, x in v.items():
             grains[len(c)] += x * x
@@ -86,29 +87,32 @@ def _cluster(labels: list[str], contexts: dict, near: float,
         norm = math.sqrt(sum(x * x for x in out.values())) or 1.0
         return {c: x / norm for c, x in out.items()}
 
-    centroids: list[dict] = []
     norms: list[float] = []
     squares: list[float] = []
-    # each context's kinds, so a label is compared only with kinds it shares one with
-    where: dict = defaultdict(set)
+    # each context's kinds and what each holds of it (the kinds' centroids, by context),
+    # so a label is compared only with kinds it shares a context with
+    held: dict = defaultdict(dict)
     out: dict[str, int] = {}
     vectors: dict = {}
     for w in labels:
         v = vectors[w] = vector(w)
         dots: dict[int, float] = defaultdict(float)
         for c, x in v.items():
-            for k in where[c]:
-                dots[k] += x * centroids[k][c]
-        best = max(dots, key=lambda k: (dots[k] / norms[k], -k), default=None)
-        if best is None or dots[best] / norms[best] < near:
-            best = len(centroids)
-            centroids.append({})
+            for k, y in held[c].items():
+                dots[k] += x * y
+        # the likest kind, the lowest numbered of any tie
+        best, top = None, 0.0
+        for k, d in dots.items():
+            like = d / norms[k]
+            if best is None or like > top or (like == top and k < best):
+                best, top = k, like
+        if best is None or top < near:
+            best = len(norms)
             norms.append(0.0)
             squares.append(0.0)
-        cen = centroids[best]
         for c, x in v.items():
-            cen[c] = cen.get(c, 0.0) + x
-            where[c].add(best)
+            at = held[c]
+            at[best] = at.get(best, 0.0) + x
         # |cen + v|^2 from what is already known, never by summing the kind again
         squares[best] += 2 * dots.get(best, 0.0) + sum(x * x for x in v.values())
         norms[best] = math.sqrt(squares[best])
@@ -131,10 +135,10 @@ def _merged(labels: list[str], vectors: dict, kind: dict[str, int],
     index: dict = {}
     rows, cols, vals = [], [], []
     for r, w in enumerate(labels):
-        for c, x in vectors[w].items():
-            rows.append(r)
-            cols.append(index.setdefault(c, len(index)))
-            vals.append(x)
+        v = vectors[w]
+        rows += [r] * len(v)
+        cols += [index.setdefault(c, len(index)) for c in v]
+        vals += v.values()
     by_label = csr_matrix((vals, (rows, cols)), shape=(len(labels), len(index)))
     while True:
         ids = sorted(set(kind.values()))

@@ -115,6 +115,8 @@ MARGIN = 0.08
 DECAY = 0.5
 # how many of a node's steps of one label a walk follows, the latest first
 REACH = 100
+# how many writes a commit waits for, a story's end aside
+BATCH = 64
 # how many of a name's steps are returned, the latest first, as recall by a cue returns a
 # few and never everything: adjectives as nodes of their own ('little', 'big') are hubs
 # every story's things hang off, and a path search fanned out across all of them
@@ -501,8 +503,8 @@ class GraphArm:
                  known: dict | None = None, cache: Path | None = CACHE) -> None:
         directory.mkdir(parents=True, exist_ok=True)
         self.db = sqlite3.connect(str(directory / "graph.db"))
-        # a commit after every sentence is kept, and written ahead, without waiting on
-        # the disk for each one
+        # what is written is kept in batches (`written`), and written ahead, without
+        # waiting on the disk for each commit
         self.db.execute("PRAGMA journal_mode=WAL")
         self.db.execute("PRAGMA synchronous=NORMAL")
         self.db.executescript(SCHEMA)
@@ -510,6 +512,7 @@ class GraphArm:
             self.db.executemany(f"INSERT OR IGNORE INTO {table} VALUES (?, ?, ?, ?)",
                                 [tuple(x) for x in rows])
         self.db.commit()
+        self._unwritten = 0
         # what was being heard when each word was heard, folded over the stream
         self.situations = Situations(self.db)
         self.model = model
@@ -620,13 +623,23 @@ class GraphArm:
             self._keep(key, kept)
         return [tuple(k) for k in kept]
 
+    def written(self, now: bool = False) -> None:
+        """Make what was written durable: at each break between stories, and otherwise
+        once in `BATCH` calls, not after every sentence, where the commits were the largest
+        single cost of a run. The connection reads its own writes, so no answer waits on
+        a commit; `close` makes the rest durable."""
+        self._unwritten += 1
+        if now or self._unwritten >= BATCH:
+            self.db.commit()
+            self._unwritten = 0
+
     def hear(self, turn: int, text: str) -> None:
         # a turn holding no words is a break in the text ('***', a new page): what is
         # heard after it is another episode
         if not any(ch.isalnum() for ch in text):
             self.db.execute("INSERT OR IGNORE INTO boundaries VALUES (?)", (turn,))
             self.situations.ended()
-            self.db.commit()
+            self.written(True)
             self.recalled = []
             # a name's steps are its individuals in mind, and a new episode has none
             for key in [k for k in self._steps if k.startswith("n:")]:
@@ -714,7 +727,7 @@ class GraphArm:
                                 "pronoun) DO UPDATE SET n = n + 1",
                                 (f"n:{self.label(node)}", t[2:].split("|", 1)[1]))
                 self._agreed.pop(self.label(node), None)
-        self.db.commit()
+        self.written()
 
     def referent(self, pronoun: str) -> str | None:
         """What a pronoun refers to, from this episode: the latest individual in the slot
@@ -1628,7 +1641,7 @@ class GraphArm:
         goals = self.holding(want)
         self.learn_circumstance(question, want)
         if not fillers:
-            self.db.commit()
+            self.written()
             return
         if not goals and not want.isdigit():
             # an answer nothing heard holds may be a number word, whose worth is learnt
@@ -1676,7 +1689,7 @@ class GraphArm:
                 stored["sig"] = self.signature(question, fillers)
                 self.db.execute("INSERT OR IGNORE INTO learnt VALUES (?, ?, 1, 0)",
                                 (shape, json.dumps(stored)))
-        self.db.commit()
+        self.written()
 
     # -- words never heard ----------------------------------------------------
 
@@ -1800,7 +1813,7 @@ class GraphArm:
                     here &= set(json.loads(row[0]))
                 self.db.execute("INSERT OR REPLACE INTO contexts VALUES (?, ?, ?)",
                                 (w, json.dumps(sorted(here)), (row[1] if row else 0) + 1))
-        self.db.commit()
+        self.written()
 
     def pinned(self, word: str) -> str | None:
         """The one name every hearing of a word left, where two or more agreed: one

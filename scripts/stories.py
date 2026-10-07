@@ -259,7 +259,7 @@ ARMS = {"graphed": Graphed, "recalled": Recalled, "asked": Asked}
 def one(name: str, args, stories, asked: int, checks: int, stamp: str) -> int:
     """One arm through the stream, its reading written and its curve printed."""
     work = Path(tempfile.mkdtemp(prefix=f"unfused-stories-{name}-"))
-    arm = {"blind": Blind, "frequent": Frequent}[name]() if name not in ARMS         else ARMS[name](work)
+    arm = ARMS[name](work) if name in ARMS else {"blind": Blind, "frequent": Frequent}[name]()
     out = run(arm, stories)
     shutil.rmtree(work, ignore_errors=True)
     reading = {"kind": "stories", "taken_at": stamp, "note": args.note,

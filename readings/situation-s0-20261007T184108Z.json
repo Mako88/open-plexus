@@ -1,0 +1,159 @@
+{
+ "kind": "situation",
+ "taken_at": "20261007T184108Z",
+ "note": "7f first read: a predictor from the event and the story so far, by passes of replay. Refuted at this size if story clears neither joint on unheard fillers nor joint-recent (recency, as focus has it) on all",
+ "graph": "state\\graphs\\stream",
+ "stories": [
+  2608,
+  653
+ ],
+ "asked": 20000,
+ "unheard": 4167,
+ "width": 128,
+ "reads": {
+  "role": {
+   "all": {
+    "mrr": 0.2461,
+    "hit1": 0.1631,
+    "hit10": 0.4208
+   },
+   "unheard": {
+    "mrr": 0.0847,
+    "hit1": 0.0384,
+    "hit10": 0.1665
+   }
+  },
+  "counts": {
+   "all": {
+    "mrr": 0.3041,
+    "hit1": 0.2165,
+    "hit10": 0.4802
+   },
+   "unheard": {
+    "mrr": 0.0504,
+    "hit1": 0.0154,
+    "hit10": 0.1099
+   }
+  },
+  "joint": {
+   "all": {
+    "mrr": 0.3393,
+    "hit1": 0.2457,
+    "hit10": 0.5251
+   },
+   "unheard": {
+    "mrr": 0.063,
+    "hit1": 0.0221,
+    "hit10": 0.1368
+   }
+  },
+  "joint-recent0.1": {
+   "all": {
+    "mrr": 0.4241,
+    "hit1": 0.2764,
+    "hit10": 0.7419
+   },
+   "unheard": {
+    "mrr": 0.1969,
+    "hit1": 0.0463,
+    "hit10": 0.5817
+   }
+  },
+  "joint-recent0.3": {
+   "all": {
+    "mrr": 0.5034,
+    "hit1": 0.3525,
+    "hit10": 0.7902
+   },
+   "unheard": {
+    "mrr": 0.3525,
+    "hit1": 0.1809,
+    "hit10": 0.695
+   }
+  },
+  "joint-recent0.5": {
+   "all": {
+    "mrr": 0.5178,
+    "hit1": 0.3584,
+    "hit10": 0.8006
+   },
+   "unheard": {
+    "mrr": 0.4286,
+    "hit1": 0.2681,
+    "hit10": 0.7267
+   }
+  },
+  "event-1": {
+   "all": {
+    "mrr": 0.2896,
+    "hit1": 0.2074,
+    "hit10": 0.4583
+   },
+   "unheard": {
+    "mrr": 0.0879,
+    "hit1": 0.0398,
+    "hit10": 0.1797
+   }
+  },
+  "event-3": {
+   "all": {
+    "mrr": 0.343,
+    "hit1": 0.2512,
+    "hit10": 0.5255
+   },
+   "unheard": {
+    "mrr": 0.0936,
+    "hit1": 0.042,
+    "hit10": 0.1898
+   }
+  },
+  "event-10": {
+   "all": {
+    "mrr": 0.3393,
+    "hit1": 0.2522,
+    "hit10": 0.511
+   },
+   "unheard": {
+    "mrr": 0.0711,
+    "hit1": 0.0288,
+    "hit10": 0.1404
+   }
+  },
+  "story-1": {
+   "all": {
+    "mrr": 0.4626,
+    "hit1": 0.375,
+    "hit10": 0.6165
+   },
+   "unheard": {
+    "mrr": 0.3129,
+    "hit1": 0.2376,
+    "hit10": 0.4442
+   }
+  },
+  "story-3": {
+   "all": {
+    "mrr": 0.5098,
+    "hit1": 0.414,
+    "hit10": 0.6796
+   },
+   "unheard": {
+    "mrr": 0.3748,
+    "hit1": 0.2822,
+    "hit10": 0.534
+   }
+  },
+  "story-10": {
+   "all": {
+    "mrr": 0.4458,
+    "hit1": 0.3513,
+    "hit10": 0.6237
+   },
+   "unheard": {
+    "mrr": 0.2725,
+    "hit1": 0.1781,
+    "hit10": 0.4579
+   }
+  }
+ }
+}

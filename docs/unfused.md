@@ -106,14 +106,15 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
      walks).
   3. ~~A check that more than one telling answers accepts every answer they support~~.
      Struck 2026-10-04 (`_answers` in `exam/stories.py`).
-  4. Harder checks, one at a time and each measured alone. Done: further from their
-     sentence (`far`, not harder: an episode is held whole) and early stories asked
-     late (`late`, after a parent's reminder, 0.484 against near 0.965; 0.686 with
-     no reminder, since a retold sentence opens new individuals). Left, after item 7
-     (John's, 2026-10-04 put item 5 first so every later reading is quick to take;
-     the cloze's lever has since moved to item 7): needing two told facts, and about
-     what changed. Late's reminder as a person
-     gives one is in (`cued`, John's).
+  4. NEXT. Harder checks, one at a time and each measured alone (John's, 2026-10-07:
+     the main curve and slope; see DECIDED, the cloze is knowledge). Done: further
+     from their sentence (`far`, not harder: an episode is held whole) and early
+     stories asked late (`late`, after a parent's reminder, 0.484 against near 0.965;
+     0.686 with no reminder, since a retold sentence opens new individuals). Late's
+     reminder as a person gives one is in (`cued`, John's). Left, in order: needing
+     two told facts put together, about what changed (where a thing is now, after it
+     moved), and why something happened. The information is in the story, so these
+     read understanding apart from knowledge; scale should not be what they need.
   5. The walk (John's): every node a question names fires at once, and what
      their activations meet at is the answer, as spreading activation does
      (Quillian; ACT-R), each node passing on activation divided by its fan so a hub
@@ -168,7 +169,7 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
      few where the cue is ambiguous (worth at most about three points); and whether
      episodes recalled together become a category (OPEN FORKS, meta layers, John's
      'dreaming').
-  7. NEXT. A slow memory that generalises (John's, 2026-10-06; complementary learning
+  7. A slow memory that generalises (John's, 2026-10-06; complementary learning
      systems, McClelland, McNaughton and O'Reilly). The graph is the fast memory, one
      hearing and every episode kept apart, which is why the checks read 0.97. What is
      missing is the slow one, whose representations overlap so what is learnt of one
@@ -203,7 +204,7 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
         further (0.193 against 0.191 at 1,000-3,000), and all scales together end
         lower. Prediction as the teacher stays the idea; this rule over these vectors
         only front-loads what counting reaches anyway.
-     d. NEXT. Schemas with roles, minted where a pattern recurs and pays (OPEN FORKS, meta
+     d. Schemas with roles, minted where a pattern recurs and pays (OPEN FORKS, meta
         layers): the units the next layer builds on.
      e. ~~How much a vector holds~~ (John's, 2026-10-07). Struck 2026-10-07
         (`scripts/capacity.py`): bound vectors hold a word's experience exactly up to
@@ -215,7 +216,7 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
         the story, replayed, read the cloze at 0.310 alone and 0.387 beside focus,
         against 0.486, and do not grow from 300 stories to 1,000. Not the idea: it never
         read the wh-word's mark, and was trained apart from focus rather than as its
-        score. Next is d, schemas.
+        score. Next for knowledge is d, schemas, judged by slope.
      Refuted if, with all of it, the cloze still reads no higher at 1,000-3,000 than
      at 300-1,000.
   Then John's two nearest goals (2026-10-04): a conversation with the system (the
@@ -481,6 +482,13 @@ commit.
   a fact should answer it every time, so each miss has a cause to find. The cloze stays
   as a second curve, read as prediction (what a story brings back), never removed. The
   checks are made harder (THE ORDER) so they measure past 0.94.
+  - **The cloze is knowledge, not understanding** (John's, 2026-10-07). What fills a
+    held-back sentence comes from experience across many stories (how often a butterfly
+    lands on a flower), not from the story asked about, so it measures how much has been
+    heard. It drops in priority: the harder checks are the main curve, and a mechanism
+    for knowledge earns its place by the cloze's slope (rising from 300-1,000 to
+    1,000-3,000), never by its level at one size. Nothing is scaled up until something's
+    slope rises.
 - **A continual learner is judged by how well it keeps learning.** John's, 2026-10-03.
   Three readings along one stream, weightiest first: whether it still gets more right as it
   hears more, whether it keeps what it had (early material asked late), and what an answer

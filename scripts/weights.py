@@ -48,6 +48,9 @@ class Schemed(GraphArm):
     """The system as committed, which also counts narrative schemas as each episode
     ends, so focus's names can be read with them. Its answers are the committed ones."""
 
+    # an answer keeps what focus weighed, so it is not weighed a second time here
+    trace = True
+
     def __init__(self, *args, **kw) -> None:
         super().__init__(*args, **kw)
         self.db.executescript(
@@ -172,20 +175,28 @@ class Schemed(GraphArm):
 
 
 class Recorded(runner.Graphed):
-    def __init__(self, work: Path) -> None:
+    def __init__(self, work: Path, every: int = 1) -> None:
         super().__init__(work)
+        # the extra factors are read on every `every`th question focus decided
+        self.every, self.decided = every, 0
         self.arm.close()
         self.open = lambda: Schemed(work)
         self.arm = self.open()
         self.records: list[dict] = []
 
     def ask(self, turn, story):
-        scores = self.arm.focus(story.question) or {}
+        said = super().ask(turn, story)
+        scores = self.arm.traced or {}
+        if scores:
+            self.decided += 1
+        # a question outside the sample keeps no record: the sweep reads those it has
+        # every factor of
+        if scores and (self.decided - 1) % self.every:
+            scores = {}
         schemas = self.arm.schemas(story.question) if scores else {}
         echoes = self.arm.echoes(story.question) if scores else {}
         scores = {n: (*f, schemas.get(n, 1.0), QUIET + echoes.get(n, 0.0))
                   for n, f in scores.items()}
-        said = super().ask(turn, story)
         notes = self.arm.last_notes
         # one entry an ask, in the order the runner's rows come, to be joined with them
         # whether each right name's label had a kind when asked: a word first heard since
@@ -259,10 +270,13 @@ def main() -> int:
     p.add_argument("--stories", type=int, default=1000)
     p.add_argument("--seed", type=int, default=0)
     p.add_argument("--note", default="")
+    # the extra factors (schemas, echoes) cost more than the answer: read them on every
+    # Nth question focus decides, and the sweep is over those
+    p.add_argument("--every", type=int, default=1)
     args = p.parse_args()
     stories = stream(args.stories, args.seed)
     work = Path(tempfile.mkdtemp(prefix="unfused-weights-"))
-    arm = Recorded(work)
+    arm = Recorded(work, args.every)
     out = runner.run(arm, stories)
     shutil.rmtree(work, ignore_errors=True)
     records = [{**r, "story": row["story"], "form": row["form"]}

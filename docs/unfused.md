@@ -203,21 +203,18 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
         further (0.193 against 0.191 at 1,000-3,000), and all scales together end
         lower. Prediction as the teacher stays the idea; this rule over these vectors
         only front-loads what counting reaches anyway.
-     d. Schemas with roles, minted where a pattern recurs and pays (OPEN FORKS, meta
+     d. NEXT. Schemas with roles, minted where a pattern recurs and pays (OPEN FORKS, meta
         layers): the units the next layer builds on.
      e. ~~How much a vector holds~~ (John's, 2026-10-07). Struck 2026-10-07
         (`scripts/capacity.py`): bound vectors hold a word's experience exactly up to
         tens of facts at 1,024 wide, summed never, learnt only a hub's; and no likeness
         of words, the exact counts' own included, predicts a pairing not yet heard
         better than the role's commonest fillers. The exact store stays the store.
-     f. NEXT. The split (DECIDED, vectors hold a moment): a predictor from the
-        situation to what comes next, learnt by replay, its guess cleaned up by the
-        graph. First offline, on the saved stream graph (`scripts/situation.py`): held-out
-        events' fillers predicted from the event's other items and the story so far,
-        against the exact counts backed off to the role's commonest, by passes of
-        replay. Refuted at this size if no conditioning clears the counts on unheard
-        fillers; then the slow memory waits on more stories, not on its shape. Then, if
-        it clears, into focus as its score, read on the cloze.
+     f. ~~A predictor from the situation~~. Refuted 2026-10-07 (`c479e826`, deleted in
+        the commit after it): learnt role-gated vectors over the event and the story,
+        replayed, read the cloze at 0.310 alone and 0.387 beside focus, against 0.486,
+        and do not grow from 300 stories to 1,000. Focus's mark and fit are worth more
+        than what this predictor learns at this size. Next is d, schemas.
      Refuted if, with all of it, the cloze still reads no higher at 1,000-3,000 than
      at 300-1,000.
   Then John's two nearest goals (2026-10-04): a conversation with the system (the

@@ -253,26 +253,7 @@ def _summary(arm, rows, sizes, turn, started, cpu) -> dict:
             "forms": forms, "rows": rows}
 
 
-class Predicted(Graphed):
-    """Focus scored by the slow memory's predictor alone (THE ORDER, item 7f)."""
-    name = "predicted"
-    predicting = "alone"
-
-    def __init__(self, work: Path) -> None:
-        from unfused.graph import GraphArm
-
-        self.open = lambda: GraphArm(work, predicting=self.predicting)
-        self.arm = self.open()
-
-
-class Mixed(Predicted):
-    """The predictor's chance beside focus's factors, as one more of them."""
-    name = "mixed"
-    predicting = "mixed"
-
-
-ARMS = {"graphed": Graphed, "recalled": Recalled, "asked": Asked, "predicted": Predicted,
-        "mixed": Mixed}
+ARMS = {"graphed": Graphed, "recalled": Recalled, "asked": Asked}
 
 
 def one(name: str, args, stories, asked: int, checks: int, stamp: str) -> int:

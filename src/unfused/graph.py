@@ -23,7 +23,7 @@ import json
 import math
 import re
 import sqlite3
-from collections import Counter, deque
+from collections import Counter
 from pathlib import Path
 
 from unfused.home import home

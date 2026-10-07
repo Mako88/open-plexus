@@ -87,13 +87,6 @@ _OBJECT_SYNONYMS = {
     "walking sticks": "canes", "glass jars": "preserving pots", "iron hooks": "metal pegs",
     "wool cards": "fleece combs",
 }
-_TRADE_SYNONYMS = {
-    "repairs clocks": "mends timepieces", "keeps bees": "tends hives",
-    "binds books": "sews volumes", "grinds lenses": "shapes optics",
-    "shoes horses": "fits hooves", "thatches roofs": "lays reed",
-    "carves spoons": "whittles utensils", "dyes wool": "colours fleece",
-    "sets type": "arranges letterpress", "mends nets": "patches trawls",
-}
 
 # How a fact is told. Several surfaces per kind, because people do not say a
 # thing the same way twice, and one surface per kind lets a keyword index align

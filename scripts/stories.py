@@ -19,11 +19,11 @@ import sys
 import tempfile
 import time
 from collections import Counter, defaultdict
-from datetime import UTC, datetime
 from pathlib import Path
 
 os.environ.setdefault("HF_HUB_OFFLINE", "1")
 
+from unfused.reading import utc_stamp  # noqa: E402
 from unfused.exam.stories import bucket, fingerprint, right, stream  # noqa: E402
 from unfused.exam.world import RIGHT, WRONG  # noqa: E402
 
@@ -326,7 +326,7 @@ def main() -> int:
     asked = sum(s.question is not None for s in stories)
     checks = sum(len(s.checks) for s in stories)
     print(f"{len(stories)} stories, {asked} cloze, {checks} checks", flush=True)
-    stamp = args.stamp or datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")
+    stamp = args.stamp or utc_stamp()
     names = args.arms.split(",")
     args.jobs = min(args.jobs or max(1, (os.cpu_count() or 1) - 1), len(names))
     if args.jobs > 1:

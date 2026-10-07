@@ -16,11 +16,11 @@ import os
 import shutil
 import sys
 import tempfile
-from datetime import UTC, datetime
 from pathlib import Path
 
 os.environ.setdefault("HF_HUB_OFFLINE", "1")
 
+from unfused.reading import utc_stamp  # noqa: E402
 from unfused.arms import FullContext  # noqa: E402
 from unfused.exam.babi import TASKS, fingerprint, modal_answers, stories  # noqa: E402
 from unfused.exam.run import converse, run, summarise  # noqa: E402
@@ -110,7 +110,7 @@ def main() -> None:
         summary = summarise(rows)
         by_task = {str(t): round(sum(r["correct"] for r in rows if r["task"] == t)
                                  / max(1, sum(r["task"] == t for r in rows)), 3) for t in tasks}
-        taken = datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")
+        taken = utc_stamp()
         reading = {
             "kind": "babi", "arm": name, "taken_at": taken, "note": args.note,
             # the command that took it, so a comparison copies it rather than rebuilds it

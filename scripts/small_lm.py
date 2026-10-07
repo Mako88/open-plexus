@@ -24,7 +24,6 @@ import re
 import sys
 import time
 from collections import Counter
-from datetime import UTC, datetime
 from pathlib import Path
 
 os.environ.setdefault("HF_HUB_OFFLINE", "1")
@@ -32,6 +31,7 @@ os.environ.setdefault("HF_HUB_OFFLINE", "1")
 import torch  # noqa: E402
 from torch import nn  # noqa: E402
 
+from unfused.reading import utc_stamp  # noqa: E402
 from unfused.exam.stories import VALID, fingerprint, raw, right, stream  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -171,7 +171,7 @@ def main() -> int:
                      "said": said, "correct": right(s.answers, said), "pool": len(pool),
                      "in_pool": any(right(s.answers, c) for c in pool)})
     score = sum(r["correct"] for r in rows) / len(rows) if rows else 0.0
-    stamp = datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")
+    stamp = utc_stamp()
     reading = {"kind": "small-lm", "taken_at": stamp, "note": args.note,
                "stream": {"source": "TinyStories-valid", "seed": args.seed,
                           "stories": args.stories, "fingerprint": fingerprint(stories),

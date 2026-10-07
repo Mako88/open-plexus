@@ -16,11 +16,11 @@ import os
 import shutil
 import sys
 import tempfile
-from datetime import UTC, datetime
 from pathlib import Path
 
 os.environ.setdefault("HF_HUB_OFFLINE", "1")
 
+from unfused.reading import utc_stamp  # noqa: E402
 from unfused.arms import SYSTEM, Blind, FullContext, Recall  # noqa: E402
 from unfused.exam.run import converse, run  # noqa: E402
 from unfused.exam.second import generate_second_house  # noqa: E402
@@ -114,7 +114,7 @@ def main() -> None:
         result = run(house, open_arm, limit=args.limit)
         shutil.rmtree(work, ignore_errors=True)
 
-        taken = datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")
+        taken = utc_stamp()
         reading = {
             **result,
             "kind": "exam",

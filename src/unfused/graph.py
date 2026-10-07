@@ -892,11 +892,7 @@ class GraphArm:
             # kinds whenever in the stage they are read, a reopening included
             last = self.db.execute("SELECT id FROM events ORDER BY id LIMIT 1 OFFSET ?",
                                    (max(0, min(events, math.ceil(1.25 ** stage)) - 1),)).fetchone()
-            rows = [(e, lemma, link, self.label(n)) for e, lemma, link, n in self.db.execute(
-                "SELECT edges.event, events.lemma, edges.label, edges.node FROM edges JOIN "
-                "events ON events.id = edges.event WHERE edges.node NOT LIKE 'e:%' AND "
-                "edges.node NOT LIKE 'f:%' AND edges.event <= ?",
-                (last[0] if last else 0,))]
+            rows = self.arguments(last[0] if last else 0)
             kind = kinds(rows)
             slots, filled = Counter(), Counter()
             for _, lemma, link, label in rows:
@@ -904,6 +900,15 @@ class GraphArm:
                 filled[kind[label]] += 1
             got = self._kinds = (self.episode(), stage, kind, slots, filled)
         return got[2], got[3], got[4]
+
+    def arguments(self, upto: int | None = None) -> list[tuple[int, str, str, str]]:
+        """Every argument of every event that names something, as (event, lemma, link,
+        label), of the events up to `upto` where it is given: what `kinds` reads."""
+        where = "" if upto is None else " AND edges.event <= ?"
+        return [(e, lemma, link, self.label(n)) for e, lemma, link, n in self.db.execute(
+            "SELECT edges.event, events.lemma, edges.label, edges.node FROM edges JOIN "
+            "events ON events.id = edges.event WHERE edges.node NOT LIKE 'e:%' AND "
+            f"edges.node NOT LIKE 'f:%'{where}", () if upto is None else (upto,))]
 
     def kind_of(self, word: str) -> int | None:
         """The kind a label is of, learnt from how it connects; None for one never
@@ -2035,6 +2040,12 @@ class GraphArm:
             out += [first, last] if events else [lo + 1, hi]
         return tuple(out)
 
+    def events_in_mind(self, lemma: str, mood: str, limit: int) -> list[int]:
+        """The latest events of a verb in this mood that are in mind, newest first."""
+        return [e for (e,) in self.db.execute(
+            f"SELECT id FROM events WHERE lemma = ? AND mood = ? AND {self._mind('turn')} "
+            "ORDER BY id DESC LIMIT ?", (lemma, mood, *self._held(), limit))]
+
     def in_focus(self, name: str) -> bool:
         held = self.nodes(name)
         return self.db.execute(
@@ -2200,9 +2211,7 @@ class GraphArm:
             groups.append({n: 1.0 / len(held) for n in held})
         if lemma is not None:
             # a verb fires its events in mind the same way, and its latest where none is
-            events = [f"e:{e}" for (e,) in self.db.execute(
-                f"SELECT id FROM events WHERE lemma = ? AND mood = ? AND {self._mind('turn')} "
-                "ORDER BY id DESC LIMIT ?", (lemma, mood_, *self._held(), LEMMA))] or [
+            events = [f"e:{e}" for e in self.events_in_mind(lemma, mood_, LEMMA)] or [
                 f"e:{e}" for (e,) in self.db.execute(
                     "SELECT id FROM events WHERE lemma = ? AND mood = ? ORDER BY id DESC "
                     "LIMIT ?", (lemma, mood_, LEMMA))]
@@ -2335,9 +2344,7 @@ class GraphArm:
         if got is None or got[1] != ["prep:*"]:
             return
         lemma, _, bound, _, mood_, wh = got
-        for (eid,) in self.db.execute(
-                f"SELECT id FROM events WHERE lemma = ? AND mood = ? AND {self._mind('turn')} "
-                "ORDER BY id DESC LIMIT 50", (lemma, mood_, *self._held())).fetchall():
+        for eid in self.events_in_mind(lemma, mood_, 50):
             edges = self.db.execute("SELECT label, node FROM edges WHERE event = ? AND node "
                                     "NOT LIKE 'f:%'", (eid,)).fetchall()
             if not all(any(lab == label and self.is_(n, f"n:{name}") for lab, n in edges)

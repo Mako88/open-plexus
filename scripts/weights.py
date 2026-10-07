@@ -21,15 +21,16 @@ import os
 import shutil
 import sys
 import tempfile
-from datetime import UTC, datetime
 from pathlib import Path
 
 os.environ.setdefault("HF_HUB_OFFLINE", "1")
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 import stories as runner  # noqa: E402
+from unfused.reading import utc_stamp  # noqa: E402
 from unfused.exam.stories import fingerprint, right, stream  # noqa: E402
 from unfused.graph import BLANKS, GraphArm, parse  # noqa: E402
+from unfused.home import home  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[1]
 FACTORS = ("recency", "fit", "mark", "schema", "echo")
@@ -281,7 +282,7 @@ def main() -> int:
     shutil.rmtree(work, ignore_errors=True)
     records = [{**r, "story": row["story"], "form": row["form"]}
                for r, row in zip(arm.records, out["rows"]) if r is not None]
-    stamp = datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")
+    stamp = utc_stamp()
     half = args.stories // 2
     reading = {"kind": "weights", "taken_at": stamp, "note": args.note,
                "stream": {"source": "TinyStories-valid", "seed": args.seed,
@@ -322,7 +323,7 @@ def main() -> int:
         }
     path = ROOT / "readings" / f"weights-s{args.seed}-n{args.stories}-{stamp}.json"
     path.write_text(json.dumps(reading, indent=1), encoding="utf-8")
-    raw = ROOT / "state" / f"weights-records-s{args.seed}-n{args.stories}.json"
+    raw = home() / "state" / f"weights-records-s{args.seed}-n{args.stories}.json"
     raw.parent.mkdir(parents=True, exist_ok=True)
     raw.write_text(json.dumps(records), encoding="utf-8")
     print(json.dumps(reading["forms"], indent=1))

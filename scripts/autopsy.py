@@ -18,13 +18,13 @@ import shutil
 import sys
 import tempfile
 from collections import Counter
-from datetime import UTC, datetime
 from pathlib import Path
 
 os.environ.setdefault("HF_HUB_OFFLINE", "1")
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 import stories as runner  # noqa: E402
+from unfused.reading import utc_stamp  # noqa: E402
 from unfused.exam.stories import fingerprint, stream  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -122,7 +122,7 @@ def main() -> int:
     out = runner.run(arm, stories)
     shutil.rmtree(work, ignore_errors=True)
     rows = [{**r, **t} for r, t in zip(out["rows"], arm.traces)]
-    stamp = datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")
+    stamp = utc_stamp()
     reading = {"kind": "autopsy", "taken_at": stamp, "note": args.note,
                "stream": {"source": "TinyStories-valid", "seed": args.seed,
                           "stories": args.stories, "fingerprint": fingerprint(stories)},

@@ -21,12 +21,12 @@ from __future__ import annotations
 
 import argparse
 import json
-from datetime import UTC, datetime
 from itertools import product
 from pathlib import Path
 
 import numpy as np
 
+from unfused.reading import utc_stamp
 from unfused.exam.world import _OBJECT_SYNONYMS, _ROOM_SYNONYMS, generate_house
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -105,7 +105,7 @@ def main() -> None:
         print(seed, summary)
         out.append({"seed": seed, "summary": summary, "picks": tally})
 
-    taken = datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")
+    taken = utc_stamp()
     path = ROOT / "readings" / f"unheard-{taken}.json"
     path.write_text(json.dumps({
         "kind": "unheard", "taken_at": taken, "note": args.note,

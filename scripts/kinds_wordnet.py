@@ -27,10 +27,7 @@ def main() -> None:
     ap.add_argument("--top", type=int, default=300)
     args = ap.parse_args()
     a = GraphArm(args.graph)
-    rows = [(e, lemma, link, a.label(n)) for e, lemma, link, n in a.db.execute(
-        "SELECT edges.event, events.lemma, edges.label, edges.node FROM edges JOIN events "
-        "ON events.id = edges.event WHERE edges.node NOT LIKE 'e:%' AND edges.node NOT "
-        "LIKE 'f:%'")]
+    rows = a.arguments()
     heard = Counter(r[3] for r in rows)
     truths: dict = {}
 

@@ -24,11 +24,11 @@ import json
 import os
 import tempfile
 from collections import Counter
-from datetime import UTC, datetime
 from pathlib import Path
 
 import numpy as np
 
+from unfused.reading import utc_stamp
 from unfused.exam.world import generate_house
 from unfused.graph import GraphArm
 
@@ -83,7 +83,7 @@ def main() -> None:
         row = read(seed)
         out.append(row)
         print(row, flush=True)
-    taken = datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")
+    taken = utc_stamp()
     path = ROOT / "readings" / f"kinds-{taken}.json"
     path.write_text(json.dumps({
         "kind": "kinds", "taken_at": taken, "note": args.note,

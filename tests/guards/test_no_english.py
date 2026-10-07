@@ -6,7 +6,9 @@ the foundation's item 4). With the foundation's other parts, in `test_individual
 import ast
 from pathlib import Path
 
-SOURCE = Path(__file__).resolve().parents[2] / "src" / "unfused" / "graph.py"
+SRC = Path(__file__).resolve().parents[2] / "src" / "unfused"
+# the graph and the reading it is built from
+SOURCES = [SRC / "graph.py", SRC / "parsing.py"]
 
 # words of one language that rules in the system have named: pronouns, wh-words, the
 # prepositions of place, refusals, negation, number words and the stand-in for a blank
@@ -23,9 +25,10 @@ def test_no_word_of_one_language_is_held_by_hand():
     English word (John's, 2026-10-01 and 2026-10-04). What a word does is read from what
     the parser marks in any language (a relation, a feature such as definiteness), or
     learnt. Capital letters are a mark of some scripts only."""
-    held = sorted({node.value for node in ast.walk(ast.parse(SOURCE.read_text("utf-8")))
+    held = sorted({node.value for path in SOURCES
+                   for node in ast.walk(ast.parse(path.read_text("utf-8")))
                    if isinstance(node, ast.Constant) and isinstance(node.value, str)
                    and node.value.lower() in ENGLISH})
-    capitals = SOURCE.read_text("utf-8").count(".isupper()")
+    capitals = sum(path.read_text("utf-8").count(".isupper()") for path in SOURCES)
     assert not held and not capitals, (
-        f"graph.py names English words {held} and reads capitals {capitals} times")
+        f"graph.py and parsing.py name English words {held} and read capitals {capitals} times")

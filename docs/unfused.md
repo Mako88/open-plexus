@@ -210,11 +210,12 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
         tens of facts at 1,024 wide, summed never, learnt only a hub's; and no likeness
         of words, the exact counts' own included, predicts a pairing not yet heard
         better than the role's commonest fillers. The exact store stays the store.
-     f. ~~A predictor from the situation~~. Refuted 2026-10-07 (`c479e826`, deleted in
-        the commit after it): learnt role-gated vectors over the event and the story,
-        replayed, read the cloze at 0.310 alone and 0.387 beside focus, against 0.486,
-        and do not grow from 300 stories to 1,000. Focus's mark and fit are worth more
-        than what this predictor learns at this size. Next is d, schemas.
+     f. ~~A predictor from the situation~~. This shape lost 2026-10-07 (`c479e826`,
+        deleted in the commit after it): learnt role-gated vectors over the event and
+        the story, replayed, read the cloze at 0.310 alone and 0.387 beside focus,
+        against 0.486, and do not grow from 300 stories to 1,000. Not the idea: it never
+        read the wh-word's mark, and was trained apart from focus rather than as its
+        score. Next is d, schemas.
      Refuted if, with all of it, the cloze still reads no higher at 1,000-3,000 than
      at 300-1,000.
   Then John's two nearest goals (2026-10-04): a conversation with the system (the

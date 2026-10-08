@@ -106,7 +106,7 @@ class Recalled(Graphed):
     apart from finding the episode (THE ORDER, after the foundation, item 6)."""
 
     def recall(self, lo, hi):
-        self.arm.recall(lo, hi)
+        self.arm.mind.recall(lo, hi)
 
 
 class Asked(Recalled):

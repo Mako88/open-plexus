@@ -334,3 +334,10 @@ def test_a_blank_is_read_as_the_slot_it_stands_in(tmp_path):
     assert a.reader.blank("She sat down and read what?") == ("read", "obj")
     assert a.reader.blank("In the end, Tom and what had a great time?") == ("have", "nsubj")
     assert a.reader.blank("The man brought him back to what?") == ("bring", "prep:to")
+
+
+def test_a_phrase_is_said_in_a_text_whatever_the_case_of_either():
+    from unfused.said import said_in
+
+    assert said_in("Ada", "where is ada?") and said_in("ada", "Where is Ada?")
+    assert said_in("red ball", "The RED ball rolled.") and not said_in("ball", "The ballad.")

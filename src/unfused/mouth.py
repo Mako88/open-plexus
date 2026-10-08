@@ -28,7 +28,7 @@ class Mouth:
         arm = self.arm
         asked = set(arm.reader.words(question))
         best, best_key = None, None
-        for node in arm.individuals(answer, episode=True) + [f"n:{answer}"]:
+        for node in arm.individuals.of(answer, episode=True) + [f"n:{answer}"]:
             for event, label in arm.store.edges_into(node):
                 row = arm.db.execute("SELECT turn, heard FROM events WHERE id = ?",
                                      (event,)).fetchone()

@@ -52,7 +52,7 @@ class Traced(runner.Graphed):
         said = super().ask(turn, story)
         a = self.arm
         shape, fillers = a.shape(story.question)
-        gold = {n[2:] for w in story.answers for n in a.holding(w)}
+        gold = {n[2:] for w in story.answers for n in a.individuals.holding(w)}
         # the shortest way from any name the question gives to any right name
         hops = None
         for f in fillers:

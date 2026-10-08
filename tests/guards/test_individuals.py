@@ -23,9 +23,9 @@ def test_a_thing_is_its_own_node_apart_from_its_words(tmp_path):
             "Tom had a red ball.", "Tom painted the ball blue.", "Tom threw the ball."]):
         a.hear(turn, text)
     assert hasattr(a, "individuals"), "the graph keeps no individuals apart from words"
-    assert len(a.individuals("lily")) == 2, "two stories' Lilys are two girls"
-    rooms = a.individuals("room")
+    assert len(a.individuals.of("lily")) == 2, "two stories' Lilys are two girls"
+    rooms = a.individuals.of("room")
     assert len(rooms) == 2, f"the still room and the sitting room are two rooms, not {rooms}"
-    balls = a.individuals("ball", episode=True)
+    balls = a.individuals.of("ball", episode=True)
     assert len(balls) == 1, f"the painted ball is one ball, not {balls}"
-    assert "blue" in a.said_of(balls[0]), "what was said of the ball last holds"
+    assert "blue" in a.individuals.said_of(balls[0]), "what was said of the ball last holds"

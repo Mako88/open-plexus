@@ -47,6 +47,7 @@ from unfused.parsing import (  # noqa: F401
 )
 from unfused.plans import Plans
 from unfused.reader import Reader
+from unfused.recounter import Recounter
 from unfused.said import said_in
 from unfused.shaper import Shaper
 from unfused.situations import Situations
@@ -113,6 +114,8 @@ class GraphArm:
         # a sentence heard, written into the graph
         self.hearer = Hearer(self.store, self.reader, self.mind, self.individuals,
                              self.walker, self.situations)
+        # a question whose answer is something that happened
+        self.recounter = Recounter(self.store, self.reader, self.mind)
         self.mouth = Mouth(self)
         self.last_notes: list[str] = []
         self.traced: dict | None = None
@@ -130,6 +133,10 @@ class GraphArm:
         # borrowed or joined: a wording taught before an alias settled holds the lessons
         self.aliaser.heard_in(question.text)
         self.traced = None
+        # a question whose frame lessons answered with events is answered with one
+        if event := self.recounter.answer(question.text):
+            self.last_notes = ["(found)", f"event:{event}", "by:recount"]
+            return event
         # what the question's names and verb meet at, read from its grammar, is the
         # answer whatever else is found, so it is asked first and nothing else is asked
         # when it answers: most checks are answered so, and paid for every plan before it
@@ -200,6 +207,9 @@ class GraphArm:
         if self.pending is not None and not about_world:
             question, said = self.pending
             self.pending = None
+            # a lesson whose answer was something that happened leaves no plan to a name
+            if self.recounter.learn(question, text, said):
+                return None
             named, negated = self.reaction(text, question)
             if named:
                 self.teach(question, named)

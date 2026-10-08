@@ -344,3 +344,19 @@ def test_a_phrase_is_said_in_a_text_whatever_the_case_of_either():
 
     assert said_in("Ada", "where is ada?") and said_in("ada", "Where is Ada?")
     assert said_in("red ball", "The RED ball rolled.") and not said_in("ball", "The ballad.")
+
+
+def test_a_frame_lessons_answered_with_events_is_answered_with_one(tmp_path):
+    """Which questions want something that happened is learnt from lessons, by the
+    question's frame, and such an answer is said as its predicate (the Recounter)."""
+    a = arm(tmp_path)
+    for turn, text in enumerate(["Ada walked to the river.", "Ada caught a fish."]):
+        a.turn(turn, text)
+    a.turn(2, "What did Ada do at the river?")
+    a.turn(3, "No, it's walked to the river.")
+    a.turn(4, "What did Ada do with the fish?")
+    a.turn(5, "No, it's caught a fish.")
+    a.turn(6, "***")
+    a.turn(7, "Bren baked a cake in the kitchen.")
+    a.turn(8, "Bren sang a song.")
+    assert a.turn(9, "What did Bren do in the kitchen?") == "baked a cake in the kitchen"

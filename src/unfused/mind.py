@@ -78,8 +78,7 @@ class Mind:
         self.recalled.append((lo, hi, first, last, self.now() - hi))
         self.changed()
 
-    def held(
-self, turn: int) -> bool:
+    def held(self, turn: int) -> bool:
         """Whether a turn is in mind: in this episode or one recalled."""
         return turn > self.episode() or any(lo < turn <= hi for lo, hi, *_ in self.recalled)
 

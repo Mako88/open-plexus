@@ -305,7 +305,7 @@ def extract(doc) -> list[dict]:
             said = mood(tok)
             if tok.dep_ in ("csubj", "ccomp") and any(negates(c) for c in tok.head.children):
                 said = " ".join(w for w in (said, mood(tok.head)) if w)
-            events.append({"lemma": lemma, "mood": said, "edges": []})
+            events.append({"lemma": lemma, "mood": said, "edges": [], "head": tok.i})
             # the word as heard, where it is not the lemma: the inflection a mouth will
             # say again
             if cop is None and tok.lower_ != lemma:
@@ -386,7 +386,7 @@ def extract(doc) -> list[dict]:
     # ball. The link's name is the one the parse gives it, in the order heard
     for i, (_, _, mods, _) in sorted(things.items()):
         for label, m in mods:
-            events.append({"lemma": label, "mood": "", "edges": [
+            events.append({"lemma": label, "mood": "", "head": i, "edges": [
                 ["self", f"n:{called_by(doc[i])}\x1f{i}"], [label, f"n:{m}"]]})
     # an event left with no arguments goes, and every reference to the rest is
     # renumbered: its function words alone say nothing of anything
@@ -398,7 +398,8 @@ def extract(doc) -> list[dict]:
         edges = [[label, renumber.get(t, t)] for label, t in events[i]["edges"]
                  if not t.startswith("e:") or t in renumber]
         mentions = [int(t.split("\x1f")[1]) if "\x1f" in t else None for _, t in edges]
-        out.append({"lemma": events[i]["lemma"], "mood": events[i]["mood"],
+        # the token the event was heard at, so a mouth can say it again
+        out.append({"lemma": events[i]["lemma"], "mood": events[i]["mood"], "head": events[i]["head"],
                     "edges": [[label, t.split("\x1f")[0]] for label, t in edges],
                     "mentions": mentions,
                     "things": {str(m): things[m] for m in mentions if m is not None}})

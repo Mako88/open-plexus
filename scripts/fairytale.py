@@ -17,6 +17,8 @@ test split is untaught, as a benchmark's is. The arms:
 - `primed`: the system after the first `--primed` stories of the TinyStories stream, heard
   and taught as `scripts/stories.py` does, so what it learnt there is read on another
   world (DECIDED, bAbI's milestone is transfer).
+- `taught`: primed, then taught on the first `--teach` tales of the train split, as a
+  child is taught on stories before being tested on new ones.
 - `reader`: a served language model handed the tale so far and the question: what a frozen
   model reading the whole text scores (DECIDED, the models are a milestone check).
 """
@@ -121,6 +123,39 @@ class Primed(Graphed):
         return {**self.arm.dials(), "primed": self.primed}
 
 
+class Taught(Primed):
+    """Primed, then taught on the first `--teach` tales of the train split as the stream
+    teaches: each question asked once its sections are told, the teacher saying it was
+    right where the answer scores half the benchmark's ROUGE-L or more, and giving the
+    first annotator's answer where not."""
+
+    name = "taught"
+
+    def __init__(self, work: Path, stories: int, teach: int, recounts: bool = True) -> None:
+        from unfused.exam.world import RIGHT, WRONG
+
+        super().__init__(work, stories)
+        if not recounts:
+            # the control: taught alike, with no question answered by an event
+            self.arm.recounter.learn = lambda *_: False
+            self.arm.recounter.answer = lambda _: None
+        lessons = right = 0
+        for t in tales("train", teach):
+            self.tell(BREAK)
+            due = defaultdict(list)
+            for q in t.questions:
+                due[q.at].append(q)
+            for p, sentence in enumerate(t.told, 1):
+                self.tell(sentence)
+                for q in due.get(p, []):
+                    said = self.arm.turn(self.arm_turn(), q.question) or ""
+                    ok = rouge_l(q.answers, said) >= 0.5
+                    self.arm.turn(self.arm_turn(), RIGHT if ok else
+                                  WRONG.format(answer=q.answers[0].rstrip(".")))
+                    lessons, right = lessons + 1, right + ok
+        self.primed["taught"] = {"tales": teach, "lessons": lessons, "right": right}
+
+
 class Reader:
     name = "reader"
 
@@ -160,7 +195,8 @@ def run(arm, ts) -> dict:
                              "rouge_l": round(rouge_l(q.answers, said), 4),
                              "refused": "don't know" in (said or "").lower(),
                              "attribute": q.attribute, "explicit": q.explicit,
-                             "local": q.local, "seconds": round(time.perf_counter() - t0, 3)})
+                             "local": q.local, "seconds": round(time.perf_counter() - t0, 3),
+                             "notes": list(getattr(getattr(arm, "arm", None), "last_notes", []))})
         print(f"  {t.name}: {len(t.told)} sentences, {len(rows)} asked so far", flush=True)
     return {"rows": rows, "seconds": round(time.perf_counter() - started, 1),
             "cpu_seconds": round(time.process_time() - cpu, 1)}
@@ -187,6 +223,9 @@ def main() -> int:
     p.add_argument("--split", default="test")
     p.add_argument("--tales", type=int, default=None, help="the first N tales, for a smoke run")
     p.add_argument("--primed", type=int, default=1000)
+    p.add_argument("--teach", type=int, default=60, help="train tales the taught arm learns from")
+    # a control: the taught arm with no question answered by an event
+    p.add_argument("--unrecounted", action="store_true")
     p.add_argument("--served", default="Qwen3.5-2B-Q8_0")
     p.add_argument("--port", type=int, default=8094)
     p.add_argument("--note", default="")
@@ -205,6 +244,8 @@ def main() -> int:
             arm = Graphed(work)
         elif name == "primed":
             arm = Primed(work, args.primed)
+        elif name == "taught":
+            arm = Taught(work, args.primed, args.teach, recounts=not args.unrecounted)
         elif name == "reader":
             from unfused.faculty import ServedFaculty
 
@@ -228,7 +269,9 @@ def main() -> int:
                    "seconds": out["seconds"], "cpu_seconds": out["cpu_seconds"],
                    "rows": out["rows"]}
         tag = args.served.split("-Q")[0] if name == "reader" else (
-            f"n{args.primed}" if name == "primed" else "none")
+            f"n{args.primed}" if name == "primed" else
+            f"n{args.primed}-t{args.teach}" if name == "taught" else "none")
+        tag += "-unrecounted" if args.unrecounted else ""
         tag += "-resolved" if args.resolved else ""
         path = ROOT / "readings" / f"fairytale-{name}-{tag}-{taken}.json"
         path.write_text(json.dumps(reading, indent=1), encoding="utf-8")

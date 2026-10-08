@@ -44,6 +44,7 @@ from unfused.parsing import (  # noqa: F401
 )
 from unfused.reader import Reader
 from unfused.said import said_in
+from unfused.shaper import Shaper
 from unfused.situations import Situations
 from unfused.storage import CARRIED, Store
 from unfused.walker import EFFORT, REACH, Spent, Walker
@@ -95,6 +96,9 @@ class GraphArm:
         self.mind.listen(self.walker.forget_names)
         # what each number word is worth, as lessons showed it
         self.numbers = Numbers(self.db)
+        # a question as a template and a shape
+        self.shaper = Shaper(self.db, self.reader, self.individuals)
+
         # a sentence heard, written into the graph
 
         self.hearer = Hearer(
@@ -138,80 +142,6 @@ self.store, self.reader, self.mind, self.individuals,
     # -- the graph -------------------------------------------------------------
 
     # -- plans -----------------------------------------------------------------
-
-    def template(self, question: str) -> tuple[str, list]:
-        """The question with every noun phrase cut out, and the phrases. A phrase is
-        cut to the longest ending of it the graph knows: 'how many walking sticks' holds
-        'walking sticks', with no list of words like 'many'."""
-        spans = []
-        for a, b, name, verb_at, verb in sorted(self.reader.names_in(question)):
-            words = name.split()
-            for i in range(len(words)):
-                tail = " ".join(words[i:])
-                if self.individuals.known(tail):
-                    at = question.lower().find(tail, a)
-                    if at >= 0:
-                        # the words before it are a name of their own where the graph
-                        # knows them: 'Who is Silfem cousins with?' is parsed as one
-                        # compound, 'Silfem cousins', as 'the Smith cousins' would be
-                        head = " ".join(words[:i])
-                        if head and self.individuals.known(head) and (
-                                h := question.lower().find(head, a)) >= 0 and h < at:
-                            spans.append((h, h + len(head), head))
-                        a, b, name = at, at + len(tail), tail
-                    break
-            # 'the person who repairs clocks': a name's own verb, said just before it, is
-            # cut with it, as the taught arm's `joined` does, so every trade is one shape
-            held = self.individuals.nodes(name)
-            if verb and self.db.execute(
-                    "SELECT 1 FROM edges JOIN events ON events.id = edges.event WHERE "
-                    f"edges.node IN ({','.join('?' * len(held))}) AND events.lemma = ? "
-                    "LIMIT 1", (*held, verb)).fetchone():
-                a = verb_at
-            spans.append((a, b, name))
-        out, at = "", 0
-        for i, (a, b, _) in enumerate(spans):
-            out += question[at:a] + f"<{i}>"
-            at = b
-        return out + question[at:], spans
-
-    def proper_at(self, text: str, at: int) -> bool:
-        """Whether the word a text has at this offset is a proper name, by the part of
-        speech the parse gives it: a capital letter is a mark of some scripts only."""
-        return any(r[0] <= at < r[0] + len(r[1]) and r[5] == "PROPN"
-                   for r in self.reader.spans(text))
-
-    def heard_at(self, question: str) -> None:
-        """A lesson's noun phrases counted by their place in its template."""
-        template, spans = self.template(question)
-        for i, (_, _, n) in enumerate(spans):
-            self.db.execute("INSERT INTO positions VALUES (?, ?, ?, 1) ON CONFLICT"
-                            "(template, pos, filler) DO UPDATE SET n = n + 1",
-                            (template, i, n))
-
-    def slot(self, template: str, pos: int, name: str, capital: bool) -> bool:
-        """Whether a noun phrase is a slot of its question or a word of its frame. A
-        place whose word varies across lessons of one template is a slot; one that held
-        the same word every time, twice or more, is frame ('Whose cousin is X?', 'do
-        for a living'); one never taught is a slot if the graph knows the name."""
-        seen = self.db.execute("SELECT filler, n FROM positions WHERE template = ? AND"
-                               " pos = ?", (template, pos)).fetchall()
-        if len(seen) == 1 and seen[0][1] >= 2:
-            return False
-        # a place that varies holds a slot only where its word names something here:
-        # 'colour' and 'shade' share a place across lessons and name nothing
-        return self.individuals.known(name) or capital
-
-    def shape(self, question: str) -> tuple[str, list[str]]:
-        template, every = self.template(question)
-        spans = [(a, b, n) for i, (a, b, n) in enumerate(every)
-                 if self.slot(template, i, n, self.proper_at(question, a))]
-        shape, fillers, at = "", [], 0
-        for a, b, n in sorted(spans):
-            shape += question[at:a] + f"<{len(fillers)}>"
-            fillers.append(n)
-            at = b
-        return shape + question[at:], fillers
 
     def plan_of(self, path: list, others: list[str]) -> dict | None:
         """A path as a plan: its steps, the lemma at each event on it, and where each other
@@ -337,38 +267,6 @@ self.store, self.reader, self.mind, self.individuals,
                 out.append((self.individuals.describe(end), turns))
         return out
 
-    def signature(self, question: str, fillers: list[str]) -> list[str]:
-        """A question's parse as a set of (word, link, head) triples and words, each name
-        replaced by its slot and each wh-word kept as itself, so two wordings of one
-        question share what their grammar shares: 'Where are <0>'s <1> kept?' and 'Where
-        does <0> keep the <1>?' share 'keep', 'where' and 'where advmod keep'."""
-        tokens = self.reader.tokens(question)
-        heads = {f.split()[-1]: i for i, f in enumerate(fillers)}
-        inside = {w for f in fillers for w in f.split()[:-1]}
-
-        def label(t) -> str | None:
-            lower, lemma, tag, dep, _ = t
-            if lower in heads:
-                return f"<{heads[lower]}>"
-            if lower in inside or dep in ("punct", "det", "aux", "case"):
-                return None
-            return lower if tag == "ask" else lemma
-
-        out = set()
-        for i, t in enumerate(tokens):
-            me = label(t)
-            if me is None:
-                continue
-            out.add(me)
-            head = label(tokens[t[4]]) if t[4] != i else "ROOT"
-            if head is not None:
-                out.add(f"{me} {t[3]} {head}")
-        return sorted(out)
-
-    def wh_word(self, question: str) -> str:
-        """The question's first word that asks, by what the parse marks, or ''."""
-        return next((t[0] for t in self.reader.tokens(question) if t[2] == "ask"), "")
-
     def read_plan(self, text: str) -> dict:
         """A stored plan, decoded once for every reader: answering reads every taught
         plan many times a question and a lesson changes one shape's. Shared, so only
@@ -406,7 +304,7 @@ self.store, self.reader, self.mind, self.individuals,
                 skip: str | None = None) -> tuple[float, list[str]]:
         """The taught shapes nearest a question no lesson was worded as: those of its
         number of slots whose signature overlaps the question's most, and by how much."""
-        mine = frozenset(self.signature(question, fillers))
+        mine = frozenset(self.shaper.signature(question, fillers))
         key = (mine, len(fillers), skip)
         self.settled()
         got = self._near.get(key)
@@ -444,7 +342,7 @@ self.store, self.reader, self.mind, self.individuals,
         any order, nearest a taught shape first."""
         from itertools import combinations, permutations
 
-        names = [n for _, _, n in self.template(question)[1]][:4]
+        names = [n for _, _, n in self.shaper.template(question)[1]][:4]
         readings = []
         for k in range(1, len(names) + 1):
             for chosen in combinations(names, k):
@@ -492,12 +390,12 @@ self.store, self.reader, self.mind, self.individuals,
         Y?' and the house relates X and Y by little else."""
         from itertools import combinations, permutations
 
-        names = [n for _, _, n in self.template(question)[1] if self.individuals.known(n)][:4]
+        names = [n for _, _, n in self.shaper.template(question)[1] if self.individuals.known(n)][:4]
         readings = []
         for k in range(1, len(names) + 1):
             for chosen in combinations(names, k):
                 for order in permutations(chosen):
-                    mine = set(self.signature(question, list(order)))
+                    mine = set(self.shaper.signature(question, list(order)))
                     readings += [(len(mine & sig) / len(mine | sig), list(order), shape)
                                  for shape, sig in self.taught()
                                  if shape != skip and shape.count("<") == k]
@@ -569,17 +467,17 @@ self.store, self.reader, self.mind, self.individuals,
     def teach(self, question: str, answer: str) -> None:
         want = answer.lower()
         # what the question's wh-word asked for, by the mark the answer is heard with
-        if (wh := self.wh_word(question)) and (mark := self.individuals.mark(want)):
+        if (wh := self.shaper.wh_word(question)) and (mark := self.individuals.mark(want)):
             self.db.execute("INSERT INTO asks VALUES (?, ?, 1) ON CONFLICT(wh, mark) DO "
                             "UPDATE SET n = n + 1", (wh, mark))
         # where each word sat is counted as heard, so a word held in its place is frame
-        self.heard_at(question)
+        self.shaper.heard_at(question)
         put = self.alias(question, want)
         if put != question:
-            self.heard_at(put)
+            self.shaper.heard_at(put)
         question = put
         self._stale = True
-        shape, fillers = self.shape(question)
+        shape, fillers = self.shaper.shape(question)
         for rowid, plan in self.db.execute("SELECT rowid, plan FROM learnt WHERE shape = ?",
                                            (shape,)).fetchall():
             plan = json.loads(plan)
@@ -687,7 +585,7 @@ self.store, self.reader, self.mind, self.individuals,
                 for pair, ev in plan["evidence"].items():
                     self.ordered.add((shape, k, pair, ev))
                 stored = {key: v for key, v in plan.items() if key != "evidence"}
-                stored["sig"] = self.signature(question, fillers)
+                stored["sig"] = self.shaper.signature(question, fillers)
                 self.db.execute("INSERT OR IGNORE INTO learnt VALUES (?, ?, 1, 0)",
                                 (shape, json.dumps(stored)))
                 self._lessons += 1
@@ -701,11 +599,11 @@ self.store, self.reader, self.mind, self.individuals,
         either: 'the chipped dishes' where only cracked plates were told of. A proper
         name is never one, since a person never mentioned is someone nobody told of; nor
         is a word lessons held in its place every time ('do all day'), which is frame."""
-        template, spans = self.template(question)
+        template, spans = self.shaper.template(question)
         out = []
         for i, (a, b, name) in enumerate(spans):
             words = name.split()
-            if self.proper_at(question, a):
+            if self.shaper.proper_at(question, a):
                 continue
             if any(self.individuals.known(" ".join(words[j:])) for j in range(len(words))):
                 continue
@@ -766,7 +664,7 @@ self.store, self.reader, self.mind, self.individuals,
         solving finds anything for it, as borrowing reads a question."""
         from itertools import combinations, permutations
 
-        names = [n for _, _, n in self.template(question)[1]][:4]
+        names = [n for _, _, n in self.shaper.template(question)[1]][:4]
         out = []
         for k in range(1, len(names) + 1):
             for chosen in combinations(names, k):
@@ -788,7 +686,7 @@ self.store, self.reader, self.mind, self.individuals,
         spans = self.unheard(question)
         if not spans:
             return
-        names = [n for _, _, n in self.template(question)[1]][:4]
+        names = [n for _, _, n in self.shaper.template(question)[1]][:4]
         unheard = {u for _, _, u in spans}
         done: set[str] = set()
         for _, order, shapes in self.readings(question, spans):
@@ -854,7 +752,7 @@ self.store, self.reader, self.mind, self.individuals,
         goals = self.individuals.holding(want)[:1]
         if not spans or not goals:
             return question
-        names = [n for _, _, n in self.template(question)[1]][:4]
+        names = [n for _, _, n in self.shaper.template(question)[1]][:4]
         unheard = {u for _, _, u in spans}
         found: dict[str, set] = {}
         for near, order, shapes in self.readings(question, spans):
@@ -910,7 +808,7 @@ self.store, self.reader, self.mind, self.individuals,
         said, self.walker.spent = None, 0
         try:
             said = next((self.latest(found) for text in dict.fromkeys((put, question.text))
-                         if (found := self.answers(*self.shape(text), text, borrow=False))),
+                         if (found := self.answers(*self.shaper.shape(text), text, borrow=False))),
                         None)
             if said is None:
                 said = self.answered(put)
@@ -1084,7 +982,7 @@ self.store, self.reader, self.mind, self.individuals,
         mark. None where the question is not guessed at."""
         slot = self.reader.blank(question)
         # a question about someone never mentioned is not guessed at
-        if slot is None or not all(self.individuals.known(f) for f in self.shape(question)[1]):
+        if slot is None or not all(self.individuals.known(f) for f in self.shaper.shape(question)[1]):
             return None
         now = self.mind.now()
         act: dict[str, float] = {}
@@ -1107,7 +1005,7 @@ self.store, self.reader, self.mind, self.individuals,
                     + 0.1 * (link + 0.5) / (total + 0.5 * labels))
 
         asks = dict(self.db.execute("SELECT mark, n FROM asks WHERE wh = ?",
-                                    (self.wh_word(question),)).fetchall())
+                                    (self.shaper.wh_word(question),)).fetchall())
 
         def asked_for(name: str) -> float:
             # how often this wh-word's answers bore the name's mark, as lessons have it
@@ -1119,7 +1017,7 @@ self.store, self.reader, self.mind, self.individuals,
         # pig the story is about, whatever more was said of it. A word that is no
         # individual ('red') is its own description
         own = set()
-        for f in self.shape(question)[1]:
+        for f in self.shaper.shape(question)[1]:
             found = [n for n in self.individuals.nodes(f) if n in act and n.startswith("i:")]
             if found:
                 own.add(max(found, key=act.get))
@@ -1178,7 +1076,7 @@ self.store, self.reader, self.mind, self.individuals,
         as a question of its own ('Who is Kroudroth's cousin?'), its answer put in its
         place, and what is left asked again. Plans are whole paths and do not compose; a
         question's grammar does."""
-        shape, fillers = self.shape(text)
+        shape, fillers = self.shaper.shape(text)
         found = self.answers(shape, fillers, text, borrow=False)
         if found:
             return self.latest(found)
@@ -1270,7 +1168,7 @@ self.store, self.reader, self.mind, self.individuals,
         clause's place. A shape's plans are its relation's disjuncts, one a wording it was
         taught in, so the clause is found however the fact was told."""
         for a, b in self.inner(text):
-            names = [n for _, _, n in self.template(text[a:b])[1] if self.individuals.known(n)]
+            names = [n for _, _, n in self.shaper.template(text[a:b])[1] if self.individuals.known(n)]
             if not names:
                 continue
             for thing in self.related(text[a:b], names):
@@ -1300,7 +1198,7 @@ self.store, self.reader, self.mind, self.individuals,
         shapes = []
         for k in range(len(names), 0, -1):
             for chosen in combinations(names, k):
-                mine = set(self.signature(phrase, list(chosen)))
+                mine = set(self.shaper.signature(phrase, list(chosen)))
                 for shape, sig in sigs.items():
                     if shape.count("<") == k:
                         shapes.append((len(mine & sig) / max(1, len(mine | sig)), chosen, shape))

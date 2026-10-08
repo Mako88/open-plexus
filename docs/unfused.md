@@ -108,7 +108,7 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
      walks).
   3. ~~A check that more than one telling answers accepts every answer they support~~.
      Struck 2026-10-04 (`_answers` in `exam/stories.py`).
-  4. NEXT. Harder checks, one at a time and each measured alone (John's, 2026-10-07:
+  4. Harder checks, one at a time and each measured alone (John's, 2026-10-07:
      the main curve and slope; see DECIDED, the cloze is knowledge). Done: further
      from their sentence (`far`, not harder: an episode is held whole) and early
      stories asked late (`late`, after a parent's reminder, 0.484 against near 0.965;
@@ -121,7 +121,8 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
      move things by pronoun ('She put it in the box') and the exam reads no
      coreference. How it gets enough is parked behind FairytaleQA (below); a
      coreference model on the world's side is the likeliest way. Then why something
-     happened.
+     happened. The information is in the story, so these read understanding apart
+     from knowledge; scale should not be what they need.
      A standard test a rung above the stream, beside our own checks (John's,
      2026-10-07): FairytaleQA (Xu et al. 2022; `scripts/fairytale.py`), teachers'
      questions on Gutenberg fairy tales, labelled by what they ask (action, setting,
@@ -129,11 +130,11 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
      published. The stream stays what the system learns from; the tales test whether
      what it learnt carries to prose it was not built around. Read against MCTest's
      sliding window and the 2B and 9B handed the tale (the 9B owed, John's: later).
-     John's to choose what it points at first (`2f4b8f4c` and the commit after it):
-     answers that are an event or a property ('What did the fisherman do?'), which is
-     the mouth (the graphed arm, item 2), or binding pronouns, which the world-side
-     control prices at a quarter more right answers. The information is in the story, so these read
-     understanding apart from knowledge; scale should not be what they need.
+     What it points at first (`2f4b8f4c` and the commit after it): answers that are
+     an event or a property ('What did the fisherman do?'), then binding pronouns,
+     which the world-side control prices at a quarter more right answers. NEXT
+     (John's, 2026-10-08): the mouth (the graphed arm, item 2), read on FairytaleQA
+     and on the stream's checks.
      Beside them, knowledge asked fairly (John's, 2026-10-07): the cloze banded by how
      many earlier stories told its answer in its slot (`scripts/heard.py`), and a form
      asking a fact seen across five or more stories in a wording no story used ('What
@@ -893,7 +894,9 @@ the store merges by id. Kill a third of the nodes mid-exam.
   (2026-10-07): by single responsibility, each job a class of its own with a narrow
   interface that `GraphArm` holds (composition, not mixins over one shared state),
   one pure move a PR with every answer the same; a job that is one large
-  responsibility may stay whole. Parsing and storage first.
+  responsibility may stay whole. Parsing and storage first. Taken by an agent
+  (John's, 2026-10-08), then the review round (THE ORDER, after the foundation,
+  item 2), taking what it notices on the way.
 - **Concurrent walks, and sessions.** John's, 2026-10-04. Every walk has an id and
   runs on its own: a question's answers now, and a prediction's (THE ORDER, item 7)
   runs beside it, as a brain predicts while it perceives, never in the answer's path.

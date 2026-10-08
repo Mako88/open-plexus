@@ -60,7 +60,7 @@ class Traced(runner.Graphed):
                 for limit in range(1, REACH + 1):
                     if hops is not None and limit >= hops:
                         break
-                    if a.paths(f"n:{f}", f"n:{g}", limit=limit, most=1):
+                    if a.walker.paths(f"n:{f}", f"n:{g}", limit=limit, most=1):
                         hops = limit
                         break
         scores = a.focus(story.question) or {}

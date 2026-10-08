@@ -1,5 +1,7 @@
 """The graphed arm, on the small parser so the guards stay fast."""
 
+import math
+
 from unfused.exam.world import Question
 from unfused.graph import PARSER, GraphArm, extract, nlp
 
@@ -271,7 +273,8 @@ def test_what_a_wh_word_asks_for_is_learnt_from_lessons(tmp_path):
         a.hear(i, text)
     # both were seen, and Max the later; lessons said 'what' is answered with a word
     # written small, so what is in focus for it is the ball
-    assert a.focuser.focused("Then Lily saw what again?") == "ball"
+    scores = a.focuser.focus("Then Lily saw what again?")
+    assert max(scores, key=lambda n: (math.prod(scores[n]), n)) == "ball"
 
 
 def test_a_pronoun_is_resolved_against_the_episode(tmp_path):

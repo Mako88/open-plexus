@@ -20,7 +20,6 @@ from __future__ import annotations
 
 import json
 import math
-from collections import Counter
 from pathlib import Path
 
 from unfused.hearer import Hearer
@@ -42,6 +41,7 @@ from unfused.parsing import (  # noqa: F401
     parse_many,
     vectors,
 )
+from unfused.plans import Plans
 from unfused.reader import Reader
 from unfused.said import said_in
 from unfused.shaper import Shaper
@@ -98,6 +98,9 @@ class GraphArm:
         self.numbers = Numbers(self.db)
         # a question as a template and a shape
         self.shaper = Shaper(self.db, self.reader, self.individuals)
+        # the plans lessons left, and which taught shapes a question is nearest
+        self.plans = Plans(self.db, self.shaper)
+
 
         # a sentence heard, written into the graph
 
@@ -115,24 +118,8 @@ self.store, self.reader, self.mind, self.individuals,
         # the words never heard and answers already counted towards an alias, this world
         self.aliased: set = set()
 
-        # taught shapes' signatures, rebuilt after a lesson; questions' parses
-        self._sigs: list | None = None
-        # how many times `learnt` has been written, and the plans of every followed shape
-        # as of the last count `related` read them at
-        self._lessons = 0
+        # the plans of every followed shape as of the last lesson count `related` read them at
         self._followed: tuple | None = None
-        # how many times a lesson changed which plans are followed, or added one, and the
-        # count the taught shapes' caches were last rebuilt at; a lesson marks them stale,
-        # and they are rebuilt at the next read only if that count moved
-        self._shapes = 0
-        self._built = 0
-        self._stale = False
-        # the taught shapes of each number of slots, indexed by their signatures' parts,
-        # and the nearest shapes already found for a signature; both until a lesson
-        self._by_slots: dict = {}
-        self._near: dict = {}
-        # each stored plan's text, decoded (`read_plan`)
-        self._read: dict[str, dict] = {}
 
     # -- reading ---------------------------------------------------------------
 
@@ -267,92 +254,6 @@ self.store, self.reader, self.mind, self.individuals,
                 out.append((self.individuals.describe(end), turns))
         return out
 
-    def read_plan(self, text: str) -> dict:
-        """A stored plan, decoded once for every reader: answering reads every taught
-        plan many times a question and a lesson changes one shape's. Shared, so only
-        `teach`, which changes plans, decodes its own."""
-        got = self._read.get(text)
-        if got is None:
-            # a lesson rewrites a plan's text, so the texts it replaced are let go in bulk
-            if len(self._read) > 100_000:
-                self._read.clear()
-            got = self._read[text] = json.loads(text)
-        return got
-
-    def settled(self) -> None:
-        """After a lesson, the taught shapes are read again at the next use, unless the
-        lesson changed none of the plans followed, which is all they are read from."""
-        if self._stale:
-            self._stale = False
-            if self._built != self._shapes:
-                self._sigs, self._by_slots, self._near = None, {}, {}
-                self._built = self._shapes
-
-    def taught(self) -> list[tuple[str, set]]:
-        """Every taught shape's plans' signatures, rebuilt after a lesson."""
-        self.settled()
-        if self._sigs is None:
-            self._sigs = []
-            for shape, plan in self.db.execute(
-                    "SELECT shape, plan FROM learnt WHERE hits > misses").fetchall():
-                sig = self.read_plan(plan).get("sig")
-                if sig:
-                    self._sigs.append((shape, set(sig)))
-        return self._sigs
-
-    def nearest(self, question: str, fillers: list[str],
-                skip: str | None = None) -> tuple[float, list[str]]:
-        """The taught shapes nearest a question no lesson was worded as: those of its
-        number of slots whose signature overlaps the question's most, and by how much."""
-        mine = frozenset(self.shaper.signature(question, fillers))
-        key = (mine, len(fillers), skip)
-        self.settled()
-        got = self._near.get(key)
-        if got is None:
-            # each shape's overlap is counted through the index, so a shape sharing
-            # nothing with the question costs nothing, and scores 0
-            rows, index = self.taught_by(len(fillers))
-            shared = Counter(i for part in mine for i in index.get(part, ()))
-            near = [(shape, shared[i] / (len(mine) + len(sig) - shared[i]))
-                    for i, (shape, sig) in enumerate(rows) if shape != skip]
-            best = max((n for _, n in near), default=0.0)
-            got = self._near[key] = (best, list(dict.fromkeys(
-                shape for shape, n in near if n == best)))
-        return got[0], list(got[1])
-
-    def taught_by(self, slots: int) -> tuple[list, dict]:
-        """The taught shapes of this many slots with their signatures, in the order
-        `taught` gives them, and where each part of a signature is held among them."""
-        self.settled()
-        got = self._by_slots.get(slots)
-        if got is None:
-            rows = [(shape, sig) for shape, sig in self.taught() if shape.count("<") == slots]
-            index: dict = {}
-            for i, (_, sig) in enumerate(rows):
-                for part in sig:
-                    index.setdefault(part, []).append(i)
-            got = self._by_slots[slots] = (rows, index)
-        return got
-
-    def borrowed(self, question: str,
-                 skip: str | None = None) -> list[tuple[list[str], list[str]]]:
-        """A wording no lesson used has no history saying which of its names are slots
-        and which are frame ('cousin' in 'Which person is X's cousin?'), nor in what order
-        its slots run. Every reading is scored, each name a slot or frame and the slots in
-        any order, nearest a taught shape first."""
-        from itertools import combinations, permutations
-
-        names = [n for _, _, n in self.shaper.template(question)[1]][:4]
-        readings = []
-        for k in range(1, len(names) + 1):
-            for chosen in combinations(names, k):
-                for order in permutations(chosen):
-                    near, shapes = self.nearest(question, list(order), skip)
-                    if shapes:
-                        readings.append((near, list(order), shapes))
-        readings.sort(key=lambda r: -r[0])
-        return [(f, sh) for _, f, sh in readings]
-
     def answers(self, shape: str, fillers: list[str], question: str,
                 borrow: bool = True) -> list[tuple[str, int]]:
         ranked = self.db.execute(
@@ -370,7 +271,7 @@ self.store, self.reader, self.mind, self.individuals,
         # plans of the nearest other taught shape under the nearest reading of it that
         # reaches anything in the graph: 'Who is X's cousin?' learnt one direction, and
         # 'Whose cousin is X?' holds the other
-        for fillers, nearest in self.borrowed(question, shape)[:12]:
+        for fillers, nearest in self.plans.borrowed(question, shape)[:12]:
             ranked = [r for near in nearest for r in self.db.execute(
                 "SELECT plan FROM learnt WHERE shape = ? AND hits > misses "
                 "ORDER BY hits - misses DESC, hits DESC", (near,)).fetchall()]
@@ -397,13 +298,13 @@ self.store, self.reader, self.mind, self.individuals,
                 for order in permutations(chosen):
                     mine = set(self.shaper.signature(question, list(order)))
                     readings += [(len(mine & sig) / len(mine | sig), list(order), shape)
-                                 for shape, sig in self.taught()
+                                 for shape, sig in self.plans.taught()
                                  if shape != skip and shape.count("<") == k]
         readings.sort(key=lambda r: -r[0])
         for _, fillers, shape in readings[:tries]:
             ranked = [(p,) for (p,) in self.db.execute(
                 "SELECT plan FROM learnt WHERE shape = ? AND hits > misses "
-                "ORDER BY hits - misses DESC, hits DESC", (shape,)) if not self.read_plan(p).get("count")]
+                "ORDER BY hits - misses DESC, hits DESC", (shape,)) if not self.plans.read_plan(p).get("count")]
             found = self.followed(ranked, fillers, question)
             if found:
                 return found
@@ -413,7 +314,7 @@ self.store, self.reader, self.mind, self.individuals,
         for strict in (True, False):
             found = []
             for (plan,) in ranked:
-                plan = self.read_plan(plan)
+                plan = self.plans.read_plan(plan)
                 said = self.said(plan, fillers, strict, question)
                 if said and plan.get("count"):
                     # a count is of a set, not of one latest event, so the plan that held
@@ -476,7 +377,7 @@ self.store, self.reader, self.mind, self.individuals,
         if put != question:
             self.shaper.heard_at(put)
         question = put
-        self._stale = True
+        self.plans.begin()
         shape, fillers = self.shaper.shape(question)
         for rowid, plan in self.db.execute("SELECT rowid, plan FROM learnt WHERE shape = ?",
                                            (shape,)).fetchall():
@@ -506,7 +407,7 @@ self.store, self.reader, self.mind, self.individuals,
                     into[1] += 1
                 self.db.execute("UPDATE learnt SET plan = ? WHERE rowid = ?",
                                 (json.dumps(plan), rowid))
-                self._lessons += 1
+                self.plans.changed()
             # whether the plan asks about the present, counted on every lesson where
             # reading only what is still so and reading everything differ
             # right over no answer over wrong: reading the present and finding nothing
@@ -521,7 +422,7 @@ self.store, self.reader, self.mind, self.individuals,
                 plan["present"] = tally
                 self.db.execute("UPDATE learnt SET plan = ? WHERE rowid = ?",
                                 (json.dumps(plan), rowid))
-                self._lessons += 1
+                self.plans.changed()
             held = holds(None)
             if held is None:
                 continue
@@ -529,10 +430,10 @@ self.store, self.reader, self.mind, self.individuals,
             (hits, misses), = self.db.execute(
                 f"UPDATE learnt SET {column} = {column} + 1 WHERE rowid = ? "
                 "RETURNING hits, misses", (rowid,)).fetchall()
-            self._lessons += 1
+            self.plans.changed()
             # a plan is followed where it held more often than it failed
             if (hits - held > misses - (not held)) != (hits > misses):
-                self._shapes += 1
+                self.plans.refollowed()
         goals = self.individuals.holding(want)
         self.learn_circumstance(question, want)
         if not fillers:
@@ -578,9 +479,9 @@ self.store, self.reader, self.mind, self.individuals,
                 (hits, misses), = self.db.execute(
                     "UPDATE learnt SET plan = ?, hits = hits + 1 WHERE rowid = ? "
                     "RETURNING hits, misses", (json.dumps(kept), rid)).fetchall()
-                self._lessons += 1
+                self.plans.changed()
                 if (hits - 1 > misses) != (hits > misses):
-                    self._shapes += 1
+                    self.plans.refollowed()
             else:
                 for pair, ev in plan["evidence"].items():
                     self.ordered.add((shape, k, pair, ev))
@@ -588,8 +489,8 @@ self.store, self.reader, self.mind, self.individuals,
                 stored["sig"] = self.shaper.signature(question, fillers)
                 self.db.execute("INSERT OR IGNORE INTO learnt VALUES (?, ?, 1, 0)",
                                 (shape, json.dumps(stored)))
-                self._lessons += 1
-                self._shapes += 1
+                self.plans.changed()
+                self.plans.refollowed()
         self.store.written()
 
     # -- words never heard ----------------------------------------------------
@@ -671,7 +572,7 @@ self.store, self.reader, self.mind, self.individuals,
                 if not any(w in chosen for _, _, w in spans):
                     continue
                 for order in permutations(chosen):
-                    near, shapes = self.nearest(question, list(order))
+                    near, shapes = self.plans.nearest(question, list(order))
                     if shapes:
                         out.append((near, order, shapes))
         out.sort(key=lambda r: (sum(not self.individuals.known(n) for n in r[1]), -r[0]))
@@ -692,7 +593,7 @@ self.store, self.reader, self.mind, self.individuals,
         for _, order, shapes in self.readings(question, spans):
             plans = [p for sh in shapes for (raw,) in self.db.execute(
                 "SELECT plan FROM learnt WHERE shape = ? AND hits > misses", (sh,))
-                if not (p := self.read_plan(raw)).get("count")]
+                if not (p := self.plans.read_plan(raw)).get("count")]
             for free, w in enumerate(order):
                 if w not in unheard or w in done:
                     continue
@@ -756,7 +657,7 @@ self.store, self.reader, self.mind, self.individuals,
         unheard = {u for _, _, u in spans}
         found: dict[str, set] = {}
         for near, order, shapes in self.readings(question, spans):
-            plans = [self.read_plan(p) for sh in shapes for (p,) in self.db.execute(
+            plans = [self.plans.read_plan(p) for sh in shapes for (p,) in self.db.execute(
                 "SELECT plan FROM learnt WHERE shape = ? AND hits > misses", (sh,))]
             for free, w in enumerate(order):
                 if w not in unheard or found.get(w):
@@ -1108,7 +1009,7 @@ self.store, self.reader, self.mind, self.individuals,
         for shape in shapes:
             for (p,) in self.db.execute(
                     "SELECT plan FROM learnt WHERE shape = ? AND hits > misses", (shape,)):
-                plan = self.read_plan(p)
+                plan = self.plans.read_plan(p)
                 if plan["steps"] and not plan.get("count") and plan["steps"][-1][1] == 1:
                     out.add(plan["steps"][-1][0])
         return out
@@ -1123,7 +1024,7 @@ self.store, self.reader, self.mind, self.individuals,
         as 'keeps the floats in the dairy' has, by a longer way."""
         if not fillers:
             return []
-        roles = self.roles([shape]) or self.roles(self.nearest(text, fillers)[1])
+        roles = self.roles([shape]) or self.roles(self.plans.nearest(text, fillers)[1])
         if not roles:
             return []
         start = f"n:{fillers[0]}"
@@ -1185,15 +1086,15 @@ self.store, self.reader, self.mind, self.individuals,
         to reach anything finds, latest first."""
         from itertools import combinations, permutations
 
-        if self._followed is None or self._followed[0] != self._lessons:
+        if self._followed is None or self._followed[0] != self.plans.lessons:
             rows: dict[str, list] = {}
             for shape, plan in self.db.execute(
                     "SELECT shape, plan FROM learnt WHERE hits > misses "
                     "ORDER BY hits - misses DESC, hits DESC").fetchall():
-                rows.setdefault(shape, []).append(self.read_plan(plan))
+                rows.setdefault(shape, []).append(self.plans.read_plan(plan))
             sigs = {shape: next((set(p["sig"]) for p in plans if p.get("sig")), set())
                     for shape, plans in rows.items()}
-            self._followed = (self._lessons, rows, sigs)
+            self._followed = (self.plans.lessons, rows, sigs)
         _, rows, sigs = self._followed
         shapes = []
         for k in range(len(names), 0, -1):

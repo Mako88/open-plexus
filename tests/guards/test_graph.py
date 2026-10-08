@@ -271,7 +271,7 @@ def test_what_a_wh_word_asks_for_is_learnt_from_lessons(tmp_path):
         a.hear(i, text)
     # both were seen, and Max the later; lessons said 'what' is answered with a word
     # written small, so what is in focus for it is the ball
-    assert a.focused("Then Lily saw what again?") == "ball"
+    assert a.focuser.focused("Then Lily saw what again?") == "ball"
 
 
 def test_a_pronoun_is_resolved_against_the_episode(tmp_path):

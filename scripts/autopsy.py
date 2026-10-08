@@ -63,7 +63,7 @@ class Traced(runner.Graphed):
                     if a.walker.paths(f"n:{f}", f"n:{g}", limit=limit, most=1):
                         hops = limit
                         break
-        scores = a.focus(story.question) or {}
+        scores = a.focuser.focus(story.question) or {}
         self.traces.append({
             "shape_learnt": a.db.execute("SELECT 1 FROM learnt WHERE shape = ? LIMIT 1",
                                          (shape,)).fetchone() is not None,

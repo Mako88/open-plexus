@@ -70,7 +70,7 @@ class Follower:
                 ways = [(lab, d, nxt) for lab, d, nxt in self.walker.around(here)
                         if lab == label and d == direction][:REACH]
                 for lab, d, nxt in ways:
-                    if self.individuals.among(nxt, nodes):
+                    if self.individuals.visited(nxt, nodes):
                         continue
                     t, now = turns, last
                     if nxt.startswith("e:"):
@@ -128,7 +128,7 @@ class Follower:
                 return [(e, (t,))]
         return None
 
-    def said(self, plan: dict, fillers: list[str], strict: bool,
+    def plan_answers(self, plan: dict, fillers: list[str], strict: bool,
              question: str, present: bool | None = None) -> list[tuple[str, int]]:
         ends = self.follow(plan, fillers, strict, present)
         chosen = self.relative(plan, ends, fillers)
@@ -148,7 +148,7 @@ class Follower:
             found = []
             for plan in ranked:
                 plan = self.plans.read_plan(plan)
-                said = self.said(plan, fillers, strict, question)
+                said = self.plan_answers(plan, fillers, strict, question)
                 if said and plan.get("count"):
                     # a count is of a set, not of one latest event, so the plan that held
                     # most often answers it rather than whichever passed the latest turn

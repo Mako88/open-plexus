@@ -238,7 +238,7 @@ class Walker:
             nxt_frontier = []
             for path in frontier:
                 for label, direction, nxt in self.around(path[-1]):
-                    if self.individuals.among(nxt, path[::2]):
+                    if self.individuals.visited(nxt, path[::2]):
                         continue
                     way = path + [(label, direction), nxt]
                     if not nxt.startswith("e:"):
@@ -256,4 +256,4 @@ class Walker:
         for label, direction in steps:
             here = [n for h in here for lab, d, n in self.around(h)
                     if lab == label and d == direction][:200]
-        return any(self.individuals.is_(n, goal) for n in here)
+        return any(self.individuals.stands_for(n, goal) for n in here)

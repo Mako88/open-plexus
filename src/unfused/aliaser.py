@@ -101,7 +101,7 @@ class Aliaser:
                     at = b
         return out + question[at:]
 
-    def readings(self, question: str, spans: list) -> list[tuple[float, tuple, list]]:
+    def orderings(self, question: str, spans: list) -> list[tuple[float, tuple, list]]:
         """Every reading of a question holding words never heard, each name a slot or
         frame and the slots in any order, nearest taught shapes with each. A slot left
         unbound claims less than one bound, so the readings with fewest unbound slots go
@@ -132,7 +132,7 @@ class Aliaser:
         names = self.shaper.names(question)
         unheard = {u for _, _, u in spans}
         done: set[str] = set()
-        for _, order, shapes in self.readings(question, spans):
+        for _, order, shapes in self.orderings(question, spans):
             plans = [p for sh in shapes for p in self.plans.of(sh, counts=False)]
             for free, w in enumerate(order):
                 if w not in unheard or w in done:
@@ -196,7 +196,7 @@ class Aliaser:
         names = self.shaper.names(question)
         unheard = {u for _, _, u in spans}
         found: dict[str, set] = {}
-        for near, order, shapes in self.readings(question, spans):
+        for near, order, shapes in self.orderings(question, spans):
             plans = [p for sh in shapes for p in self.plans.of(sh)]
 
             for free, w in enumerate(order):

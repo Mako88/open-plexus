@@ -18,7 +18,7 @@ class Individuals:
         self.db = db
         self.mind = mind
         # every name's mark, dropped only for names a sentence names
-        self._marks: dict = {}
+        self._heard: dict = {}
         # each individual's label and how it is said, and each name's individuals
         self._labels: dict = {}
         self._described: dict = {}
@@ -46,8 +46,8 @@ class Individuals:
     def forget_described(self, node: str) -> None:
         self._described.pop(node, None)
 
-    def forget_mark(self, name: str) -> None:
-        self._marks.pop(name, None)
+    def forget_heard_as(self, name: str) -> None:
+        self._heard.pop(name, None)
 
     def forget_agreed(self, label: str | None) -> None:
         self._agreed.pop(label, None)
@@ -131,7 +131,7 @@ class Individuals:
             got = self._described[node] = " ".join(mods + [self.label(node)])
         return got
 
-    def is_(self, node: str, goal: str) -> bool:
+    def stands_for(self, node: str, goal: str) -> bool:
         """Whether a node is the goal, or an individual the goal's name finds."""
         if node == goal:
             return True
@@ -140,7 +140,7 @@ class Individuals:
         self.nodes(goal[2:])
         return node in self._nodes[("set", goal[2:])]
 
-    def among(self, node: str, nodes) -> bool:
+    def visited(self, node: str, nodes) -> bool:
         """Whether a walk has been at a node already: at it, or at a name or description
         that finds it, so a walk from 'lily' does not come back through a Lily."""
         return node in nodes or (node.startswith("i:") and (
@@ -193,15 +193,15 @@ class Individuals:
         return len(self.nodes(name)) > 1 or self.db.execute(
             "SELECT 1 FROM edges WHERE node = ? LIMIT 1", (f"n:{name}",)).fetchone() is not None
 
-    def mark(self, name: str) -> str | None:
+    def heard_as(self, name: str) -> str | None:
         """How a name is heard: the part of speech its mentions were given most ('PROPN'
         for Lily, 'NOUN' for the ball), or None where nothing was heard of it by that
         name. A capital letter is a mark of some scripts only."""
-        if name not in self._marks:
-            self._marks[name] = self._mark(name)
-        return self._marks[name]
+        if name not in self._heard:
+            self._heard[name] = self._heard_as(name)
+        return self._heard[name]
 
-    def _mark(self, name: str) -> str | None:
+    def _heard_as(self, name: str) -> str | None:
         row = self.db.execute("SELECT pos FROM heard_as WHERE name = ? ORDER BY n DESC "
                               "LIMIT 1", (name.split()[-1] if name.strip() else "",)
                               ).fetchone()

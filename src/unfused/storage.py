@@ -63,10 +63,12 @@ HUB = 300
 class Store:
     def __init__(self, directory: Path, known: dict | None = None) -> None:
         self.db = sqlite3.connect(str(directory / "graph.db"))
-        # what is written is kept in batches (`written`), and written ahead, without
-        # waiting on the disk for each commit
+        # what is written is kept in batches (`written`), and written ahead without ever
+        # waiting on the disk: a run is not resumed, so a commit only has to survive the
+        # process ending, not the machine losing power, and the waits at each checkpoint
+        # were half of what committing cost
         self.db.execute("PRAGMA journal_mode=WAL")
-        self.db.execute("PRAGMA synchronous=NORMAL")
+        self.db.execute("PRAGMA synchronous=OFF")
         self.db.executescript(SCHEMA)
         for table, rows in (known or {}).items():
             self.db.executemany(f"INSERT OR IGNORE INTO {table} VALUES (?, ?, ?, ?)",

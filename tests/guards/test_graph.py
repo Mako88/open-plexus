@@ -172,14 +172,14 @@ def test_a_word_never_heard_is_learnt_as_the_name_it_stood_for(tmp_path):
     a.teach("What colour are the pots?", "ochre")
     # one fact is one piece of evidence however often it is asked, and one is not enough
     a.teach("What colour are the pots?", "ochre")
-    assert a.aliases("pots") == []
+    assert a.aliaser.aliases("pots") == []
     a.hear(2, "The jars are red.")
     a.teach("What colour are the pots?", "red")
-    assert a.aliases("pots") == ["jars"]
+    assert a.aliaser.aliases("pots") == ["jars"]
     a.hear(3, "The jars are blue.")
     assert a.answer(q("What colour are the pots?")) == "blue"
     # a person nobody told of is never taken for one somebody did
-    assert "edda" not in {n for _, _, n in a.unheard("Where does Edda keep the pots?")}
+    assert "edda" not in {n for _, _, n in a.aliaser.unheard("Where does Edda keep the pots?")}
 
 
 def test_a_word_never_heard_is_narrowed_over_the_questions_it_is_heard_in(tmp_path):
@@ -194,9 +194,9 @@ def test_a_word_never_heard_is_narrowed_over_the_questions_it_is_heard_in(tmp_pa
     a.teach("Where does Bren keep the kettle?", "barn")
     a.answer(q("Where does Ada keep the pots?"))
     # one hearing cannot show a word names something rather than being frame
-    assert a.pinned("pots") is None
+    assert a.aliaser.pinned("pots") is None
     assert a.answer(q("Where does Bren keep the pots?")) == "shed"
-    assert a.pinned("pots") == "jars"
+    assert a.aliaser.pinned("pots") == "jars"
 
 
 def test_a_word_never_heard_is_voted_for_at_its_first_hearing(tmp_path):
@@ -207,7 +207,7 @@ def test_a_word_never_heard_is_voted_for_at_its_first_hearing(tmp_path):
     a.hear(1, "Ada keeps the rope in the attic.")
     a.teach("Where does Ada keep the rope?", "attic")
     assert a.answer(q("Where does Ada keep the pots?")) == "cellar"
-    assert a.pinned("pots") is None and a.voted("pots") == "jars"
+    assert a.aliaser.pinned("pots") is None and a.aliaser.voted("pots") == "jars"
 
 
 def test_a_compound_whose_first_word_is_a_known_name_is_two_names(tmp_path):

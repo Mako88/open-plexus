@@ -79,7 +79,7 @@ class Focuser:
 
         def asked_for(name: str) -> float:
             # how often this wh-word's answers bore the name's mark, as lessons have it
-            mark = self.individuals.mark(name)
+            mark = self.individuals.heard_as(name)
             return 0.5 if mark is None else (asks.get(mark, 0) + 1) / (sum(asks.values()) + 2)
 
         # the question's own things are not its answer: each of its names finds the

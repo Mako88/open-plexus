@@ -103,7 +103,7 @@ class Hearer:
                 self.individuals.forget_described(node)
                 if (name := self.individuals.label(node)) is not None:
                     self.walker.forget(f"n:{name}")
-                    self.individuals.forget_mark(name)
+                    self.individuals.forget_heard_as(name)
                     touched.update(name.split())
         self.situations.heard(heard, [ev["lemma"] for ev in events])
         self.walker.happened(list(zip(events, ids)), turn)

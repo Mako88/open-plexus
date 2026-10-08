@@ -106,7 +106,7 @@ class Decomposer:
             nxt = []
             for path in frontier:
                 for label, direction, node in self.walker.around(path[-1]):
-                    if self.individuals.among(node, seen):
+                    if self.individuals.visited(node, seen):
                         continue
                     if node.startswith("e:") and self.walker.mood(node):
                         continue

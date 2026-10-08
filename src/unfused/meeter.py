@@ -77,7 +77,7 @@ class Meeter:
             return None
 
         def named(node: str) -> bool:
-            return any(self.individuals.is_(node, f"n:{n}") for n in names)
+            return any(self.individuals.stands_for(node, f"n:{n}") for n in names)
 
         # what each event holds at the asked slot is scored by the product of what each
         # source brought the event, the slot lessons rank first scored most
@@ -180,7 +180,7 @@ class Meeter:
         for eid in self.mind.events_in_mind(lemma, mood_, 50):
             edges = self.db.execute("SELECT label, node FROM edges WHERE event = ? AND node "
                                     "NOT LIKE 'f:%'", (eid,)).fetchall()
-            if not all(any(lab == label and self.individuals.is_(n, f"n:{name}") for lab, n in edges)
+            if not all(any(lab == label and self.individuals.stands_for(n, f"n:{name}") for lab, n in edges)
                        for label, name in bound):
                 continue
             for lab, n in edges:

@@ -33,7 +33,7 @@ import shutil
 import sys
 import tempfile
 import time
-from collections import defaultdict
+from collections import Counter, defaultdict
 from pathlib import Path
 
 os.environ.setdefault("HF_HUB_OFFLINE", "1")
@@ -43,6 +43,9 @@ from unfused.reading import utc_stamp  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[1]
 BREAK = "***"
+# what each group of pronouns agrees in, as the parse marks it: the oracle's seeds
+AGREES = {"he": "Gender=Masc|Number=Sing|Person=3", "she": "Gender=Fem|Number=Sing|Person=3",
+          "it": "Gender=Neut|Number=Sing|Person=3", "they": "Number=Plur|Person=3"}
 GROUPS = {"he": {"he", "him", "his", "himself"}, "she": {"she", "her", "hers", "herself"},
           "it": {"it", "its", "itself"}, "they": {"they", "them", "their", "theirs",
                                                   "themselves"}}
@@ -71,7 +74,11 @@ def _gold(doc, sentence: int, at: int):
     return min(held, key=lambda m: m.end - m.start, default=None)
 
 
-def run(arm, turn: int, docs) -> dict:
+def _group(word: str) -> str:
+    return next(g for g, ws in GROUPS.items() if word in ws)
+
+
+def run(arm, turn: int, docs, gold: dict | None = None) -> dict:
     rows = []
     started, cpu = time.perf_counter(), time.process_time()
     for doc in docs:
@@ -106,8 +113,14 @@ def run(arm, turn: int, docs) -> dict:
                      if (k := (e.sentence, e.start, e.end)) in became}
             node = bound.get((m.sentence, m.start))
             before = [n for s, at, n in heard if (s, at) < (m.sentence, m.start)]
+            named = [e for e in earlier if e.word not in PRONOUNS]
+            if gold is not None:
+                for n in nodes:
+                    gold.setdefault(arm.individuals.label(n), Counter())[_group(m.word)] += 1
             rows.append({"doc": doc.name, "sentence": m.sentence, "at": m.start,
                          "pronoun": m.word, "said": doc.told[m.sentence],
+                         "to": arm.individuals.label(node) if node else None,
+                         "antecedent": named[-1].word if named else None,
                          "same_sentence": any(e.sentence == m.sentence for e in earlier),
                          "bound": node is not None, "right": node in nodes,
                          "recent": bool(before) and before[-1] in nodes,
@@ -126,7 +139,7 @@ def summary(rows) -> dict:
 
     by_group = defaultdict(list)
     for r in rows:
-        by_group[next(g for g, ws in GROUPS.items() if r["pronoun"] in ws)].append(r)
+        by_group[_group(r["pronoun"])].append(r)
     return {**mean(rows),
             "same_sentence": mean([r for r in rows if r["same_sentence"]]),
             "earlier_sentence": mean([r for r in rows if not r["same_sentence"]]),
@@ -140,19 +153,52 @@ def main() -> int:
     p.add_argument("--docs", type=int, default=None, help="the first N documents")
     p.add_argument("--primed", type=int, default=1000)
     p.add_argument("--note", default="")
+    # the binder's arms under comparison
+    p.add_argument("--unparallel", action="store_true",
+                   help="a pronoun looks among things in any slot, not only its own")
+    p.add_argument("--agreeing-first", action="store_true",
+                   help="one known to agree comes before a later one never called anything")
+    p.add_argument("--learns-from", default="paths", choices=("resolved", "paths", "both"),
+                   help="what agreement is learnt from (`Hearer.learns_from`)")
+    # a control: every label's agreement as the gold chains give it, from a first pass,
+    # seeded before the reading, so what binding with agreement known is worth is read
+    p.add_argument("--oracle", action="store_true")
     args = p.parse_args()
+
+    from unfused.hearer import Hearer
+    from unfused.individuals import Individuals
+
+    Hearer.learns_from = args.learns_from
+
+    Individuals.parallel = not args.unparallel
+    Individuals.agreeing_first = args.agreeing_first
 
     docs = documents(args.split, args.docs)
     print(f"{len(docs)} documents", flush=True)
     for name in args.arms.split(","):
         work = Path(tempfile.mkdtemp(prefix=f"unfused-preco-{name}-"))
         arm, turn = _open(name, work, args.primed)
+        if args.oracle:
+            gold: dict = {}
+            first = Path(tempfile.mkdtemp(prefix="unfused-preco-oracle-"))
+            seeing, _ = _open("graphed", first, args.primed)
+            run(seeing, 0, docs, gold)
+            seeing.close()
+            shutil.rmtree(first, ignore_errors=True)
+            arm.db.executemany(
+                "INSERT INTO agreement VALUES (?, ?, ?) ON CONFLICT(name, pronoun) DO UPDATE "
+                "SET n = n + excluded.n",
+                [(f"n:{label}", AGREES[g], n + 1) for label, c in gold.items() if label
+                 for g, n in c.items()])
         out = run(arm, turn, docs)
         dials = arm.dials()
         arm.close()
         shutil.rmtree(work, ignore_errors=True)
         taken = utc_stamp()
         reading = {"kind": "preco", "arm": name, "taken_at": taken, "note": args.note,
+                   "binder": {"parallel": not args.unparallel,
+                              "agreeing_first": args.agreeing_first, "oracle": args.oracle,
+                              "learns_from": args.learns_from},
                    "command": " ".join(sys.argv),
                    "world": {"source": f"PreCo-{args.split}", "documents": len(docs),
                              "pronouns": len(out["rows"]), "fingerprint": fingerprint(docs)},
@@ -160,6 +206,10 @@ def main() -> int:
                    "seconds": out["seconds"], "cpu_seconds": out["cpu_seconds"],
                    "rows": out["rows"]}
         tag = f"n{args.primed}" if name == "primed" else "none"
+        tag += "-unparallel" if args.unparallel else ""
+        tag += "-agreeing" if args.agreeing_first else ""
+        tag += "-oracle" if args.oracle else ""
+        tag += f"-from-{args.learns_from}"
         path = ROOT / "readings" / f"preco-{name}-{tag}-{taken}.json"
         path.write_text(json.dumps(reading, indent=1), encoding="utf-8")
         s = reading["summary"]

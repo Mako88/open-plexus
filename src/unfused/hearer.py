@@ -29,6 +29,10 @@ class Hearer:
         self.situations = situations
         self.bound: dict = {}
 
+    # an arm under comparison (PreCo, 2026-10-08): what agreement is learnt from, the
+    # pronouns the binder resolved across sentences, those bound by their own clause, or both
+    learns_from = "paths"
+
     def hear(self, turn: int, text: str) -> None:
         # a turn holding no words is a break in the text ('***', a new page): what is
         # heard after it is another episode
@@ -82,16 +86,21 @@ class Hearer:
         # the last sentence's mentions and pronouns, by where each was said, with the
         # individual each became: what binding is read by
         self.bound = {}
+        # what each pronoun bound by its own clause agrees in, with what it was bound to
+        agreed: list[tuple[str, str]] = []
         for ev, eid in zip(events, ids):
             nothing = [None] * len(ev["edges"])
-            for (label, t), m, p in zip(ev["edges"], ev.get("mentions", nothing),
-                                        ev.get("pronouns", nothing)):
+            for (label, t), m, p, path in zip(ev["edges"], ev.get("mentions", nothing),
+                                              ev.get("pronouns", nothing),
+                                              ev.get("paths", nothing)):
                 node = (f"e:{ids[int(t[2:])]}" if t.startswith("e:") else
                         who[str(m)] if m is not None else resolved.get(t, t))
                 if node is None:
                     continue
                 if p is not None:
                     self.bound[("pronoun", p)] = node
+                    if path is not None and self.learns_from in ("paths", "both"):
+                        agreed.append((node, path))
                 elif m is not None and "place" in ev:
                     self.bound[("mention", ev["place"][str(m)])] = node
                 self.store.add_edge(eid, label, node)
@@ -122,11 +131,13 @@ class Hearer:
         for name in self.individuals.forget_words(touched):
             if " " in name:
                 self.walker.forget(f"n:{name}")
-        for t, node in resolved.items():
-            if node is not None and t.startswith("p:"):
-                # agreement is what everyone knows, so it is counted by label
-                self.db.execute("INSERT INTO agreement VALUES (?, ?, 1) ON CONFLICT(name, "
-                                "pronoun) DO UPDATE SET n = n + 1",
-                                (f"n:{self.individuals.label(node)}", t[2:].split("|", 1)[1]))
-                self.individuals.forget_agreed(self.individuals.label(node))
+        if self.learns_from in ("resolved", "both"):
+            agreed += [(node, t[2:].split("|", 1)[1]) for t, node in resolved.items()
+                       if node is not None and t.startswith("p:")]
+        for node, agrees in agreed:
+            # agreement is what everyone knows, so it is counted by label
+            self.db.execute("INSERT INTO agreement VALUES (?, ?, 1) ON CONFLICT(name, "
+                            "pronoun) DO UPDATE SET n = n + 1",
+                            (f"n:{self.individuals.label(node)}", agrees))
+            self.individuals.forget_agreed(self.individuals.label(node))
         self.store.written()

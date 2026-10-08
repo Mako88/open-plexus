@@ -16,7 +16,7 @@ from unfused.home import home
 # every extraction kept across runs: the parser is deterministic, and the version is in
 # the key so a change to what is extracted re-reads every sentence
 CACHE = home() / "state" / "parses.sqlite"
-VERSION = "graph-14"
+VERSION = "graph-15"
 # every text MiniLM has encoded, by its text
 VECTORS = home() / "state" / "vectors.sqlite"
 # every text the parser has read, as its reading, by model and text
@@ -241,6 +241,21 @@ def agreement(tok) -> str:
                     if k not in ("Case", "PronType", "Poss", "Reflex"))
 
 
+def clause_subject(tok):
+    """The named subject of the clause a word is in, read up the tree from the word to the
+    clause's head: what a possessive or a reflexive refers to by the parse alone ('Tom lost
+    his hat', 'Lily saw herself'), as binding theory has it. None where the subject is
+    itself a pronoun or the clause has none."""
+    t = tok
+    while True:
+        s = next((c for c in t.children if c.dep_ in ("nsubj", "nsubj:pass")), None)
+        if s is not None and s.i != tok.i:
+            return s if s.pos_ != "PRON" else None
+        if t.head.i == t.i or t.pos_ in ("VERB", "AUX") or t.dep_ in CLAUSES:
+            return None
+        t = t.head
+
+
 def mood(tok) -> str:
     """What did not happen, and what only might or will, by what the parse marks: a
     negation (`Polarity=Neg`), and an auxiliary marked finite with no mood of its own,
@@ -334,7 +349,12 @@ def extract(doc) -> list[dict]:
                 return f"f:{tok.lower_}"
             # one with nothing to refer to in its own sentence is resolved when heard,
             # against the episode, by what it agrees in and the slot it fills. Where it
-            # was said rides with it, so what it was bound to can be read against it
+            # was said rides with it, so what it was bound to can be read against it.
+            # A possessive or a reflexive is its own clause's subject, and what it agrees
+            # in rides as well: what that subject is called is learnt from it
+            if {"Yes"} & set(feature(tok, "Poss") + feature(tok, "Reflex")) and (
+                    s := clause_subject(tok)) is not None:
+                return thing(s) + f"\x1e{tok.idx}\x1e{agreement(tok)}"
             if first is not None:
                 return thing(first) + f"\x1e{tok.idx}"
             return f"p:{tok.dep_}|{agreement(tok)}\x1e{tok.idx}"
@@ -400,12 +420,14 @@ def extract(doc) -> list[dict]:
                  if not t.startswith("e:") or t in renumber]
         # a pronoun's place in the text, beside the edge it became
         pronouns = [int(t.split("\x1e")[1]) if "\x1e" in t else None for _, t in edges]
-        edges = [[label, t.split("\x1e")[0]] for label, t in edges]
+        # what a pronoun bound by its own clause agrees in, beside the edge it became
+        paths = [t.split("\x1e")[2] if t.count("\x1e") == 2 else None for _, t in edges]
+        edges =[[label, t.split("\x1e")[0]] for label, t in edges]
         mentions = [int(t.split("\x1f")[1]) if "\x1f" in t else None for _, t in edges]
         # the token the event was heard at, so a mouth can say it again
         out.append({"lemma": events[i]["lemma"], "mood": events[i]["mood"], "head": events[i]["head"],
                     "edges": [[label, t.split("\x1f")[0]] for label, t in edges],
-                    "mentions": mentions, "pronouns": pronouns,
+                    "mentions": mentions, "pronouns": pronouns, "paths": paths,
                     "things": {str(m): things[m] for m in mentions if m is not None},
                     "place": {str(m): doc[m].idx for m in mentions if m is not None}})
     return out

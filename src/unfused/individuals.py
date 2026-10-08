@@ -224,14 +224,23 @@ class Individuals:
         learnt from what pronouns have been resolved to."""
         slot, agrees = pronoun.split("|", 1)
         subject = slot.startswith("nsubj")
+        unsure = None
         for node, label in self.db.execute(
                 "SELECT node, label FROM edges WHERE "
                 f"{self.mind.within('event', events=True)} AND node LIKE 'i:%' "
                 "ORDER BY event DESC LIMIT 200", self.mind.bounds(events=True)):
-            if label.startswith("nsubj") != subject or label == "self":
+            if label == "self" or (self.parallel and label.startswith("nsubj") != subject):
                 continue
             called = self.agreed(self.label(node))
             if called and agrees not in called and max(called.values()) >= 2:
                 continue
-            return node
-        return None
+            if not self.agreeing_first or (called and agrees in called):
+                return node
+            unsure = unsure or node
+        return unsure
+
+    # arms under comparison (PreCo, 2026-10-08): whether a pronoun looks only among
+    # things in its own slot, and whether one known to agree comes before a later one
+    # never called anything
+    parallel = True
+    agreeing_first = False

@@ -1,0 +1,7362 @@
+{
+ "kind": "propara",
+ "arm": "window",
+ "taken_at": "20261008T122212Z",
+ "note": "smoke",
+ "command": "scripts/propara.py --arms window --note smoke",
+ "world": {
+  "source": "ProPara-test",
+  "paragraphs": 54,
+  "questions": 563,
+  "fingerprint": "0279f9668cc8"
+ },
+ "summary": {
+  "right": 0.453,
+  "refused": 0.0,
+  "n": 563,
+  "moved": {
+   "right": 0.395,
+   "refused": 0.0,
+   "n": 243
+  },
+  "stayed": {
+   "right": 0.497,
+   "refused": 0.0,
+   "n": 320
+  },
+  "told": {
+   "right": 0.483,
+   "refused": 0.0,
+   "n": 482
+  },
+  "untold": {
+   "right": 0.272,
+   "refused": 0.0,
+   "n": 81
+  }
+ },
+ "dials": {},
+ "seconds": 0.0,
+ "cpu_seconds": 0.0,
+ "rows": [
+  {
+   "paragraph": "37",
+   "at": 1,
+   "question": "Where is the plant?",
+   "places": [
+    "watery environment"
+   ],
+   "said": "A plant of animal dies in a watery environment.",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "37",
+   "at": 2,
+   "question": "Where is the plant?",
+   "places": [
+    "mud and silt"
+   ],
+   "said": "A plant of animal dies in a watery environment.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "37",
+   "at": 3,
+   "question": "Where is the plant?",
+   "places": [
+    "mud and silt"
+   ],
+   "said": "A plant of animal dies in a watery environment.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "37",
+   "at": 4,
+   "question": "Where is the plant?",
+   "places": [
+    "rock"
+   ],
+   "said": "A plant of animal dies in a watery environment.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "37",
+   "at": 4,
+   "question": "Where are the bones?",
+   "places": [
+    "rock"
+   ],
+   "said": "Soft tissues quickly decompose leaving behind hard bones or shells.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "37",
+   "at": 5,
+   "question": "Where is the plant?",
+   "places": [
+    "rock"
+   ],
+   "said": "A plant of animal dies in a watery environment.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "37",
+   "at": 5,
+   "question": "Where is the mineral?",
+   "places": [
+    "rock"
+   ],
+   "said": "As the bone decays mineral seeps in replacing it.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "37",
+   "at": 6,
+   "question": "Where is the plant?",
+   "places": [
+    "rock"
+   ],
+   "said": "A plant of animal dies in a watery environment.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "37",
+   "at": 6,
+   "question": "Where is the mineral?",
+   "places": [
+    "rock"
+   ],
+   "said": "As the bone decays mineral seeps in replacing it.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "38",
+   "at": 2,
+   "question": "Where is the animal?",
+   "places": [
+    "sandy or wet place"
+   ],
+   "said": "The animal dies and the body falls down.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": false
+  },
+  {
+   "paragraph": "38",
+   "at": 3,
+   "question": "Where is the animal?",
+   "places": [
+    "sandy or wet place"
+   ],
+   "said": "The animal dies and the body falls down.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "38",
+   "at": 4,
+   "question": "Where is the animal?",
+   "places": [
+    "sandy or wet place"
+   ],
+   "said": "The animal dies and the body falls down.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "38",
+   "at": 4,
+   "question": "Where is the soil?",
+   "places": [
+    "around the body"
+   ],
+   "said": "The soil forms around the body.",
+   "right": true,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "38",
+   "at": 5,
+   "question": "Where is the animal?",
+   "places": [
+    "sandy or wet place"
+   ],
+   "said": "The animal dies and the body falls down.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "38",
+   "at": 5,
+   "question": "Where is the rock?",
+   "places": [
+    "around the body"
+   ],
+   "said": "Time passes on and the rock forms.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "38",
+   "at": 6,
+   "question": "Where is the rock?",
+   "places": [
+    "around the body"
+   ],
+   "said": "Time passes on and the rock forms.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "38",
+   "at": 6,
+   "question": "Where is the fossil?",
+   "places": [
+    "rock"
+   ],
+   "said": "Millions years later the fossil forms.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "38",
+   "at": 7,
+   "question": "Where is the rock?",
+   "places": [
+    "around the body"
+   ],
+   "said": "Time passes on and the rock forms.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "38",
+   "at": 7,
+   "question": "Where is the fossil?",
+   "places": [
+    "rock"
+   ],
+   "said": "It is not eaten by anything.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "67",
+   "at": 2,
+   "question": "Where are the plants?",
+   "places": [
+    "swamp"
+   ],
+   "said": "The dead plants end up in swamps.",
+   "right": true,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "67",
+   "at": 3,
+   "question": "Where are the plants?",
+   "places": [
+    "bottom of the swamp"
+   ],
+   "said": "The dead plants end up in swamps.",
+   "right": true,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "67",
+   "at": 4,
+   "question": "Where are the plants?",
+   "places": [
+    "bottom of the swamp"
+   ],
+   "said": "The dead plants end up in swamps.",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "67",
+   "at": 5,
+   "question": "Where is the peat?",
+   "places": [
+    "bottom of the swamp"
+   ],
+   "said": "The dead plants join together forming peat.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "67",
+   "at": 6,
+   "question": "Where is the peat?",
+   "places": [
+    "bottom of the swamp"
+   ],
+   "said": "The dead plants join together forming peat.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "67",
+   "at": 7,
+   "question": "Where is the peat?",
+   "places": [
+    "bottom of the swamp"
+   ],
+   "said": "The dead plants join together forming peat.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "67",
+   "at": 8,
+   "question": "Where is the peat?",
+   "places": [
+    "bottom of the swamp"
+   ],
+   "said": "The dead plants join together forming peat.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "67",
+   "at": 9,
+   "question": "Where is the coal?",
+   "places": [
+    "bottom of the swamp"
+   ],
+   "said": "The peat turns into coal after a long time.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "68",
+   "at": 1,
+   "question": "Where is the water?",
+   "places": [
+    "steamy , swampy area"
+   ],
+   "said": "300 millions years ago plants and trees died.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": false
+  },
+  {
+   "paragraph": "68",
+   "at": 2,
+   "question": "Where are the plant and tree remains?",
+   "places": [
+    "area"
+   ],
+   "said": "The plant and tree remains sank to the bottom of steamy, swampy areas.",
+   "right": true,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "68",
+   "at": 2,
+   "question": "Where is the water?",
+   "places": [
+    "steamy , swampy area"
+   ],
+   "said": "The plant and tree remains sank to the bottom of steamy, swampy areas.",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": false
+  },
+  {
+   "paragraph": "68",
+   "at": 3,
+   "question": "Where are the plant and tree remains?",
+   "places": [
+    "steamy , swampy area"
+   ],
+   "said": "The plant and tree remains sank to the bottom of steamy, swampy areas.",
+   "right": true,
+   "refused": false,
+   "moved": true,
+   "told": false
+  },
+  {
+   "paragraph": "68",
+   "at": 3,
+   "question": "Where is the water?",
+   "places": [
+    "steamy , swampy area"
+   ],
+   "said": "The plant and tree remains sank to the bottom of steamy, swampy areas.",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": false
+  },
+  {
+   "paragraph": "68",
+   "at": 4,
+   "question": "Where are the plant and tree remains?",
+   "places": [
+    "swampy area"
+   ],
+   "said": "The plant and tree remains sank to the bottom of steamy, swampy areas.",
+   "right": true,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "68",
+   "at": 4,
+   "question": "Where is the peat?",
+   "places": [
+    "steamy , swampy area"
+   ],
+   "said": "Eventually forming a soggy, dense material called peat.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": false
+  },
+  {
+   "paragraph": "68",
+   "at": 4,
+   "question": "Where is the water?",
+   "places": [
+    "peat"
+   ],
+   "said": "The plant and tree remains sank to the bottom of steamy, swampy areas.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "68",
+   "at": 5,
+   "question": "Where are the plant and tree remains?",
+   "places": [
+    "sand , clay , and other mineral material"
+   ],
+   "said": "The plant and tree remains sank to the bottom of steamy, swampy areas.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": false
+  },
+  {
+   "paragraph": "68",
+   "at": 5,
+   "question": "Where is the peat?",
+   "places": [
+    "sand , clay , and other mineral material"
+   ],
+   "said": "The peat was buried over millions of years by sand, clay, and other mineral material.",
+   "right": true,
+   "refused": false,
+   "moved": true,
+   "told": false
+  },
+  {
+   "paragraph": "68",
+   "at": 5,
+   "question": "Where is the water?",
+   "places": [
+    "peat"
+   ],
+   "said": "The plant and tree remains sank to the bottom of steamy, swampy areas.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "68",
+   "at": 6,
+   "question": "Where are the plant and tree remains?",
+   "places": [
+    "swampy area"
+   ],
+   "said": "The plant and tree remains sank to the bottom of steamy, swampy areas.",
+   "right": true,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "68",
+   "at": 6,
+   "question": "Where is the peat?",
+   "places": [
+    "swampy area"
+   ],
+   "said": "The peat was buried over millions of years by sand, clay, and other mineral material.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "68",
+   "at": 7,
+   "question": "Where are the plant and tree remains?",
+   "places": [
+    "swampy area"
+   ],
+   "said": "The plant and tree remains sank to the bottom of steamy, swampy areas.",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "68",
+   "at": 7,
+   "question": "Where is the heat?",
+   "places": [
+    "burial peat"
+   ],
+   "said": "With the heat caused by increased burial peat slowly became coal.",
+   "right": true,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "68",
+   "at": 7,
+   "question": "Where is the coal?",
+   "places": [
+    "burial peat"
+   ],
+   "said": "With the heat caused by increased burial peat slowly became coal.",
+   "right": true,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "69",
+   "at": 1,
+   "question": "Where is the sand?",
+   "places": [
+    "bottom of swamp"
+   ],
+   "said": "Plants and trees die.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": false
+  },
+  {
+   "paragraph": "69",
+   "at": 1,
+   "question": "Where is the clay?",
+   "places": [
+    "bottom of swamp"
+   ],
+   "said": "Plants and trees die.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": false
+  },
+  {
+   "paragraph": "69",
+   "at": 1,
+   "question": "Where is the water?",
+   "places": [
+    "bottom of swamp"
+   ],
+   "said": "Plants and trees die.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": false
+  },
+  {
+   "paragraph": "69",
+   "at": 2,
+   "question": "Where are the plants?",
+   "places": [
+    "bottom of swamp"
+   ],
+   "said": "Dead plants and trees pile up at the bottom of swamps.",
+   "right": true,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "69",
+   "at": 2,
+   "question": "Where is the sand?",
+   "places": [
+    "bottom of swamp"
+   ],
+   "said": "Dead plants and trees pile up at the bottom of swamps.",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "69",
+   "at": 2,
+   "question": "Where is the clay?",
+   "places": [
+    "bottom of swamp"
+   ],
+   "said": "Dead plants and trees pile up at the bottom of swamps.",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "69",
+   "at": 2,
+   "question": "Where is the water?",
+   "places": [
+    "bottom of swamp"
+   ],
+   "said": "Dead plants and trees pile up at the bottom of swamps.",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "69",
+   "at": 3,
+   "question": "Where is the peat?",
+   "places": [
+    "bottom of swamp"
+   ],
+   "said": "Dead plants and trees pile up at the bottom of swamps.",
+   "right": true,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "69",
+   "at": 3,
+   "question": "Where is the sand?",
+   "places": [
+    "bottom of swamp"
+   ],
+   "said": "Dead plants and trees pile up at the bottom of swamps.",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "69",
+   "at": 3,
+   "question": "Where is the clay?",
+   "places": [
+    "bottom of swamp"
+   ],
+   "said": "Dead plants and trees pile up at the bottom of swamps.",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "69",
+   "at": 3,
+   "question": "Where is the water?",
+   "places": [
+    "peat"
+   ],
+   "said": "Dead plants and trees pile up at the bottom of swamps.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "69",
+   "at": 4,
+   "question": "Where is the peat?",
+   "places": [
+    "bottom of swamp"
+   ],
+   "said": "Sand and clay cover the peat.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "69",
+   "at": 4,
+   "question": "Where is the sand?",
+   "places": [
+    "bottom of swamp"
+   ],
+   "said": "Sand and clay cover the peat.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "69",
+   "at": 4,
+   "question": "Where is the clay?",
+   "places": [
+    "bottom of swamp"
+   ],
+   "said": "Sand and clay cover the peat.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "69",
+   "at": 4,
+   "question": "Where is the water?",
+   "places": [
+    "peat"
+   ],
+   "said": "Dead plants and trees pile up at the bottom of swamps.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "69",
+   "at": 5,
+   "question": "Where is the peat?",
+   "places": [
+    "bottom of swamp"
+   ],
+   "said": "Sand and clay cover the peat.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "69",
+   "at": 5,
+   "question": "Where are the sedimentary rocks?",
+   "places": [
+    "bottom of swamp"
+   ],
+   "said": "The sand and clay form sedimentary rocks.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "69",
+   "at": 5,
+   "question": "Where is the water?",
+   "places": [
+    "peat"
+   ],
+   "said": "Dead plants and trees pile up at the bottom of swamps.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "69",
+   "at": 6,
+   "question": "Where is the peat?",
+   "places": [
+    "bottom of swamp"
+   ],
+   "said": "Sand and clay cover the peat.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "69",
+   "at": 6,
+   "question": "Where are the sedimentary rocks?",
+   "places": [
+    "bottom of swamp"
+   ],
+   "said": "The sand and clay form sedimentary rocks.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "69",
+   "at": 6,
+   "question": "Where is the pressure?",
+   "places": [
+    "sedimentary rock"
+   ],
+   "said": "Pressure caused by sedimentary rocks squeezes water out of the peat.",
+   "right": true,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "69",
+   "at": 7,
+   "question": "Where are the sedimentary rocks?",
+   "places": [
+    "bottom of swamp"
+   ],
+   "said": "The sand and clay form sedimentary rocks.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "69",
+   "at": 7,
+   "question": "Where is the pressure?",
+   "places": [
+    "sedimentary rock"
+   ],
+   "said": "Pressure caused by sedimentary rocks squeezes water out of the peat.",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "69",
+   "at": 7,
+   "question": "Where is the coal?",
+   "places": [
+    "bottom of swamp"
+   ],
+   "said": "Heat changes the material into coal.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "70",
+   "at": 1,
+   "question": "Where is the water?",
+   "places": [
+    "rain"
+   ],
+   "said": "There is a lot of rain.",
+   "right": true,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "70",
+   "at": 2,
+   "question": "Where is the water?",
+   "places": [
+    "river or lake"
+   ],
+   "said": "There is a lot of rain.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "70",
+   "at": 3,
+   "question": "Where is the water?",
+   "places": [
+    "ground"
+   ],
+   "said": "Water builds up on the ground.",
+   "right": true,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "70",
+   "at": 4,
+   "question": "Where is the water?",
+   "places": [
+    "street"
+   ],
+   "said": "Water builds up on the ground.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "70",
+   "at": 5,
+   "question": "Where is the water?",
+   "places": [
+    "house"
+   ],
+   "said": "Water builds up on the ground.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "70",
+   "at": 6,
+   "question": "Where is the water?",
+   "places": [
+    "ground"
+   ],
+   "said": "There is a lot of rain.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "70",
+   "at": 7,
+   "question": "Where is the water?",
+   "places": [
+    "stream"
+   ],
+   "said": "There is a lot of rain.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "99",
+   "at": 1,
+   "question": "Where are the rain clouds?",
+   "places": [
+    "sky"
+   ],
+   "said": "Rain clouds travel across the sky.",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "99",
+   "at": 1,
+   "question": "Where are the clouds?",
+   "places": [
+    "sky"
+   ],
+   "said": "Rain clouds travel across the sky.",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "99",
+   "at": 2,
+   "question": "Where are the rain clouds?",
+   "places": [
+    "sky"
+   ],
+   "said": "Rain clouds travel across the sky.",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "99",
+   "at": 2,
+   "question": "Where are the clouds?",
+   "places": [
+    "sky"
+   ],
+   "said": "Rain clouds travel across the sky.",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "99",
+   "at": 3,
+   "question": "Where are the rain clouds?",
+   "places": [
+    "sky"
+   ],
+   "said": "Rain clouds are stopped or slowed by mountains or wind.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "99",
+   "at": 3,
+   "question": "Where is the rain?",
+   "places": [
+    "mountain"
+   ],
+   "said": "Rain clouds travel across the sky.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "99",
+   "at": 3,
+   "question": "Where are the clouds?",
+   "places": [
+    "sky"
+   ],
+   "said": "Rain clouds are stopped or slowed by mountains or wind.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "99",
+   "at": 4,
+   "question": "Where are the rain clouds?",
+   "places": [
+    "sky"
+   ],
+   "said": "Rain clouds are stopped or slowed by mountains or wind.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "99",
+   "at": 4,
+   "question": "Where is the rain?",
+   "places": [
+    "mountain"
+   ],
+   "said": "Rain clouds travel across the sky.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "99",
+   "at": 4,
+   "question": "Where are the clouds?",
+   "places": [
+    "sky"
+   ],
+   "said": "The clouds are no longer raining when or if they reach the other side of the obstacle.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "99",
+   "at": 5,
+   "question": "Where are the rain clouds?",
+   "places": [
+    "sky"
+   ],
+   "said": "Rain clouds are stopped or slowed by mountains or wind.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "99",
+   "at": 5,
+   "question": "Where is the rain?",
+   "places": [
+    "mountain"
+   ],
+   "said": "Rain clouds travel across the sky.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "99",
+   "at": 5,
+   "question": "Where are the clouds?",
+   "places": [
+    "sky"
+   ],
+   "said": "The clouds are no longer raining when or if they reach the other side of the obstacle.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "99",
+   "at": 6,
+   "question": "Where are the rain clouds?",
+   "places": [
+    "sky"
+   ],
+   "said": "Rain clouds are stopped or slowed by mountains or wind.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "99",
+   "at": 6,
+   "question": "Where is the rain?",
+   "places": [
+    "mountain"
+   ],
+   "said": "Rain clouds travel across the sky.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "99",
+   "at": 6,
+   "question": "Where are the clouds?",
+   "places": [
+    "sky"
+   ],
+   "said": "The clouds are no longer raining when or if they reach the other side of the obstacle.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "99",
+   "at": 6,
+   "question": "Where is the a very different ecosystem?",
+   "places": [
+    "area that receive little rain"
+   ],
+   "said": "The area that receives little rain develops a very different ecosystem.",
+   "right": true,
+   "refused": false,
+   "moved": true,
+   "told": false
+  },
+  {
+   "paragraph": "99",
+   "at": 7,
+   "question": "Where are the rain clouds?",
+   "places": [
+    "sky"
+   ],
+   "said": "Rain clouds are stopped or slowed by mountains or wind.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "99",
+   "at": 7,
+   "question": "Where is the rain?",
+   "places": [
+    "mountain"
+   ],
+   "said": "Rain clouds travel across the sky.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "99",
+   "at": 7,
+   "question": "Where are the clouds?",
+   "places": [
+    "sky"
+   ],
+   "said": "The clouds are no longer raining when or if they reach the other side of the obstacle.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "99",
+   "at": 7,
+   "question": "Where is the a very different ecosystem?",
+   "places": [
+    "area that receive little rain"
+   ],
+   "said": "The area that receives little rain develops a very different ecosystem.",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": false
+  },
+  {
+   "paragraph": "99",
+   "at": 7,
+   "question": "Where is the desert?",
+   "places": [
+    "area that receive little rain"
+   ],
+   "said": "The area that receives little rain becomes a desert.",
+   "right": true,
+   "refused": false,
+   "moved": true,
+   "told": false
+  },
+  {
+   "paragraph": "152",
+   "at": 1,
+   "question": "Where is the water vapor?",
+   "places": [
+    "atmosphere"
+   ],
+   "said": "Water vapor is in the atmosphere.",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "152",
+   "at": 2,
+   "question": "Where is the water vapor?",
+   "places": [
+    "atmosphere"
+   ],
+   "said": "Water vapor is in the atmosphere.",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "152",
+   "at": 3,
+   "question": "Where is the water vapor?",
+   "places": [
+    "atmosphere"
+   ],
+   "said": "Water vapor is in the atmosphere.",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "152",
+   "at": 4,
+   "question": "Where is the solid?",
+   "places": [
+    "atmosphere"
+   ],
+   "said": "Water vapor is in the atmosphere.",
+   "right": true,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "152",
+   "at": 5,
+   "question": "Where is the solid?",
+   "places": [
+    "atmosphere"
+   ],
+   "said": "Water vapor is in the atmosphere.",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "152",
+   "at": 6,
+   "question": "Where is the solid?",
+   "places": [
+    "atmosphere"
+   ],
+   "said": "Water vapor is in the atmosphere.",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "249",
+   "at": 4,
+   "question": "Where is the oxygen?",
+   "places": [
+    "rock"
+   ],
+   "said": "Oxidation takes place when oxygen combines with other elements in rocks.",
+   "right": true,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "249",
+   "at": 8,
+   "question": "Where are the new types of rocks?",
+   "places": [
+    "water"
+   ],
+   "said": "They form new types of rocks.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "310",
+   "at": 1,
+   "question": "Where is the blood?",
+   "places": [
+    "heart"
+   ],
+   "said": "Blood enters the right side of your heart.",
+   "right": true,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "310",
+   "at": 1,
+   "question": "Where is the carbon dioxide?",
+   "places": [
+    "blood"
+   ],
+   "said": "Blood enters the right side of your heart.",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "310",
+   "at": 1,
+   "question": "Where is the oxygen?",
+   "places": [
+    "lung"
+   ],
+   "said": "Blood enters the right side of your heart.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": false
+  },
+  {
+   "paragraph": "310",
+   "at": 2,
+   "question": "Where is the blood?",
+   "places": [
+    "lung"
+   ],
+   "said": "Blood enters the right side of your heart.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "310",
+   "at": 2,
+   "question": "Where is the carbon dioxide?",
+   "places": [
+    "blood"
+   ],
+   "said": "Blood enters the right side of your heart.",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "310",
+   "at": 2,
+   "question": "Where is the oxygen?",
+   "places": [
+    "lung"
+   ],
+   "said": "Blood enters the right side of your heart.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "310",
+   "at": 3,
+   "question": "Where is the blood?",
+   "places": [
+    "lung"
+   ],
+   "said": "Carbon dioxide is removed from the blood.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "310",
+   "at": 3,
+   "question": "Where is the oxygen?",
+   "places": [
+    "lung"
+   ],
+   "said": "Carbon dioxide is removed from the blood.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "310",
+   "at": 4,
+   "question": "Where is the blood?",
+   "places": [
+    "lung"
+   ],
+   "said": "Carbon dioxide is removed from the blood.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "310",
+   "at": 4,
+   "question": "Where is the oxygen?",
+   "places": [
+    "blood"
+   ],
+   "said": "Oxygen is added to your blood.",
+   "right": true,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "310",
+   "at": 5,
+   "question": "Where is the blood?",
+   "places": [
+    "heart"
+   ],
+   "said": "Carbon dioxide is removed from the blood.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "310",
+   "at": 5,
+   "question": "Where is the oxygen?",
+   "places": [
+    "blood"
+   ],
+   "said": "Oxygen is added to your blood.",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "310",
+   "at": 6,
+   "question": "Where is the blood?",
+   "places": [
+    "body"
+   ],
+   "said": "Carbon dioxide is removed from the blood.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "310",
+   "at": 6,
+   "question": "Where is the oxygen?",
+   "places": [
+    "blood"
+   ],
+   "said": "Oxygen is added to your blood.",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "400",
+   "at": 4,
+   "question": "Where is the energy?",
+   "places": [
+    "solar panel"
+   ],
+   "said": "The elements create energy.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": false
+  },
+  {
+   "paragraph": "400",
+   "at": 5,
+   "question": "Where is the electricity?",
+   "places": [
+    "solar panel"
+   ],
+   "said": "The energy is turned into electricity.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": false
+  },
+  {
+   "paragraph": "401",
+   "at": 2,
+   "question": "Where is the sunlight?",
+   "places": [
+    "solar panel"
+   ],
+   "said": "Solar panels are made up of two types of silicon.",
+   "right": true,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "401",
+   "at": 3,
+   "question": "Where is the sunlight?",
+   "places": [
+    "top half of the solar panel"
+   ],
+   "said": "Sunlight goes into the top half of the solar panel.",
+   "right": true,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "401",
+   "at": 4,
+   "question": "Where is the sunlight?",
+   "places": [
+    "bottom half of the solar panel"
+   ],
+   "said": "Sunlight goes into the top half of the solar panel.",
+   "right": true,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "401",
+   "at": 5,
+   "question": "Where is the direct current?",
+   "places": [
+    "solar panel"
+   ],
+   "said": "The \"jump\" between the two halves can be used to make direct current.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "401",
+   "at": 6,
+   "question": "Where is the alternating current?",
+   "places": [
+    "solar `` inverter ''"
+   ],
+   "said": "A solar \"inverter\" changes the direct current to alternating current.",
+   "right": true,
+   "refused": false,
+   "moved": true,
+   "told": false
+  },
+  {
+   "paragraph": "401",
+   "at": 7,
+   "question": "Where is the alternating current?",
+   "places": [
+    "house"
+   ],
+   "said": "A solar \"inverter\" changes the direct current to alternating current.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "409",
+   "at": 4,
+   "question": "Where is the image?",
+   "places": [
+    "retina"
+   ],
+   "said": "The retina receives the image.",
+   "right": true,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "409",
+   "at": 5,
+   "question": "Where are the electrical impulses?",
+   "places": [
+    "retina"
+   ],
+   "said": "The retina transforms this image into electrical impulses.",
+   "right": true,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "409",
+   "at": 6,
+   "question": "Where are the electrical impulses?",
+   "places": [
+    "brain"
+   ],
+   "said": "The retina transforms this image into electrical impulses.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "409",
+   "at": 7,
+   "question": "Where are the electrical impulses?",
+   "places": [
+    "brain"
+   ],
+   "said": "The retina transforms this image into electrical impulses.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "410",
+   "at": 1,
+   "question": "Where is the light?",
+   "places": [
+    "cornea"
+   ],
+   "said": "The cornea helps to focus light.",
+   "right": true,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "410",
+   "at": 2,
+   "question": "Where is the light?",
+   "places": [
+    "iris"
+   ],
+   "said": "The cornea helps to focus light.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "410",
+   "at": 3,
+   "question": "Where is the light?",
+   "places": [
+    "retina"
+   ],
+   "said": "The cornea helps to focus light.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": false
+  },
+  {
+   "paragraph": "410",
+   "at": 4,
+   "question": "Where is the electric signal?",
+   "places": [
+    "retina"
+   ],
+   "said": "The retina converts the light that reaches the retina into an electric signal.",
+   "right": true,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "410",
+   "at": 5,
+   "question": "Where is the electric signal?",
+   "places": [
+    "brain"
+   ],
+   "said": "The retina converts the light that reaches the retina into an electric signal.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "410",
+   "at": 6,
+   "question": "Where is the electric signal?",
+   "places": [
+    "brain"
+   ],
+   "said": "The retina converts the light that reaches the retina into an electric signal.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "411",
+   "at": 1,
+   "question": "Where is the light?",
+   "places": [
+    "photoreceptor cell"
+   ],
+   "said": "Visual perception begins as soon as the eye focuses light onto the retina, where it is absorbed by a layer of photoreceptor cells.",
+   "right": true,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "411",
+   "at": 2,
+   "question": "Where are the electrochemical signals?",
+   "places": [
+    "retina"
+   ],
+   "said": "These cells convert light into electrochemical signals, and are divided into two types, rods.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "411",
+   "at": 3,
+   "question": "Where are the electrochemical signals?",
+   "places": [
+    "retina"
+   ],
+   "said": "These cells convert light into electrochemical signals, and are divided into two types, rods.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "411",
+   "at": 4,
+   "question": "Where are the electrochemical signals?",
+   "places": [
+    "retina"
+   ],
+   "said": "These cells convert light into electrochemical signals, and are divided into two types, rods.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "411",
+   "at": 5,
+   "question": "Where are the electrochemical signals?",
+   "places": [
+    "retina"
+   ],
+   "said": "These cells convert light into electrochemical signals, and are divided into two types, rods.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "411",
+   "at": 6,
+   "question": "Where are the electrochemical signals?",
+   "places": [
+    "cerebral cortex"
+   ],
+   "said": "These cells convert light into electrochemical signals, and are divided into two types, rods.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "411",
+   "at": 7,
+   "question": "Where are the electrochemical signals?",
+   "places": [
+    "superior colliculus"
+   ],
+   "said": "These cells convert light into electrochemical signals, and are divided into two types, rods.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "411",
+   "at": 8,
+   "question": "Where are the electrochemical signals?",
+   "places": [
+    "brain"
+   ],
+   "said": "These cells convert light into electrochemical signals, and are divided into two types, rods.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "429",
+   "at": 1,
+   "question": "Where is the nitrogen?",
+   "places": [
+    "atmosphere"
+   ],
+   "said": "Nitrogen exists naturally in the atmosphere.",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "429",
+   "at": 2,
+   "question": "Where is the fixed nitrogen?",
+   "places": [
+    "soil"
+   ],
+   "said": "Nitrogen exists naturally in the atmosphere.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "429",
+   "at": 3,
+   "question": "Where is the fixed nitrogen?",
+   "places": [
+    "soil"
+   ],
+   "said": "Nitrogen is now usable by living things.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "429",
+   "at": 4,
+   "question": "Where is the fixed nitrogen?",
+   "places": [
+    "plant"
+   ],
+   "said": "Nitrogen is now usable by living things.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "429",
+   "at": 5,
+   "question": "Where is the fixed nitrogen?",
+   "places": [
+    "animal"
+   ],
+   "said": "Nitrogen is now usable by living things.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "429",
+   "at": 5,
+   "question": "Where are the plants?",
+   "places": [
+    "animal"
+   ],
+   "said": "Animals eat the plants.",
+   "right": true,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "429",
+   "at": 6,
+   "question": "Where is the fixed nitrogen?",
+   "places": [
+    "waste"
+   ],
+   "said": "Nitrogen is now usable by living things.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "429",
+   "at": 7,
+   "question": "Where is the fixed nitrogen?",
+   "places": [
+    "waste"
+   ],
+   "said": "Nitrogen is now usable by living things.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "429",
+   "at": 8,
+   "question": "Where is the fixed nitrogen?",
+   "places": [
+    "soil"
+   ],
+   "said": "Nitrogen is now usable by living things.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "429",
+   "at": 9,
+   "question": "Where is the gas-based form?",
+   "places": [
+    "soil"
+   ],
+   "said": "Different bacteria turn nitrogen back into a gas-based form.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "429",
+   "at": 10,
+   "question": "Where is the gas-based form?",
+   "places": [
+    "atmosphere"
+   ],
+   "said": "Different bacteria turn nitrogen back into a gas-based form.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "460",
+   "at": 1,
+   "question": "Where is the carbon?",
+   "places": [
+    "live thing"
+   ],
+   "said": "Living things have carbon in them.",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": false
+  },
+  {
+   "paragraph": "460",
+   "at": 2,
+   "question": "Where is the carbon?",
+   "places": [
+    "live thing"
+   ],
+   "said": "Living things have carbon in them.",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": false
+  },
+  {
+   "paragraph": "460",
+   "at": 3,
+   "question": "Where are the living things?",
+   "places": [
+    "underground"
+   ],
+   "said": "The remains of living things eventually become buried underground.",
+   "right": true,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "460",
+   "at": 3,
+   "question": "Where is the carbon?",
+   "places": [
+    "underground"
+   ],
+   "said": "Living things have carbon in them.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "460",
+   "at": 4,
+   "question": "Where is the carbon-based mixture?",
+   "places": [
+    "underground"
+   ],
+   "said": "More physical pressure is put on the remains of living things as they become further underground.",
+   "right": true,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "460",
+   "at": 5,
+   "question": "Where is the carbon-based mixture?",
+   "places": [
+    "underground"
+   ],
+   "said": "This carbon-based mixture stays underground for a long time.",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "460",
+   "at": 6,
+   "question": "Where is the carbon-based mixture?",
+   "places": [
+    "underground"
+   ],
+   "said": "More physical pressure is put on the remains of living things as they become further underground.",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "460",
+   "at": 7,
+   "question": "Where is the fossil fuel?",
+   "places": [
+    "surface"
+   ],
+   "said": "More physical pressure is put on the remains of living things as they become further underground.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "460",
+   "at": 7,
+   "question": "Where is the energy?",
+   "places": [
+    "fossil fuel"
+   ],
+   "said": "More physical pressure is put on the remains of living things as they become further underground.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": false
+  },
+  {
+   "paragraph": "460",
+   "at": 8,
+   "question": "Where is the energy?",
+   "places": [
+    "fossil fuel"
+   ],
+   "said": "More physical pressure is put on the remains of living things as they become further underground.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "463",
+   "at": 1,
+   "question": "Where are the raindrops?",
+   "places": [
+    "updraft"
+   ],
+   "said": "Updrafts in a thunderstorm carry raindrops upwards.",
+   "right": true,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "463",
+   "at": 3,
+   "question": "Where is the ice particle?",
+   "places": [
+    "surface"
+   ],
+   "said": "The raindrops condense onto dust or other small parti.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": false
+  },
+  {
+   "paragraph": "463",
+   "at": 4,
+   "question": "Where is the ice particle?",
+   "places": [
+    "surface"
+   ],
+   "said": "The tiny ice particle keeps moving up and down, gathering more ice on the surface.",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "463",
+   "at": 4,
+   "question": "Where is the hailstone?",
+   "places": [
+    "aloft"
+   ],
+   "said": "The raindrops condense onto dust or other small parti.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": false
+  },
+  {
+   "paragraph": "463",
+   "at": 5,
+   "question": "Where is the ice particle?",
+   "places": [
+    "surface"
+   ],
+   "said": "The tiny ice particle keeps moving up and down, gathering more ice on the surface.",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "463",
+   "at": 5,
+   "question": "Where is the hailstone?",
+   "places": [
+    "earth"
+   ],
+   "said": "Eventually the hailstone falls to earth either because it's too heavy to remain aloft or because a drowndraft pushes it down.",
+   "right": true,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "465",
+   "at": 1,
+   "question": "Where is the water?",
+   "places": [
+    "wind"
+   ],
+   "said": "Water gets caught in winds that are moving upward.",
+   "right": true,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "465",
+   "at": 2,
+   "question": "Where is the hail?",
+   "places": [
+    "wind"
+   ],
+   "said": "The water freezes.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "465",
+   "at": 3,
+   "question": "Where is the hail?",
+   "places": [
+    "wind"
+   ],
+   "said": "The water freezes.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "465",
+   "at": 4,
+   "question": "Where is the hail?",
+   "places": [
+    "wind"
+   ],
+   "said": "The water freezes.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "465",
+   "at": 5,
+   "question": "Where is the hail?",
+   "places": [
+    "wind"
+   ],
+   "said": "The water freezes.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "465",
+   "at": 6,
+   "question": "Where is the hail?",
+   "places": [
+    "wind"
+   ],
+   "said": "The hail becomes too large to be pushed up by the wind.",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "465",
+   "at": 7,
+   "question": "Where is the hail?",
+   "places": [
+    "ground"
+   ],
+   "said": "The hail becomes too large to be pushed up by the wind.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "502",
+   "at": 1,
+   "question": "Where is the energy?",
+   "places": [
+    "combustion chamber"
+   ],
+   "said": "Energy is created by burning either diesel or petrol in a combustion chamber.",
+   "right": true,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "502",
+   "at": 2,
+   "question": "Where is the energy?",
+   "places": [
+    "piston motion"
+   ],
+   "said": "The energy is transferred from the pistons moving up and down at high speeds.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": false
+  },
+  {
+   "paragraph": "502",
+   "at": 2,
+   "question": "Where is the piston motion?",
+   "places": [
+    "piston"
+   ],
+   "said": "The energy is transferred from the pistons moving up and down at high speeds.",
+   "right": true,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "502",
+   "at": 3,
+   "question": "Where is the energy?",
+   "places": [
+    "rotary motion"
+   ],
+   "said": "The energy is transferred from the pistons moving up and down at high speeds.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "502",
+   "at": 4,
+   "question": "Where is the energy?",
+   "places": [
+    "rotary motion"
+   ],
+   "said": "The energy is transferred from the pistons moving up and down at high speeds.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "502",
+   "at": 5,
+   "question": "Where is the energy?",
+   "places": [
+    "rotary motion"
+   ],
+   "said": "The energy is transferred from the pistons moving up and down at high speeds.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "503",
+   "at": 1,
+   "question": "Where is the gasoline?",
+   "places": [
+    "car"
+   ],
+   "said": "A car is filled with gasoline (gas).",
+   "right": true,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "503",
+   "at": 1,
+   "question": "Where is the battery?",
+   "places": [
+    "car"
+   ],
+   "said": "A car is filled with gasoline (gas).",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "503",
+   "at": 1,
+   "question": "Where is the piston?",
+   "places": [
+    "car"
+   ],
+   "said": "A car is filled with gasoline (gas).",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "503",
+   "at": 1,
+   "question": "Where is the crankshaft?",
+   "places": [
+    "car"
+   ],
+   "said": "A car is filled with gasoline (gas).",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "503",
+   "at": 1,
+   "question": "Where is the wheel?",
+   "places": [
+    "car"
+   ],
+   "said": "A car is filled with gasoline (gas).",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "503",
+   "at": 2,
+   "question": "Where is the gasoline?",
+   "places": [
+    "car"
+   ],
+   "said": "A car is filled with gasoline (gas).",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "503",
+   "at": 2,
+   "question": "Where is the battery?",
+   "places": [
+    "car"
+   ],
+   "said": "A car is filled with gasoline (gas).",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "503",
+   "at": 2,
+   "question": "Where is the piston?",
+   "places": [
+    "car"
+   ],
+   "said": "A car is filled with gasoline (gas).",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "503",
+   "at": 2,
+   "question": "Where is the crankshaft?",
+   "places": [
+    "car"
+   ],
+   "said": "A car is filled with gasoline (gas).",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "503",
+   "at": 2,
+   "question": "Where is the wheel?",
+   "places": [
+    "car"
+   ],
+   "said": "A car is filled with gasoline (gas).",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "503",
+   "at": 3,
+   "question": "Where is the gasoline?",
+   "places": [
+    "car"
+   ],
+   "said": "A car is filled with gasoline (gas).",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "503",
+   "at": 3,
+   "question": "Where is the battery?",
+   "places": [
+    "car"
+   ],
+   "said": "The car's battery produces a spark (electricity).",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "503",
+   "at": 3,
+   "question": "Where is the spark?",
+   "places": [
+    "car"
+   ],
+   "said": "The car's battery produces a spark (electricity).",
+   "right": true,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "503",
+   "at": 3,
+   "question": "Where is the piston?",
+   "places": [
+    "car"
+   ],
+   "said": "A car is filled with gasoline (gas).",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "503",
+   "at": 3,
+   "question": "Where is the crankshaft?",
+   "places": [
+    "car"
+   ],
+   "said": "A car is filled with gasoline (gas).",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "503",
+   "at": 3,
+   "question": "Where is the wheel?",
+   "places": [
+    "car"
+   ],
+   "said": "A car is filled with gasoline (gas).",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "503",
+   "at": 4,
+   "question": "Where is the gasoline?",
+   "places": [
+    "car"
+   ],
+   "said": "A car is filled with gasoline (gas).",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "503",
+   "at": 4,
+   "question": "Where is the battery?",
+   "places": [
+    "car"
+   ],
+   "said": "The car's battery produces a spark (electricity).",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "503",
+   "at": 4,
+   "question": "Where is the spark?",
+   "places": [
+    "car"
+   ],
+   "said": "A car is filled with gasoline (gas).",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "503",
+   "at": 4,
+   "question": "Where is the piston?",
+   "places": [
+    "car"
+   ],
+   "said": "A car is filled with gasoline (gas).",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "503",
+   "at": 4,
+   "question": "Where is the crankshaft?",
+   "places": [
+    "car"
+   ],
+   "said": "A car is filled with gasoline (gas).",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "503",
+   "at": 4,
+   "question": "Where is the wheel?",
+   "places": [
+    "car"
+   ],
+   "said": "A car is filled with gasoline (gas).",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "503",
+   "at": 5,
+   "question": "Where is the gasoline?",
+   "places": [
+    "car"
+   ],
+   "said": "A car is filled with gasoline (gas).",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "503",
+   "at": 5,
+   "question": "Where is the battery?",
+   "places": [
+    "car"
+   ],
+   "said": "The car's battery produces a spark (electricity).",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "503",
+   "at": 5,
+   "question": "Where is the piston?",
+   "places": [
+    "car"
+   ],
+   "said": "A car is filled with gasoline (gas).",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "503",
+   "at": 5,
+   "question": "Where is the crankshaft?",
+   "places": [
+    "car"
+   ],
+   "said": "A car is filled with gasoline (gas).",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "503",
+   "at": 5,
+   "question": "Where is the wheel?",
+   "places": [
+    "car"
+   ],
+   "said": "A car is filled with gasoline (gas).",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "503",
+   "at": 6,
+   "question": "Where is the gasoline?",
+   "places": [
+    "car"
+   ],
+   "said": "A car is filled with gasoline (gas).",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "503",
+   "at": 6,
+   "question": "Where is the battery?",
+   "places": [
+    "car"
+   ],
+   "said": "The car's battery produces a spark (electricity).",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "503",
+   "at": 6,
+   "question": "Where is the piston?",
+   "places": [
+    "car"
+   ],
+   "said": "The expanding air and gas pushes a piston out.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "503",
+   "at": 6,
+   "question": "Where is the crankshaft?",
+   "places": [
+    "car"
+   ],
+   "said": "A car is filled with gasoline (gas).",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "503",
+   "at": 6,
+   "question": "Where is the wheel?",
+   "places": [
+    "car"
+   ],
+   "said": "A car is filled with gasoline (gas).",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "503",
+   "at": 7,
+   "question": "Where is the gasoline?",
+   "places": [
+    "car"
+   ],
+   "said": "A car is filled with gasoline (gas).",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "503",
+   "at": 7,
+   "question": "Where is the battery?",
+   "places": [
+    "car"
+   ],
+   "said": "The car's battery produces a spark (electricity).",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "503",
+   "at": 7,
+   "question": "Where is the piston?",
+   "places": [
+    "car"
+   ],
+   "said": "The expanding air and gas pushes a piston out.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "503",
+   "at": 7,
+   "question": "Where is the crankshaft?",
+   "places": [
+    "car"
+   ],
+   "said": "The motion of several pistons move the crankshaft.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "503",
+   "at": 7,
+   "question": "Where is the wheel?",
+   "places": [
+    "car"
+   ],
+   "said": "A car is filled with gasoline (gas).",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "503",
+   "at": 8,
+   "question": "Where is the gasoline?",
+   "places": [
+    "car"
+   ],
+   "said": "A car is filled with gasoline (gas).",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "503",
+   "at": 8,
+   "question": "Where is the battery?",
+   "places": [
+    "car"
+   ],
+   "said": "The car's battery produces a spark (electricity).",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "503",
+   "at": 8,
+   "question": "Where is the piston?",
+   "places": [
+    "car"
+   ],
+   "said": "The expanding air and gas pushes a piston out.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "503",
+   "at": 8,
+   "question": "Where is the crankshaft?",
+   "places": [
+    "car"
+   ],
+   "said": "A car is filled with gasoline (gas).",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "503",
+   "at": 8,
+   "question": "Where is the wheel?",
+   "places": [
+    "car"
+   ],
+   "said": "A car is filled with gasoline (gas).",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "503",
+   "at": 9,
+   "question": "Where is the gasoline?",
+   "places": [
+    "car"
+   ],
+   "said": "A car is filled with gasoline (gas).",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "503",
+   "at": 9,
+   "question": "Where is the battery?",
+   "places": [
+    "car"
+   ],
+   "said": "The car's battery produces a spark (electricity).",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "503",
+   "at": 9,
+   "question": "Where is the piston?",
+   "places": [
+    "car"
+   ],
+   "said": "The expanding air and gas pushes a piston out.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "503",
+   "at": 9,
+   "question": "Where is the crankshaft?",
+   "places": [
+    "car"
+   ],
+   "said": "A car is filled with gasoline (gas).",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "503",
+   "at": 9,
+   "question": "Where is the wheel?",
+   "places": [
+    "car"
+   ],
+   "said": "A car is filled with gasoline (gas).",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "533",
+   "at": 1,
+   "question": "Where is the seed?",
+   "places": [
+    "soil"
+   ],
+   "said": "A seed comes from an adult tree.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": false
+  },
+  {
+   "paragraph": "533",
+   "at": 2,
+   "question": "Where are the sprouts?",
+   "places": [
+    "soil"
+   ],
+   "said": "It sprouts from the soil.",
+   "right": true,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "533",
+   "at": 3,
+   "question": "Where is the seedling?",
+   "places": [
+    "soil"
+   ],
+   "said": "It sprouts from the soil.",
+   "right": true,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "533",
+   "at": 4,
+   "question": "Where is the sapling?",
+   "places": [
+    "soil"
+   ],
+   "said": "It sprouts from the soil.",
+   "right": true,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "533",
+   "at": 5,
+   "question": "Where is the tree?",
+   "places": [
+    "soil"
+   ],
+   "said": "It reaches maturity, this make take many years depending on the type of tree.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "533",
+   "at": 6,
+   "question": "Where is the tree?",
+   "places": [
+    "soil"
+   ],
+   "said": "It reaches maturity, this make take many years depending on the type of tree.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "534",
+   "at": 4,
+   "question": "Where is the fruit?",
+   "places": [
+    "tree"
+   ],
+   "said": "A seed is planted.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "534",
+   "at": 5,
+   "question": "Where is the fruit?",
+   "places": [
+    "tree"
+   ],
+   "said": "A seed is planted.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "534",
+   "at": 5,
+   "question": "Where are the flowers?",
+   "places": [
+    "tree"
+   ],
+   "said": "Flowers.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "534",
+   "at": 6,
+   "question": "Where is the fruit?",
+   "places": [
+    "tree"
+   ],
+   "said": "A seed is planted.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "534",
+   "at": 6,
+   "question": "Where are the flowers?",
+   "places": [
+    "tree"
+   ],
+   "said": "Flowers.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "534",
+   "at": 7,
+   "question": "Where is the fruit?",
+   "places": [
+    "tree"
+   ],
+   "said": "A seed is planted.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "534",
+   "at": 7,
+   "question": "Where are the flowers?",
+   "places": [
+    "tree"
+   ],
+   "said": "Flowers.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "582",
+   "at": 1,
+   "question": "Where is the warm, moist air?",
+   "places": [
+    "north"
+   ],
+   "said": "Warm, moist air moves from south to north.",
+   "right": true,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "582",
+   "at": 2,
+   "question": "Where is the warm, moist air?",
+   "places": [
+    "north"
+   ],
+   "said": "Warm, moist air moves from south to north.",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "582",
+   "at": 2,
+   "question": "Where is the cool, dry air?",
+   "places": [
+    "south"
+   ],
+   "said": "Cool, dry air moves from north to south.",
+   "right": true,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "582",
+   "at": 7,
+   "question": "Where are the circular patterns?",
+   "places": [
+    "updraft"
+   ],
+   "said": "Winds start to form circular patterns in the updraft.",
+   "right": true,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "582",
+   "at": 8,
+   "question": "Where is the updraft?",
+   "places": [
+    "tornado"
+   ],
+   "said": "Winds start to form circular patterns in the updraft.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "583",
+   "at": 2,
+   "question": "Where is the warm, humd low-presure air?",
+   "places": [
+    "air"
+   ],
+   "said": "Warm, humid low-pressure air rises.",
+   "right": true,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "583",
+   "at": 3,
+   "question": "Where is the warm, humd low-presure air?",
+   "places": [
+    "air"
+   ],
+   "said": "Warm, humid low-pressure air rises.",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "583",
+   "at": 3,
+   "question": "Where is the dry, cold high-pressure air?",
+   "places": [
+    "air"
+   ],
+   "said": "Dry, cold high-pressure air is punched through.",
+   "right": true,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "583",
+   "at": 4,
+   "question": "Where is the warm, humd low-presure air?",
+   "places": [
+    "air"
+   ],
+   "said": "Warm, humid low-pressure air rises.",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "583",
+   "at": 4,
+   "question": "Where is the updraft?",
+   "places": [
+    "air"
+   ],
+   "said": "Creates a strong updraft.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "583",
+   "at": 4,
+   "question": "Where is the dry, cold high-pressure air?",
+   "places": [
+    "air"
+   ],
+   "said": "Dry, cold high-pressure air is punched through.",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "583",
+   "at": 5,
+   "question": "Where is the warm, humd low-presure air?",
+   "places": [
+    "air"
+   ],
+   "said": "Warm, humid low-pressure air rises.",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "583",
+   "at": 5,
+   "question": "Where is the updraft?",
+   "places": [
+    "air"
+   ],
+   "said": "When the rotation is violent enough a funnel forms.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "583",
+   "at": 5,
+   "question": "Where is the dry, cold high-pressure air?",
+   "places": [
+    "air"
+   ],
+   "said": "Dry, cold high-pressure air is punched through.",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "583",
+   "at": 5,
+   "question": "Where is the rotation?",
+   "places": [
+    "funnel"
+   ],
+   "said": "When the rotation is violent enough a funnel forms.",
+   "right": true,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "583",
+   "at": 6,
+   "question": "Where is the warm, humd low-presure air?",
+   "places": [
+    "ground"
+   ],
+   "said": "Warm, humid low-pressure air rises.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "583",
+   "at": 6,
+   "question": "Where is the updraft?",
+   "places": [
+    "ground"
+   ],
+   "said": "Creates a strong updraft.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "583",
+   "at": 6,
+   "question": "Where is the dry, cold high-pressure air?",
+   "places": [
+    "ground"
+   ],
+   "said": "Dry, cold high-pressure air is punched through.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "583",
+   "at": 6,
+   "question": "Where is the rotation?",
+   "places": [
+    "ground"
+   ],
+   "said": "When the rotation is violent enough a funnel forms.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "583",
+   "at": 6,
+   "question": "Where is the funnel?",
+   "places": [
+    "ground"
+   ],
+   "said": "When the rotation is violent enough a funnel forms.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "600",
+   "at": 1,
+   "question": "Where is the air?",
+   "places": [
+    "engine"
+   ],
+   "said": "Fuel is converted to energy when air and petrol mix.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": false
+  },
+  {
+   "paragraph": "600",
+   "at": 1,
+   "question": "Where is the petrol?",
+   "places": [
+    "engine"
+   ],
+   "said": "Fuel is converted to energy when air and petrol mix.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": false
+  },
+  {
+   "paragraph": "600",
+   "at": 2,
+   "question": "Where is the energy?",
+   "places": [
+    "engine"
+   ],
+   "said": "Fuel is converted to energy when air and petrol mix.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "600",
+   "at": 2,
+   "question": "Where are the hot gas?",
+   "places": [
+    "engine"
+   ],
+   "said": "The car engine burns the mix of air and petrol.",
+   "right": true,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "600",
+   "at": 3,
+   "question": "Where is the energy?",
+   "places": [
+    "piston"
+   ],
+   "said": "Fuel is converted to energy when air and petrol mix.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "600",
+   "at": 3,
+   "question": "Where are the hot gas?",
+   "places": [
+    "engine"
+   ],
+   "said": "Hot gas from the burning pushes the pistons.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "600",
+   "at": 4,
+   "question": "Where is the energy?",
+   "places": [
+    "crankshaft"
+   ],
+   "said": "Fuel is converted to energy when air and petrol mix.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "600",
+   "at": 4,
+   "question": "Where are the hot gas?",
+   "places": [
+    "engine"
+   ],
+   "said": "Hot gas from the burning pushes the pistons.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "600",
+   "at": 5,
+   "question": "Where is the energy?",
+   "places": [
+    "gear"
+   ],
+   "said": "Fuel is converted to energy when air and petrol mix.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "600",
+   "at": 5,
+   "question": "Where are the hot gas?",
+   "places": [
+    "engine"
+   ],
+   "said": "Hot gas from the burning pushes the pistons.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "600",
+   "at": 6,
+   "question": "Where is the energy?",
+   "places": [
+    "wheel"
+   ],
+   "said": "Fuel is converted to energy when air and petrol mix.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "600",
+   "at": 6,
+   "question": "Where are the hot gas?",
+   "places": [
+    "engine"
+   ],
+   "said": "Hot gas from the burning pushes the pistons.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "653",
+   "at": 4,
+   "question": "Where is the flower?",
+   "places": [
+    "tree"
+   ],
+   "said": "A seed is planted.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "653",
+   "at": 5,
+   "question": "Where is the fruit?",
+   "places": [
+    "tree"
+   ],
+   "said": "The flowers become fruit.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "653",
+   "at": 6,
+   "question": "Where is the fruit?",
+   "places": [
+    "tree"
+   ],
+   "said": "The flowers become fruit.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "654",
+   "at": 1,
+   "question": "Where is the seedling?",
+   "places": [
+    "ground"
+   ],
+   "said": "A seedling is grown in the ground.",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "654",
+   "at": 2,
+   "question": "Where is the seedling?",
+   "places": [
+    "ground"
+   ],
+   "said": "A seedling is grown in the ground.",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "654",
+   "at": 2,
+   "question": "Where is the root system?",
+   "places": [
+    "ground"
+   ],
+   "said": "The seedling grows bigger, and forms its root system.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "654",
+   "at": 3,
+   "question": "Where is the seedling?",
+   "places": [
+    "ground"
+   ],
+   "said": "A seedling is grown in the ground.",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "654",
+   "at": 3,
+   "question": "Where is the root system?",
+   "places": [
+    "ground"
+   ],
+   "said": "The seedling grows bigger, and forms its root system.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "654",
+   "at": 3,
+   "question": "Where is the tree?",
+   "places": [
+    "ground"
+   ],
+   "said": "A seedling is grown in the ground.",
+   "right": true,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "654",
+   "at": 4,
+   "question": "Where is the seedling?",
+   "places": [
+    "ground"
+   ],
+   "said": "A seedling is grown in the ground.",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "654",
+   "at": 4,
+   "question": "Where is the root system?",
+   "places": [
+    "ground"
+   ],
+   "said": "The seedling grows bigger, and forms its root system.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "654",
+   "at": 4,
+   "question": "Where is the tree?",
+   "places": [
+    "ground"
+   ],
+   "said": "A seedling is grown in the ground.",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "654",
+   "at": 5,
+   "question": "Where is the seedling?",
+   "places": [
+    "ground"
+   ],
+   "said": "A seedling is grown in the ground.",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "654",
+   "at": 5,
+   "question": "Where is the root system?",
+   "places": [
+    "ground"
+   ],
+   "said": "The seedling grows bigger, and forms its root system.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "654",
+   "at": 5,
+   "question": "Where is the tree?",
+   "places": [
+    "ground"
+   ],
+   "said": "A seedling is grown in the ground.",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "654",
+   "at": 6,
+   "question": "Where is the seedling?",
+   "places": [
+    "ground"
+   ],
+   "said": "A seedling is grown in the ground.",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "654",
+   "at": 6,
+   "question": "Where is the root system?",
+   "places": [
+    "ground"
+   ],
+   "said": "The seedling grows bigger, and forms its root system.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "654",
+   "at": 6,
+   "question": "Where is the material for new growth?",
+   "places": [
+    "ground"
+   ],
+   "said": "After a number of years the tree will grow old and die, becoming material for new growth.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "659",
+   "at": 1,
+   "question": "Where is the ammonium?",
+   "places": [
+    "soil"
+   ],
+   "said": "Bacteria changes nitrogen into ammonium through fixation.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": false
+  },
+  {
+   "paragraph": "659",
+   "at": 1,
+   "question": "Where is the plant?",
+   "places": [
+    "soil"
+   ],
+   "said": "Bacteria changes nitrogen into ammonium through fixation.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": false
+  },
+  {
+   "paragraph": "659",
+   "at": 1,
+   "question": "Where is the extra nitrogen?",
+   "places": [
+    "soil"
+   ],
+   "said": "Bacteria changes nitrogen into ammonium through fixation.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": false
+  },
+  {
+   "paragraph": "659",
+   "at": 2,
+   "question": "Where is the nitrogen?",
+   "places": [
+    "soil"
+   ],
+   "said": "The nitrification process is where ammonium gets changed into nitrates by bacteria.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": false
+  },
+  {
+   "paragraph": "659",
+   "at": 2,
+   "question": "Where is the plant?",
+   "places": [
+    "soil"
+   ],
+   "said": "The nitrification process is where ammonium gets changed into nitrates by bacteria.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": false
+  },
+  {
+   "paragraph": "659",
+   "at": 2,
+   "question": "Where is the extra nitrogen?",
+   "places": [
+    "soil"
+   ],
+   "said": "The nitrification process is where ammonium gets changed into nitrates by bacteria.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": false
+  },
+  {
+   "paragraph": "659",
+   "at": 3,
+   "question": "Where is the nitrogen?",
+   "places": [
+    "plant"
+   ],
+   "said": "The nitrification process is where ammonium gets changed into nitrates by bacteria.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "659",
+   "at": 3,
+   "question": "Where is the plant?",
+   "places": [
+    "soil"
+   ],
+   "said": "The nitrification process is where ammonium gets changed into nitrates by bacteria.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "659",
+   "at": 3,
+   "question": "Where is the extra nitrogen?",
+   "places": [
+    "soil"
+   ],
+   "said": "The nitrification process is where ammonium gets changed into nitrates by bacteria.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "659",
+   "at": 4,
+   "question": "Where is the ammonium?",
+   "places": [
+    "soil"
+   ],
+   "said": "The nitrification process is where ammonium gets changed into nitrates by bacteria.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "659",
+   "at": 4,
+   "question": "Where is the extra nitrogen?",
+   "places": [
+    "soil"
+   ],
+   "said": "The nitrification process is where ammonium gets changed into nitrates by bacteria.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "659",
+   "at": 5,
+   "question": "Where is the ammonium?",
+   "places": [
+    "soil"
+   ],
+   "said": "The nitrification process is where ammonium gets changed into nitrates by bacteria.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "659",
+   "at": 5,
+   "question": "Where is the extra nitrogen?",
+   "places": [
+    "air"
+   ],
+   "said": "The nitrification process is where ammonium gets changed into nitrates by bacteria.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "659",
+   "at": 6,
+   "question": "Where is the ammonium?",
+   "places": [
+    "soil"
+   ],
+   "said": "The nitrification process is where ammonium gets changed into nitrates by bacteria.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "659",
+   "at": 6,
+   "question": "Where is the extra nitrogen?",
+   "places": [
+    "air"
+   ],
+   "said": "The nitrification process is where ammonium gets changed into nitrates by bacteria.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "660",
+   "at": 1,
+   "question": "Where is the organic nitrogen?",
+   "places": [
+    "soil"
+   ],
+   "said": "Nitrogen-fixing bacteria convert atmospheric nitrogen to organic nitrogen.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": false
+  },
+  {
+   "paragraph": "660",
+   "at": 2,
+   "question": "Where is the organic nitrogen?",
+   "places": [
+    "plant"
+   ],
+   "said": "Plants absorb organic nitrogen from the soil through their roots.",
+   "right": true,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "660",
+   "at": 3,
+   "question": "Where is the organic nitrogen?",
+   "places": [
+    "plant"
+   ],
+   "said": "Plants absorb organic nitrogen from the soil through their roots.",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "660",
+   "at": 4,
+   "question": "Where is the organic nitrogen?",
+   "places": [
+    "plant"
+   ],
+   "said": "Plants absorb organic nitrogen from the soil through their roots.",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "660",
+   "at": 5,
+   "question": "Where is the organic nitrogen?",
+   "places": [
+    "fungus"
+   ],
+   "said": "Plants absorb organic nitrogen from the soil through their roots.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": false
+  },
+  {
+   "paragraph": "660",
+   "at": 5,
+   "question": "Where are the wastes?",
+   "places": [
+    "soil"
+   ],
+   "said": "Animals expel wastes.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "660",
+   "at": 6,
+   "question": "Where are the wastes?",
+   "places": [
+    "soil"
+   ],
+   "said": "Animals expel wastes.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "660",
+   "at": 6,
+   "question": "Where is the ammonium?",
+   "places": [
+    "soil"
+   ],
+   "said": "Fungi convert organic nitrogen to ammonium.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "660",
+   "at": 7,
+   "question": "Where are the wastes?",
+   "places": [
+    "soil"
+   ],
+   "said": "Animals expel wastes.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "660",
+   "at": 7,
+   "question": "Where is the nitrate?",
+   "places": [
+    "soil"
+   ],
+   "said": "Nitrifying bacteria convert ammonium to nitrate.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "660",
+   "at": 8,
+   "question": "Where are the wastes?",
+   "places": [
+    "soil"
+   ],
+   "said": "Animals expel wastes.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "660",
+   "at": 8,
+   "question": "Where are the nitrogen gas?",
+   "places": [
+    "soil"
+   ],
+   "said": "Bacteria convert nitrate to nitrogen gas.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "660",
+   "at": 9,
+   "question": "Where are the wastes?",
+   "places": [
+    "soil"
+   ],
+   "said": "Animals expel wastes.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "660",
+   "at": 9,
+   "question": "Where are the nitrogen gas?",
+   "places": [
+    "atmosphere"
+   ],
+   "said": "Nitrogen gas escapes from soil into the atmosphere.",
+   "right": true,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "661",
+   "at": 1,
+   "question": "Where is the ammonium?",
+   "places": [
+    "soil"
+   ],
+   "said": "Fixation is the first step in the process of making nitrogen usable by plants. Here bacteria change nitrogen into ammonium.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": false
+  },
+  {
+   "paragraph": "661",
+   "at": 1,
+   "question": "Where is the plant?",
+   "places": [
+    "soil"
+   ],
+   "said": "Fixation is the first step in the process of making nitrogen usable by plants. Here bacteria change nitrogen into ammonium.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": false
+  },
+  {
+   "paragraph": "661",
+   "at": 2,
+   "question": "Where are the nitrates?",
+   "places": [
+    "soil"
+   ],
+   "said": "Nitrification is the process by which ammonium gets changed into nitrates by bacteria.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": false
+  },
+  {
+   "paragraph": "661",
+   "at": 2,
+   "question": "Where is the plant?",
+   "places": [
+    "soil"
+   ],
+   "said": "Fixation is the first step in the process of making nitrogen usable by plants. Here bacteria change nitrogen into ammonium.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": false
+  },
+  {
+   "paragraph": "661",
+   "at": 3,
+   "question": "Where are the nitrates?",
+   "places": [
+    "plant"
+   ],
+   "said": "Nitrates are what the plants can then absorb.",
+   "right": true,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "661",
+   "at": 3,
+   "question": "Where is the plant?",
+   "places": [
+    "soil"
+   ],
+   "said": "Fixation is the first step in the process of making nitrogen usable by plants. Here bacteria change nitrogen into ammonium.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": false
+  },
+  {
+   "paragraph": "661",
+   "at": 4,
+   "question": "Where are the nitrates?",
+   "places": [
+    "plant"
+   ],
+   "said": "Nitrates are what the plants can then absorb.",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "661",
+   "at": 4,
+   "question": "Where is the plant?",
+   "places": [
+    "soil"
+   ],
+   "said": "Fixation is the first step in the process of making nitrogen usable by plants. Here bacteria change nitrogen into ammonium.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": false
+  },
+  {
+   "paragraph": "661",
+   "at": 5,
+   "question": "Where is the nitrogen?",
+   "places": [
+    "amino acid , nucleic acid , and chlorophyll"
+   ],
+   "said": "Fixation is the first step in the process of making nitrogen usable by plants. Here bacteria change nitrogen into ammonium.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": false
+  },
+  {
+   "paragraph": "661",
+   "at": 5,
+   "question": "Where is the plant?",
+   "places": [
+    "soil"
+   ],
+   "said": "Fixation is the first step in the process of making nitrogen usable by plants. Here bacteria change nitrogen into ammonium.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "661",
+   "at": 6,
+   "question": "Where is the nitrogen?",
+   "places": [
+    "amino acid , nucleic acid , and chlorophyll"
+   ],
+   "said": "Fixation is the first step in the process of making nitrogen usable by plants. Here bacteria change nitrogen into ammonium.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": false
+  },
+  {
+   "paragraph": "661",
+   "at": 6,
+   "question": "Where is the plant?",
+   "places": [
+    "soil"
+   ],
+   "said": "Fixation is the first step in the process of making nitrogen usable by plants. Here bacteria change nitrogen into ammonium.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "661",
+   "at": 7,
+   "question": "Where is the ammonium?",
+   "places": [
+    "soil"
+   ],
+   "said": "Fixation is the first step in the process of making nitrogen usable by plants. Here bacteria change nitrogen into ammonium.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "661",
+   "at": 8,
+   "question": "Where is the ammonium?",
+   "places": [
+    "air"
+   ],
+   "said": "Fixation is the first step in the process of making nitrogen usable by plants. Here bacteria change nitrogen into ammonium.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "661",
+   "at": 9,
+   "question": "Where is the ammonium?",
+   "places": [
+    "air"
+   ],
+   "said": "Fixation is the first step in the process of making nitrogen usable by plants. Here bacteria change nitrogen into ammonium.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "695",
+   "at": 1,
+   "question": "Where is the vapor?",
+   "places": [
+    "river or lake or the ocean"
+   ],
+   "said": "During evaporation the sun heats up water in rivers or lakes or the ocean and turns it into vapor or steam.",
+   "right": true,
+   "refused": false,
+   "moved": true,
+   "told": false
+  },
+  {
+   "paragraph": "695",
+   "at": 2,
+   "question": "Where is the vapor?",
+   "places": [
+    "air"
+   ],
+   "said": "During evaporation the sun heats up water in rivers or lakes or the ocean and turns it into vapor or steam.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "695",
+   "at": 3,
+   "question": "Where are the clouds?",
+   "places": [
+    "air"
+   ],
+   "said": "Water vapor in the air gets cold and changes back into liquid, forming clouds, which is called condensation.",
+   "right": true,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "695",
+   "at": 4,
+   "question": "Where are the clouds?",
+   "places": [
+    "air"
+   ],
+   "said": "Water vapor in the air gets cold and changes back into liquid, forming clouds, which is called condensation.",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "695",
+   "at": 5,
+   "question": "Where are the clouds?",
+   "places": [
+    "air"
+   ],
+   "said": "Water vapor in the air gets cold and changes back into liquid, forming clouds, which is called condensation.",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "695",
+   "at": 5,
+   "question": "Where is the rain?",
+   "places": [
+    "earth"
+   ],
+   "said": "Water vapor in the air gets cold and changes back into liquid, forming clouds, which is called condensation.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "695",
+   "at": 5,
+   "question": "Where is the hail?",
+   "places": [
+    "earth"
+   ],
+   "said": "Water vapor in the air gets cold and changes back into liquid, forming clouds, which is called condensation.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "695",
+   "at": 5,
+   "question": "Where is the sleet?",
+   "places": [
+    "earth"
+   ],
+   "said": "Water vapor in the air gets cold and changes back into liquid, forming clouds, which is called condensation.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "695",
+   "at": 5,
+   "question": "Where is the snow?",
+   "places": [
+    "earth"
+   ],
+   "said": "Water vapor in the air gets cold and changes back into liquid, forming clouds, which is called condensation.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "695",
+   "at": 6,
+   "question": "Where are the clouds?",
+   "places": [
+    "air"
+   ],
+   "said": "Water vapor in the air gets cold and changes back into liquid, forming clouds, which is called condensation.",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "695",
+   "at": 6,
+   "question": "Where is the rain?",
+   "places": [
+    "earth"
+   ],
+   "said": "Water vapor in the air gets cold and changes back into liquid, forming clouds, which is called condensation.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "695",
+   "at": 6,
+   "question": "Where is the hail?",
+   "places": [
+    "earth"
+   ],
+   "said": "Water vapor in the air gets cold and changes back into liquid, forming clouds, which is called condensation.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "695",
+   "at": 6,
+   "question": "Where is the sleet?",
+   "places": [
+    "earth"
+   ],
+   "said": "Water vapor in the air gets cold and changes back into liquid, forming clouds, which is called condensation.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "695",
+   "at": 6,
+   "question": "Where is the snow?",
+   "places": [
+    "earth"
+   ],
+   "said": "Water vapor in the air gets cold and changes back into liquid, forming clouds, which is called condensation.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "695",
+   "at": 7,
+   "question": "Where are the clouds?",
+   "places": [
+    "air"
+   ],
+   "said": "Water vapor in the air gets cold and changes back into liquid, forming clouds, which is called condensation.",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "695",
+   "at": 7,
+   "question": "Where is the rain?",
+   "places": [
+    "ocean , lake , or river"
+   ],
+   "said": "Water vapor in the air gets cold and changes back into liquid, forming clouds, which is called condensation.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": false
+  },
+  {
+   "paragraph": "695",
+   "at": 7,
+   "question": "Where is the hail?",
+   "places": [
+    "ocean , lake , or river"
+   ],
+   "said": "Water vapor in the air gets cold and changes back into liquid, forming clouds, which is called condensation.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": false
+  },
+  {
+   "paragraph": "695",
+   "at": 7,
+   "question": "Where is the sleet?",
+   "places": [
+    "ocean , lake , or river"
+   ],
+   "said": "Water vapor in the air gets cold and changes back into liquid, forming clouds, which is called condensation.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": false
+  },
+  {
+   "paragraph": "695",
+   "at": 7,
+   "question": "Where is the snow?",
+   "places": [
+    "ocean , lake , or river"
+   ],
+   "said": "Water vapor in the air gets cold and changes back into liquid, forming clouds, which is called condensation.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": false
+  },
+  {
+   "paragraph": "696",
+   "at": 1,
+   "question": "Where is the water vapor?",
+   "places": [
+    "air"
+   ],
+   "said": "Air contains invisible moisture called water vapor.",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "696",
+   "at": 1,
+   "question": "Where is the cloud?",
+   "places": [
+    "air"
+   ],
+   "said": "Air contains invisible moisture called water vapor.",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "696",
+   "at": 2,
+   "question": "Where is the water vapor?",
+   "places": [
+    "water droplet"
+   ],
+   "said": "Excess water vapor is condensed out as water in the form of water droplets.",
+   "right": true,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "696",
+   "at": 2,
+   "question": "Where are the water droplets?",
+   "places": [
+    "air"
+   ],
+   "said": "Excess water vapor is condensed out as water in the form of water droplets.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "696",
+   "at": 2,
+   "question": "Where is the cloud?",
+   "places": [
+    "air"
+   ],
+   "said": "Excess water vapor is condensed out as water in the form of water droplets.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "696",
+   "at": 3,
+   "question": "Where are the water droplets?",
+   "places": [
+    "cloud"
+   ],
+   "said": "Water droplets are carried up into the clouds.",
+   "right": true,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "696",
+   "at": 3,
+   "question": "Where is the cloud?",
+   "places": [
+    "air"
+   ],
+   "said": "Excess water vapor is condensed out as water in the form of water droplets.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "696",
+   "at": 4,
+   "question": "Where are the water droplets?",
+   "places": [
+    "cloud"
+   ],
+   "said": "Water droplets are carried up into the clouds.",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "696",
+   "at": 4,
+   "question": "Where is the cloud?",
+   "places": [
+    "air"
+   ],
+   "said": "Excess water vapor is condensed out as water in the form of water droplets.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "696",
+   "at": 5,
+   "question": "Where is the water vapor?",
+   "places": [
+    "cloud"
+   ],
+   "said": "Excess water vapor is condensed out as water in the form of water droplets.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "696",
+   "at": 5,
+   "question": "Where are the water droplets?",
+   "places": [
+    "cloud"
+   ],
+   "said": "Water droplets are carried up into the clouds.",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "696",
+   "at": 5,
+   "question": "Where is the cloud?",
+   "places": [
+    "air"
+   ],
+   "said": "When the cloud is saturated.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "696",
+   "at": 6,
+   "question": "Where is the cloud?",
+   "places": [
+    "air"
+   ],
+   "said": "When the cloud is saturated.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "697",
+   "at": 2,
+   "question": "Where is the water?",
+   "places": [
+    "cloud"
+   ],
+   "said": "The water condenses into clouds.",
+   "right": true,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "697",
+   "at": 3,
+   "question": "Where is the water?",
+   "places": [
+    "cloud"
+   ],
+   "said": "The water condenses into clouds.",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "697",
+   "at": 4,
+   "question": "Where is the water?",
+   "places": [
+    "cloud"
+   ],
+   "said": "The clouds reach a point where they cannot hold any more water.",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "697",
+   "at": 5,
+   "question": "Where is the water?",
+   "places": [
+    "area below the cloud"
+   ],
+   "said": "The clouds reach a point where they cannot hold any more water.",
+   "right": true,
+   "refused": false,
+   "moved": true,
+   "told": false
+  },
+  {
+   "paragraph": "697",
+   "at": 5,
+   "question": "Where is the rain?",
+   "places": [
+    "area below the cloud"
+   ],
+   "said": "The clouds reach a point where they cannot hold any more water.",
+   "right": true,
+   "refused": false,
+   "moved": true,
+   "told": false
+  },
+  {
+   "paragraph": "1031",
+   "at": 1,
+   "question": "Where are the bones?",
+   "places": [
+    "mud or soil"
+   ],
+   "said": "A plant or animal dies in mud or soil.",
+   "right": true,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "1031",
+   "at": 2,
+   "question": "Where are the bones?",
+   "places": [
+    "mud or soil"
+   ],
+   "said": "The bones are all that remains.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "1031",
+   "at": 3,
+   "question": "Where is the sediment?",
+   "places": [
+    "mud or soil"
+   ],
+   "said": "Over time the bones are covered in sediment.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "1031",
+   "at": 5,
+   "question": "Where is the fossil?",
+   "places": [
+    "rock"
+   ],
+   "said": "The rock becomes a fossil.",
+   "right": true,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "1032",
+   "at": 1,
+   "question": "Where are the animals?",
+   "places": [
+    "wet environment"
+   ],
+   "said": "Most fossils formed when animals or plants die in wet environment.",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "1032",
+   "at": 1,
+   "question": "Where are the plants?",
+   "places": [
+    "wet environment"
+   ],
+   "said": "Most fossils formed when animals or plants die in wet environment.",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "1032",
+   "at": 2,
+   "question": "Where are the animals?",
+   "places": [
+    "mud"
+   ],
+   "said": "The animals and plants are then buried in mud.",
+   "right": true,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "1032",
+   "at": 2,
+   "question": "Where are the plants?",
+   "places": [
+    "mud"
+   ],
+   "said": "The animals and plants are then buried in mud.",
+   "right": true,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "1032",
+   "at": 3,
+   "question": "Where are the bones and hard tissues?",
+   "places": [
+    "mud"
+   ],
+   "said": "The animals and plants are then buried in mud.",
+   "right": true,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "1032",
+   "at": 4,
+   "question": "Where are the bones and hard tissues?",
+   "places": [
+    "mud"
+   ],
+   "said": "Bones and hard tissues remain.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "1032",
+   "at": 5,
+   "question": "Where is the sediment?",
+   "places": [
+    "remains"
+   ],
+   "said": "Sediment builds up over the remains over a period of time.",
+   "right": true,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "1032",
+   "at": 6,
+   "question": "Where is the rock?",
+   "places": [
+    "remains"
+   ],
+   "said": "The sediment hardens into rock.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "1033",
+   "at": 2,
+   "question": "Where is the animal?",
+   "places": [
+    "mud"
+   ],
+   "said": "The animal is buried fast under mud.",
+   "right": true,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "1033",
+   "at": 3,
+   "question": "Where is the skeleton?",
+   "places": [
+    "mud"
+   ],
+   "said": "The animal is buried fast under mud.",
+   "right": true,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "1033",
+   "at": 4,
+   "question": "Where is the skeleton?",
+   "places": [
+    "rock"
+   ],
+   "said": "The animal is buried fast under mud.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "1033",
+   "at": 5,
+   "question": "Where is the mold?",
+   "places": [
+    "mud"
+   ],
+   "said": "The animal is buried fast under mud.",
+   "right": true,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "1033",
+   "at": 6,
+   "question": "Where is the mold?",
+   "places": [
+    "mud"
+   ],
+   "said": "A mold is left in the mud where the skeleton was.",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "1145",
+   "at": 1,
+   "question": "Where is the hydrogen fuel?",
+   "places": [
+    "star"
+   ],
+   "said": "A red giant star forms from an existing star.",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "1145",
+   "at": 1,
+   "question": "Where are the hydrogen atoms?",
+   "places": [
+    "star"
+   ],
+   "said": "A red giant star forms from an existing star.",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "1145",
+   "at": 2,
+   "question": "Where are the hydrogen atoms?",
+   "places": [
+    "star"
+   ],
+   "said": "Formation occurs when the star runs out of hydrogen fuel.",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "1145",
+   "at": 3,
+   "question": "Where are the helium atoms?",
+   "places": [
+    "star"
+   ],
+   "said": "Hydrogen atoms are combined together to form helium atoms.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "1145",
+   "at": 4,
+   "question": "Where are the helium atoms?",
+   "places": [
+    "star"
+   ],
+   "said": "Hydrogen atoms are combined together to form helium atoms.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "1145",
+   "at": 5,
+   "question": "Where are the helium atoms?",
+   "places": [
+    "star"
+   ],
+   "said": "Hydrogen atoms are combined together to form helium atoms.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "1146",
+   "at": 1,
+   "question": "Where is the hydrogen fuel?",
+   "places": [
+    "star"
+   ],
+   "said": "A star burns in space.",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "1146",
+   "at": 1,
+   "question": "Where is the hydrogen?",
+   "places": [
+    "star"
+   ],
+   "said": "A star burns in space.",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "1146",
+   "at": 1,
+   "question": "Where is the energy?",
+   "places": [
+    "star"
+   ],
+   "said": "A star burns in space.",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "1146",
+   "at": 2,
+   "question": "Where is the hydrogen?",
+   "places": [
+    "star"
+   ],
+   "said": "The star runs out of hydrogen fuel.",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "1146",
+   "at": 2,
+   "question": "Where is the energy?",
+   "places": [
+    "star"
+   ],
+   "said": "The star runs out of hydrogen fuel.",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "1146",
+   "at": 3,
+   "question": "Where is the helium?",
+   "places": [
+    "star"
+   ],
+   "said": "All the hydrogen is turned into helium.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "1146",
+   "at": 3,
+   "question": "Where is the energy?",
+   "places": [
+    "star"
+   ],
+   "said": "All the hydrogen is turned into helium.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "1146",
+   "at": 4,
+   "question": "Where is the helium?",
+   "places": [
+    "star"
+   ],
+   "said": "All the hydrogen is turned into helium.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "1146",
+   "at": 5,
+   "question": "Where is the helium?",
+   "places": [
+    "star"
+   ],
+   "said": "All the hydrogen is turned into helium.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "1146",
+   "at": 6,
+   "question": "Where is the helium?",
+   "places": [
+    "star"
+   ],
+   "said": "All the hydrogen is turned into helium.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "1146",
+   "at": 7,
+   "question": "Where are the carbon atoms?",
+   "places": [
+    "star"
+   ],
+   "said": "The helium atoms begin to combine into carbon atoms.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "1146",
+   "at": 8,
+   "question": "Where are the carbon atoms?",
+   "places": [
+    "star"
+   ],
+   "said": "The helium atoms begin to combine into carbon atoms.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "1146",
+   "at": 9,
+   "question": "Where are the carbon atoms?",
+   "places": [
+    "star"
+   ],
+   "said": "The helium atoms begin to combine into carbon atoms.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "1146",
+   "at": 10,
+   "question": "Where are the carbon atoms?",
+   "places": [
+    "star"
+   ],
+   "said": "The helium atoms begin to combine into carbon atoms.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "1146",
+   "at": 10,
+   "question": "Where is the red giant star?",
+   "places": [
+    "space"
+   ],
+   "said": "The star is a red giant.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "1147",
+   "at": 1,
+   "question": "Where are the helium atoms?",
+   "places": [
+    "star"
+   ],
+   "said": "Hydrogen atoms in a star combine together to form helium atoms.",
+   "right": true,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "1147",
+   "at": 1,
+   "question": "Where is the hydrogen?",
+   "places": [
+    "star"
+   ],
+   "said": "Hydrogen atoms in a star combine together to form helium atoms.",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "1147",
+   "at": 2,
+   "question": "Where are the helium atoms?",
+   "places": [
+    "star"
+   ],
+   "said": "All of the hydrogen in a star turns into helium.",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "1147",
+   "at": 2,
+   "question": "Where is the helium?",
+   "places": [
+    "star"
+   ],
+   "said": "All of the hydrogen in a star turns into helium.",
+   "right": true,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "1147",
+   "at": 3,
+   "question": "Where are the helium atoms?",
+   "places": [
+    "star"
+   ],
+   "said": "Hydrogen atoms in a star combine together to form helium atoms.",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "1147",
+   "at": 3,
+   "question": "Where is the helium?",
+   "places": [
+    "star"
+   ],
+   "said": "All of the hydrogen in a star turns into helium.",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "1147",
+   "at": 4,
+   "question": "Where are the helium atoms?",
+   "places": [
+    "star"
+   ],
+   "said": "All of the hydrogen in a star turns into helium.",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "1147",
+   "at": 4,
+   "question": "Where are the carbon atoms?",
+   "places": [
+    "star"
+   ],
+   "said": "Helium atoms combine together to form carbon atoms.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "1147",
+   "at": 5,
+   "question": "Where are the helium atoms?",
+   "places": [
+    "star"
+   ],
+   "said": "All of the hydrogen in a star turns into helium.",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "1147",
+   "at": 5,
+   "question": "Where are the carbon atoms?",
+   "places": [
+    "star"
+   ],
+   "said": "Helium atoms combine together to form carbon atoms.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "1147",
+   "at": 6,
+   "question": "Where are the helium atoms?",
+   "places": [
+    "star"
+   ],
+   "said": "Hydrogen atoms in a star combine together to form helium atoms.",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "1147",
+   "at": 6,
+   "question": "Where are the carbon atoms?",
+   "places": [
+    "star"
+   ],
+   "said": "Helium atoms combine together to form carbon atoms.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "1188",
+   "at": 1,
+   "question": "Where is the comet?",
+   "places": [
+    "outer space"
+   ],
+   "said": "Comets fly around in outer space.",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "1188",
+   "at": 2,
+   "question": "Where is the comet?",
+   "places": [
+    "close to a planet"
+   ],
+   "said": "A comet flies close to a planet.",
+   "right": true,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "1188",
+   "at": 3,
+   "question": "Where is the comet?",
+   "places": [
+    "planet 's atmosphere"
+   ],
+   "said": "The comet enters the planet's atmosphere.",
+   "right": true,
+   "refused": false,
+   "moved": true,
+   "told": false
+  },
+  {
+   "paragraph": "1188",
+   "at": 5,
+   "question": "Where is the hole?",
+   "places": [
+    "planet"
+   ],
+   "said": "The energy of the impact creates a hole on the planet.",
+   "right": true,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "1189",
+   "at": 1,
+   "question": "Where is the chunks of rock?",
+   "places": [
+    "atmosphere"
+   ],
+   "said": "Chunks of rocks break off of meteorites.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": false
+  },
+  {
+   "paragraph": "1189",
+   "at": 2,
+   "question": "Where is the chunks of rock?",
+   "places": [
+    "atmosphere"
+   ],
+   "said": "Chunks of rocks break off of meteorites.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "1189",
+   "at": 3,
+   "question": "Where is the chunks of rock?",
+   "places": [
+    "atmosphere"
+   ],
+   "said": "The rock is too big to be slowed down.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "1189",
+   "at": 5,
+   "question": "Where is the crater?",
+   "places": [
+    "earth"
+   ],
+   "said": "The angle the meteorite hits can impact how large the crater is.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "1189",
+   "at": 6,
+   "question": "Where is the crater?",
+   "places": [
+    "earth"
+   ],
+   "said": "The angle the meteorite hits can impact how large the crater is.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "1190",
+   "at": 1,
+   "question": "Where is the deoxygenated blood?",
+   "places": [
+    "heart"
+   ],
+   "said": "Two large veins bring blood to the heart.",
+   "right": true,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "1190",
+   "at": 2,
+   "question": "Where is the deoxygenated blood?",
+   "places": [
+    "right atrium"
+   ],
+   "said": "Two large veins bring blood to the heart.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "1190",
+   "at": 3,
+   "question": "Where is the deoxygenated blood?",
+   "places": [
+    "tricuspid valve"
+   ],
+   "said": "Two large veins bring blood to the heart.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "1190",
+   "at": 4,
+   "question": "Where is the deoxygenated blood?",
+   "places": [
+    "right ventricle"
+   ],
+   "said": "Two large veins bring blood to the heart.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "1190",
+   "at": 5,
+   "question": "Where is the deoxygenated blood?",
+   "places": [
+    "lung"
+   ],
+   "said": "Two large veins bring blood to the heart.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "1190",
+   "at": 6,
+   "question": "Where is the oxygenated blood?",
+   "places": [
+    "lung"
+   ],
+   "said": "Two large veins bring blood to the heart.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "1190",
+   "at": 7,
+   "question": "Where is the oxygenated blood?",
+   "places": [
+    "left atrium"
+   ],
+   "said": "Oxygenated blood enters the left atrium.",
+   "right": true,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "1190",
+   "at": 8,
+   "question": "Where is the oxygenated blood?",
+   "places": [
+    "left ventricle"
+   ],
+   "said": "Oxygenated blood enters the left atrium.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "1190",
+   "at": 9,
+   "question": "Where is the oxygenated blood?",
+   "places": [
+    "body"
+   ],
+   "said": "Oxygenated blood enters the left atrium.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "1190",
+   "at": 10,
+   "question": "Where is the deoxygenated blood?",
+   "places": [
+    "heart"
+   ],
+   "said": "The deoxygenated blood returns to the heart.",
+   "right": true,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "1240",
+   "at": 1,
+   "question": "Where is the Air?",
+   "places": [
+    "evaporator 's coil"
+   ],
+   "said": "Fans blow air onto the evaporator's coils.",
+   "right": true,
+   "refused": false,
+   "moved": true,
+   "told": false
+  },
+  {
+   "paragraph": "1240",
+   "at": 1,
+   "question": "Where is the Refrigerent Liquid?",
+   "places": [
+    "coil"
+   ],
+   "said": "Fans blow air onto the evaporator's coils.",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "1240",
+   "at": 2,
+   "question": "Where is the Air?",
+   "places": [
+    "evaporator 's coil"
+   ],
+   "said": "Fans blow air onto the evaporator's coils.",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": false
+  },
+  {
+   "paragraph": "1240",
+   "at": 2,
+   "question": "Where is the Heat?",
+   "places": [
+    "refrigerant"
+   ],
+   "said": "The refrigerant within the coils absorbs the heat.",
+   "right": true,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "1240",
+   "at": 2,
+   "question": "Where is the Refrigerent Liquid?",
+   "places": [
+    "coil"
+   ],
+   "said": "Fans blow air onto the evaporator's coils.",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "1240",
+   "at": 3,
+   "question": "Where is the Air?",
+   "places": [
+    "evaporator 's coil"
+   ],
+   "said": "Fans blow air onto the evaporator's coils.",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": false
+  },
+  {
+   "paragraph": "1240",
+   "at": 3,
+   "question": "Where is the Heat?",
+   "places": [
+    "coil"
+   ],
+   "said": "The refrigerant within the coils absorbs the heat.",
+   "right": true,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "1240",
+   "at": 3,
+   "question": "Where are the Refrigerent Gas?",
+   "places": [
+    "coil"
+   ],
+   "said": "The refrigerant changes from a liquid to a gas.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "1240",
+   "at": 4,
+   "question": "Where is the Heat?",
+   "places": [
+    "coil"
+   ],
+   "said": "The refrigerant within the coils absorbs the heat.",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "1240",
+   "at": 4,
+   "question": "Where are the Refrigerent Gas?",
+   "places": [
+    "compressor"
+   ],
+   "said": "The refrigerant changes from a liquid to a gas.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "1240",
+   "at": 5,
+   "question": "Where is the Heat?",
+   "places": [
+    "coil"
+   ],
+   "said": "The refrigerant within the coils absorbs the heat.",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "1240",
+   "at": 5,
+   "question": "Where is the Liquid?",
+   "places": [
+    "condenser"
+   ],
+   "said": "The refrigerant changes from a liquid to a gas.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "1240",
+   "at": 6,
+   "question": "Where is the Liquid?",
+   "places": [
+    "condenser"
+   ],
+   "said": "The refrigerant changes from a liquid to a gas.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "1240",
+   "at": 7,
+   "question": "Where is the Liquid?",
+   "places": [
+    "condenser"
+   ],
+   "said": "Heat is radiated away from the condenser.",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "1240",
+   "at": 8,
+   "question": "Where is the Liquid?",
+   "places": [
+    "evaporator"
+   ],
+   "said": "The cooled liquid is returned to the evaporator.",
+   "right": true,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "725",
+   "at": 1,
+   "question": "Where is the plant?",
+   "places": [
+    "mud and silt"
+   ],
+   "said": "Most fossils are formed when a plant or animal dies in a watery environment and is buried in mud and silt.",
+   "right": true,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "725",
+   "at": 1,
+   "question": "Where are the soft tissues?",
+   "places": [
+    "mud and silt"
+   ],
+   "said": "Most fossils are formed when a plant or animal dies in a watery environment and is buried in mud and silt.",
+   "right": true,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "725",
+   "at": 1,
+   "question": "Where are the bones?",
+   "places": [
+    "mud and silt"
+   ],
+   "said": "Most fossils are formed when a plant or animal dies in a watery environment and is buried in mud and silt.",
+   "right": true,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "725",
+   "at": 2,
+   "question": "Where are the bones?",
+   "places": [
+    "mud and silt"
+   ],
+   "said": "Soft tissues quickly decompose leaving the hard bones or shells behind.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "725",
+   "at": 6,
+   "question": "Where is the stone replica?",
+   "places": [
+    "void"
+   ],
+   "said": "He void left behind may then fill with minerals making a stone replica of the organism.",
+   "right": true,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "726",
+   "at": 1,
+   "question": "Where is the mud?",
+   "places": [
+    "bottom of a ocean"
+   ],
+   "said": "An animal lives a happy life.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": false
+  },
+  {
+   "paragraph": "726",
+   "at": 2,
+   "question": "Where is the mud?",
+   "places": [
+    "bottom of a ocean"
+   ],
+   "said": "The animal gets very old.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": false
+  },
+  {
+   "paragraph": "726",
+   "at": 3,
+   "question": "Where is the mud?",
+   "places": [
+    "bottom of a ocean"
+   ],
+   "said": "The animal gets very old.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": false
+  },
+  {
+   "paragraph": "726",
+   "at": 4,
+   "question": "Where is the animal's skeleton?",
+   "places": [
+    "bottom of a ocean"
+   ],
+   "said": "The animal's skeleton sinks to the bottom of an ocean.",
+   "right": true,
+   "refused": false,
+   "moved": true,
+   "told": false
+  },
+  {
+   "paragraph": "726",
+   "at": 4,
+   "question": "Where is the mud?",
+   "places": [
+    "bottom of a ocean"
+   ],
+   "said": "The animal gets very old.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": false
+  },
+  {
+   "paragraph": "726",
+   "at": 5,
+   "question": "Where is the animal's skeleton?",
+   "places": [
+    "bottom of a ocean"
+   ],
+   "said": "The animal's skeleton sinks to the bottom of an ocean.",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": false
+  },
+  {
+   "paragraph": "726",
+   "at": 5,
+   "question": "Where is the mud?",
+   "places": [
+    "bottom of a ocean"
+   ],
+   "said": "The skeleton is buried by mud.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": false
+  },
+  {
+   "paragraph": "726",
+   "at": 6,
+   "question": "Where is the animal's skeleton?",
+   "places": [
+    "bottom of a ocean"
+   ],
+   "said": "The animal's skeleton sinks to the bottom of an ocean.",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": false
+  },
+  {
+   "paragraph": "726",
+   "at": 6,
+   "question": "Where is the mud?",
+   "places": [
+    "bottom of a ocean"
+   ],
+   "said": "The skeleton is buried by mud.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": false
+  },
+  {
+   "paragraph": "726",
+   "at": 7,
+   "question": "Where is the animal's skeleton?",
+   "places": [
+    "bottom of a ocean"
+   ],
+   "said": "The animal's skeleton sinks to the bottom of an ocean.",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": false
+  },
+  {
+   "paragraph": "726",
+   "at": 7,
+   "question": "Where is the mud?",
+   "places": [
+    "bottom of a ocean"
+   ],
+   "said": "The skeleton is buried by mud.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": false
+  },
+  {
+   "paragraph": "726",
+   "at": 8,
+   "question": "Where is the animal's skeleton?",
+   "places": [
+    "bottom of a ocean"
+   ],
+   "said": "The animal's skeleton sinks to the bottom of an ocean.",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": false
+  },
+  {
+   "paragraph": "726",
+   "at": 8,
+   "question": "Where is the rock?",
+   "places": [
+    "bottom of a ocean"
+   ],
+   "said": "The skeleton is buried by mud.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": false
+  },
+  {
+   "paragraph": "726",
+   "at": 9,
+   "question": "Where is the rock?",
+   "places": [
+    "bottom of a ocean"
+   ],
+   "said": "The skeleton is buried by mud.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": false
+  },
+  {
+   "paragraph": "726",
+   "at": 9,
+   "question": "Where is the hole?",
+   "places": [
+    "rock"
+   ],
+   "said": "The skeleton is buried by mud.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "726",
+   "at": 10,
+   "question": "Where is the rock?",
+   "places": [
+    "bottom of a ocean"
+   ],
+   "said": "A hole is preserved in rock that is the shape of the skeleton.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": false
+  },
+  {
+   "paragraph": "726",
+   "at": 10,
+   "question": "Where is the hole?",
+   "places": [
+    "rock"
+   ],
+   "said": "A hole is preserved in rock that is the shape of the skeleton.",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "727",
+   "at": 1,
+   "question": "Where are the soft tissues?",
+   "places": [
+    "animal"
+   ],
+   "said": "An animal dies.",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "727",
+   "at": 1,
+   "question": "Where are the bones?",
+   "places": [
+    "animal"
+   ],
+   "said": "An animal dies.",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "727",
+   "at": 2,
+   "question": "Where is the animal?",
+   "places": [
+    "watery environment"
+   ],
+   "said": "An animal dies.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "727",
+   "at": 2,
+   "question": "Where are the soft tissues?",
+   "places": [
+    "animal"
+   ],
+   "said": "An animal dies.",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "727",
+   "at": 2,
+   "question": "Where are the bones?",
+   "places": [
+    "animal"
+   ],
+   "said": "An animal dies.",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "727",
+   "at": 3,
+   "question": "Where are the bones?",
+   "places": [
+    "animal"
+   ],
+   "said": "The soft tissues quickly decompose.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "727",
+   "at": 4,
+   "question": "Where are the bones?",
+   "places": [
+    "watery environment"
+   ],
+   "said": "The bones are left behind.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "727",
+   "at": 5,
+   "question": "Where are the bones?",
+   "places": [
+    "mud and silt"
+   ],
+   "said": "The bones are left behind.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "727",
+   "at": 5,
+   "question": "Where is the mud?",
+   "places": [
+    "watery environment"
+   ],
+   "said": "Over time, mud and silt accumulate over the bones.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "727",
+   "at": 6,
+   "question": "Where are the bones?",
+   "places": [
+    "rock"
+   ],
+   "said": "The bones are left behind.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "727",
+   "at": 6,
+   "question": "Where is the rock?",
+   "places": [
+    "watery environment"
+   ],
+   "said": "Mud and silt harden into rock.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "727",
+   "at": 7,
+   "question": "Where is the rock?",
+   "places": [
+    "watery environment"
+   ],
+   "said": "Mud and silt harden into rock.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "727",
+   "at": 8,
+   "question": "Where is the rock?",
+   "places": [
+    "watery environment"
+   ],
+   "said": "Mud and silt harden into rock.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "727",
+   "at": 8,
+   "question": "Where are the minerals?",
+   "places": [
+    "bone"
+   ],
+   "said": "The bones are left behind.",
+   "right": true,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "727",
+   "at": 9,
+   "question": "Where is the rock?",
+   "places": [
+    "watery environment"
+   ],
+   "said": "Mud and silt harden into rock.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "727",
+   "at": 9,
+   "question": "Where are the minerals?",
+   "places": [
+    "rock"
+   ],
+   "said": "The bones are left behind.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "727",
+   "at": 10,
+   "question": "Where is the rock?",
+   "places": [
+    "watery environment"
+   ],
+   "said": "Mud and silt harden into rock.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "727",
+   "at": 10,
+   "question": "Where are the minerals?",
+   "places": [
+    "rock"
+   ],
+   "said": "The bones are left behind.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "727",
+   "at": 10,
+   "question": "Where is the fossil?",
+   "places": [
+    "rock"
+   ],
+   "said": "You have a fossil.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "791",
+   "at": 3,
+   "question": "Where is the DC electricity?",
+   "places": [
+    "solar cell"
+   ],
+   "said": "Sun shines on the solar cells which generates DC electricity.",
+   "right": true,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "791",
+   "at": 4,
+   "question": "Where is the AC electricity?",
+   "places": [
+    "inverter"
+   ],
+   "said": "Electricity is fed into an inverter to change it to AC electricity.",
+   "right": true,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "791",
+   "at": 5,
+   "question": "Where is the AC electricity?",
+   "places": [
+    "home"
+   ],
+   "said": "Electricity is fed into an inverter to change it to AC electricity.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "791",
+   "at": 6,
+   "question": "Where is the AC electricity?",
+   "places": [
+    "power grid"
+   ],
+   "said": "Electricity is fed into an inverter to change it to AC electricity.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "896",
+   "at": 1,
+   "question": "Where is the oxygen-depleted blood?",
+   "places": [
+    "heart"
+   ],
+   "said": "Oxygen-depleted blood enters the heart on the right atrium.",
+   "right": true,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "896",
+   "at": 2,
+   "question": "Where is the oxygen-depleted blood?",
+   "places": [
+    "heart"
+   ],
+   "said": "Oxygen-depleted blood enters the heart on the right atrium.",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "896",
+   "at": 3,
+   "question": "Where is the oxygen-depleted blood?",
+   "places": [
+    "right ventricle"
+   ],
+   "said": "Oxygen-depleted blood enters the heart on the right atrium.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "896",
+   "at": 4,
+   "question": "Where is the oxygen-depleted blood?",
+   "places": [
+    "right ventricle"
+   ],
+   "said": "Oxygen-depleted blood enters the heart on the right atrium.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "896",
+   "at": 5,
+   "question": "Where is the oxygen-depleted blood?",
+   "places": [
+    "right ventricle"
+   ],
+   "said": "Oxygen-depleted blood enters the heart on the right atrium.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "896",
+   "at": 6,
+   "question": "Where is the oxygen-depleted blood?",
+   "places": [
+    "lung"
+   ],
+   "said": "Oxygen-depleted blood enters the heart on the right atrium.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "896",
+   "at": 7,
+   "question": "Where is the oxygenated blood?",
+   "places": [
+    "lung"
+   ],
+   "said": "When the ventricle is full, the tricuspid valve shuts.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "896",
+   "at": 8,
+   "question": "Where is the oxygenated blood?",
+   "places": [
+    "left atrium"
+   ],
+   "said": "The oxygenated blood goes into the left atrium.",
+   "right": true,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "896",
+   "at": 9,
+   "question": "Where is the oxygenated blood?",
+   "places": [
+    "body"
+   ],
+   "said": "The oxygenated blood goes into the left atrium.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "903",
+   "at": 1,
+   "question": "Where is the visible light?",
+   "places": [
+    "lens"
+   ],
+   "said": "Visible light enters through the lens.",
+   "right": true,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "903",
+   "at": 2,
+   "question": "Where is the visible light?",
+   "places": [
+    "retina"
+   ],
+   "said": "Visible light enters through the lens.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "903",
+   "at": 3,
+   "question": "Where is the visible light?",
+   "places": [
+    "photoreceptor cell"
+   ],
+   "said": "Visible light enters through the lens.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "903",
+   "at": 4,
+   "question": "Where is the chemical energy?",
+   "places": [
+    "photoreceptor cell"
+   ],
+   "said": "Which is turned into chemical energy.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "903",
+   "at": 5,
+   "question": "Where is the chemical energy?",
+   "places": [
+    "brain"
+   ],
+   "said": "Which is turned into chemical energy.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "903",
+   "at": 5,
+   "question": "Where is the image?",
+   "places": [
+    "brain"
+   ],
+   "said": "The resulting information is interpreted by the brain as an image.",
+   "right": true,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "904",
+   "at": 1,
+   "question": "Where is the small image?",
+   "places": [
+    "retina"
+   ],
+   "said": "The cornea and lens refract light into a small image.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": false
+  },
+  {
+   "paragraph": "904",
+   "at": 1,
+   "question": "Where are the retina's rods and cones?",
+   "places": [
+    "retina"
+   ],
+   "said": "The cornea and lens refract light into a small image.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": false
+  },
+  {
+   "paragraph": "904",
+   "at": 2,
+   "question": "Where is the small image?",
+   "places": [
+    "retina"
+   ],
+   "said": "The cornea and lens refract light into a small image.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "904",
+   "at": 2,
+   "question": "Where are the retina's rods and cones?",
+   "places": [
+    "retina"
+   ],
+   "said": "The cornea and lens refract light into a small image.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "904",
+   "at": 3,
+   "question": "Where are the retina's rods and cones?",
+   "places": [
+    "retina"
+   ],
+   "said": "The retina's rods and cones convert it to electrical pulses.",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "904",
+   "at": 3,
+   "question": "Where are the electrical pulses?",
+   "places": [
+    "optic nerve"
+   ],
+   "said": "The retina's rods and cones convert it to electrical pulses.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": false
+  },
+  {
+   "paragraph": "904",
+   "at": 4,
+   "question": "Where are the retina's rods and cones?",
+   "places": [
+    "retina"
+   ],
+   "said": "The retina's rods and cones convert it to electrical pulses.",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "904",
+   "at": 4,
+   "question": "Where are the electrical pulses?",
+   "places": [
+    "optic canal"
+   ],
+   "said": "The retina's rods and cones convert it to electrical pulses.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "904",
+   "at": 5,
+   "question": "Where are the retina's rods and cones?",
+   "places": [
+    "retina"
+   ],
+   "said": "The retina's rods and cones convert it to electrical pulses.",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "904",
+   "at": 5,
+   "question": "Where are the electrical pulses?",
+   "places": [
+    "lateral geniculate nucleus and the visual cortex"
+   ],
+   "said": "The retina's rods and cones convert it to electrical pulses.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "927",
+   "at": 1,
+   "question": "Where are the plants?",
+   "places": [
+    "ground"
+   ],
+   "said": "There is a lot of rain within a short period of time.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": false
+  },
+  {
+   "paragraph": "927",
+   "at": 1,
+   "question": "Where are the trees?",
+   "places": [
+    "ground"
+   ],
+   "said": "There is a lot of rain within a short period of time.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": false
+  },
+  {
+   "paragraph": "927",
+   "at": 2,
+   "question": "Where is the rain water?",
+   "places": [
+    "ground"
+   ],
+   "said": "The ground tries to absorb as much rain water as it can.",
+   "right": true,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "927",
+   "at": 2,
+   "question": "Where are the plants?",
+   "places": [
+    "ground"
+   ],
+   "said": "The ground tries to absorb as much rain water as it can.",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "927",
+   "at": 2,
+   "question": "Where are the trees?",
+   "places": [
+    "ground"
+   ],
+   "said": "The ground tries to absorb as much rain water as it can.",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "927",
+   "at": 3,
+   "question": "Where is the rain water?",
+   "places": [
+    "ground"
+   ],
+   "said": "The ground tries to absorb as much rain water as it can.",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "927",
+   "at": 3,
+   "question": "Where are the plants?",
+   "places": [
+    "ground"
+   ],
+   "said": "The ground tries to absorb as much rain water as it can.",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "927",
+   "at": 3,
+   "question": "Where are the trees?",
+   "places": [
+    "ground"
+   ],
+   "said": "The ground tries to absorb as much rain water as it can.",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "927",
+   "at": 4,
+   "question": "Where is the rain water?",
+   "places": [
+    "ground"
+   ],
+   "said": "There is a lot of rain within a short period of time.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "927",
+   "at": 4,
+   "question": "Where are the plants?",
+   "places": [
+    "ground"
+   ],
+   "said": "The ground tries to absorb as much rain water as it can.",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "927",
+   "at": 4,
+   "question": "Where are the trees?",
+   "places": [
+    "ground"
+   ],
+   "said": "The ground tries to absorb as much rain water as it can.",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "927",
+   "at": 5,
+   "question": "Where is the rain water?",
+   "places": [
+    "ground"
+   ],
+   "said": "There is a lot of rain within a short period of time.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "927",
+   "at": 6,
+   "question": "Where is the rain water?",
+   "places": [
+    "ground"
+   ],
+   "said": "There is a lot of rain within a short period of time.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "932",
+   "at": 1,
+   "question": "Where is the water?",
+   "places": [
+    "rock"
+   ],
+   "said": "Water flows by rocks.",
+   "right": true,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "932",
+   "at": 1,
+   "question": "Where are the chemicals?",
+   "places": [
+    "water"
+   ],
+   "said": "Water flows by rocks.",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "932",
+   "at": 1,
+   "question": "Where is the oxygen?",
+   "places": [
+    "air"
+   ],
+   "said": "Water flows by rocks.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": false
+  },
+  {
+   "paragraph": "932",
+   "at": 2,
+   "question": "Where is the water?",
+   "places": [
+    "rock"
+   ],
+   "said": "Water flows by rocks.",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "932",
+   "at": 2,
+   "question": "Where are the chemicals?",
+   "places": [
+    "water"
+   ],
+   "said": "Chemicals are in the waters.",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "932",
+   "at": 2,
+   "question": "Where is the oxygen?",
+   "places": [
+    "air"
+   ],
+   "said": "Chemicals are in the waters.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": false
+  },
+  {
+   "paragraph": "932",
+   "at": 3,
+   "question": "Where is the water?",
+   "places": [
+    "rock"
+   ],
+   "said": "Water flows by rocks.",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "932",
+   "at": 3,
+   "question": "Where are the chemicals?",
+   "places": [
+    "water"
+   ],
+   "said": "Chemicals are in the waters.",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "932",
+   "at": 3,
+   "question": "Where is the oxygen?",
+   "places": [
+    "air"
+   ],
+   "said": "Chemicals are in the waters.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": false
+  },
+  {
+   "paragraph": "932",
+   "at": 4,
+   "question": "Where is the water?",
+   "places": [
+    "rock"
+   ],
+   "said": "Water flows by rocks.",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "932",
+   "at": 4,
+   "question": "Where are the chemicals?",
+   "places": [
+    "water"
+   ],
+   "said": "Chemicals are in the waters.",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "932",
+   "at": 4,
+   "question": "Where is the oxygen?",
+   "places": [
+    "air"
+   ],
+   "said": "Chemicals are in the waters.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": false
+  },
+  {
+   "paragraph": "932",
+   "at": 5,
+   "question": "Where is the water?",
+   "places": [
+    "rock"
+   ],
+   "said": "Water flows by rocks.",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "932",
+   "at": 5,
+   "question": "Where are the chemicals?",
+   "places": [
+    "water"
+   ],
+   "said": "Chemicals are in the waters.",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "932",
+   "at": 5,
+   "question": "Where is the oxygen?",
+   "places": [
+    "air"
+   ],
+   "said": "Oxygen in the air reacts with rocks.",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "932",
+   "at": 6,
+   "question": "Where is the water?",
+   "places": [
+    "rock"
+   ],
+   "said": "Water flows by rocks.",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "932",
+   "at": 6,
+   "question": "Where are the chemicals?",
+   "places": [
+    "water"
+   ],
+   "said": "Chemicals are in the waters.",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "932",
+   "at": 6,
+   "question": "Where is the oxygen?",
+   "places": [
+    "air"
+   ],
+   "said": "Oxygen in the air reacts with rocks.",
+   "right": true,
+   "refused": false,
+   "moved": false,
+   "told": true
+  },
+  {
+   "paragraph": "933",
+   "at": 3,
+   "question": "Where is the water?",
+   "places": [
+    "mineral base material"
+   ],
+   "said": "Water is introduced to carbon dioxide.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": false
+  },
+  {
+   "paragraph": "933",
+   "at": 4,
+   "question": "Where is the water?",
+   "places": [
+    "rock"
+   ],
+   "said": "Water is introduced to carbon dioxide.",
+   "right": false,
+   "refused": false,
+   "moved": true,
+   "told": true
+  },
+  {
+   "paragraph": "933",
+   "at": 5,
+   "question": "Where is the water?",
+   "places": [
+    "rock"
+   ],
+   "said": "Water is introduced to carbon dioxide.",
+   "right": false,
+   "refused": false,
+   "moved": false,
+   "told": true
+  }
+ ]
+}

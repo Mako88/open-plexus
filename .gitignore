@@ -53,3 +53,6 @@ data/fairytaleqa/
 
 # PreCo, somebody else's data; src/unfused/exam/preco.py says where it is fetched from.
 data/preco/
+
+# ProPara, somebody else's data; fetched from github.com/allenai/propara (data/emnlp18).
+data/propara/

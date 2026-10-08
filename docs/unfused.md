@@ -146,6 +146,15 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
      preschool English) wired in as a standard test of the system's own binding,
      each pronoun's referent scored against the gold chains, with the world-side
      control (a quarter more right answers on the tales) as the ceiling to aim at.
+     Wired 2026-10-08 (`scripts/preco.py`, 100 dev documents). The control that prices
+     it: agreement known per label (seeded from the gold chains) is the lever, worth
+     about twelve points once the binder looks in every slot and prefers a candidate
+     known to agree; learnt as it is, both those rule changes lose. NEXT: where
+     agreement comes from. Clause-bound possessives and reflexives teach it (Bergsma and
+     Lin 2006), and 1,000 stories of them barely carry to PreCo's labels; owed, the
+     primed run under the changed rule, then agreement that generalises past the label
+     (the noun's own `Number` from the parse first, then what fills the verb's slot).
+     ProPara is wired (`scripts/propara.py`); only `window` is read so far.
      Beside them, knowledge asked fairly (John's, 2026-10-07): the cloze banded by how
      many earlier stories told its answer in its slot (`scripts/heard.py`), and a form
      asking a fact seen across five or more stories in a wording no story used ('What

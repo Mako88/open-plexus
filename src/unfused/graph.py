@@ -46,6 +46,7 @@ from unfused.reader import Reader
 from unfused.said import said_in
 from unfused.shaper import Shaper
 from unfused.situations import Situations
+from unfused.solver import Solver
 from unfused.storage import CARRIED, Store
 from unfused.walker import EFFORT, REACH, Spent, Walker
 
@@ -100,6 +101,9 @@ class GraphArm:
         self.shaper = Shaper(self.db, self.reader, self.individuals)
         # the plans lessons left, and which taught shapes a question is nearest
         self.plans = Plans(self.db, self.shaper)
+        # a plan read as a pattern, matched with any variable free
+        self.solver = Solver(self.db, self.walker, self.individuals, self.plans, self.shaper)
+
 
 
         # a sentence heard, written into the graph
@@ -118,8 +122,7 @@ self.store, self.reader, self.mind, self.individuals,
         # the words never heard and answers already counted towards an alias, this world
         self.aliased: set = set()
 
-        # the plans of every followed shape as of the last lesson count `related` read them at
-        self._followed: tuple | None = None
+
 
     # -- reading ---------------------------------------------------------------
 
@@ -599,12 +602,12 @@ self.store, self.reader, self.mind, self.individuals,
                     continue
                 bound = {i: n for i, n in enumerate(order) if i != free and self.individuals.known(n)}
                 if bound:
-                    here = {e for p in plans for e, _ in self.solve(p, bound, free)}
+                    here = {e for p in plans for e, _ in self.solver.solve(p, bound, free)}
                 else:
                     # with nothing else to pin it, a new word is narrowed by the situation
                     # it is heard in, never by every name ever heard
                     here = {n for n in self.individuals.names_in_mind()
-                            if any(self.solve(p, {free: n}, "a") for p in plans)}
+                            if any(self.solver.solve(p, {free: n}, "a") for p in plans)}
                 here -= set(names)
                 if not here:
                     continue
@@ -666,7 +669,7 @@ self.store, self.reader, self.mind, self.individuals,
                 bound["a"] = goals[0][2:]
                 # a name the question says is never what another of its words stands for
                 found[w] = {e for plan in plans if not plan.get("count")
-                            for e, _ in self.solve(plan, bound, free) if e not in names}
+                            for e, _ in self.solver.solve(plan, bound, free) if e not in names}
         # a name two of the words found is not evidence for either
         shared = [n for w, ends in found.items() for n in ends
                   if any(n in other for v, other in found.items() if v != w)]
@@ -1072,104 +1075,11 @@ self.store, self.reader, self.mind, self.individuals,
             names = [n for _, _, n in self.shaper.template(text[a:b])[1] if self.individuals.known(n)]
             if not names:
                 continue
-            for thing in self.related(text[a:b], names):
+            for thing in self.solver.related(text[a:b], names):
                 said = self.answered(text[:a] + thing.title() + text[b:], depth + 1)
                 if said is not None:
                     return said
         return None
-
-    def related(self, phrase: str, names: list[str]) -> list[str]:
-        """What a phrase's clause leaves open, from the taught shapes with a variable for
-        some of its names and one more, nearest the phrase first. Some, because a name
-        the graph knows may be the shape's frame ('cousin' in "X's cousin"). Each way of
-        binding the names to its variables with the rest free, and what the first binding
-        to reach anything finds, latest first."""
-        from itertools import combinations, permutations
-
-        if self._followed is None or self._followed[0] != self.plans.lessons:
-            rows: dict[str, list] = {}
-            for shape, plan in self.db.execute(
-                    "SELECT shape, plan FROM learnt WHERE hits > misses "
-                    "ORDER BY hits - misses DESC, hits DESC").fetchall():
-                rows.setdefault(shape, []).append(self.plans.read_plan(plan))
-            sigs = {shape: next((set(p["sig"]) for p in plans if p.get("sig")), set())
-                    for shape, plans in rows.items()}
-            self._followed = (self.plans.lessons, rows, sigs)
-        _, rows, sigs = self._followed
-        shapes = []
-        for k in range(len(names), 0, -1):
-            for chosen in combinations(names, k):
-                mine = set(self.shaper.signature(phrase, list(chosen)))
-                for shape, sig in sigs.items():
-                    if shape.count("<") == k:
-                        shapes.append((len(mine & sig) / max(1, len(mine | sig)), chosen, shape))
-        shapes.sort(key=lambda r: -r[0])
-        for _, chosen, shape in shapes[:8]:
-            plans = [p for p in rows[shape] if not p.get("count")]
-            variables = list(range(len(chosen))) + ["a"]
-            for free in variables:
-                rest = [v for v in variables if v != free]
-                for order in permutations(chosen):
-                    bound = dict(zip(rest, order))
-                    found = [f for plan in plans for f in self.solve(plan, bound, free)
-                             if f[0] not in names]
-                    if found:
-                        return [e for e, _ in sorted(found, key=lambda f: f[1], reverse=True)]
-        return []
-
-    def solve(self, plan: dict, bound: dict, free) -> list[tuple[str, tuple]]:
-        """A plan read as a pattern and matched with any of its variables free: the
-        path's first node is variable 0, its end 'a', and each hook's end the slot it
-        names. Matched outward from a bound variable; the values found for `free`, each
-        with the latest turn of what happened on the way."""
-        steps = plan["steps"]
-        edges = [(("p", i), ("p", i + 1), lab, d) for i, (lab, d) in enumerate(steps)]
-        var = {0: ("p", 0), "a": ("p", len(steps))}
-        for h, (k, i, hsteps) in enumerate(plan["attach"]):
-            prev = ("p", i)
-            for j, (lab, d) in enumerate(hsteps):
-                edges.append((prev, ("h", h, j), lab, d))
-                prev = ("h", h, j)
-            var[k] = prev
-        if free not in var or not bound or not all(v in var for v in bound):
-            return []
-        want = {var[v]: f"n:{n}" for v, n in bound.items()}
-        root = next(iter(want))
-        moods = plan.get("moods", {})
-        partials = [{root: want[root]}]
-        todo = list(edges)
-        while todo and partials:
-            seen = partials[0]
-            edge = next((e for e in todo if (e[0] in seen) != (e[1] in seen)), None)
-            if edge is None:
-                break
-            todo.remove(edge)
-            u, v, lab, d = edge
-            here, there, way = (u, v, d) if u in seen else (v, u, -d)
-            nxt = []
-            for got in partials:
-                for node in self.walker.around_as(got[here], lab, way):
-                    if self.individuals.among(node, set(got.values())):
-                        continue
-                    if there in want and not self.individuals.is_(node, want[there]):
-                        continue
-                    # never through what did not happen where the lessons' did, or the
-                    # other way round, as a plan is followed
-                    if node.startswith("e:") and there[0] == "p" and self.walker.mood(node) not in \
-                            moods.get(str(there[1]), [self.walker.mood(node)]):
-                        continue
-                    nxt.append({**got, there: node})
-            partials = nxt[:2000]
-        out = []
-        for got in partials:
-            end = got.get(var[free], "")
-            if not end or end.startswith("e:") or len(got) < len(
-                    {n for e in edges for n in e[:2]}):
-                continue
-            turns = [self.walker.event(n)[1] for n in got.values()
-                     if n.startswith("e:") and not self.walker.mood(n)]
-            out.append((self.individuals.describe(end), (max(turns, default=0),)))
-        return out
 
     def apart(self, text: str, depth: int) -> str | None:
         for a, b in self.inner(text):

@@ -116,7 +116,7 @@ def test_a_later_event_on_the_same_arguments_replaces_an_earlier_one(tmp_path):
     a.hear(1, "Mary got the football.")
     a.hear(2, "Mary dropped the football.")
     a.hear(3, "Mary might get the football.")
-    went, got, dropped, might = (f"e:{i}" for i, in a.db.execute(
+    went, got, dropped, _ = (f"e:{i}" for i, in a.db.execute(
         "SELECT id FROM events ORDER BY turn"))
     assert a.walker.replaced(got) == 2
     # other arguments, or a later event that only might happen, replace nothing

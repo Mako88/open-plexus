@@ -322,10 +322,10 @@ def test_a_question_is_matched_as_an_event_with_one_slot_free(tmp_path):
         a.hear(i, text)
     # a possessed noun is read through, a place asked by 'where' is any link of place,
     # and a name hanging off another argument ('with Ann') still has to be there
-    assert a.met("Who loved her veil?") == "princess"
-    assert a.met("Where did Roxy put the leaves?") == "feet"
-    assert a.met("Who is cousins with Ann?") == "tom"
-    assert a.met("Who hated her veil?") is None
+    assert a.meeter.met("Who loved her veil?") == "princess"
+    assert a.meeter.met("Where did Roxy put the leaves?") == "feet"
+    assert a.meeter.met("Who is cousins with Ann?") == "tom"
+    assert a.meeter.met("Who hated her veil?") is None
 
 
 def test_a_blank_is_read_as_the_slot_it_stands_in(tmp_path):

@@ -91,7 +91,7 @@ self, turn: int) -> bool:
         return turn
 
     def within(self, column: str, events: bool = False) -> str:
-        """SQL for a turn (or, with `events`, an event id) in mind, read with `_held`."""
+        """SQL for a turn (or, with `events`, an event id) in mind, read with `bounds`."""
         here = f"{column} >= ?" if events else f"{column} > ?"
         return "(" + " OR ".join([here] + [f"{column} BETWEEN ? AND ?"] * len(self.recalled)) + ")"
 

@@ -42,7 +42,7 @@ def test_a_word_held_every_time_is_frame_not_a_slot(tmp_path):
     for i, (who, other) in enumerate([("Ada", "Bren"), ("Cael", "Dov"), ("Eli", "Fen")]):
         a.hear(i, f"{who} is a cousin of {other}.")
         a.teach(f"Whose cousin is {who}?", other)
-    shape, fillers = a.shape("Whose cousin is Ada?")
+    shape, fillers = a.shaper.shape("Whose cousin is Ada?")
     assert shape == "Whose cousin is <0>?" and fillers == ["ada"]
 
 
@@ -217,7 +217,7 @@ def test_a_compound_whose_first_word_is_a_known_name_is_two_names(tmp_path):
     a = arm(tmp_path)
     a.hear(0, "Ada and Bren are cousins.")
     a.hear(1, "Cal and Dot are cousins.")
-    template, spans = a.template("Who is Ada cousins with?")
+    template, spans = a.shaper.template("Who is Ada cousins with?")
     assert [n for _, _, n in spans] == ["ada", "cousins"]
     a.teach("Who is Ada cousins with?", "Bren")
     a.teach("Who is Bren cousins with?", "Ada")

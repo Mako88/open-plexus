@@ -6,4 +6,5 @@ import re
 
 
 def said_in(answer: str, question: str) -> bool:
-    return re.search(rf"\b{re.escape(answer)}\b", question.lower()) is not None
+    """Whether `answer` is said in `question` as whole words, in either case."""
+    return re.search(rf"\b{re.escape(answer.lower())}\b", question.lower()) is not None

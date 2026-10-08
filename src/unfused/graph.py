@@ -102,52 +102,28 @@ class GraphArm:
         self.meeter = Meeter(self.db, self.reader, self.mind, self.individuals, self.walker)
         # the name that best fits the asked slot
         self.focuser = Focuser(self.db, self.reader, self.mind, self.individuals, self.shaper)
-        # a lesson, and the plans it leaves
         # a question the plans cannot answer, taken apart
         self.decomposer = Decomposer(self.db, self.reader, self.walker, self.individuals,
                                      self.plans, self.shaper, self.follower, self.solver,
                                      self.meeter)
-        self.teacher = Teacher(
-self.store, self.walker, self.individuals, self.plans,
+        # a lesson, and the plans it leaves
+        self.teacher = Teacher(self.store, self.walker, self.individuals, self.plans,
                                self.shaper, self.follower, self.aliaser, self.meeter,
                                self.numbers)
-
-
-
-
-
-
-
         # a sentence heard, written into the graph
-
-        self.hearer = Hearer(
-self.store, self.reader, self.mind, self.individuals,
+        self.hearer = Hearer(self.store, self.reader, self.mind, self.individuals,
                              self.walker, self.situations)
-
         self.mouth = Mouth(self)
         self.last_notes: list[str] = []
         self.traced: dict | None = None
-
         # a question this arm answered, waiting for the turn that reacts to it
         self.pending: tuple[str, str] | None = None
-
-
-
-
-    # -- reading ---------------------------------------------------------------
 
     def hear(self, turn: int, text: str) -> None:
         self.hearer.hear(turn, text)
 
     def teach(self, question: str, answer: str) -> None:
         self.teacher.teach(question, answer)
-
-
-    # -- the graph -------------------------------------------------------------
-
-    # -- plans -----------------------------------------------------------------
-
-    # -- words never heard ----------------------------------------------------
 
     def answer(self, question) -> str:
         # what the plans of either wording's own shape find comes before anything

@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import json
 from collections import Counter
+from itertools import combinations, permutations
 
 from unfused.shaper import Shaper
 
@@ -49,7 +50,23 @@ class Plans:
     def refollowed(self) -> None:
         self._shapes += 1
 
+    def ranked(self, shape: str, counts: bool = True) -> list[str]:
+        """The texts of a shape's followed plans, the one that held most often first; a plan
+        that counts a set is left out with `counts` false."""
+        rows = [p for (p,) in self.db.execute(
+            "SELECT plan FROM learnt WHERE shape = ? AND hits > misses "
+            "ORDER BY hits - misses DESC, hits DESC", (shape,))]
+        return rows if counts else [p for p in rows if not self.read_plan(p).get("count")]
+
+    def of(self, shape: str, counts: bool = True) -> list[dict]:
+        """A shape's followed plans, decoded, in the order the table gives them; a plan that
+        counts a set is left out with `counts` false."""
+        plans = [self.read_plan(p) for (p,) in self.db.execute(
+            "SELECT plan FROM learnt WHERE shape = ? AND hits > misses", (shape,))]
+        return plans if counts else [p for p in plans if not p.get("count")]
+
     def read_plan(self, text: str) -> dict:
+
         """A stored plan, decoded once for every reader: answering reads every taught
         plan many times a question and a lesson changes one shape's. Shared, so only
         `teach`, which changes plans, decodes its own."""
@@ -122,9 +139,7 @@ class Plans:
         and which are frame ('cousin' in 'Which person is X's cousin?'), nor in what order
         its slots run. Every reading is scored, each name a slot or frame and the slots in
         any order, nearest a taught shape first."""
-        from itertools import combinations, permutations
-
-        names = [n for _, _, n in self.shaper.template(question)[1]][:4]
+        names = self.shaper.names(question)
         readings = []
         for k in range(1, len(names) + 1):
             for chosen in combinations(names, k):

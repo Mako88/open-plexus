@@ -10,6 +10,8 @@ of its own the plans of the nearest taught shape are borrowed.
 
 from __future__ import annotations
 
+from itertools import combinations, permutations
+
 from unfused.individuals import Individuals
 from unfused.numbers import Numbers
 from unfused.plans import Plans
@@ -144,7 +146,7 @@ class Follower:
     def followed(self, ranked: list, fillers: list[str], question: str) -> list:
         for strict in (True, False):
             found = []
-            for (plan,) in ranked:
+            for plan in ranked:
                 plan = self.plans.read_plan(plan)
                 said = self.said(plan, fillers, strict, question)
                 if said and plan.get("count"):
@@ -158,9 +160,7 @@ class Follower:
 
     def answers(self, shape: str, fillers: list[str], question: str,
                 borrow: bool = True) -> list[tuple[str, int]]:
-        ranked = self.db.execute(
-            "SELECT plan FROM learnt WHERE shape = ? AND hits > misses "
-            "ORDER BY hits - misses DESC, hits DESC", (shape,)).fetchall()
+        ranked = self.plans.ranked(shape)
         if ranked:
             found = self.followed(ranked, fillers, question)
             if found:
@@ -174,9 +174,7 @@ class Follower:
         # reaches anything in the graph: 'Who is X's cousin?' learnt one direction, and
         # 'Whose cousin is X?' holds the other
         for fillers, nearest in self.plans.borrowed(question, shape)[:12]:
-            ranked = [r for near in nearest for r in self.db.execute(
-                "SELECT plan FROM learnt WHERE shape = ? AND hits > misses "
-                "ORDER BY hits - misses DESC, hits DESC", (near,)).fetchall()]
+            ranked = [r for near in nearest for r in self.plans.ranked(near)]
             found = self.followed(ranked, fillers, question)
             if found:
                 return found
@@ -191,9 +189,7 @@ class Follower:
         wordings are one relation where the house holds a solution for both: 'What is
         the number of X in the Y?' shares little grammar with 'How many X are in the
         Y?' and the house relates X and Y by little else."""
-        from itertools import combinations, permutations
-
-        names = [n for _, _, n in self.shaper.template(question)[1] if self.individuals.known(n)][:4]
+        names = self.shaper.names(question, known=True)
         readings = []
         for k in range(1, len(names) + 1):
             for chosen in combinations(names, k):
@@ -204,9 +200,8 @@ class Follower:
                                  if shape != skip and shape.count("<") == k]
         readings.sort(key=lambda r: -r[0])
         for _, fillers, shape in readings[:tries]:
-            ranked = [(p,) for (p,) in self.db.execute(
-                "SELECT plan FROM learnt WHERE shape = ? AND hits > misses "
-                "ORDER BY hits - misses DESC, hits DESC", (shape,)) if not self.plans.read_plan(p).get("count")]
+            ranked = self.plans.ranked(shape, counts=False)
+
             found = self.followed(ranked, fillers, question)
             if found:
                 return found

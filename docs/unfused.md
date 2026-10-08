@@ -119,8 +119,9 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
      walk (`resolved`; 0.523 before). What changed is in (`changed`: where a thing is
      now, after the story moved it), 1 of 6 at 1,000 stories: rare, since the stories
      move things by pronoun ('She put it in the box') and the exam reads no
-     coreference. How it gets enough is parked behind FairytaleQA (below); a
-     coreference model on the world's side is the likeliest way. Then why something
+     coreference. It stays as it is: where a thing is now is read on standard tests
+     instead (John's, 2026-10-08), bAbI tasks 2 and 3 and ProPara, so no question
+     is written by a coreference model. Then why something
      happened. The information is in the story, so these read understanding apart
      from knowledge; scale should not be what they need.
      A standard test a rung above the stream, beside our own checks (John's,
@@ -140,6 +141,11 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
      train split). Next, by size on the tales: 'why', a reason rather than an event
      (278 of 1,007, near 0.05), whose wh-word `blank` does not read as a frame since
      it is no pronoun; then properties and feelings ('How did the king feel?').
+     Binding pronouns is the thinking's job, never the ear's (John's, 2026-10-08): no
+     coreference model in the system. NEXT: PreCo (Chen et al. 2018, coreference in
+     preschool English) wired in as a standard test of the system's own binding,
+     each pronoun's referent scored against the gold chains, with the world-side
+     control (a quarter more right answers on the tales) as the ceiling to aim at.
      Beside them, knowledge asked fairly (John's, 2026-10-07): the cloze banded by how
      many earlier stories told its answer in its slot (`scripts/heard.py`), and a form
      asking a fact seen across five or more stories in a wording no story used ('What

@@ -74,7 +74,16 @@ class Shaper:
         # 'colour' and 'shade' share a place across lessons and name nothing
         return self.individuals.known(name) or capital
 
+    def names(self, question: str, known: bool = False, most: int | None = 4) -> list[str]:
+        """The names a question's noun phrases are cut to, the first `most` of them, and only
+        those the graph knows with `known`. A reading tries each order of the names, so
+        more than four is more than is ever tried."""
+        out = [n for _, _, n in self.template(question)[1]
+               if not known or self.individuals.known(n)]
+        return out if most is None else out[:most]
+
     def shape(self, question: str) -> tuple[str, list[str]]:
+
         template, every = self.template(question)
         spans = [(a, b, n) for i, (a, b, n) in enumerate(every)
                  if self.slot(template, i, n, self.proper_at(question, a))]

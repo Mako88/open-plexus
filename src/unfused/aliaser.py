@@ -12,6 +12,7 @@ voted for one (`unaliased`).
 from __future__ import annotations
 
 import json
+from itertools import combinations, permutations
 
 from unfused.individuals import Individuals
 from unfused.parsing import vectors
@@ -106,9 +107,7 @@ class Aliaser:
         unbound claims less than one bound, so the readings with fewest unbound slots go
         first, nearest within that; each word is counted by the first reading whose
         solving finds anything for it, as borrowing reads a question."""
-        from itertools import combinations, permutations
-
-        names = [n for _, _, n in self.shaper.template(question)[1]][:4]
+        names = self.shaper.names(question)
         out = []
         for k in range(1, len(names) + 1):
             for chosen in combinations(names, k):
@@ -130,13 +129,11 @@ class Aliaser:
         spans = self.unheard(question)
         if not spans:
             return
-        names = [n for _, _, n in self.shaper.template(question)[1]][:4]
+        names = self.shaper.names(question)
         unheard = {u for _, _, u in spans}
         done: set[str] = set()
         for _, order, shapes in self.readings(question, spans):
-            plans = [p for sh in shapes for (raw,) in self.db.execute(
-                "SELECT plan FROM learnt WHERE shape = ? AND hits > misses", (sh,))
-                if not (p := self.plans.read_plan(raw)).get("count")]
+            plans = [p for sh in shapes for p in self.plans.of(sh, counts=False)]
             for free, w in enumerate(order):
                 if w not in unheard or w in done:
                     continue
@@ -196,12 +193,12 @@ class Aliaser:
         goals = self.individuals.holding(want)[:1]
         if not spans or not goals:
             return question
-        names = [n for _, _, n in self.shaper.template(question)[1]][:4]
+        names = self.shaper.names(question)
         unheard = {u for _, _, u in spans}
         found: dict[str, set] = {}
         for near, order, shapes in self.readings(question, spans):
-            plans = [self.plans.read_plan(p) for sh in shapes for (p,) in self.db.execute(
-                "SELECT plan FROM learnt WHERE shape = ? AND hits > misses", (sh,))]
+            plans = [p for sh in shapes for p in self.plans.of(sh)]
+
             for free, w in enumerate(order):
                 if w not in unheard or found.get(w):
                     continue

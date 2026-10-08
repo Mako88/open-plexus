@@ -44,16 +44,14 @@ from unfused.reader import Reader
 from unfused.said import said_in
 from unfused.situations import Situations
 from unfused.storage import CARRIED, Store
+from unfused.walker import EFFORT, REACH, Spent, Walker
 
 # how much nearer a word's likest candidate must be than the next for a vote: right picks'
 # gaps sat at 0.14 to 0.21 and wrong ones' at 0.02 to 0.06 (readings/unheard-*)
 MARGIN = 0.08
 # how fast a hearing fades within an episode (ACT-R's base-level decay)
 DECAY = 0.5
-# how many of a node's steps of one label a walk follows, the latest first
-REACH = 100
-# how many nodes' steps one question may look at before its plans give up
-EFFORT = 200_000
+
 # how many hearings a name's fit is shrunk by towards nothing, so one hearing is not a
 # certainty
 PRIOR = 2.0
@@ -67,9 +65,6 @@ LEMMA = 300
 # how high focus must rank what a plan found for the plan's answer to stand
 TOP = 3
 
-
-class Spent(Exception):
-    """A question's effort is used up."""
 
 
 class GraphArm:
@@ -93,6 +88,9 @@ class GraphArm:
         self.mind = Mind(self.db, self.reader)
         # what a name or an id stands for
         self.individuals = Individuals(self.db, self.mind)
+        # the graph as steps from a node, and the walks over them
+        self.walker = Walker(self.store, self.individuals, self.mind)
+        self.mind.listen(self.walker.forget_names)
 
         self.mouth = Mouth(self)
         self.last_notes: list[str] = []
@@ -103,9 +101,7 @@ class GraphArm:
         self.pending: tuple[str, str] | None = None
         # the words never heard and answers already counted towards an alias, this world
         self.aliased: set = set()
-        # the latest turn of an event that happened with each set of arguments, read
-        # off the graph once when first asked and kept up as events are heard
-        self._latest: dict | None = None
+
         # taught shapes' signatures, rebuilt after a lesson; questions' parses
         self._sigs: list | None = None
         # how many times `learnt` has been written, and the plans of every followed shape
@@ -124,24 +120,6 @@ class GraphArm:
         self._near: dict = {}
         # each stored plan's text, decoded (`read_plan`)
         self._read: dict[str, dict] = {}
-        # every node's steps, kept across sentences and questions: a walk over a hub asks
-        # for the same node's steps thousands of times. A sentence drops only the nodes it
-        # gives a new step, so what was loaded stays loaded
-        self._steps: dict = {}
-        # each node's steps by label and direction, kept beside the steps they sort
-        self._labelled: dict = {}
-        # each node's steps' next nodes, as a tuple in order and a set, beside the steps
-        self._reached: dict = {}
-
-        # steps looked at by the question being answered, or None outside answering
-        self.spent: int | None = None
-        self.mind.listen(self._forget_names)
-
-    def _forget_names(self) -> None:
-        # a name's steps are its individuals in mind, and a new episode or a recalled one
-        # changes them
-        for key in [k for k in self._steps if k.startswith("n:")]:
-            del self._steps[key]
 
     # -- reading ---------------------------------------------------------------
 
@@ -215,23 +193,20 @@ class GraphArm:
                                     (name, ev["lemma"], label))
                     self.db.executemany("INSERT OR IGNORE INTO named VALUES (?, ?)",
                                         [(w, name) for w in name.split()])
-                self._steps.pop(node, None)
-                self._steps.pop(f"e:{eid}", None)
+                self.walker.forget(node)
+                self.walker.forget(f"e:{eid}")
                 self.individuals.forget_described(node)
                 if (name := self.individuals.label(node)) is not None:
-                    self._steps.pop(f"n:{name}", None)
+                    self.walker.forget(f"n:{name}")
                     self.individuals.forget_mark(name)
                     touched.update(name.split())
         self.situations.heard(heard, [ev["lemma"] for ev in events])
-        if self._latest is not None:
-            for ev, eid in zip(events, ids):
-                if not ev["mood"] and (got := self.store.args(eid)):
-                    self._latest[got] = max(self._latest.get(got, 0), turn)
+        self.walker.happened(list(zip(events, ids)), turn)
         # a name or a description holding a word this sentence touched may stand for
         # something else now, and its steps are its individuals'
         for name in self.individuals.forget_words(touched):
             if " " in name:
-                self._steps.pop(f"n:{name}", None)
+                self.walker.forget(f"n:{name}")
         for t, node in resolved.items():
             if node is not None and t.startswith("p:"):
                 # agreement is what everyone knows, so it is counted by label
@@ -242,172 +217,6 @@ class GraphArm:
         self.store.written()
 
     # -- the graph -------------------------------------------------------------
-
-    def around(self, node: str) -> list[tuple[str, int, str]]:
-        """Every step from a node: (label, direction, next node). Direction 1 goes from an
-        event to its argument, -1 back from an argument to its event."""
-        # a question's effort is the steps it looks at; past `EFFORT` it stops looking
-        if self.spent is not None:
-            self.spent += 1
-            if self.spent > EFFORT:
-                raise Spent
-        steps = self._steps.get(node)
-        if steps is None:
-            steps = self._steps[node] = self._around(node)
-            if node.startswith("n:"):
-                self.individuals.indexed(node[2:])
-        return steps
-
-    def around_as(self, node: str, label: str, direction: int) -> list[str]:
-        """The nodes one step of this label and direction away, in the order `around`
-        gives them and counted as one look as `around` is: a hub's steps are sorted by
-        label once, so a pattern does not read all of them for each of its partials."""
-        steps = self.around(node)
-        kept = self._labelled.get(node)
-        if kept is None or kept[0] is not steps:
-            by: dict = {}
-            for lab, d, nxt in steps:
-                by.setdefault((lab, d), []).append(nxt)
-            kept = self._labelled[node] = (steps, by)
-        return kept[1].get((label, direction), [])
-
-    def _around(self, node: str) -> list[tuple[str, int, str]]:
-        if node.startswith("e:"):
-            eid = int(node[2:])
-            out = [(label, 1, n) for label, n in self.store.outs(eid)]
-        else:
-            out = []
-        # the latest first, so a walk cut short keeps what was heard most recently. A
-        # name's steps are its individuals' steps, read through the label's index: those
-        # opened in this episode and the latest `REACH` of the rest, as recall by a cue
-        # returns a few by recency and never everything ever heard by that name. The
-        # episode's alone cost four clozes, which reached a namesake in another story
-        if node.startswith("n:"):
-            every = self.individuals.nodes(node[2:])
-            mind = [n for n in every[1:] if n.startswith("i:")
-                    and self.mind.held(int(n[2:].split(".")[0]))]
-            held = [every[0]] + list(dict.fromkeys(mind + every[1:1 + REACH]))
-        else:
-            held = [node]
-        out += [(label, -1, f"e:{e}") for e, label in self.store.latest_into(held)]
-        return out
-
-    def event(self, node: str) -> tuple[str, int]:
-        lemma, turn, _ = self.store.event_row(node)
-        return lemma, turn
-
-    def replaced(self, node: str) -> int:
-        """Whether a later event that happened has exactly this one's arguments, the
-        prepositions aside: 'Mary dropped the football' replaces 'Mary picked up the
-        football', 'Mary went to the hallway' replaces 'Mary went to the kitchen', and
-        'Mary picked up the football' replaces neither, its arguments being others. The
-        turn of the latest that replaces it, or 0. Read from the latest turn each set of
-        arguments happened at, so it is a lookup, never a search of what came later."""
-        mine = self.store.args(int(node[2:]))
-        if not mine:
-            return 0
-        if self._latest is None:
-            by: dict = {}
-            for e, label, n in self.db.execute(
-                    "SELECT edges.event, edges.label, edges.node FROM edges JOIN events ON "
-                    "events.id = edges.event WHERE events.mood = '' AND edges.label NOT LIKE "
-                    "'prep:%' AND edges.node NOT LIKE 'f:%'"):
-                by.setdefault(e, set()).add((label, n))
-            turns = dict(self.db.execute("SELECT id, turn FROM events WHERE mood = ''"))
-            self._latest = {}
-            for e, got in by.items():
-                got = frozenset(got)
-                self._latest[got] = max(self._latest.get(got, 0), turns[e])
-        latest = self._latest.get(mine, 0)
-        return latest if latest > self.event(node)[1] else 0
-
-    def mood(self, node: str) -> str:
-        return self.store.event_row(node)[2]
-
-    def paths(self, start: str, goal: str, limit: int = 8, avoid: set | None = None,
-              most: int | None = None) -> list[list]:
-        """The shortest paths from one node to another, each a list of nodes and steps
-        alternating, at most `limit` steps, the first `most` of them in the order the
-        nodes' steps are kept. Distances come first, from a search that copies no path;
-        then only the ways along which each node is at its distance are followed, so a
-        hub that joins every story costs its steps once, not once a path through it."""
-        # what is the goal, read once a search: a name's goal is the name and each
-        # individual it finds, as `is_` asks, and a search asks of millions of nodes
-        if goal.startswith("n:"):
-            goals = self.individuals.finds(goal[2:])
-        else:
-            goals = {goal}
-        names: dict = {}
-        tracked = self.spent is not None
-        steps_of, reached_of = self._steps.get, self._reached
-
-        def reach(node: str) -> tuple:
-            """A node's steps, counted as `around` counts them, and with them the nodes
-            they lead to, each once, kept beside the steps they are read from."""
-            steps = self.around(node) if tracked else steps_of(node)
-            if steps is None:
-                steps = self.around(node)
-            kept = reached_of.get(node)
-            if kept is None or kept[0] is not steps:
-                nexts = tuple(dict.fromkeys(n for _, _, n in steps))
-                kept = reached_of[node] = (steps, nexts, frozenset(nexts))
-            return kept
-
-        dist, layer, best = {start: 0}, [start], None
-        for depth in range(1, limit + 1):
-            nxt_layer = []
-            for node in layer:
-                _, nexts, every = reach(node)
-                # once a node of the layer leads to the goal the rest of it, and the layer
-                # it would make, are never read: they are only counted, above. Nor is the
-                # last layer, which can only find the goal
-                if best is not None:
-                    continue
-                if not goals.isdisjoint(every):
-                    best = depth
-                    continue
-                if depth == limit:
-                    continue
-                for nxt in nexts:
-                    if nxt in dist:
-                        continue
-                    if nxt.startswith("i:"):
-                        got = names.get(nxt)
-                        if got is None:
-                            got = names[nxt] = (f"n:{self.individuals.label(nxt)}", f"n:{self.individuals.describe(nxt)}")
-                        if got[0] in dist or got[1] in dist:
-                            continue
-                        if avoid and (nxt in avoid or got[0] in avoid or got[1] in avoid):
-                            continue
-                    elif avoid and nxt in avoid:
-                        continue
-                    dist[nxt] = depth
-                    nxt_layer.append(nxt)
-            if best is not None or not nxt_layer:
-                break
-            layer = nxt_layer
-        if best is None:
-            return []
-        found: list[list] = []
-        # nodes a walk left with nothing found: every way on from them is a dead end,
-        # since a node's distance, and so where a walk may go from it, is fixed
-        dead: set = set()
-
-        def walk(path: list, depth: int) -> None:
-            had = len(found)
-            for label, direction, nxt in reach(path[-1])[0]:
-                if most is not None and len(found) >= most:
-                    return
-                if nxt in goals:
-                    if depth + 1 == best:
-                        found.append(path + [(label, direction), nxt])
-                elif depth + 1 < best and dist.get(nxt) == depth + 1 and nxt not in dead:
-                    walk(path + [(label, direction), nxt], depth + 1)
-            if len(found) == had:
-                dead.add(path[-1])
-
-        walk([start], 0)
-        return found
 
     # -- plans -----------------------------------------------------------------
 
@@ -491,12 +300,12 @@ class GraphArm:
         steps = [list(s) for s in path[1::2]]
         nodes = path[::2]
         lemmas, moods, attach, order = {}, {}, [], {}
-        events = [(i, node, *self.event(node)) for i, node in enumerate(nodes)
+        events = [(i, node, *self.walker.event(node)) for i, node in enumerate(nodes)
                   if node.startswith("e:")]
         evidence = {}
         for i, node, lemma, _ in events:
             lemmas[str(i)] = [lemma]
-            moods[str(i)] = [self.mood(node)]
+            moods[str(i)] = [self.walker.mood(node)]
         # whether each event came before or after the one before it on the path, by that
         # one's lemma: after 'got' the answer's move came later, after 'put down' earlier.
         # The two events are kept beside it, so a pair seen again is not counted again
@@ -509,7 +318,7 @@ class GraphArm:
             # path from the sticks to their number
             hook = None
             for i, node in enumerate(nodes):
-                for way in self.paths(node, f"n:{name}", limit=3, avoid=set(nodes),
+                for way in self.walker.paths(node, f"n:{name}", limit=3, avoid=set(nodes),
                                       most=1):
                     if hook is None or len(way) < len(hook[2]) * 2 + 1:
                         hook = [k + 1, i, [list(st) for st in way[1::2]]]
@@ -519,45 +328,16 @@ class GraphArm:
         return {"steps": steps, "lemmas": lemmas, "moods": moods, "attach": attach,
                 "order": order, "evidence": evidence}
 
-    def reaches(self, node: str, steps: list, goal: str) -> bool:
-        """Whether a way of these steps leads from a node to a goal."""
-        here = [node]
-        for label, direction in steps:
-            here = [n for h in here for lab, d, n in self.around(h)
-                    if lab == label and d == direction][:200]
-        return any(self.individuals.is_(n, goal) for n in here)
-
     @staticmethod
     def key(plan: dict) -> str:
         return json.dumps({"steps": plan["steps"], "attach": plan["attach"],
                            "count": plan.get("count", False)})
 
-    def walks(self, start: str, depth: int = 4, cap: int = 5000) -> dict:
-        """Every way of up to `depth` steps from a node to a name, grouped by its steps:
-        {steps: (ends, one path)}."""
-        out: dict = {}
-        frontier = [[start]]
-        for _ in range(depth):
-            nxt_frontier = []
-            for path in frontier:
-                for label, direction, nxt in self.around(path[-1]):
-                    if self.individuals.among(nxt, path[::2]):
-                        continue
-                    way = path + [(label, direction), nxt]
-                    if not nxt.startswith("e:"):
-                        key = json.dumps([list(s) for s in way[1::2]])
-                        ends, rep = out.get(key, (set(), way))
-                        ends.add(nxt)
-                        out[key] = (ends, rep)
-                    nxt_frontier.append(way)
-            frontier = nxt_frontier[:cap]
-        return out
-
     def counted(self, fillers: list[str], want: int) -> list[dict]:
         """Plans that count: from the question's first name, every way whose distinct
         ends number what was taught, shortest first."""
         found = []
-        for key, (ends, rep) in self.walks(f"n:{fillers[0]}").items():
+        for key, (ends, rep) in self.walker.walks(f"n:{fillers[0]}").items():
             if len(ends) == want:
                 plan = self.plan_of(rep, fillers[1:])
                 if plan is not None:
@@ -578,7 +358,7 @@ class GraphArm:
             present = now > then
         out = []
         def hooked(node: str, pos: int) -> bool:
-            return all(self.reaches(node, h[2], f"n:{fillers[h[0]]}")
+            return all(self.walker.reaches(node, h[2], f"n:{fillers[h[0]]}")
                        for h in plan["attach"] if h[1] == pos and h[0] < len(fillers))
 
         def ordered(last, j: int, turn_j: int) -> bool:
@@ -602,25 +382,25 @@ class GraphArm:
                 here = nodes[-1]
                 # a hub ('Lily' in a thousand stories) is walked through its latest
                 # `REACH` steps of the label, as recall searches the recent first
-                ways = [(lab, d, nxt) for lab, d, nxt in self.around(here)
+                ways = [(lab, d, nxt) for lab, d, nxt in self.walker.around(here)
                         if lab == label and d == direction][:REACH]
                 for lab, d, nxt in ways:
                     if self.individuals.among(nxt, nodes):
                         continue
                     t, now = turns, last
                     if nxt.startswith("e:"):
-                        lemma, et = self.event(nxt)
+                        lemma, et = self.walker.event(nxt)
                         pos = str(i + 1)
                         if strict and lemma not in plan["lemmas"].get(pos, [lemma]):
                             continue
                         # loosely, any verb will do, but never one that did not happen
                         # where the lessons' did, or the other way round
-                        mood = self.mood(nxt)
+                        mood = self.walker.mood(nxt)
                         if mood not in plan.get("moods", {}).get(pos, [mood]):
                             continue
                         if not ordered(last, i + 1, et):
                             continue
-                        if present and (by := self.replaced(nxt)):
+                        if present and (by := self.walker.replaced(nxt)):
                             self.emptied = max(self.emptied, by)
                             continue
                         # what did not happen, or only might, changed nothing, so it is
@@ -943,7 +723,7 @@ class GraphArm:
             # an answer nothing heard holds may be a number word, whose worth is learnt
             self.heard_count(shape, fillers, want)
         # only the first twenty of the shortest are ever made plans
-        found = [p for g in goals[:5] for p in self.paths(f"n:{fillers[0]}", g, most=20)]
+        found = [p for g in goals[:5] for p in self.walker.paths(f"n:{fillers[0]}", g, most=20)]
         shortest = min((len(p) for p in found), default=0)
         plans = [self.plan_of(p, fillers[1:]) for p in found if len(p) == shortest][:20]
         if not any(plans) and self.number(want) is not None:
@@ -1206,7 +986,7 @@ class GraphArm:
             self.last_notes = ["(found)", f"meet:{meet}", "by:relative"]
             return meet
         put = self.unaliased(question.text)
-        said, self.spent = None, 0
+        said, self.walker.spent = None, 0
         try:
             said = next((self.latest(found) for text in dict.fromkeys((put, question.text))
                          if (found := self.answers(*self.shape(text), text, borrow=False))),
@@ -1221,7 +1001,8 @@ class GraphArm:
                 said = self.answered(again)
         except Spent:
             pass
-        given_up, self.spent = self.spent > EFFORT, None
+        given_up, self.walker.spent = self.walker.spent > EFFORT, None
+
         # what the plans found from outside focus is another conversation's, as often as
         # not; what is in focus and fits the asked slot comes first
         # and what a plan found stands only where focus would also consider it: a plan
@@ -1268,7 +1049,7 @@ class GraphArm:
         def reached(e: str) -> bool:
             # a verb alone meets nothing: an event of another story is read only where a
             # name the question says met it there
-            if not names and not self.mind.held(self.event(e)[1]):
+            if not names and not self.mind.held(self.walker.event(e)[1]):
                 return False
             return all(e in d and d[e] <= (0 if lemma is not None and i == len(depth) - 1
                                            else 2) for i, d in enumerate(depth))
@@ -1290,12 +1071,12 @@ class GraphArm:
             if not reached(e):
                 continue
             a = math.prod(s.get(e, 0.0) for s in spread)
-            for label, d, n in self.around(e):
+            for label, d, n in self.walker.around(e):
                 if d != 1 or n.startswith("f:") or (r := rank(label)) is None:
                     continue
                 if n.startswith("e:"):
                     # a possessed noun ('her veil') is an event whose `self` is the name
-                    n = next((m for lab, dd, m in self.around(n) if lab == "self" and dd == 1),
+                    n = next((m for lab, dd, m in self.walker.around(n) if lab == "self" and dd == 1),
                              None)
                     if n is None:
                         continue
@@ -1342,7 +1123,7 @@ class GraphArm:
 
     def fresh(self, event: str) -> float:
         """How strongly an event is in mind now: ACT-R's base level of one hearing."""
-        return (self._now - self.event(event)[1] + 1) ** -DECAY
+        return (self._now - self.walker.event(event)[1] + 1) ** -DECAY
 
     def spread(self, start: dict[str, float]) -> tuple[dict[str, float], dict[str, int]]:
         """Activation spread from one source for `STEPS` steps: every node's total, and
@@ -1353,7 +1134,7 @@ class GraphArm:
             for node, a in frontier.items():
                 if a < FLOOR:
                     continue
-                steps = [s for s in self.around(node) if not s[2].startswith("f:")]
+                steps = [s for s in self.walker.around(node) if not s[2].startswith("f:")]
                 if not steps:
                     continue
                 share = a * PASS / len(steps)
@@ -1499,7 +1280,7 @@ class GraphArm:
         """A lesson whose answer may be a number word: every walk from the question's
         first name, with how many it reached, and none for a walk this shape had before
         that reaches nothing now."""
-        ways = self.walks(f"n:{fillers[0]}")
+        ways = self.walker.walks(f"n:{fillers[0]}")
         rows = [(shape, key, want, len(ends)) for key, (ends, _) in ways.items()]
         rows += [(shape, key, want, 0) for (key,) in self.db.execute(
             "SELECT DISTINCT walk FROM counts WHERE shape = ?", (shape,)) if key not in ways]
@@ -1570,23 +1351,23 @@ class GraphArm:
         def close(n: str, f: str) -> bool:
             got = near.get((n, f))
             if got is None:
-                got = near[(n, f)] = bool(self.paths(n, f"n:{f}", limit=2, most=1))
+                got = near[(n, f)] = bool(self.walker.paths(n, f"n:{f}", limit=2, most=1))
             return got
 
         for _ in range(limit):
             nxt = []
             for path in frontier:
-                for label, direction, node in self.around(path[-1]):
+                for label, direction, node in self.walker.around(path[-1]):
                     if self.individuals.among(node, seen):
                         continue
-                    if node.startswith("e:") and self.mood(node):
+                    if node.startswith("e:") and self.walker.mood(node):
                         continue
                     way = path + [(label, direction), node]
                     if (not node.startswith("e:") and direction == 1 and label in roles
                             and not said_in(self.individuals.describe(node), text) and all(
                                 any(close(n, f) for n in way[::2]
                                     if n.startswith("e:")) for f in fillers[1:])):
-                        turns = [self.event(n)[1] for n in way[::2] if n.startswith("e:")]
+                        turns = [self.walker.event(n)[1] for n in way[::2] if n.startswith("e:")]
                         found.append((self.individuals.describe(node), (max(turns, default=0),)))
                     nxt.append(way)
             if found:
@@ -1682,15 +1463,15 @@ class GraphArm:
             here, there, way = (u, v, d) if u in seen else (v, u, -d)
             nxt = []
             for got in partials:
-                for node in self.around_as(got[here], lab, way):
+                for node in self.walker.around_as(got[here], lab, way):
                     if self.individuals.among(node, set(got.values())):
                         continue
                     if there in want and not self.individuals.is_(node, want[there]):
                         continue
                     # never through what did not happen where the lessons' did, or the
                     # other way round, as a plan is followed
-                    if node.startswith("e:") and there[0] == "p" and self.mood(node) not in \
-                            moods.get(str(there[1]), [self.mood(node)]):
+                    if node.startswith("e:") and there[0] == "p" and self.walker.mood(node) not in \
+                            moods.get(str(there[1]), [self.walker.mood(node)]):
                         continue
                     nxt.append({**got, there: node})
             partials = nxt[:2000]
@@ -1700,8 +1481,8 @@ class GraphArm:
             if not end or end.startswith("e:") or len(got) < len(
                     {n for e in edges for n in e[:2]}):
                 continue
-            turns = [self.event(n)[1] for n in got.values()
-                     if n.startswith("e:") and not self.mood(n)]
+            turns = [self.walker.event(n)[1] for n in got.values()
+                     if n.startswith("e:") and not self.walker.mood(n)]
             out.append((self.individuals.describe(end), (max(turns, default=0),)))
         return out
 

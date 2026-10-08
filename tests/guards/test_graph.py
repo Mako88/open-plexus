@@ -118,9 +118,9 @@ def test_a_later_event_on_the_same_arguments_replaces_an_earlier_one(tmp_path):
     a.hear(3, "Mary might get the football.")
     went, got, dropped, might = (f"e:{i}" for i, in a.db.execute(
         "SELECT id FROM events ORDER BY turn"))
-    assert a.replaced(got) == 2
+    assert a.walker.replaced(got) == 2
     # other arguments, or a later event that only might happen, replace nothing
-    assert not a.replaced(went) and not a.replaced(dropped)
+    assert not a.walker.replaced(went) and not a.walker.replaced(dropped)
 
 
 def test_a_telling_after_a_question_is_heard_not_taken_as_its_answer(tmp_path):
@@ -307,11 +307,11 @@ def test_steps_stay_loaded_across_sentences_and_never_go_stale(tmp_path):
     a.hear(0, "Ada keeps the kettle in the shed.")
     a.hear(1, "Bren keeps the rope in the attic.")
     for node in ("n:ada", "n:bren", "n:shed", "n:attic", "e:1", "e:2"):
-        a.around(node)
+        a.walker.around(node)
     a.hear(2, "Ada keeps the kettle in the attic.")
-    assert "n:bren" in a._steps
-    assert all(steps == a._around(node) for node, steps in a._steps.items())
-    assert "n:attic" not in a._steps or len(a._steps["n:attic"]) == 2
+    assert "n:bren" in a.walker._steps
+    assert all(steps == a.walker._around(node) for node, steps in a.walker._steps.items())
+    assert "n:attic" not in a.walker._steps or len(a.walker._steps["n:attic"]) == 2
 
 
 def test_a_question_is_matched_as_an_event_with_one_slot_free(tmp_path):

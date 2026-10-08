@@ -134,7 +134,13 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
      an event or a property ('What did the fisherman do?'), then binding pronouns,
      which the world-side control prices at a quarter more right answers. NEXT
      (John's, 2026-10-08): the mouth (the graphed arm, item 2), read on FairytaleQA
-     and on the stream's checks.
+     and on the stream's checks. Its first step is in (`mouth.py`: the answer said
+     as its phrase where it was heard). Next, answers that are an event or a
+     property, learnt rather than read off 'do': FairytaleQA's train split heard and
+     taught as the stream is, a reaction's answer matched to a told event where no
+     name holds it, plans that end at an event, and the mouth saying an event as its
+     predicate. It touches teaching and answering, so it waits on the split's moves
+     there or is taken on a branch merged after them.
      Beside them, knowledge asked fairly (John's, 2026-10-07): the cloze banded by how
      many earlier stories told its answer in its slot (`scripts/heard.py`), and a form
      asking a fact seen across five or more stories in a wording no story used ('What

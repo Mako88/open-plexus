@@ -1532,8 +1532,15 @@ class GraphArm:
 
     def words(self, text: str) -> list[str]:
         """A text's words as the parse lemmatises them, so a cue in other words of
-        the same kind ('find' for 'found') reaches the episode that heard them."""
-        return [t.lemma_.lower() for t in parse(self.model, text) if t.is_alpha]
+        the same kind ('find' for 'found') reaches the episode that heard them. Kept with
+        the parses, so a sentence heard again is not read back as a whole document for its
+        lemmas, which was a third of hearing."""
+        key = hashlib.sha256(f"{VERSION}|{self.model}|words|{text}".encode()).hexdigest()
+        kept = self._kept(key)
+        if kept is None:
+            kept = [t.lemma_.lower() for t in parse(self.model, text) if t.is_alpha]
+            self._keep(key, kept)
+        return kept
 
     def words_of(self, episode: int) -> list[str]:
         """The words an episode held, in the order they were first written."""
@@ -2248,28 +2255,35 @@ class GraphArm:
         about the noun it hangs from, so its own words, the relative word first, are asked
         of the walk ('who found a shell?') and what they meet stands in the phrase's place.
         The relative word is the parse's (`PronType=Rel`); a clause the walk cannot answer
-        leaves the question as it was."""
-        doc = list(parse(self.model, text))
-        for verb in doc:
-            if not verb.dep_.startswith("acl") or not any(asking(c) for c in verb.children):
-                continue
-            noun = verb.head
+        leaves the question as it was. What the parse gives, each such phrase's span and its
+        clause's, is kept with the parses."""
+        key = hashlib.sha256(f"{VERSION}|{self.model}|relatives|{text}".encode()).hexdigest()
+        kept = self._kept(key)
+        if kept is None:
+            kept = []
+            doc = list(parse(self.model, text))
+            for verb in doc:
+                if not verb.dep_.startswith("acl") or not any(asking(c) for c in verb.children):
+                    continue
+                noun = verb.head
 
-            def under(tok) -> list:
-                out = [tok]
-                for c in tok.children:
-                    out += under(c)
-                return out
+                def under(tok) -> list:
+                    out = [tok]
+                    for c in tok.children:
+                        out += under(c)
+                    return out
 
-            phrase = sorted(under(noun), key=lambda x: x.i)
-            clause = sorted(under(verb), key=lambda x: x.i)
-            # the question's own wh-word is never inside the phrase it asks about
-            if phrase[0].i == 0 or len(phrase) >= len(doc) - 2:
-                continue
-            end = clause[-1].idx + len(clause[-1].text)
-            who = self.met(text[clause[0].idx:end] + "?")
+                phrase = sorted(under(noun), key=lambda x: x.i)
+                clause = sorted(under(verb), key=lambda x: x.i)
+                # the question's own wh-word is never inside the phrase it asks about
+                if phrase[0].i == 0 or len(phrase) >= len(doc) - 2:
+                    continue
+                kept.append([phrase[0].idx, phrase[-1].idx + len(phrase[-1].text),
+                             clause[0].idx, clause[-1].idx + len(clause[-1].text)])
+            self._keep(key, kept)
+        for a, b, start, end in kept:
+            who = self.met(text[start:end] + "?")
             if who:
-                a, b = phrase[0].idx, phrase[-1].idx + len(phrase[-1].text)
                 return text[:a] + who.title() + text[b:]
         return text
 

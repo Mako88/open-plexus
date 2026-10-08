@@ -18,11 +18,9 @@ No path, no answer: "I don't know."
 
 from __future__ import annotations
 
-import hashlib
 import json
 import math
 import re
-import sqlite3
 from collections import Counter
 from pathlib import Path
 
@@ -33,23 +31,15 @@ from unfused.mouth import Mouth
 from unfused.parsing import (  # noqa: F401
     BLANKS,
     CACHE,
-    CLAUSES,
-    DESCRIBE,
     PARSER,
-    SKIP,
     VERSION,
-    asking,
     extract,
-    feature,
-    link,
-    mood,
-    negates,
     nlp,
     parse,
     parse_many,
-    phrase,
     vectors,
 )
+from unfused.reader import Reader
 from unfused.situations import Situations
 from unfused.storage import CARRIED, Store
 
@@ -98,11 +88,12 @@ class GraphArm:
         # what was being heard when each word was heard, folded over the stream
         self.situations = Situations(self.db)
         self.model = model
-        self.cache = cache
+        # everything the parser says of a text, kept so no text is parsed twice
+        self.reader = Reader(model, cache)
         self.mouth = Mouth(self)
+
         self.last_notes: list[str] = []
         self.traced: dict | None = None
-        self.parsed = 0
         # the pairs of events already counted towards a plan's order, this world
         self.ordered: set = set()
         # a question this arm answered, waiting for the turn that reacts to it
@@ -135,7 +126,6 @@ class GraphArm:
         self._near: dict = {}
         # each stored plan's text, decoded (`read_plan`)
         self._read: dict[str, dict] = {}
-        self._tokens: dict = {}
         # every node's steps, kept across sentences and questions: a walk over a hub asks
         # for the same node's steps thousands of times. A sentence drops only the nodes it
         # gives a new step, so what was loaded stays loaded
@@ -165,58 +155,6 @@ class GraphArm:
 
     # -- reading ---------------------------------------------------------------
 
-    def _kept(self, key: str):
-        if self.cache is None:
-            return None
-        if not hasattr(self, "_cdb"):
-            self.cache.parent.mkdir(parents=True, exist_ok=True)
-            self._cdb = sqlite3.connect(str(self.cache), timeout=60)
-            self._cdb.execute("PRAGMA journal_mode=WAL")
-            self._cdb.execute("PRAGMA synchronous=OFF")
-            self._cdb.execute("CREATE TABLE IF NOT EXISTS parses (key TEXT PRIMARY KEY, "
-                              "value TEXT NOT NULL)")
-        row = self._cdb.execute("SELECT value FROM parses WHERE key = ?", (key,)).fetchone()
-        return json.loads(row[0]) if row else None
-
-    def _keep(self, key: str, value) -> None:
-        if self.cache is not None:
-            self._cdb.execute("INSERT OR REPLACE INTO parses VALUES (?, ?)",
-                              (key, json.dumps(value)))
-            self._cdb.commit()
-
-    def read(self, text: str) -> list[dict]:
-        key = hashlib.sha256(f"{VERSION}|{self.model}|events|{text}".encode()).hexdigest()
-        kept = self._kept(key)
-        if kept is None:
-            kept = extract(parse(self.model, text))
-            self.parsed += 1
-            self._keep(key, kept)
-        return kept
-
-    def names_in(self, question: str) -> list[tuple[int, int, str]]:
-        """The question's noun phrases, as spans with their names."""
-        key = hashlib.sha256(f"{VERSION}|{self.model}|names-2|{question}".encode()).hexdigest()
-        kept = self._kept(key)
-        if kept is None:
-            doc = parse(self.model, question)
-            kept = []
-            for tok in doc:
-                if tok.pos_ in ("NOUN", "PROPN") and tok.dep_ not in DESCRIBE:
-                    left = [t for t in tok.children if t.dep_ in DESCRIBE and t.i < tok.i]
-                    start = min([t.idx for t in left] + [tok.idx])
-                    # never the question's own verb: 'keep' in 'Where does Ada keep the
-                    # jars?' is cut with the jars only where the graph holds Ada's keeping
-                    # told actively, so one relation would be two shapes by how its facts
-                    # were told
-                    verb = tok.head if tok.dep_ == "obj" and tok.head.dep_ != "ROOT" else None
-                    between = (doc[verb.i + 1:min([t.i for t in left] + [tok.i])]
-                               if verb is not None and verb.i < tok.i else None)
-                    governs = ([verb.idx, verb.lemma_.lower()] if between is not None
-                               and all(t.dep_ == "det" for t in between) else [None, None])
-                    kept.append([start, tok.idx + len(tok.text), phrase(tok), *governs])
-            self._keep(key, kept)
-        return [tuple(k) for k in kept]
-
     def hear(self, turn: int, text: str) -> None:
         # a turn holding no words is a break in the text ('***', a new page): what is
         # heard after it is another episode
@@ -231,10 +169,10 @@ class GraphArm:
             return
         # the episode's index: each word it held, so a cue can find it again
         ep = self.episode()
-        new = [(w, ep) for w in set(self.words(text))]
+        new = [(w, ep) for w in set(self.reader.words(text))]
         self.db.executemany("INSERT OR IGNORE INTO episode_words VALUES (?, ?)", new)
         self.keep_words(ep, [w for w, _ in new])
-        events = self.read(text)
+        events = self.reader.read(text)
         resolved = {t: self.referent(t[2:]) for ev in events for _, t in ev["edges"]
                     if t.startswith("p:")}
         # each thing the sentence names, as an individual: one opened here, or the one
@@ -664,7 +602,7 @@ class GraphArm:
         cut to the longest ending of it the graph knows: 'how many walking sticks' holds
         'walking sticks', with no list of words like 'many'."""
         spans = []
-        for a, b, name, verb_at, verb in sorted(self.names_in(question)):
+        for a, b, name, verb_at, verb in sorted(self.reader.names_in(question)):
             words = name.split()
             for i in range(len(words)):
                 tail = " ".join(words[i:])
@@ -698,7 +636,8 @@ class GraphArm:
     def proper_at(self, text: str, at: int) -> bool:
         """Whether the word a text has at this offset is a proper name, by the part of
         speech the parse gives it: a capital letter is a mark of some scripts only."""
-        return any(r[0] <= at < r[0] + len(r[1]) and r[5] == "PROPN" for r in self.spans(text))
+        return any(r[0] <= at < r[0] + len(r[1]) and r[5] == "PROPN"
+                   for r in self.reader.spans(text))
 
     def heard_at(self, question: str) -> None:
         """A lesson's noun phrases counted by their place in its template."""
@@ -890,7 +829,7 @@ class GraphArm:
         replaced by its slot and each wh-word kept as itself, so two wordings of one
         question share what their grammar shares: 'Where are <0>'s <1> kept?' and 'Where
         does <0> keep the <1>?' share 'keep', 'where' and 'where advmod keep'."""
-        tokens = self.tokens(question)
+        tokens = self.reader.tokens(question)
         heads = {f.split()[-1]: i for i, f in enumerate(fillers)}
         inside = {w for f in fillers for w in f.split()[:-1]}
 
@@ -915,21 +854,7 @@ class GraphArm:
 
     def wh_word(self, question: str) -> str:
         """The question's first word that asks, by what the parse marks, or ''."""
-        return next((t[0] for t in self.tokens(question) if t[2] == "ask"), "")
-
-    def tokens(self, question: str) -> list:
-        """A question's parse, one row a token: its word, lemma, tag, link and head."""
-        if question not in self._tokens:
-            key = hashlib.sha256(f"{VERSION}|{self.model}|tokens-2|{question}".encode()
-                                 ).hexdigest()
-            kept = self._kept(key)
-            if kept is None:
-                kept = [[t.lower_, t.lemma_.lower(), "ask" if asking(t) else "", t.dep_,
-                         t.head.i]
-                        for t in parse(self.model, question)]
-                self._keep(key, kept)
-            self._tokens[question] = kept
-        return self._tokens[question]
+        return next((t[0] for t in self.reader.tokens(question) if t[2] == "ask"), "")
 
     def read_plan(self, text: str) -> dict:
         """A stored plan, decoded once for every reader: answering reads every taught
@@ -1533,18 +1458,6 @@ class GraphArm:
         for key in [k for k in self._steps if k.startswith("n:")]:
             del self._steps[key]
 
-    def words(self, text: str) -> list[str]:
-        """A text's words as the parse lemmatises them, so a cue in other words of
-        the same kind ('find' for 'found') reaches the episode that heard them. Kept with
-        the parses, so a sentence heard again is not read back as a whole document for its
-        lemmas, which was a third of hearing."""
-        key = hashlib.sha256(f"{VERSION}|{self.model}|words|{text}".encode()).hexdigest()
-        kept = self._kept(key)
-        if kept is None:
-            kept = [t.lemma_.lower() for t in parse(self.model, text) if t.is_alpha]
-            self._keep(key, kept)
-        return kept
-
     def words_of(self, episode: int) -> list[str]:
         """The words an episode held, in the order they were first written."""
         got = self._episode_words.get(episode)
@@ -1588,7 +1501,7 @@ class GraphArm:
 
         ep = self.episode()
         here = {w for w in self.words_of(ep)}
-        cue = here | set(self.words(question))
+        cue = here | set(self.reader.words(question))
         episodes = self.db.execute("SELECT COUNT(*) FROM boundaries").fetchone()[0]
         if not cue or episodes < 2:
             return
@@ -1655,79 +1568,6 @@ class GraphArm:
             f"({','.join('?' * len(held))}) AND {self._mind('events.turn')} LIMIT 1",
             (*held, *self._held())).fetchone() is not None
 
-    def blank(self, question: str) -> tuple[str, str] | None:
-        """The slot the question's wh-word stands in: ('eat', 'dobj') for 'Lily ate
-        what?', ('land', 'prep:on') for 'The bird landed on what?'."""
-        key = hashlib.sha256(f"{VERSION}|{self.model}|blank-3|{question}".encode()).hexdigest()
-        kept = self._kept(key)
-        if kept is None:
-            kept = list(_slot(parse(self.model, question)) or [])
-            self._keep(key, kept)
-        return tuple(kept) if kept else None
-
-    def pattern(self, question: str) -> tuple[str, list[str], list] | None:
-        """The question read as an event with one slot free: its verb's lemma as a telling's
-        event is named, the links the wh-word could stand in, and the names it is bound to,
-        as (label, name). 'Who loved her veil?' is a 'love' event with 'nsubj' free and
-        ('dobj', 'veil') bound; 'Where did Roxy put the leaves?' is a 'put' event with any
-        link of place free. A pronoun binds nothing, since a question's pronoun names no
-        one of its own."""
-        key = hashlib.sha256(f"{VERSION}|{self.model}|pattern-6|{question}".encode()).hexdigest()
-        kept = self._kept(key)
-        if kept is None:
-            kept = []
-            doc = parse(self.model, question)
-            wh = next((t for t in doc if asking(t)), None)
-            if wh is not None:
-                case = [k.lower_ for k in wh.children if k.dep_ == "case"]
-                if any(c.dep_ == "cop" for c in wh.children):
-                    # the word that asks is a copula's predicate ('Who is cousins with
-                    # Ann?'): a copula equates its two sides, so it stands in either
-                    verb, free = wh, ["nsubj", "attr"]
-                elif wh.pos_ == "ADV":
-                    # a word that asks for a circumstance ('where', 'when') stands in an
-                    # oblique; which ones its answers hang by is learnt (`circumstances`)
-                    verb, free = wh.head, ["prep:*"]
-                elif case:
-                    verb, free = wh.head, ["prep:" + " ".join(case)]
-                elif wh.dep_ != "det":
-                    # an object asked for is either of the core objects the parse tells
-                    # apart ('told the eye', 'asked his mommy' are read as indirect), the
-                    # direct first
-                    verb, free = wh.head, (["obj", "iobj"] if wh.dep_ == "obj" else [wh.dep_])
-                else:
-                    verb, free = None, []
-                cop = next((c for c in verb.children if c.dep_ == "cop"), None) if verb \
-                    is not None else None
-                if verb is not None and (verb.pos_ in ("VERB", "AUX") or cop is not None):
-                    lemma = (cop or verb).lemma_.lower()
-                    mood_ = mood(verb)
-                    bound = []
-                    if cop is not None and verb is not wh:
-                        vcase = [k.lower_ for k in verb.children if k.dep_ == "case"]
-                        bound.append(["prep:" + " ".join(vcase) if vcase else (
-                            "acomp" if verb.pos_ == "ADJ" else "attr"), phrase(verb)])
-                    for c in verb.children:
-                        if c is wh or c.pos_ == "PRON":
-                            continue
-                        if c.dep_ not in SKIP and c.pos_ in ("NOUN", "PROPN"):
-                            bound.append([link(c), phrase(c)])
-                    # every name inside the verb's own arguments, however deep: 'with
-                    # Nogael' in 'Who is cousins with Nogael?' hangs off 'cousins', not the
-                    # verb. Another clause ('and he puffed', 'which was his dog house') is
-                    # another event and binds nothing here
-                    named, todo = set(), [c for c in verb.children if c.dep_ not in CLAUSES]
-                    while todo:
-                        t = todo.pop()
-                        if t.pos_ in ("NOUN", "PROPN") and t.dep_ not in DESCRIBE:
-                            named.add(phrase(t))
-                        todo += [c for c in t.children if c.dep_ not in CLAUSES]
-                    named = sorted(named)
-                    kept = [lemma, free, bound, named, mood_, wh.lemma_.lower()]
-            self._keep(key, kept)
-        return (kept[0], kept[1], [tuple(b) for b in kept[2]], kept[3], kept[4], kept[5]) \
-            if kept else None
-
     def met(self, question: str) -> str | None:
         """What a question's sources meet at, read at the asked slot: spreading activation
         (Quillian; ACT-R, John's walk). Each name the question says fires its
@@ -1793,7 +1633,7 @@ class GraphArm:
         """Where a question's activation starts: a group a source (each name it says,
         and its verb), the names, the verb's lemma and the links the asked slot could
         be. None for a question that asks no slot, or about someone never mentioned."""
-        got = self.pattern(question)
+        got = self.reader.pattern(question)
         if got is None:
             # no slot asked, so nothing to read where the sources meet
             return None
@@ -1861,7 +1701,7 @@ class GraphArm:
         """Each name focus weighs for a question, with its three factors: how strongly it
         is in focus, how it fits the asked slot, and how often the wh-word asks for its
         mark. None where the question is not guessed at."""
-        slot = self.blank(question)
+        slot = self.reader.blank(question)
         # a question about someone never mentioned is not guessed at
         if slot is None or not all(self.known(f) for f in self.shape(question)[1]):
             return None
@@ -1938,7 +1778,7 @@ class GraphArm:
     def learn_circumstance(self, question: str, want: str) -> None:
         """A lesson's answer to a word asking for a circumstance: the oblique the answer
         hangs by in the episode's event the question matches."""
-        got = self.pattern(question)
+        got = self.reader.pattern(question)
         if got is None or got[1] != ["prep:*"]:
             return
         lemma, _, bound, _, mood_, wh = got
@@ -2218,7 +2058,7 @@ class GraphArm:
         cousin of the person who repairs clocks'. A phrase is a noun's whole subtree, kept
         where a possessor, a clause or a preposition hangs off it and the wh-word is not
         inside it."""
-        rows = self.spans(text)
+        rows = self.reader.spans(text)
         kids: dict[int, list[int]] = {}
         for i, r in enumerate(rows):
             if r[4] != i:
@@ -2260,46 +2100,11 @@ class GraphArm:
         The relative word is the parse's (`PronType=Rel`); a clause the walk cannot answer
         leaves the question as it was. What the parse gives, each such phrase's span and its
         clause's, is kept with the parses."""
-        key = hashlib.sha256(f"{VERSION}|{self.model}|relatives|{text}".encode()).hexdigest()
-        kept = self._kept(key)
-        if kept is None:
-            kept = []
-            doc = list(parse(self.model, text))
-            for verb in doc:
-                if not verb.dep_.startswith("acl") or not any(asking(c) for c in verb.children):
-                    continue
-                noun = verb.head
-
-                def under(tok) -> list:
-                    out = [tok]
-                    for c in tok.children:
-                        out += under(c)
-                    return out
-
-                phrase = sorted(under(noun), key=lambda x: x.i)
-                clause = sorted(under(verb), key=lambda x: x.i)
-                # the question's own wh-word is never inside the phrase it asks about
-                if phrase[0].i == 0 or len(phrase) >= len(doc) - 2:
-                    continue
-                kept.append([phrase[0].idx, phrase[-1].idx + len(phrase[-1].text),
-                             clause[0].idx, clause[-1].idx + len(clause[-1].text)])
-            self._keep(key, kept)
-        for a, b, start, end in kept:
+        for a, b, start, end in self.reader.relatives(text):
             who = self.met(text[start:end] + "?")
             if who:
                 return text[:a] + who.title() + text[b:]
         return text
-
-    def spans(self, text: str) -> list:
-        """A sentence's parse with where each word sits: offset, word, tag, link, head, and
-        part of speech."""
-        key = hashlib.sha256(f"{VERSION}|{self.model}|spans|{text}".encode()).hexdigest()
-        kept = self._kept(key)
-        if kept is None:
-            kept = [[t.idx, t.text, t.tag_, t.dep_, t.head.i, t.pos_]
-                    for t in parse(self.model, text)]
-            self._keep(key, kept)
-        return kept
 
     # -- a conversation -------------------------------------------------------
 
@@ -2318,7 +2123,7 @@ class GraphArm:
         # a reaction is about the answer, not the world: no event in it has a named
         # subject ('it's the shed', 'that's right'), where a telling has ('Ada keeps...')
         about_world = any(label.startswith("nsubj") and t.startswith("n:")
-                           for ev in self.read(text) for label, t in ev["edges"])
+                           for ev in self.reader.read(text) for label, t in ev["edges"])
         if self.pending is not None and not about_world:
             question, said = self.pending
             self.pending = None
@@ -2337,21 +2142,7 @@ class GraphArm:
 
     def reaction(self, text: str, question: str) -> tuple[str | None, bool]:
         """What a reaction names that the question did not, and whether it says no."""
-        key = hashlib.sha256(f"{VERSION}|{self.model}|reaction-3|{text}".encode()).hexdigest()
-        rows = self._kept(key)
-        if rows is None:
-            doc = parse(self.model, text)
-            # one row a token: no, yes, whether it may name something, its name, and
-            # whether it is a number of things read as the arm reads one ('none')
-            rows = []
-            for t in doc:
-                no = negates(t)
-                yes = "Pos" in feature(t, "Polarity")
-                part = t.dep_ in DESCRIBE and t.head.pos_ in ("NOUN", "PROPN")
-                number = "Card" in feature(t, "NumType") or t.lower_.isdigit()
-                names = not part and (t.pos_ in ("NOUN", "PROPN", "NUM", "ADJ") or number)
-                rows.append([no, yes, names, t.lower_ if number else phrase(t), number])
-            self._keep(key, rows)
+        rows = self.reader.reaction_rows(text)
         negated = any(no for no, _, _, _, _ in rows)
         # a reaction that says yes and not no confirms the answer given and names
         # nothing: 'right' in 'Yes, that's right' is an adjective as a colour is, and
@@ -2376,36 +2167,12 @@ class GraphArm:
         return {"model": self.model, "version": VERSION, "events": n_events, "edges": n_edges,
                 "individuals": individuals,
                 "shapes": self.db.execute("SELECT COUNT(DISTINCT shape) FROM learnt")
-                .fetchone()[0], "parsed": self.parsed}
+                .fetchone()[0], "parsed": self.reader.parsed}
 
     def close(self) -> None:
         self.situations.save()
         self.store.close()
-        if hasattr(self, "_cdb"):
-            self._cdb.close()
-
-
-def _slot(doc) -> tuple[str, str] | None:
-    """The verb and link the word asking for a thing fills (a pronoun that asks, by
-    `PronType`). One joined to another by 'and' fills the other's slot ('Tom and what had
-    fun' is a subject of 'have'), and an oblique is named by its case word ('The bird
-    landed on what?' is 'land' 'prep:on'). A predicate with a copula is the copula's."""
-    t = next((t for t in doc if asking(t) and t.pos_ == "PRON"), None)
-    if t is None:
-        return None
-    while t.dep_ == "conj" and t.head.i != t.i:
-        t = t.head
-    if t.dep_ in ("det",):
-        return None
-    if any(c.dep_ == "cop" for c in t.children):
-        # 'The ball was what?': the word is the copula's predicate
-        cop = next(c for c in t.children if c.dep_ == "cop")
-        return cop.lemma_.lower(), "attr"
-    lab, head = link(t), t.head
-    while head.pos_ in ("ADV", "ADP") and head.head.i != head.i:
-        head = head.head
-    cop = next((c for c in head.children if c.dep_ == "cop"), None)
-    return (cop or head).lemma_.lower(), lab
+        self.reader.close()
 
 
 def asked(text: str) -> bool:

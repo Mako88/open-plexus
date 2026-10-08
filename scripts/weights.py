@@ -95,7 +95,7 @@ class Schemed(GraphArm):
 
     def schemas(self, question: str) -> dict[str, float]:
         """Each name focus weighs, by its best individual's schema for the blank."""
-        slot = self.blank(question)
+        slot = self.reader.blank(question)
         out: dict[str, float] = {}
         if slot is None:
             return out

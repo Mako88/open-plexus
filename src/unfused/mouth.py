@@ -26,7 +26,7 @@ class Mouth:
 
     def heard(self, question: str, answer: str) -> str | None:
         arm = self.arm
-        asked = set(arm.words(question))
+        asked = set(arm.reader.words(question))
         best, best_key = None, None
         for node in arm.individuals(answer, episode=True) + [f"n:{answer}"]:
             for event, label in arm.store.edges_into(node):
@@ -34,7 +34,7 @@ class Mouth:
                                      (event,)).fetchone()
                 if row is None or not arm.held(row[0]):
                     continue
-                key = (len(asked & set(arm.words(row[1]))), event)
+                key = (len(asked & set(arm.reader.words(row[1]))), event)
                 if best_key is None or key > best_key:
                     best, best_key = (event, label, node, row), key
         if best is None:

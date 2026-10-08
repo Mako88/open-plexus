@@ -36,16 +36,6 @@ class Focuser:
             f"({','.join('?' * len(held))}) AND {self.mind.within('events.turn')} LIMIT 1",
             (*held, *self.mind.bounds())).fetchone() is not None
 
-    def focused(self, question: str) -> str | None:
-        """The name in this episode that best fits the asked slot: how strongly it is in focus,
-        each hearing fading as ACT-R's base level does, times how often it has filled the
-        asked verb's slot, out of everything it has filled, times how often the wh-word's
-        answers bore its mark."""
-        scores = self.focus(question)
-        if not scores:
-            return None
-        return max((a * f * w, n) for n, (a, f, w) in scores.items())[1]
-
     def focus(self, question: str) -> dict[str, tuple[float, float, float]] | None:
         """Each name focus weighs for a question, with its three factors: how strongly it
         is in focus, how it fits the asked slot, and how often the wh-word asks for its

@@ -27,6 +27,7 @@ from unfused.hearer import Hearer
 from unfused.individuals import Individuals
 from unfused.mind import Mind
 from unfused.mouth import Mouth
+from unfused.numbers import Numbers
 
 # the scripts and the guards read BLANKS, PARSER, extract, nlp, parse_many and vectors through
 # this module, so they are named here whether or not it uses them
@@ -92,8 +93,12 @@ class GraphArm:
         # the graph as steps from a node, and the walks over them
         self.walker = Walker(self.store, self.individuals, self.mind)
         self.mind.listen(self.walker.forget_names)
+        # what each number word is worth, as lessons showed it
+        self.numbers = Numbers(self.db)
         # a sentence heard, written into the graph
-        self.hearer = Hearer(self.store, self.reader, self.mind, self.individuals,
+
+        self.hearer = Hearer(
+self.store, self.reader, self.mind, self.individuals,
                              self.walker, self.situations)
 
         self.mouth = Mouth(self)
@@ -554,10 +559,11 @@ class GraphArm:
             return chosen
         if plan.get("count"):
             if ends:
-                return [(self.say_number(len({e for e, _ in ends})), max(t for _, t in ends))]
+                return [(self.numbers.say_number(len({e for e, _ in ends})),
+                         max(t for _, t in ends))]
             # nothing left to count is an answer, resting on what emptied the set: 'Mary
             # dropped the football' is later than her picking it up
-            return [(self.say_number(0), (self.emptied,))] if self.emptied else []
+            return [(self.numbers.say_number(0), (self.emptied,))] if self.emptied else []
         return [f for f in ends if not said_in(f[0], question)]
 
     def teach(self, question: str, answer: str) -> None:
@@ -584,8 +590,9 @@ class GraphArm:
                 if not found:
                     return None
                 said = max(found, key=lambda f: f[1])[0]
-                return said_in(want, said) or (self.number(want) is not None
-                                               and self.number(said) == self.number(want))
+                return said_in(want, said) or (
+                    self.numbers.number(want) is not None
+                    and self.numbers.number(said) == self.numbers.number(want))
 
             # whether the answer is the visit just before or after another name of the
             # question, counted wherever that name is among the plan's ends
@@ -640,10 +647,10 @@ class GraphArm:
         found = [p for g in goals[:5] for p in self.walker.paths(f"n:{fillers[0]}", g, most=20)]
         shortest = min((len(p) for p in found), default=0)
         plans = [self.plan_of(p, fillers[1:]) for p in found if len(p) == shortest][:20]
-        if not any(plans) and self.number(want) is not None:
+        if not any(plans) and self.numbers.number(want) is not None:
             # a number no telling said is a number of things: 'How many people keep
             # things in the pantry?' taught 3
-            plans = self.counted(fillers, self.number(want))
+            plans = self.counted(fillers, self.numbers.number(want))
         for plan in plans:
             if plan is None:
                 continue
@@ -1154,41 +1161,6 @@ class GraphArm:
                     self.db.execute("INSERT INTO circumstances VALUES (?, ?, 1) ON CONFLICT"
                                     "(wh, link) DO UPDATE SET n = n + 1", (wh, lab))
                     return
-
-    # -- numbers ---------------------------------------------------------------
-
-    def number(self, text: str) -> int | None:
-        """A number said as digits, or as a word whose value lessons settled."""
-        t = text.strip().lower()
-        if t.isdigit():
-            return int(t)
-        return self.numbers().get(t)
-
-    def say_number(self, n: int) -> str:
-        """A number in the word lessons said it with, or as digits."""
-        return next((w for w, v in self.numbers().items() if v == n), str(n))
-
-    def numbers(self) -> dict[str, int]:
-        """What each number word is worth, learnt as a child learns to count: over the
-        lessons whose answer was a word nothing heard holds, one walk's count went with
-        each word, each word always with the same count and each count with the same
-        word. That walk is the counting, and the words' values are its counts. Two words
-        at least, since one cannot show a pairing."""
-        total = self.db.execute("SELECT COUNT(*) FROM counts").fetchone()[0]
-        if getattr(self, "_numbers", (None,))[0] == total:
-            return self._numbers[1]
-        by: dict = {}
-        for shape, walk, word, size in self.db.execute("SELECT * FROM counts"):
-            by.setdefault((shape, walk), []).append((word, size))
-        best: tuple = (0, {})
-        for items in by.values():
-            fwd: dict = {}
-            back: dict = {}
-            if all(fwd.setdefault(w, n) == n and back.setdefault(n, w) == w
-                   for w, n in items) and len(fwd) >= 2 and len(items) > best[0]:
-                best = (len(items), fwd)
-        self._numbers = (total, best[1])
-        return best[1]
 
     def heard_count(self, shape: str, fillers: list[str], want: str) -> None:
         """A lesson whose answer may be a number word: every walk from the question's

@@ -89,13 +89,111 @@ def tale(name: str, split: str = "test") -> Tale:
     return Tale(name=name, told=sentences, questions=questions)
 
 
-def tales(split: str = "test", limit: int | None = None) -> list[Tale]:
+def tales(split: str = "test", limit: int | None = None, resolved: bool = False) -> list[Tale]:
     folder = DATA / "questions" / split
     if not folder.exists():
         raise SystemExit(f"FairytaleQA is not in {DATA}; fetch {URL} and unzip it into "
                          f"{DATA.parents[1]}")
     names = sorted(p.name.removesuffix("-questions.csv") for p in folder.glob("*.csv"))
-    return [tale(n, split) for n in names[:limit]]
+    out = [tale(n, split) for n in names[:limit]]
+    if resolved:
+        for t in out:
+            t.told = resolve(t.told)
+    return out
+
+
+# each tale's sentences with their pronouns resolved, kept by the text: bump on any change
+CACHE = home() / "state" / "fairytales-resolved"
+RESOLVED = "resolved-3"
+_coref = None
+
+
+def _named(doc, chain) -> str | None:
+    """What a chain is called: its commonest name ('Ian'), else 'the' and its commonest
+    noun ('the deer'), by each mention's head, the word whose head is outside it. A
+    representative mention whole carries its clauses ('a wife with golden hair')."""
+    from collections import Counter
+
+    names, nouns = Counter(), Counter()
+    for m in chain.mentions:
+        words = doc.sentences[m.sentence].words
+        span = range(m.start_word, m.end_word)
+        head = next((words[i] for i in span if words[i].head - 1 not in span), None)
+        if head is None or head.upos not in ("PROPN", "NOUN"):
+            continue
+        if head.upos == "PROPN":
+            run = [words[i].text for i in span if words[i].upos == "PROPN"]
+            names[" ".join(run)] += 1
+        else:
+            nouns[head.text.lower()] += 1
+    if names:
+        return names.most_common(1)[0][0]
+    if nouns:
+        return f"the {nouns.most_common(1)[0][0]}"
+    return None
+
+
+def resolve(sentences: list[str]) -> list[str]:
+    """A control (THE ORDER, FairytaleQA): the tale with every personal pronoun replaced
+    by the naming mention of its chain ('she ran on' to 'the deer ran on'), by Stanza's
+    coreference model, so how much binding pronouns is worth is read apart from the
+    system's own binding. The world's reading, never the system's; a possessive keeps its
+    's, and a chain named only by pronouns is left as told."""
+    import json
+
+    key = hashlib.sha256(f"{RESOLVED}|{'\n'.join(sentences)}".encode()).hexdigest()
+    path = CACHE / f"{key}.json"
+    if path.exists():
+        return json.loads(path.read_text(encoding="utf-8"))
+    global _coref
+    if _coref is None:
+        import stanza
+
+        from unfused.parsing import STANZA
+
+        _coref = stanza.Pipeline("en", dir=str(STANZA),
+                                 processors="tokenize,mwt,pos,lemma,depparse,coref",
+                                 tokenize_no_ssplit=True, download_method=None, verbose=False)
+    # read in windows of about WINDOW words, since a whole tale's mention pairs fill the
+    # card; a pronoun whose naming mention is in an earlier window is left as told
+    out, window = [], []
+    for s in sentences:
+        if window and sum(len(x.split()) for x in window) + len(s.split()) > WINDOW:
+            out += _resolved(window)
+            window = []
+        window.append(s)
+    if window:
+        out += _resolved(window)
+    CACHE.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(out), encoding="utf-8")
+    return out
+
+
+WINDOW = 800
+
+
+def _resolved(sentences: list[str]) -> list[str]:
+    text = "\n\n".join(sentences)
+    doc = _coref(text)
+    swaps: list[tuple[int, int, str]] = []
+    for chain in doc.coref:
+        name = _named(doc, chain)
+        if name is None:
+            continue
+        for m in chain.mentions:
+            if m.end_word - m.start_word != 1:
+                continue
+            w = doc.sentences[m.sentence].words[m.start_word]
+            feats = w.feats or ""
+            if w.upos != "PRON" or "PronType=Prs" not in feats or w.start_char is None:
+                continue
+            swaps.append((w.start_char, w.end_char,
+                          f"{name}'s" if "Poss=Yes" in feats else name))
+    for start, end, said in sorted(swaps, reverse=True):
+        text = text[:start] + said + text[end:]
+    out = text.split("\n\n")
+    assert len(out) == len(sentences)
+    return [_flat(s) for s in out]
 
 
 def fingerprint(ts: list[Tale]) -> str:

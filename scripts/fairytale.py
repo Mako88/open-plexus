@@ -190,9 +190,11 @@ def main() -> int:
     p.add_argument("--served", default="Qwen3.5-2B-Q8_0")
     p.add_argument("--port", type=int, default=8094)
     p.add_argument("--note", default="")
+    # a control: the tales with their pronouns resolved on the world's side
+    p.add_argument("--resolved", action="store_true")
     args = p.parse_args()
 
-    ts = tales(args.split, args.tales)
+    ts = tales(args.split, args.tales, resolved=args.resolved)
     print(f"{len(ts)} tales, {sum(len(t.questions) for t in ts)} questions", flush=True)
     for name in args.arms.split(","):
         work = Path(tempfile.mkdtemp(prefix=f"unfused-fairytale-{name}-"))
@@ -219,13 +221,15 @@ def main() -> int:
         reading = {"kind": "fairytaleqa", "arm": name, "taken_at": taken, "note": args.note,
                    "command": " ".join(sys.argv),
                    "faculty": faculty.name if faculty else None,
-                   "world": {"source": f"FairytaleQA-{args.split}", "tales": len(ts),
+                   "world": {"source": f"FairytaleQA-{args.split}", "resolved": args.resolved,
+                             "tales": len(ts),
                              "questions": len(out["rows"]), "fingerprint": fingerprint(ts)},
                    "summary": summary(out["rows"]), "dials": dials,
                    "seconds": out["seconds"], "cpu_seconds": out["cpu_seconds"],
                    "rows": out["rows"]}
         tag = args.served.split("-Q")[0] if name == "reader" else (
             f"n{args.primed}" if name == "primed" else "none")
+        tag += "-resolved" if args.resolved else ""
         path = ROOT / "readings" / f"fairytale-{name}-{tag}-{taken}.json"
         path.write_text(json.dumps(reading, indent=1), encoding="utf-8")
         s = reading["summary"]

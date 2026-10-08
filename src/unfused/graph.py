@@ -26,6 +26,8 @@ import sqlite3
 from collections import Counter
 from pathlib import Path
 
+from unfused.mouth import Mouth
+
 # the scripts and the guards read BLANKS, PARSER, extract, nlp, parse_many and vectors through
 # this module, so they are named here whether or not it uses them
 from unfused.parsing import (  # noqa: F401
@@ -97,6 +99,7 @@ class GraphArm:
         self.situations = Situations(self.db)
         self.model = model
         self.cache = cache
+        self.mouth = Mouth(self)
         self.last_notes: list[str] = []
         self.traced: dict | None = None
         self.parsed = 0
@@ -2310,7 +2313,8 @@ class GraphArm:
             self.remind(text)
             said = self.answer(_Asked(text))
             self.pending = (text, said)
-            return said
+            # what is taught is the node; what is said is the phrase it was heard in
+            return said if said == "I don't know." else self.mouth.say(text, said)
         # a reaction is about the answer, not the world: no event in it has a named
         # subject ('it's the shed', 'that's right'), where a telling has ('Ada keeps...')
         about_world = any(label.startswith("nsubj") and t.startswith("n:")

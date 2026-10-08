@@ -89,7 +89,8 @@ def test_a_conversation_teaches_with_nothing_labelled(tmp_path):
     a.turn(1, "Bren keeps the rope in the attic.")
     assert a.turn(2, "Where is Ada's kettle?") == "I don't know."
     a.turn(3, "No, it's the shed.")
-    assert a.turn(4, "Where is Bren's rope?") == "attic"
+    # the answer is said in the words it was heard in (the mouth)
+    assert a.turn(4, "Where is Bren's rope?") == "in the attic"
     a.turn(5, "Yes, that's right.")
     # a question is never stored as a telling
     assert not a.db.execute("SELECT 1 FROM events WHERE heard LIKE '%?'").fetchone()

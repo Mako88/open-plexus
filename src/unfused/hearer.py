@@ -27,6 +27,7 @@ class Hearer:
         self.individuals = individuals
         self.walker = walker
         self.situations = situations
+        self.bound: dict = {}
 
     def hear(self, turn: int, text: str) -> None:
         # a turn holding no words is a break in the text ('***', a new page): what is
@@ -78,12 +79,21 @@ class Hearer:
         heard: list[tuple[str, str]] = []
         for ev in events:
             ids.append(self.store.new_event(turn, ev["lemma"], text, ev["mood"]))
+        # the last sentence's mentions and pronouns, by where each was said, with the
+        # individual each became: what binding is read by
+        self.bound = {}
         for ev, eid in zip(events, ids):
-            for (label, t), m in zip(ev["edges"], ev.get("mentions", [None] * len(ev["edges"]))):
+            nothing = [None] * len(ev["edges"])
+            for (label, t), m, p in zip(ev["edges"], ev.get("mentions", nothing),
+                                        ev.get("pronouns", nothing)):
                 node = (f"e:{ids[int(t[2:])]}" if t.startswith("e:") else
                         who[str(m)] if m is not None else resolved.get(t, t))
                 if node is None:
                     continue
+                if p is not None:
+                    self.bound[("pronoun", p)] = node
+                elif m is not None and "place" in ev:
+                    self.bound[("mention", ev["place"][str(m)])] = node
                 self.store.add_edge(eid, label, node)
                 # what is said of any node of this event may have changed
                 self.individuals.forget_said(node)

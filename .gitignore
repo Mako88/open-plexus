@@ -50,3 +50,6 @@ data/tinystories/
 
 # FairytaleQA, somebody else's data; src/unfused/exam/fairytales.py says where it is fetched from.
 data/fairytaleqa/
+
+# PreCo, somebody else's data; src/unfused/exam/preco.py says where it is fetched from.
+data/preco/

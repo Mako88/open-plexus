@@ -333,10 +333,11 @@ def extract(doc) -> list[dict]:
             if "3" not in feature(tok, "Person"):
                 return f"f:{tok.lower_}"
             # one with nothing to refer to in its own sentence is resolved when heard,
-            # against the episode, by what it agrees in and the slot it fills
+            # against the episode, by what it agrees in and the slot it fills. Where it
+            # was said rides with it, so what it was bound to can be read against it
             if first is not None:
-                return thing(first)
-            return f"p:{tok.dep_}|{agreement(tok)}"
+                return thing(first) + f"\x1e{tok.idx}"
+            return f"p:{tok.dep_}|{agreement(tok)}\x1e{tok.idx}"
         if tok.pos_ in ("NOUN", "PROPN", "NUM", "ADJ") or "Card" in feature(tok, "NumType"):
             return thing(tok)
         # any other word is kept, as a function word is
@@ -397,10 +398,14 @@ def extract(doc) -> list[dict]:
     for i in kept:
         edges = [[label, renumber.get(t, t)] for label, t in events[i]["edges"]
                  if not t.startswith("e:") or t in renumber]
+        # a pronoun's place in the text, beside the edge it became
+        pronouns = [int(t.split("\x1e")[1]) if "\x1e" in t else None for _, t in edges]
+        edges = [[label, t.split("\x1e")[0]] for label, t in edges]
         mentions = [int(t.split("\x1f")[1]) if "\x1f" in t else None for _, t in edges]
         # the token the event was heard at, so a mouth can say it again
         out.append({"lemma": events[i]["lemma"], "mood": events[i]["mood"], "head": events[i]["head"],
                     "edges": [[label, t.split("\x1f")[0]] for label, t in edges],
-                    "mentions": mentions,
-                    "things": {str(m): things[m] for m in mentions if m is not None}})
+                    "mentions": mentions, "pronouns": pronouns,
+                    "things": {str(m): things[m] for m in mentions if m is not None},
+                    "place": {str(m): doc[m].idx for m in mentions if m is not None}})
     return out

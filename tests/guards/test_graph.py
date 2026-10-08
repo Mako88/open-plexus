@@ -248,7 +248,7 @@ def test_a_blank_is_filled_from_what_is_in_focus(tmp_path):
         a.hear(i, text)
     # the kite is a story ago, past a break; the ball and the dog are this episode's,
     # and a ball is thrown
-    assert a.episode() == 3
+    assert a.mind.episode() == 3
     assert a.answer(q("Then Lily threw what again?")) == "ball"
 
 

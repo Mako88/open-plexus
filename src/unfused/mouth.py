@@ -32,7 +32,7 @@ class Mouth:
             for event, label in arm.store.edges_into(node):
                 row = arm.db.execute("SELECT turn, heard FROM events WHERE id = ?",
                                      (event,)).fetchone()
-                if row is None or not arm.held(row[0]):
+                if row is None or not arm.mind.held(row[0]):
                     continue
                 key = (len(asked & set(arm.reader.words(row[1]))), event)
                 if best_key is None or key > best_key:

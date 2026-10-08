@@ -71,9 +71,9 @@ class Schemed(GraphArm):
         its lemma, each spreading by the committed walk, and what reaches a name is
         summed. Copying from context, as an attention head does: what sat beside the
         sentence's other words earlier in the story."""
-        self._now = self.now()
+        self._now = self.mind.now()
         out: dict[str, float] = {}
-        episode, first = self.episode(), self.first_event()
+        episode, first = self.mind.episode(), self.mind.first_event()
         for t in parse(self.model, question):
             lemma = t.lemma_.lower()
             if t.pos_ in ("NOUN", "PROPN"):
@@ -101,7 +101,7 @@ class Schemed(GraphArm):
             return out
         for (node,) in self.db.execute(
                 "SELECT DISTINCT node FROM edges WHERE event >= ? AND node LIKE 'i:%'",
-                (self.first_event(),)):
+                (self.mind.first_event(),)):
             said = self.describe(node)
             out[said] = max(out.get(said, 0.0), self.schema(node, slot))
         return out
@@ -111,7 +111,7 @@ class Schemed(GraphArm):
         narrative schemas): for each individual of the episode, the verb slots it filled
         in the order it filled them, each earlier slot counted with each later one. 'lose'
         then 'find', the same ball. Learnt from counts across episodes, never written."""
-        first = self.first_event()
+        first = self.mind.first_event()
         seen: dict[str, list[str]] = {}
         for node, lemma, label in self.db.execute(
                 "SELECT edges.node, events.lemma, edges.label FROM edges JOIN events ON "
@@ -154,7 +154,7 @@ class Schemed(GraphArm):
         for lemma, label in self.db.execute(
                 "SELECT events.lemma, edges.label FROM edges JOIN events ON events.id = "
                 "edges.event WHERE edges.node = ? AND edges.event >= ? AND events.mood = ''",
-                (node, self.first_event())):
+                (node, self.mind.first_event())):
             if label not in BLANKS and not label.startswith("prep:"):
                 continue
             a = f"{lemma}|{label}"

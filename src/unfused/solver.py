@@ -59,9 +59,9 @@ class Solver:
             nxt = []
             for got in partials:
                 for node in self.walker.around_as(got[here], lab, way):
-                    if self.individuals.among(node, set(got.values())):
+                    if self.individuals.visited(node, set(got.values())):
                         continue
-                    if there in want and not self.individuals.is_(node, want[there]):
+                    if there in want and not self.individuals.stands_for(node, want[there]):
                         continue
                     # never through what did not happen where the lessons' did, or the
                     # other way round, as a plan is followed

@@ -45,7 +45,7 @@ class Teacher:
     def teach(self, question: str, answer: str) -> None:
         want = answer.lower()
         # what the question's wh-word asked for, by the mark the answer is heard with
-        if (wh := self.shaper.wh_word(question)) and (mark := self.individuals.mark(want)):
+        if (wh := self.shaper.wh_word(question)) and (mark := self.individuals.heard_as(want)):
             self.db.execute("INSERT INTO asks VALUES (?, ?, 1) ON CONFLICT(wh, mark) DO "
                             "UPDATE SET n = n + 1", (wh, mark))
         # where each word sat is counted as heard, so a word held in its place is frame
@@ -61,8 +61,8 @@ class Teacher:
             plan = json.loads(plan)
 
             def holds(present: bool | None) -> bool | None:
-                found = (self.follower.said(plan, fillers, True, question, present)
-                         or self.follower.said(plan, fillers, False, question, present))
+                found = (self.follower.plan_answers(plan, fillers, True, question, present)
+                         or self.follower.plan_answers(plan, fillers, False, question, present))
                 if not found:
                     return None
                 said = max(found, key=lambda f: f[1])[0]
@@ -130,10 +130,10 @@ class Teacher:
         for plan in plans:
             if plan is None:
                 continue
-            k = self.key(plan)
+            k = self.plan_key(plan)
             row = self.db.execute("SELECT rowid, plan FROM learnt WHERE shape = ?",
                                   (shape,)).fetchall()
-            same = next(((r, json.loads(p)) for r, p in row if self.key(json.loads(p)) == k),
+            same = next(((r, json.loads(p)) for r, p in row if self.plan_key(json.loads(p)) == k),
                         None)
             if same:
                 rid, kept = same
@@ -205,7 +205,7 @@ class Teacher:
                 "order": order, "evidence": evidence}
 
     @staticmethod
-    def key(plan: dict) -> str:
+    def plan_key(plan: dict) -> str:
         return json.dumps({"steps": plan["steps"], "attach": plan["attach"],
                            "count": plan.get("count", False)})
 

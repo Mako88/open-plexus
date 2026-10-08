@@ -85,13 +85,13 @@ class Individuals:
         still, in whatever order the words came)."""
         got = self._nodes.get(name)
         if got is None:
-            got = [f"n:{name}"] + self.labelled(name)
+            got = [f"n:{name}"] + self.of(name)
             words = name.split()
             for size in range(len(words) - 1, 0, -1) if len(got) == 1 else ():
                 found = []
                 for at in range(len(words) - size + 1):
                     rest = set(words[:at] + words[at + size:])
-                    found += [n for n in self.labelled(" ".join(words[at:at + size]))
+                    found += [n for n in self.of(" ".join(words[at:at + size]))
                               if rest <= set(self.said_of(n))]
                 if found:
                     got += found
@@ -102,9 +102,6 @@ class Individuals:
                 self._words.setdefault(w, set()).add(name)
         return got
 
-    def labelled(self, name: str) -> list[str]:
-        return [n for (n,) in self.db.execute(
-            "SELECT node FROM called WHERE name = ? ORDER BY turn DESC", (name,))]
 
     def said_of(self, node: str) -> list[str]:
         """What was said of an individual, the latest first: the adjectives it was heard
@@ -183,9 +180,6 @@ class Individuals:
             out.append(f"n:{word}")
         return out
 
-    def names(self) -> list[str]:
-        """The names heard, as labels of individuals or as words held themselves."""
-        return [n for (n,) in self.db.execute("SELECT DISTINCT name FROM named")]
 
     def names_in_mind(self) -> list[str]:
         """The names heard in this episode: of the individuals opened in it, and the

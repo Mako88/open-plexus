@@ -77,7 +77,7 @@ class Schemed(GraphArm):
         for t in parse(self.model, question):
             lemma = t.lemma_.lower()
             if t.pos_ in ("NOUN", "PROPN"):
-                held = self.individuals(lemma, episode=True)
+                held = self.individuals.of(lemma, episode=True)
             elif t.pos_ == "VERB":
                 held = [f"e:{e}" for (e,) in self.db.execute(
                     "SELECT id FROM events WHERE lemma = ? AND turn > ? AND id >= ?",
@@ -89,7 +89,7 @@ class Schemed(GraphArm):
             total, _ = self.spread({n: 1.0 / len(held) for n in held})
             for node, a in total.items():
                 if node.startswith("i:") and node not in held:
-                    said = self.describe(node)
+                    said = self.individuals.describe(node)
                     out[said] = out.get(said, 0.0) + a
         return out
 
@@ -102,7 +102,7 @@ class Schemed(GraphArm):
         for (node,) in self.db.execute(
                 "SELECT DISTINCT node FROM edges WHERE event >= ? AND node LIKE 'i:%'",
                 (self.mind.first_event(),)):
-            said = self.describe(node)
+            said = self.individuals.describe(node)
             out[said] = max(out.get(said, 0.0), self.schema(node, slot))
         return out
 

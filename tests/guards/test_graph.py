@@ -283,8 +283,8 @@ def test_a_pronoun_is_resolved_against_the_episode(tmp_path):
         "WHERE events.lemma = 'throw'").fetchall())
     assert not any(n.startswith("p:") for _, n in edges)
     # onto the individuals already heard, not new ones of the same name
-    assert ("nsubj", a.individuals("tom")[0]) in edges
-    assert ("obj", a.individuals("ball")[0]) in edges and "red" in a.said_of(a.individuals("ball")[0])
+    assert ("nsubj", a.individuals.of("tom")[0]) in edges
+    assert ("obj", a.individuals.of("ball")[0]) in edges and "red" in a.individuals.said_of(a.individuals.of("ball")[0])
 
 
 def test_a_mention_opens_or_joins_an_individual_by_what_the_parse_marks(tmp_path):
@@ -294,8 +294,8 @@ def test_a_mention_opens_or_joins_an_individual_by_what_the_parse_marks(tmp_path
     for turn, text in enumerate(["Lily found a ball.", "Lily threw the ball.",
                                  "Tom found a ball.", "***", "Lily found the ball."]):
         a.hear(turn, text)
-    assert len(a.individuals("lily")) == 2 and len(a.individuals("ball")) == 3
-    first, second = sorted(a.individuals("ball"))[:2]
+    assert len(a.individuals.of("lily")) == 2 and len(a.individuals.of("ball")) == 3
+    first, second = sorted(a.individuals.of("ball"))[:2]
     thrown = a.db.execute("SELECT edges.node FROM edges JOIN events ON events.id = "
                           "edges.event WHERE events.lemma = 'throw' AND edges.label = "
                           "'obj'").fetchone()[0]

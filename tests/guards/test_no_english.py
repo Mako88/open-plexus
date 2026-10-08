@@ -9,7 +9,7 @@ from pathlib import Path
 SRC = Path(__file__).resolve().parents[2] / "src" / "unfused"
 # the graph and the modules it is built from
 SOURCES = [SRC / "graph.py", SRC / "parsing.py", SRC / "storage.py", SRC / "reader.py",
-           SRC / "mind.py", SRC / "mouth.py"]
+           SRC / "mind.py", SRC / "mouth.py", SRC / "individuals.py", SRC / "said.py"]
 
 # words of one language that rules in the system have named: pronouns, wh-words, the
 # prepositions of place, refusals, negation, number words and the stand-in for a blank

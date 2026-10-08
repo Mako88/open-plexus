@@ -48,7 +48,7 @@ def read(seed: int) -> dict:
         if not t.rstrip().endswith("?"):
             arm.hear(i, t)
     kind = {q.answer.lower(): q.kind for q in house.questions
-            if q.answer and q.kind != "count" and arm.known(q.answer.lower())}
+            if q.answer and q.kind != "count" and arm.individuals.known(q.answer.lower())}
     held = {n: Counter(lab for (lab,) in arm.db.execute(
         "SELECT label FROM edges WHERE node = ?", (f"n:{n}",))) for n in kind}
     arm.close()

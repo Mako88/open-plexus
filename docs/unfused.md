@@ -102,7 +102,7 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
      teaching; then parallelism and a fast weight sweep; then measurement that does
      not slow the run (John's: the arm traces the decisions it makes anyway,
      instruments sample questions, a sampling profiler from outside); then rounds of
-     review (duplication into shared
+     review (the first struck 2026-10-08, #34 to #40: duplication into shared
      helpers, vacuous tests, dead code from refuted arms, names); and once a piece
      stops changing, its hot kernel moved to native code (the graph store, the
      walks).
@@ -896,13 +896,8 @@ the store merges by id. Kill a third of the nodes mid-exam.
   representation that cannot be converted exactly (one parser's relations to another's)
   is read again from it; a vector space can be, by a map fitted on texts both versions
   encoded (orthogonal Procrustes), trusted once its error on held-out texts is read.
-  First: `graph.py` split along reading, storage, individuals and answering. John's
-  (2026-10-07): by single responsibility, each job a class of its own with a narrow
-  interface that `GraphArm` holds (composition, not mixins over one shared state),
-  one pure move a PR with every answer the same; a job that is one large
-  responsibility may stay whole. Parsing and storage first. Taken by an agent
-  (John's, 2026-10-08), then the review round (THE ORDER, after the foundation,
-  item 2), taking what it notices on the way.
+  ~~First: `graph.py` split by single responsibility~~. Struck 2026-10-08 (#19 to
+  #33): fifteen parts `GraphArm` holds by composition, every answer the same.
 - **Concurrent walks, and sessions.** John's, 2026-10-04. Every walk has an id and
   runs on its own: a question's answers now, and a prediction's (THE ORDER, item 7)
   runs beside it, as a brain predicts while it perceives, never in the answer's path.

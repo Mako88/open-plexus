@@ -47,3 +47,6 @@ data/babi/README.md
 
 # TinyStories, somebody else's data; src/unfused/exam/stories.py says where it is fetched from.
 data/tinystories/
+
+# FairytaleQA, somebody else's data; src/unfused/exam/fairytales.py says where it is fetched from.
+data/fairytaleqa/

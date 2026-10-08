@@ -119,9 +119,16 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
      walk (`resolved`; 0.523 before). What changed is in (`changed`: where a thing is
      now, after the story moved it), 1 of 6 at 1,000 stories: rare, since the stories
      move things by pronoun ('She put it in the box') and the exam reads no
-     coreference. John's to choose how it gets enough: a coreference model on the
-     world's side, questions the 9B writes and the parse checks, or reading it at
-     3,000. Then why something happened. The information is in the story, so these read
+     coreference. How it gets enough is parked behind FairytaleQA (below); a
+     coreference model on the world's side is the likeliest way. Then why something
+     happened.
+     A standard test a rung above the stream, beside our own checks (John's,
+     2026-10-07): FairytaleQA (Xu et al. 2022; `scripts/fairytale.py`), teachers'
+     questions on Gutenberg fairy tales, labelled by what they ask (action, setting,
+     causal, feeling, prediction) and explicit or implicit, scored by ROUGE-L as
+     published. The stream stays what the system learns from; the tales test whether
+     what it learnt carries to prose it was not built around. Read against MCTest's
+     sliding window and the 2B and 9B handed the tale. The information is in the story, so these read
      understanding apart from knowledge; scale should not be what they need.
      Beside them, knowledge asked fairly (John's, 2026-10-07): the cloze banded by how
      many earlier stories told its answer in its slot (`scripts/heard.py`), and a form

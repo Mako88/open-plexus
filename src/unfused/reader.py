@@ -39,7 +39,13 @@ class Reader:
         self.parsed = 0
         self._tokens: dict = {}
 
+    def _key(self, kind: str, text: str) -> str:
+        """Where a parse is kept: the parser's version and model, what was read of the text,
+        and the text."""
+        return hashlib.sha256(f"{VERSION}|{self.model}|{kind}|{text}".encode()).hexdigest()
+
     def _kept(self, key: str):
+
         if self.cache is None:
             return None
         if not hasattr(self, "_cdb"):
@@ -59,7 +65,7 @@ class Reader:
             self._cdb.commit()
 
     def read(self, text: str) -> list[dict]:
-        key = hashlib.sha256(f"{VERSION}|{self.model}|events|{text}".encode()).hexdigest()
+        key = self._key("events", text)
         kept = self._kept(key)
         if kept is None:
             kept = extract(parse(self.model, text))
@@ -69,7 +75,7 @@ class Reader:
 
     def names_in(self, question: str) -> list[tuple[int, int, str]]:
         """The question's noun phrases, as spans with their names."""
-        key = hashlib.sha256(f"{VERSION}|{self.model}|names-2|{question}".encode()).hexdigest()
+        key = self._key("names-2", question)
         kept = self._kept(key)
         if kept is None:
             doc = parse(self.model, question)
@@ -94,8 +100,7 @@ class Reader:
     def tokens(self, question: str) -> list:
         """A question's parse, one row a token: its word, lemma, tag, link and head."""
         if question not in self._tokens:
-            key = hashlib.sha256(f"{VERSION}|{self.model}|tokens-2|{question}".encode()
-                                 ).hexdigest()
+            key = self._key("tokens-2", question)
             kept = self._kept(key)
             if kept is None:
                 kept = [[t.lower_, t.lemma_.lower(), "ask" if asking(t) else "", t.dep_,
@@ -110,7 +115,7 @@ class Reader:
         the same kind ('find' for 'found') reaches the episode that heard them. Kept with
         the parses, so a sentence heard again is not read back as a whole document for its
         lemmas, which was a third of hearing."""
-        key = hashlib.sha256(f"{VERSION}|{self.model}|words|{text}".encode()).hexdigest()
+        key = self._key("words", text)
         kept = self._kept(key)
         if kept is None:
             kept = [t.lemma_.lower() for t in parse(self.model, text) if t.is_alpha]
@@ -120,7 +125,7 @@ class Reader:
     def blank(self, question: str) -> tuple[str, str] | None:
         """The slot the question's wh-word stands in: ('eat', 'dobj') for 'Lily ate
         what?', ('land', 'prep:on') for 'The bird landed on what?'."""
-        key = hashlib.sha256(f"{VERSION}|{self.model}|blank-3|{question}".encode()).hexdigest()
+        key = self._key("blank-3", question)
         kept = self._kept(key)
         if kept is None:
             kept = list(_slot(parse(self.model, question)) or [])
@@ -134,7 +139,7 @@ class Reader:
         ('dobj', 'veil') bound; 'Where did Roxy put the leaves?' is a 'put' event with any
         link of place free. A pronoun binds nothing, since a question's pronoun names no
         one of its own."""
-        key = hashlib.sha256(f"{VERSION}|{self.model}|pattern-6|{question}".encode()).hexdigest()
+        key = self._key("pattern-6", question)
         kept = self._kept(key)
         if kept is None:
             kept = []
@@ -193,7 +198,7 @@ class Reader:
     def spans(self, text: str) -> list:
         """A sentence's parse with where each word sits: offset, word, tag, link, head, and
         part of speech."""
-        key = hashlib.sha256(f"{VERSION}|{self.model}|spans|{text}".encode()).hexdigest()
+        key = self._key("spans", text)
         kept = self._kept(key)
         if kept is None:
             kept = [[t.idx, t.text, t.tag_, t.dep_, t.head.i, t.pos_]
@@ -206,7 +211,7 @@ class Reader:
         each as the character span of the phrase and of its clause: a relative clause is
         a question about the noun it hangs from, and its relative word is the parse's
         (`PronType=Rel`)."""
-        key = hashlib.sha256(f"{VERSION}|{self.model}|relatives|{text}".encode()).hexdigest()
+        key = self._key("relatives", text)
         kept = self._kept(key)
         if kept is None:
             kept = []
@@ -235,7 +240,7 @@ class Reader:
     def reaction_rows(self, text: str) -> list:
         """A reaction to an answer, one row a token: no, yes, whether it may name
         something, its name, and whether it is a number of things."""
-        key = hashlib.sha256(f"{VERSION}|{self.model}|reaction-3|{text}".encode()).hexdigest()
+        key = self._key("reaction-3", text)
         rows = self._kept(key)
         if rows is None:
             doc = parse(self.model, text)

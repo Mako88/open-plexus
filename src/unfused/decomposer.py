@@ -72,9 +72,7 @@ class Decomposer:
         held by, so an answer held by none of these is of another kind."""
         out = set()
         for shape in shapes:
-            for (p,) in self.db.execute(
-                    "SELECT plan FROM learnt WHERE shape = ? AND hits > misses", (shape,)):
-                plan = self.plans.read_plan(p)
+            for plan in self.plans.of(shape):
                 if plan["steps"] and not plan.get("count") and plan["steps"][-1][1] == 1:
                     out.add(plan["steps"][-1][0])
         return out
@@ -134,7 +132,7 @@ class Decomposer:
         clause's place. A shape's plans are its relation's disjuncts, one a wording it was
         taught in, so the clause is found however the fact was told."""
         for a, b in self.inner(text):
-            names = [n for _, _, n in self.shaper.template(text[a:b])[1] if self.individuals.known(n)]
+            names = self.shaper.names(text[a:b], known=True, most=None)
             if not names:
                 continue
             for thing in self.solver.related(text[a:b], names):

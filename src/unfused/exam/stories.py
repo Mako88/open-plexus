@@ -26,7 +26,7 @@ from unfused.home import home
 DATA = home() / "data" / "tinystories"
 # each story as made, kept by its text and how it is made: bump on any change to `make`
 CACHE = home() / "state" / "stories.sqlite"
-MADE = "stories-8"
+MADE = "stories-11"
 VALID = DATA / "TinyStories-valid.txt"
 URL = "https://huggingface.co/datasets/roneneldan/TinyStories/resolve/main/TinyStories-valid.txt"
 
@@ -48,7 +48,8 @@ class Check:
     answers: tuple[str, ...]
     earlier: list[str]  # the story's nouns told before it is asked
     # 'check' a few sentences on; 'far' once the story is told, FAR or more sentences on;
-    # 'joined' a few sentences on, its doer named by another thing told of them
+    # 'joined' a few sentences on, its doer named by another thing told of them;
+    # 'changed' where a thing is now, after the story moved it
     form: str = "check"
 
 
@@ -94,6 +95,22 @@ def _parser():
 
     # the world's own reader, never the system's: it only finds the noun to blank
     return spacy.load("en_core_web_sm")
+
+
+def sense(word: str, pos: str) -> str | None:
+    """A word's commonest sense's WordNet category ('noun.location', 'verb.motion'). The
+    world's knowledge, never the system's."""
+    from nltk.corpus import wordnet as wn
+
+    tag = wn.NOUN if pos == "n" else wn.VERB
+    try:
+        got = wn.synsets(wn.morphy(word, tag) or word, pos=tag)
+    except LookupError:
+        import nltk
+
+        nltk.download("wordnet", quiet=True)
+        got = wn.synsets(wn.morphy(word, tag) or word, pos=tag)
+    return got[0].lexname() if got else None
 
 
 def person(noun: str) -> bool:
@@ -278,7 +295,81 @@ def _checks(text, sents, docs, held) -> list[Check]:
             continue
         used |= {j, q}
         far.append(_check(q, t, what, len(sents), "far", tellings, docs))
-    return sorted(out + far + _joined(sents, docs, found, tellings), key=lambda c: c.at)
+    return sorted(out + far + _joined(sents, docs, found, tellings) + _changed(sents, docs,
+                                                                            held),
+                  key=lambda c: c.at)
+
+
+# where a thing ends up: the prepositions of a place a thing is put or goes, what a place
+# is, and the verbs that move a thing or its doer, by WordNet's categories
+_TO = {"in", "on", "under", "into", "onto", "at", "behind", "inside", "to"}
+_PLACE = {"noun.location", "noun.artifact", "noun.object", "noun.plant"}
+_PUT = {"verb.motion", "verb.contact"}
+
+
+def _placed(d) -> list[tuple[str, str, object]]:
+    """What a told sentence puts somewhere, as (what is placed, how it is asked, the
+    place's token): the object a doer puts ('put the ball in the box'), the doer itself
+    where nothing is put ('Lily went to the park'), or what a sentence says is there ('The
+    cat was on the mat'). Its main verb and the verbs joined to it ('went home and ran to
+    her room'), each in the past and said plainly."""
+    root = d[:].root
+    verbs = [root] + [c for c in root.children if c.dep_ == "conj"]
+    subj = next((c for c in root.children if c.dep_ == "nsubj"), None)
+    out = []
+    for verb in verbs:
+        if verb.pos_ not in ("VERB", "AUX") or verb.tag_ != "VBD":
+            continue
+        kids = list(verb.children)
+        if any(c.dep_ in ("aux", "auxpass", "neg") for c in kids):
+            continue
+        doer = next((c for c in kids if c.dep_ == "nsubj"), subj)
+        obj = next((c for c in kids if c.dep_ == "dobj"), None)
+        state = verb.lemma_ == "be"
+        moves = None if state else sense(verb.lemma_.lower(), "v")
+        # a thing put somewhere is moved by its doer; a doer goes there itself; a thing
+        # said to be somewhere is there
+        if not state and (obj is not None and moves not in _PUT
+                          or obj is None and moves != "verb.motion"):
+            continue
+        thing = obj if obj is not None else doer
+        if thing is None or thing.pos_ not in ("NOUN", "PROPN"):
+            continue
+        if thing.pos_ == "NOUN" and not any(c.lower_ in DEFINITE for c in thing.children):
+            continue
+        for prep in (c for c in kids if c.dep_ == "prep" and c.lower_ in _TO and c.i > verb.i):
+            place = next((g for g in prep.children if g.dep_ == "pobj"), None)
+            if place is None or place.pos_ not in ("NOUN", "PROPN"):
+                continue
+            if sense(place.lemma_.lower(), "n") not in _PLACE:
+                continue
+            said = thing.text if thing.pos_ == "PROPN" else "the " + thing.lemma_.lower()
+            out.append((thing.lemma_.lower(), said, place))
+    return out
+
+
+def _changed(sents, docs, held) -> list[Check]:
+    """Up to CHECKS questions about where a thing is now (THE ORDER, harder checks: what
+    changed): a thing the story has put in two different places, asked GAP sentences after
+    the later one ('Where is the ball now?'). Only the latest place is right; the earlier
+    one is what a memory of what was told without its order would give."""
+    where: dict[str, list] = {}
+    out, used = [], set()
+    for j, (s, d) in enumerate(zip(sents, docs)):
+        if j == held or any(q in s for q in '"“”') or s.endswith("?"):
+            continue
+        for thing, said, place in _placed(d):
+            before = where.get(thing, [])
+            last = place.lemma_.lower()
+            if (before and before[-1][1] != last and thing not in used
+                    and len(out) < CHECKS):
+                used.add(thing)
+                at = min(j + 1 + GAP, len(sents))
+                out.append(Check(at, f"Where is {said} now?", place.text.lower(),
+                                 tuple(sorted({place.text.lower(), last})),
+                                 _nouns(docs[:at]), "changed"))
+            where.setdefault(thing, []).append((j, last))
+    return out
 
 
 def _joined(sents, docs, found, tellings) -> list[Check]:

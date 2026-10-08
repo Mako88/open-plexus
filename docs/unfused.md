@@ -116,8 +116,12 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
      reminder as a person gives one is in (`cued`, John's). Two told facts put
      together is in (`joined`: the doer named by another thing told of them), 0.899
      with a relative clause read as a question about its noun and answered by the
-     walk (`resolved`; 0.523 before). Next: about what changed (where a thing is now,
-     after it moved), then why something happened. The information is in the story, so these read
+     walk (`resolved`; 0.523 before). What changed is in (`changed`: where a thing is
+     now, after the story moved it), 1 of 6 at 1,000 stories: rare, since the stories
+     move things by pronoun ('She put it in the box') and the exam reads no
+     coreference. John's to choose how it gets enough: a coreference model on the
+     world's side, questions the 9B writes and the parse checks, or reading it at
+     3,000. Then why something happened. The information is in the story, so these read
      understanding apart from knowledge; scale should not be what they need.
      Beside them, knowledge asked fairly (John's, 2026-10-07): the cloze banded by how
      many earlier stories told its answer in its slot (`scripts/heard.py`), and a form

@@ -71,7 +71,7 @@ class Schemed(GraphArm):
         its lemma, each spreading by the committed walk, and what reaches a name is
         summed. Copying from context, as an attention head does: what sat beside the
         sentence's other words earlier in the story."""
-        self._now = self.mind.now()
+        self.meeter.tick()
         out: dict[str, float] = {}
         episode, first = self.mind.episode(), self.mind.first_event()
         for t in parse(self.model, question):
@@ -86,7 +86,7 @@ class Schemed(GraphArm):
                 continue
             if not held:
                 continue
-            total, _ = self.spread({n: 1.0 / len(held) for n in held})
+            total, _ = self.meeter.spread({n: 1.0 / len(held) for n in held})
             for node, a in total.items():
                 if node.startswith("i:") and node not in held:
                     said = self.individuals.describe(node)

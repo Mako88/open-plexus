@@ -61,14 +61,10 @@ The one list a session edits at both ends. Each phase's exit is a measurement.
      relations were deleted 2026-10-07 (John's): they entered only focus's slot fit,
      and they cost a fifth of a run's CPU for nothing. Kinds come back from item 7e's
      vectors, or rebuilt where a reading shows a wrong kind is the fault.
-  4. No English by hand (the red set's last test: 41 words and 4 readings of capitals).
-     The parser marks some of what is needed in any language: pronouns' `Gender`,
-     `Number`, `Person` and `Case`, proper names' part of speech. It marks nothing for
-     wh-words or refusals: `en_core_web_trf` gives 'who' and 'where' an empty
-     morphology and 'no' no `Polarity`, only the English tags. Either those are learnt
-     from teaching, or the parser becomes one trained on Universal Dependencies
-     treebanks (Stanza marks `PronType=Int` and `Polarity=Neg`). The parser is a dial;
-     which way is John's to say. Number words have no feature in either and are learnt.
+  4. ~~No English by hand~~. Struck 2026-10-04 (`1ed235e4`, `a69e59ad`; John's: Stanza,
+     and learn what it does not mark). The system parses with Stanza's
+     `default_accurate`. spaCy is left only as the `Doc` container and in the exam's
+     own question writers.
 - **After the foundation.** John's, 2026-10-04, in order:
   1. ~~Every missed check read and sorted by cause~~. Struck 2026-10-04 (`a69e59ad`,
      `384c1d53`): of 14 at 300 stories, 7 the system's (fixed but two), 5 ambiguous,

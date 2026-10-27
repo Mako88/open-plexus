@@ -51,9 +51,12 @@ def normalise(s: str) -> list[str]:
 
 
 def correct(gold: str, reply: str) -> bool:
+    """Every word of the gold answer is in the reply, as a multiset: a sentence carrying the
+    answer word scores, "south south" needs two souths, "milk,apple" needs both."""
+    from collections import Counter
+
     words = normalise(reply)
-    golds = [g.strip().lower() for g in gold.split(",")]
-    return bool(words) and all(any(g == w for w in words) for g in golds)
+    return bool(words) and Counter(normalise(gold.replace(",", " "))) <= Counter(words)
 
 
 def main() -> None:
@@ -74,7 +77,7 @@ def main() -> None:
     tasks = [int(t) for t in args.tasks.split(",")]
     data = rows(tasks, args.n, args.seed)
     shots = rows(tasks, args.shots, args.seed + 1, split="train") if args.shots else []
-    served = args.model.startswith("openrouter:")
+    served = args.model.startswith(("openrouter:", "local:"))
 
     def turn(r: dict, with_story: bool) -> str:
         story = r["passage"].strip() if with_story else "(no story given)"
@@ -89,28 +92,33 @@ def main() -> None:
         return out
 
     if served:
-        # A reference ceiling from a big model behind OpenRouter: a calibration of the measure
-        # and the scorer, never a trunk, since it has no hidden states, gradients or state to
-        # persist. Needs OPENROUTER_API_KEY in the environment.
+        # A reference ceiling from a big model behind an OpenAI-style server: a calibration of
+        # the measure and the scorer, never a trunk, since it has no hidden states, gradients
+        # or state to persist. `local:<name>` is llama-server on 127.0.0.1:8093 (launch it with
+        # --jinja --reasoning-budget 0); `openrouter:<id>` needs OPENROUTER_API_KEY.
         import os
         import urllib.request
         from concurrent.futures import ThreadPoolExecutor
 
-        key = os.environ.get("OPENROUTER_API_KEY")
-        if not key:
-            raise SystemExit("set OPENROUTER_API_KEY in the environment")
-        served_model = args.model.split(":", 1)[1]
+        kind, served_model = args.model.split(":", 1)
+        headers = {"Content-Type": "application/json"}
+        if kind == "openrouter":
+            key = os.environ.get("OPENROUTER_API_KEY")
+            if not key:
+                raise SystemExit("set OPENROUTER_API_KEY in the environment")
+            headers["Authorization"] = f"Bearer {key}"
+            url = "https://openrouter.ai/api/v1/chat/completions"
+        else:
+            url = os.environ.get("LOCAL_SERVER", "http://127.0.0.1:8093") + "/v1/chat/completions"
         spent = {"usd": 0.0, "tokens_in": 0, "tokens_out": 0}
 
         def ask(r: dict, with_story: bool) -> str:
             body = json.dumps({
                 "model": served_model, "messages": messages(r, with_story),
-                "max_tokens": args.max_new, "temperature": 0, "reasoning": {"enabled": False},
-                "usage": {"include": True},
+                "max_tokens": args.max_new, "temperature": 0, "seed": 0,
+                "reasoning": {"enabled": False}, "usage": {"include": True},
             }).encode()
-            req = urllib.request.Request(
-                "https://openrouter.ai/api/v1/chat/completions", body,
-                {"Content-Type": "application/json", "Authorization": f"Bearer {key}"})
+            req = urllib.request.Request(url, body, headers)
             for attempt in range(5):
                 try:
                     with urllib.request.urlopen(req, timeout=120) as resp:

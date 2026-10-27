@@ -30,9 +30,9 @@ SYSTEM = (
 ROOT = Path(__file__).resolve().parent.parent
 
 
-def rows(tasks: list[int], n: int, seed: int) -> list[dict]:
+def rows(tasks: list[int], n: int, seed: int, split: str = "test") -> list[dict]:
     by_task: dict[int, list[dict]] = {t: [] for t in tasks}
-    with open(ROOT / "data" / "babi" / "babi_test.jsonl", encoding="utf-8") as f:
+    with open(ROOT / "data" / "babi" / f"babi_{split}.jsonl", encoding="utf-8") as f:
         for line in f:
             r = json.loads(line)
             if r["task"] in by_task:
@@ -66,6 +66,8 @@ def main() -> None:
     p.add_argument("--batch", type=int, default=16)
     p.add_argument("--dtype", default="float32", choices=["float32", "float16"])
     p.add_argument("--max-new", type=int, default=8)
+    p.add_argument("--shots", type=int, default=0,
+                   help="worked examples per task from the train split, as earlier turns")
     p.add_argument("--note", default="")
     args = p.parse_args()
 
@@ -81,12 +83,20 @@ def main() -> None:
         tok.pad_token = tok.eos_token
     model = AutoModelForCausalLM.from_pretrained(args.model, dtype=dtype).to("cuda").eval()
 
-    def prompt(r: dict, with_story: bool) -> str:
+    shots = rows(tasks, args.shots, args.seed + 1, split="train") if args.shots else []
+
+    def turn(r: dict, with_story: bool) -> str:
         story = r["passage"].strip() if with_story else "(no story given)"
-        user = f"Story:\n{story}\n\nQuestion: {r['question']}"
+        return f"Story:\n{story}\n\nQuestion: {r['question']}"
+
+    def prompt(r: dict, with_story: bool) -> str:
+        messages = [{"role": "system", "content": SYSTEM}]
+        for s in shots:
+            messages.append({"role": "user", "content": turn(s, True)})
+            messages.append({"role": "assistant", "content": s["answer"]})
+        messages.append({"role": "user", "content": turn(r, with_story)})
         return tok.apply_chat_template(
-            [{"role": "system", "content": SYSTEM}, {"role": "user", "content": user}],
-            tokenize=False, add_generation_prompt=True, enable_thinking=False,
+            messages, tokenize=False, add_generation_prompt=True, enable_thinking=False,
         )
 
     reading: dict = {
@@ -99,6 +109,7 @@ def main() -> None:
         "n_per_task": args.n,
         "seed": args.seed,
         "max_new_tokens": args.max_new,
+        "shots_per_task": args.shots,
         "greedy": True,
         "command": " ".join(sys.argv),
         "sha": subprocess.run(["git", "rev-parse", "--short", "HEAD"], capture_output=True,
@@ -147,7 +158,7 @@ def main() -> None:
               f"in {seconds:.0f}s", flush=True)
 
     name = args.model.split("/")[-1]
-    path = ROOT / "readings" / f"ceiling-{name}-{reading['taken_at']}.json"
+    path = ROOT / "readings" / f"ceiling-{name}-{args.shots}shot-{reading['taken_at']}.json"
     path.write_text(json.dumps(reading, indent=1), encoding="utf-8")
     print("wrote", path)
 

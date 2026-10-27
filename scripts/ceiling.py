@@ -71,32 +71,75 @@ def main() -> None:
     p.add_argument("--note", default="")
     args = p.parse_args()
 
-    import torch
-    from transformers import AutoModelForCausalLM, AutoTokenizer
-
     tasks = [int(t) for t in args.tasks.split(",")]
     data = rows(tasks, args.n, args.seed)
-    dtype = getattr(torch, args.dtype)
-    tok = AutoTokenizer.from_pretrained(args.model)
-    tok.padding_side = "left"
-    if tok.pad_token is None:
-        tok.pad_token = tok.eos_token
-    model = AutoModelForCausalLM.from_pretrained(args.model, dtype=dtype).to("cuda").eval()
-
     shots = rows(tasks, args.shots, args.seed + 1, split="train") if args.shots else []
+    served = args.model.startswith("openrouter:")
 
     def turn(r: dict, with_story: bool) -> str:
         story = r["passage"].strip() if with_story else "(no story given)"
         return f"Story:\n{story}\n\nQuestion: {r['question']}"
 
-    def prompt(r: dict, with_story: bool) -> str:
-        messages = [{"role": "system", "content": SYSTEM}]
+    def messages(r: dict, with_story: bool) -> list[dict]:
+        out = [{"role": "system", "content": SYSTEM}]
         for s in shots:
-            messages.append({"role": "user", "content": turn(s, True)})
-            messages.append({"role": "assistant", "content": s["answer"]})
-        messages.append({"role": "user", "content": turn(r, with_story)})
+            out.append({"role": "user", "content": turn(s, True)})
+            out.append({"role": "assistant", "content": s["answer"]})
+        out.append({"role": "user", "content": turn(r, with_story)})
+        return out
+
+    if served:
+        # A reference ceiling from a big model behind OpenRouter: a calibration of the measure
+        # and the scorer, never a trunk, since it has no hidden states, gradients or state to
+        # persist. Needs OPENROUTER_API_KEY in the environment.
+        import os
+        import urllib.request
+        from concurrent.futures import ThreadPoolExecutor
+
+        key = os.environ.get("OPENROUTER_API_KEY")
+        if not key:
+            raise SystemExit("set OPENROUTER_API_KEY in the environment")
+        served_model = args.model.split(":", 1)[1]
+        spent = {"usd": 0.0, "tokens_in": 0, "tokens_out": 0}
+
+        def ask(r: dict, with_story: bool) -> str:
+            body = json.dumps({
+                "model": served_model, "messages": messages(r, with_story),
+                "max_tokens": args.max_new, "temperature": 0, "reasoning": {"enabled": False},
+                "usage": {"include": True},
+            }).encode()
+            req = urllib.request.Request(
+                "https://openrouter.ai/api/v1/chat/completions", body,
+                {"Content-Type": "application/json", "Authorization": f"Bearer {key}"})
+            for attempt in range(5):
+                try:
+                    with urllib.request.urlopen(req, timeout=120) as resp:
+                        reply = json.loads(resp.read())
+                    break
+                except Exception as e:  # noqa: BLE001
+                    if attempt == 4:
+                        raise
+                    time.sleep(2 ** attempt)
+            u = reply.get("usage", {})
+            spent["usd"] += float(u.get("cost", 0) or 0)
+            spent["tokens_in"] += int(u.get("prompt_tokens", 0))
+            spent["tokens_out"] += int(u.get("completion_tokens", 0))
+            return (reply["choices"][0]["message"].get("content") or "").strip()
+    else:
+        import torch
+        from transformers import AutoModelForCausalLM, AutoTokenizer
+
+        dtype = getattr(torch, args.dtype)
+        tok = AutoTokenizer.from_pretrained(args.model)
+        tok.padding_side = "left"
+        if tok.pad_token is None:
+            tok.pad_token = tok.eos_token
+        model = AutoModelForCausalLM.from_pretrained(args.model, dtype=dtype).to("cuda").eval()
+
+    def prompt(r: dict, with_story: bool) -> str:
         return tok.apply_chat_template(
-            messages, tokenize=False, add_generation_prompt=True, enable_thinking=False,
+            messages(r, with_story), tokenize=False, add_generation_prompt=True,
+            enable_thinking=False,
         )
 
     reading: dict = {
@@ -125,16 +168,20 @@ def main() -> None:
         tokens_out = 0
         for i in range(0, len(data), args.batch):
             chunk = data[i:i + args.batch]
-            batch = tok([prompt(r, with_story) for r in chunk], return_tensors="pt",
-                        padding=True).to("cuda")
-            with torch.no_grad():
-                gen = model.generate(**batch, max_new_tokens=args.max_new, do_sample=False,
-                                     temperature=None, top_p=None, top_k=None,
-                                     pad_token_id=tok.pad_token_id)
-            new = gen[:, batch["input_ids"].shape[1]:]
-            tokens_out += int((new != tok.pad_token_id).sum())
-            for r, ids in zip(chunk, new):
-                reply = tok.decode(ids, skip_special_tokens=True).strip()
+            if served:
+                with ThreadPoolExecutor(max_workers=args.batch) as pool:
+                    replies = list(pool.map(lambda r: ask(r, with_story), chunk))
+            else:
+                batch = tok([prompt(r, with_story) for r in chunk], return_tensors="pt",
+                            padding=True).to("cuda")
+                with torch.no_grad():
+                    gen = model.generate(**batch, max_new_tokens=args.max_new, do_sample=False,
+                                         temperature=None, top_p=None, top_k=None,
+                                         pad_token_id=tok.pad_token_id)
+                new = gen[:, batch["input_ids"].shape[1]:]
+                tokens_out += int((new != tok.pad_token_id).sum())
+                replies = [tok.decode(ids, skip_special_tokens=True).strip() for ids in new]
+            for r, reply in zip(chunk, replies):
                 out_rows.append({"task": r["task"], "question": r["question"],
                                  "answer": r["answer"], "said": reply,
                                  "correct": correct(r["answer"], reply)})
@@ -142,6 +189,8 @@ def main() -> None:
             print(f"{arm} {done}/{len(data)} "
                   f"acc={sum(x['correct'] for x in out_rows) / len(out_rows):.3f}", flush=True)
         seconds = time.perf_counter() - started
+        if served:
+            tokens_out = spent["tokens_out"]
         by_task = {t: round(sum(x["correct"] for x in out_rows if x["task"] == t)
                             / max(1, sum(1 for x in out_rows if x["task"] == t)), 3)
                    for t in tasks}
@@ -151,13 +200,15 @@ def main() -> None:
             "seconds": round(seconds, 1),
             "tokens_out": tokens_out,
             "questions_per_second": round(len(out_rows) / seconds, 2),
-            "vram_peak_gb": round(torch.cuda.max_memory_allocated() / 1e9, 2),
+            "vram_peak_gb": None if served else round(torch.cuda.max_memory_allocated() / 1e9, 2),
+            "spent": dict(spent) if served else None,
             "rows": out_rows,
         }
         print(f"== {arm}: {reading['arms'][arm]['score']} by task {by_task} "
               f"in {seconds:.0f}s", flush=True)
 
-    name = args.model.split("/")[-1]
+    name = args.model.split(":", 1)[-1]
+    name = name.replace("/", "-") if served else name.split("/")[-1]
     path = ROOT / "readings" / f"ceiling-{name}-{args.shots}shot-{reading['taken_at']}.json"
     path.write_text(json.dumps(reading, indent=1), encoding="utf-8")
     print("wrote", path)

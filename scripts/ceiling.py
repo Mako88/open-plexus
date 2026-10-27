@@ -71,6 +71,9 @@ def main() -> None:
     p.add_argument("--max-new", type=int, default=8)
     p.add_argument("--shots", type=int, default=0,
                    help="worked examples per task from the train split, as earlier turns")
+    p.add_argument("--think", action="store_true",
+                   help="thinking on: the model may reason before answering; --max-new is "
+                        "then the whole budget and the answer is what follows </think>")
     p.add_argument("--note", default="")
     args = p.parse_args()
 
@@ -147,14 +150,21 @@ def main() -> None:
     def prompt(r: dict, with_story: bool) -> str:
         return tok.apply_chat_template(
             messages(r, with_story), tokenize=False, add_generation_prompt=True,
-            enable_thinking=False,
+            enable_thinking=args.think,
         )
+
+    def answer_part(reply: str) -> str:
+        """With thinking on, the answer is what follows the last </think>; a reply that ran out
+        of budget while thinking has no answer."""
+        if not args.think:
+            return reply
+        return reply.rsplit("</think>", 1)[1].strip() if "</think>" in reply else ""
 
     reading: dict = {
         "kind": "ceiling",
         "model": args.model,
         "dtype": args.dtype,
-        "thinking": False,
+        "thinking": args.think,
         "system": SYSTEM,
         "tasks": tasks,
         "n_per_task": args.n,
@@ -188,11 +198,15 @@ def main() -> None:
                                          pad_token_id=tok.pad_token_id)
                 new = gen[:, batch["input_ids"].shape[1]:]
                 tokens_out += int((new != tok.pad_token_id).sum())
-                replies = [tok.decode(ids, skip_special_tokens=True).strip() for ids in new]
+                replies = [tok.decode(ids, skip_special_tokens=False)
+                           .replace(tok.pad_token, "").replace(tok.eos_token, "").strip()
+                           for ids in new]
             for r, reply in zip(chunk, replies):
+                said = answer_part(reply)
                 out_rows.append({"task": r["task"], "question": r["question"],
-                                 "answer": r["answer"], "said": reply,
-                                 "correct": correct(r["answer"], reply)})
+                                 "answer": r["answer"], "said": said,
+                                 "correct": correct(r["answer"], said),
+                                 **({"thought": reply} if args.think else {})})
             done = i + len(chunk)
             print(f"{arm} {done}/{len(data)} "
                   f"acc={sum(x['correct'] for x in out_rows) / len(out_rows):.3f}", flush=True)
@@ -217,7 +231,8 @@ def main() -> None:
 
     name = args.model.split(":", 1)[-1]
     name = name.replace("/", "-") if served else name.split("/")[-1]
-    path = ROOT / "readings" / f"ceiling-{name}-{args.shots}shot-{reading['taken_at']}.json"
+    mode = f"{args.shots}shot" + ("-think" if args.think else "")
+    path = ROOT / "readings" / f"ceiling-{name}-{mode}-{reading['taken_at']}.json"
     path.write_text(json.dumps(reading, indent=1), encoding="utf-8")
     print("wrote", path)
 

@@ -1,5 +1,0 @@
-[
- "tools/check_commit_messages.py::DEPTH",
- "tools/check_duplication.py::MIN_STATEMENTS",
- "tools/fetch_openea.py::EXPECTED_SIZE"
-]

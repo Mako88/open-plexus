@@ -1,0 +1,41 @@
+[project]
+name = "openplexus"
+version = "0.1.0"
+description = "A small frozen language model over a store on disk that learns by being written to."
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "torch",
+    "numpy",
+    "transformers>=5.16.1",
+    "huggingface-hub",
+    "safetensors",
+    "peft>=0.21.2",
+    "pytest",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/openplexus"]
+
+# The card is a GTX 1080 Ti: compute capability 6.1 (sm_61), 11 GB, fp32 fine, fp16 slow, no
+# bf16. PyTorch's cu128 and later wheels dropped sm_61, so a torch from the default index loads,
+# reports a CUDA device, and dies on the first kernel launch with "no kernel image is available
+# for execution on the device". That failure looks like a bug in this code and is not one,
+# which is why the index is pinned here. `tests/test_toolchain.py` asserts sm_61 is present.
+[tool.uv.sources]
+torch = { index = "pytorch-cu126" }
+
+[[tool.uv.index]]
+name = "pytorch-cu126"
+url = "https://download.pytorch.org/whl/cu126"
+explicit = true
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

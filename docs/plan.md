@@ -20,14 +20,26 @@ fact without a training run. Keep the three apart:
   does what thinking a small model can. Taken off the shelf; nothing here trains it.
 - **The store.** A table on disk. Each row is something the system read or was told. Learning
   is appending a row. It is never retrained and never forgets.
-- **The glue.** A small trained piece between them. At each step it asks the store what is
-  relevant and hands that to the trunk, and it decides what is worth writing. This is the only
-  thing we train, and it is trained once.
+- **The glue.** The reasoning core, and the part we design. A small network trained by
+  gradient descent that walks the store: it asks for rows, reads the trunk's hidden state
+  after the trunk has read them, asks again, and decides what is worth writing. It is the
+  only thing we train, it is trained on the card, and it keeps being trained.
 
-What learns for life is the store's contents. The bet is that a small trunk reading a store
+The trunk is the language organ and the glue is the intelligence, so the system is as
+clever as the glue's procedures, not as clever as the trunk's one pass. What learns for
+life is the store's contents and the glue. The bet is that a small trunk reading a store
 can reason as well as a big model reasoning over what it has memorised. The bet fails if a
 trunk reading a store never approaches the same trunk with the relevant text placed in front
 of it (the ceiling), on questions whose answer needs two rows put together.
+
+This shape has been tried twice before. Memory networks (Sukhbaatar et al., 2015) solved
+most of bAbI with a tiny gradient-trained controller doing three hops over sentence rows,
+and died because their language side could not scale; a pretrained trunk is that side
+bought off the shelf. unfused (this repo's predecessor, 2026) walked a parse graph with a
+core that learnt by rule induction and no gradient, over vectors that carried no relation
+meaning, and lost to a blind rule. The two things different here are the two things its
+own record blames: the core learns by gradient, and the reader is a trunk's contextual
+hidden state, in which "Mary picked up the milk" is already bound.
 
 Why it is plausible, with numbers from elsewhere:
 
@@ -123,7 +135,11 @@ Each step says what it decides. A step is struck when it is done.
    Decides whether composing over the store works when each hop is a one-fact read, and
    whether training the glue buys anything over the loop. This is the step the bet lives or
    dies on, and the ceiling it is read against is the trunk's one-fact score, not its
-   two-fact one.
+   two-fact one. If the trained walker does not reach that ceiling on task 2, the wall is
+   the trunk's representation of what it read, not its reasoning, and the core has to be
+   rethought at that level. A walker covers composition over facts and nothing else:
+   arithmetic, counting and planning (bAbI tasks 7 and 19 first) are covered by nothing
+   yet, and are where a different reasoning mechanism would be needed.
 
 3. **Writing.** What goes in a row: the raw sentence, or the trunk's own restatement with
    names resolved ("John is in the hallway", not "he went there"), one fact a row. Rows carry

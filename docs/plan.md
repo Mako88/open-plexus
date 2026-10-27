@@ -88,13 +88,22 @@ card" gets read.
 
 Each step says what it decides. A step is struck when it is done.
 
-0. **The trunk: the smallest model that composes in context.** `scripts/ceiling.py` gives a
-   model the whole story and the question, thinking off, greedy, and scores tasks 1 to 3.
-   Run Qwen3.5-0.8B, 2B and 4B (all in the Hugging Face cache). The trunk is the smallest
-   that is near the ceiling of a much larger model on tasks 2 and 3, since a trunk that
-   cannot put two facts together with both in front of it cannot do it from a store either.
-   The earlier 0.8B reading (0.45 on task 1, 0.05 on task 2) was taken with another world's
-   system prompt and an unverified thinking switch and is not trusted. Decides the trunk.
+0. ~~**The trunk: the smallest model that composes in context.**~~ Struck 2026-10-27,
+   `readings/ceiling-*`. No small model composes in context at a cost a store could pay.
+   With the whole story in front of it and thinking off, tasks 1/2/3 read 0.49/0.04/0.07
+   at 0.8B, 0.76/0.35/0.22 at 2B, 0.92/0.32/0.28 at 4B, and 0.995/0.43/0.26 at Gemma 4
+   12B. One worked example per task buys little. Thinking on, the 2B closes its reasoning
+   within 2,048 tokens on 16 of 120 questions, restating the story and looping, at about
+   1,900 tokens a one-word answer. So: the one-fact task scales with size and is solved at
+   4B; the two- and three-fact tasks are solved at no size we can run, with or without
+   thinking. The composing is therefore the glue's job, by hops (step 2), and the trunk is
+   judged on reading one fact from rows in front of it. **The trunk is Qwen3.5-2B**, the
+   largest that trains adapters in fp32 on the card; the 4B (0.92 against 0.76 on task 1,
+   serving only, since fp16 training is not an option on Pascal) is the step up if the
+   2B's one-fact ceiling bounds step 1. Open fork: a small model with a reasoning mode
+   that terminates (Phi-4-mini-reasoning, SmolLM3) as a second trunk family, if hops
+   need the trunk to reason within a hop. The scorer is checked by `tests/test_scorer.py`
+   and the floors are near 0, so the wiring is not in doubt.
 
 1. **The store, with no training.** Rows are a story's sentences as heard, each with a vector
    (a small embedding model, or the trunk's own pooled hidden state; try both) in an on-disk
@@ -104,12 +113,17 @@ Each step says what it decides. A step is struck when it is done.
    restart the process, load it, and the answers must be identical. Decides whether a store
    that is appended to counts as memory, and what a row costs.
 
-2. **Reading across rows.** Tasks 2 and 3 with the supporting facts as separate rows among
-   thousands of others. First a loop with no training: retrieve, read, re-query with what was
-   read, retrieve again. Then a trained query: LoRA on the trunk's query path or a small
-   trained retriever, trained on bAbI's train split with checkpoint and resume. Decides whether
-   composing over the store works, and whether training the glue buys anything over the loop.
-   This is the step the bet lives or dies on.
+2. **Reading across rows, by hops.** Tasks 2 and 3 with the supporting facts as separate
+   rows among thousands of others. Step 0 showed the trunk cannot do a two-fact question in
+   one pass at any size we can run, so the glue turns it into one-fact questions: retrieve,
+   read one fact, re-query with what was read, retrieve again. First as a loop with no
+   training, the re-query being the trunk's own hidden state after reading. Then a trained
+   query: LoRA on the trunk's query path or a small trained retriever, trained on the train
+   split's supporting line numbers (every row carries them), with checkpoint and resume.
+   Decides whether composing over the store works when each hop is a one-fact read, and
+   whether training the glue buys anything over the loop. This is the step the bet lives or
+   dies on, and the ceiling it is read against is the trunk's one-fact score, not its
+   two-fact one.
 
 3. **Writing.** What goes in a row: the raw sentence, or the trunk's own restatement with
    names resolved ("John is in the hallway", not "he went there"), one fact a row. Rows carry
@@ -149,7 +163,14 @@ the store across machines. None of these starts before step 2 has a reading.
 - Python 3.12 in `.venv` via `uv sync`. Torch comes from the cu126 index because cu128 and
   later dropped Pascal; `tests/test_toolchain.py` checks it.
 - Models live in the Hugging Face cache (`~/.cache/huggingface/hub`). Qwen3.5-0.8B, 2B and 4B
-  are there as safetensors for in-process use; llama.cpp is built at
-  `D:\tools\llama.cpp-src\build\bin\Release` for serving quantised models later.
+  are there as safetensors for in-process use and as Q8 GGUFs; Gemma 4 12B at 4-bit is in
+  `D:\Downloads`. llama.cpp is built at `D:\tools\llama.cpp-src\build\bin\Release`.
+  Inference-only readings go through llama-server (`local:` in `ceiling.py`), which is
+  several times faster on this card than fp32 PyTorch, whose Qwen3.5 linear-attention
+  layers run on fallback kernels here. PyTorch is for anything that needs hidden states or
+  gradients.
+- Decoding on this card is bandwidth-bound, so serve with eight parallel streams and batch
+  the questions; four streams and a 2,048-token thinking budget was 300 questions in two and
+  a half hours.
 - Thinking is off for every reading: `enable_thinking=False` in the chat template in process,
   `--reasoning-budget 0` on llama-server. Check it in the reading, not in your head.

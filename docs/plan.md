@@ -125,6 +125,21 @@ Each step says what it decides. A step is struck when it is done.
    int8 or 4-bit, and the budget read honestly: tokens per second, VRAM, disk. Decides whether
    this reads as frontier knowledge on an 11 GB card, and what is left.
 
+6. **Consolidation: the trunk learns slowly, by replay.** Complementary learning systems
+   (McClelland, McNaughton and O'Reilly, 1995): the hippocampus learns in one shot and the
+   cortex learns slowly by replaying what the hippocampus holds, which is what stops the slow
+   system forgetting. The store is the hippocampus; the trunk is the cortex. Periodically and
+   offline, a small trainable part of the trunk (LoRA, or a Titans-style memory module inside
+   it) is trained by replay from the store, in daytime bursts with checkpoints. Reading: a
+   fact that has been consolidated is answerable with the store switched off. Decides whether
+   knowledge can move from rows into weights without a training run, and at what cost in
+   forgetting. The trunk stays frozen until this step.
+
+Where the glue makes a choice (which row to follow, whether to retrieve again, whether a
+sentence is worth writing, whether a row supersedes an older one), it is a typed decision from
+a small classifier head over the trunk's hidden state, trained with a label, never text the
+trunk generates and we parse.
+
 Later, in no order: routing in the trunk (mixture of experts or activation sparsity, with cold
 weights in CPU RAM); training a trunk of our own; discrete coarse codes as store keys; sharding
 the store across machines. None of these starts before step 2 has a reading.

@@ -119,7 +119,10 @@ def main() -> None:
             body = json.dumps({
                 "model": served_model, "messages": messages(r, with_story),
                 "max_tokens": args.max_new, "temperature": 0, "seed": 0,
-                "reasoning": {"enabled": False}, "usage": {"include": True},
+                "reasoning": {"enabled": args.think}, "usage": {"include": True},
+                # llama-server's own switch; with --jinja it then returns the reasoning in
+                # message.reasoning_content and only the answer in content
+                "chat_template_kwargs": {"enable_thinking": args.think},
             }).encode()
             req = urllib.request.Request(url, body, headers)
             for attempt in range(5):
@@ -135,7 +138,14 @@ def main() -> None:
             spent["usd"] += float(u.get("cost", 0) or 0)
             spent["tokens_in"] += int(u.get("prompt_tokens", 0))
             spent["tokens_out"] += int(u.get("completion_tokens", 0))
-            return (reply["choices"][0]["message"].get("content") or "").strip()
+            msg = reply["choices"][0]["message"]
+            content = (msg.get("content") or "").strip()
+            if args.think:
+                # the served form of the local one: reasoning kept beside the answer, and a
+                # reply that ran out of budget while thinking has an empty content
+                thought = (msg.get("reasoning_content") or msg.get("reasoning") or "").strip()
+                return f"<think>\n{thought}\n</think>\n\n{content}" if content else thought
+            return content
     else:
         import torch
         from transformers import AutoModelForCausalLM, AutoTokenizer

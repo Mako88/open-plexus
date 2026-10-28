@@ -2,10 +2,17 @@
 
 ## The goal
 
-Something that approaches a frontier model and runs on one GTX 1080 Ti. Frontier models are
-controlled by whoever can afford the training run; a model of that worth on an old consumer
-card changes who gets to have one. Everyone is looking for this, and the bet below is a
-specific place to look, with numbers behind it.
+Frontier-level on one GTX 1080 Ti. Frontier models are controlled by whoever can afford the
+training run; a model of that worth on an old consumer card changes who gets to have one.
+
+A frontier model does two things with one huge set of weights: it holds what it knows, and it
+reasons by one chain of tokens with no backtracking, a huge evaluator doing a weak search.
+The design here inverts both. Knowledge lives in a store on disk and is learnt by appending.
+Reasoning is a small trained evaluator and search in ordinary code, the way AlphaGo beat
+players no network without search could touch, and the way a small model with search over
+its steps matched one fourteen times larger on maths (Snell et al., 2024). Arithmetic and
+counting go to a tool, as they do at the frontier. The frontier claim rests on both
+inversions holding, and the plan reads each on its own.
 
 ## The bet
 
@@ -20,17 +27,23 @@ fact without a training run. Keep the three apart:
   does what thinking a small model can. Taken off the shelf; nothing here trains it.
 - **The store.** A table on disk. Each row is something the system read or was told. Learning
   is appending a row. It is never retrained and never forgets.
-- **The glue.** The reasoning core, and the part we design. A small network trained by
-  gradient descent that walks the store: it asks for rows, reads the trunk's hidden state
-  after the trunk has read them, asks again, and decides what is worth writing. It is the
-  only thing we train, it is trained on the card, and it keeps being trained.
+- **The glue.** The reasoning core, and the part we design. Small heads over the trunk's
+  hidden state, trained by gradient descent on the card and kept in training: a walker that
+  says which rows to read next, and an evaluator that says whether a candidate step is good.
+  They are the only thing we train.
+- **The search.** Ordinary code. It keeps candidate steps, scores them with the evaluator,
+  follows the best and backs up from the ones that fail. Its budget is counted in forward
+  passes of the trunk, which is the unit chain of thought is also priced in.
 
-The trunk is the language organ and the glue is the intelligence, so the system is as
-clever as the glue's procedures, not as clever as the trunk's one pass. What learns for
-life is the store's contents and the glue. The bet is that a small trunk reading a store
-can reason as well as a big model reasoning over what it has memorised. The bet fails if a
-trunk reading a store never approaches the same trunk with the relevant text placed in front
-of it (the ceiling), on questions whose answer needs two rows put together.
+The trunk is the language organ, the glue is the judgement and the search is the thinking,
+so the system is as clever as the glue's judgement multiplied by the search, not as clever
+as the trunk's one pass. What learns for life is the store's contents and the glue. The bet
+is in two halves. Knowledge: a small trunk reading a store approaches the same trunk with
+the relevant text placed in front of it (the ceiling) on questions whose answer needs two
+rows put together. Reasoning: a trained evaluator with search beats the same trunk's chain
+of thought at the same number of forward passes, on problems the trunk cannot do in one
+pass. The part that cannot be outsourced to code is the evaluator, and whether a small one
+can be trained well from labels we can get is the question the whole design turns on.
 
 This shape has been tried twice before. Memory networks (Sukhbaatar et al., 2015) solved
 most of bAbI with a tiny gradient-trained controller doing three hops over sentence rows,
@@ -141,21 +154,36 @@ Each step says what it decides. A step is struck when it is done.
    arithmetic, counting and planning (bAbI tasks 7 and 19 first) are covered by nothing
    yet, and are where a different reasoning mechanism would be needed.
 
-3. **Writing.** What goes in a row: the raw sentence, or the trunk's own restatement with
+3. **The evaluator and search.** A second head over the trunk's hidden state: given a
+   candidate step, is it good. Labels first from bAbI, where a hop that lands on a
+   supporting line is good and any other is not, so the walker's own training data
+   serves; then from step-labelled maths (PRM800K, 800k human labels on steps of MATH
+   solutions) and bAbI's path finding (task 19), which is planning in miniature. Search in
+   code: beam over hops first, then a tree with backtracking, budgeted in forward passes.
+   Counting and arithmetic go to a tool: an aggregation over rows for the first, a Python
+   call the trunk writes for the second, read on bAbI task 7 and on GSM8K. Decides whether
+   a small evaluator with search beats the trunk's own chain of thought at matched forward
+   passes. This is the step the frontier claim lives or dies on. It fails if search with
+   the trained evaluator is no better than chain of thought at the same budget on a problem
+   the 12B with thinking gets right; that would mean the evaluator, not the search, is the
+   wall, and the next question is whether a bigger label set or a LoRA under the head moves
+   it. Training here is in daytime bursts with checkpoints, as everything is.
+
+4. **Writing.** What goes in a row: the raw sentence, or the trunk's own restatement with
    names resolved ("John is in the hallway", not "he went there"), one fact a row. Rows carry
    time and are never deleted; the reader prefers the latest. Decides the row format and
    whether the trunk should write its own rows.
 
-4. **Continual state.** The conversation's working state saved to disk and reloaded, so a
+5. **Continual state.** The conversation's working state saved to disk and reloaded, so a
    restart continues mid-conversation: the KV cache of the prefix first. If its growth bites,
    a trunk with a fixed-size state (a state-space model, or a Titans-style module) is the
    alternative. Decides how state persists.
 
-5. **Scale and speed.** A real knowledge store (a Wikipedia subset), the trunk quantised to
+6. **Scale and speed.** A real knowledge store (a Wikipedia subset), the trunk quantised to
    int8 or 4-bit, and the budget read honestly: tokens per second, VRAM, disk. Decides whether
    this reads as frontier knowledge on an 11 GB card, and what is left.
 
-6. **Consolidation: the trunk learns slowly, by replay.** Complementary learning systems
+7. **Consolidation: the trunk learns slowly, by replay.** Complementary learning systems
    (McClelland, McNaughton and O'Reilly, 1995): the hippocampus learns in one shot and the
    cortex learns slowly by replaying what the hippocampus holds, which is what stops the slow
    system forgetting. The store is the hippocampus; the trunk is the cortex. Periodically and
@@ -168,11 +196,20 @@ Each step says what it decides. A step is struck when it is done.
 Where the glue makes a choice (which row to follow, whether to retrieve again, whether a
 sentence is worth writing, whether a row supersedes an older one), it is a typed decision from
 a small classifier head over the trunk's hidden state, trained with a label, never text the
-trunk generates and we parse.
+trunk generates and we parse. The one text the trunk writes for code to read is a tool call,
+and a tool call is checked by running it.
 
 Later, in no order: routing in the trunk (mixture of experts or activation sparsity, with cold
 weights in CPU RAM); training a trunk of our own; discrete coarse codes as store keys; sharding
 the store across machines. None of these starts before step 2 has a reading.
+
+A side bench, apart from the steps: alternatives to backpropagation, priced honestly. A
+character-level model of about ten million parameters on TinyStories, AdamW with backprop as
+the baseline, and every alternative read at matched FLOPs and matched wall-clock on this
+card: zeroth-order (MeZO), forward gradients, forward-forward, local losses. The prior is
+that all of them trail backprop and the gap widens with scale (Bartunov et al., 2018), and
+the bench exists to measure that gap for the glue, which is small enough that a cheaper
+credit signal might not cost it much. It runs in minutes and never touches the trunk.
 
 ## Setup
 

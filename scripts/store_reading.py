@@ -28,7 +28,9 @@ far (`walker_fit.py`), which needs `--trunk local`, the trunk in PyTorch. Rows a
 in the story in the order they were heard. `select:<k>:<depth>` adds the evaluator
 (`evaluator_fit.py`, `--evaluator`): at each hop the walker's top-k are judged, the best is
 followed if its score clears the evaluator's threshold and the walk stops otherwise, and the
-trunk sees only the rows followed. A hop or walker arm with `:f` appended shows the
+trunk sees only the rows followed. `select:<k>:<depth>:w` follows the walker's first
+proposal instead and keeps the evaluator for the stop alone: the choice and the stop are two
+roles, and this arm reads which one the evaluator earns. A hop or walker arm with `:f` appended shows the
 trunk only the rows it followed, one a hop, instead of everything it found: step 2's first
 reading showed the trunk given the right two rows among five others scores 0.48 against 0.77
 given the two alone, so what is left out matters as much as what is found. Writes
@@ -122,6 +124,9 @@ class Arm:
         self.followed_only = parts[-1] == "f"
         if self.followed_only:
             parts = parts[:-1]
+        self.walker_chooses = parts[-1] == "w"
+        if self.walker_chooses:
+            parts = parts[:-1]
         self.kind = parts[0]
         keyed = self.kind in ("store", "unscoped", "hops", "hops-random")
         self.embedder = parts[1] if keyed else None
@@ -175,7 +180,9 @@ class Arm:
                first_id: int) -> tuple[list, float]:
         """The walker proposes its top-k, the evaluator judges each given what was read, the
         best is followed if judged good enough, else the walk stops. The trunk sees only the
-        rows followed; if the walk stops at once, the best-judged candidate alone."""
+        rows followed; if the walk stops at once, the best-judged candidate alone. With `:w`
+        the walker's first proposal is followed instead and the evaluator only stops the walk,
+        when none of the k clears its threshold."""
         q = s.questions[qi]
         followed: list = []
         fallback = None
@@ -198,10 +205,10 @@ class Arm:
                                 dtype=np.float32)
                 states = np.concatenate([states, when], axis=1)
             scores = self.evaluator.query(states)[:, 0]
-            best = int(np.argmax(scores))
+            best = 0 if self.walker_chooses else int(np.argmax(scores))
             if fallback is None:
                 fallback = hits[best].row
-            if scores[best] <= self.evaluator.threshold:
+            if scores.max() <= self.evaluator.threshold:
                 break
             followed.append(hits[best].row)
         ms = 1000 * (time.perf_counter() - started)

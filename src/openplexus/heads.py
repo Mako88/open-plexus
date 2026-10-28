@@ -35,8 +35,9 @@ class LinearHead:
         self.weight = weight.astype(np.float32)  # (features, target dim)
         self.layer = layer
         self.lam = lam
-        # what the target is: a store embedder's name, "label", or "label+time" when the
-        # features are the hidden state followed by when-heard features
+        # what the target is: a store embedder's name, "label", "label+time" when the
+        # features are the hidden state followed by when-heard features, or "time-only" for
+        # the control head that never sees a state and is not for reading end to end
         self.key = key
         self.threshold = threshold  # for a label head: the score above which a candidate is good
         self.mean = mean  # standardisation of the features before the map, if fitted that way

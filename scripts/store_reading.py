@@ -172,6 +172,8 @@ class Arm:
                 break
             states = self.trunk.hidden([judge_prompt(q.text, read, h_.row.text) for h_ in hits],
                                        [self.evaluator.layer])[self.evaluator.layer]
+            if self.evaluator.key == "time-only":
+                raise SystemExit("a time-only evaluator is a control, not a head to read with")
             if self.evaluator.key == "label+time":
                 heard = before - first_id
                 last = followed[-1].id - first_id if followed else -1

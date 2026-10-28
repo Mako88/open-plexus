@@ -1,0 +1,243 @@
+{
+ "kind": "evaluator-fit",
+ "step": 3,
+ "features": {
+  "path": "state\\features\\eval",
+  "trunk": "Qwen/Qwen3.5-2B fp32 in process",
+  "walker": {
+   "path": "state/walker-step2/walker-minilm.npz",
+   "layer": 16,
+   "lam": 10.0
+  },
+  "k": 4,
+  "tasks": [
+   1,
+   2,
+   3
+  ],
+  "layers": [
+   12,
+   16,
+   20
+  ],
+  "train_stories_fit": 160,
+  "counts": {
+   "fit": {
+    "states": 7200,
+    "judgements": 27648
+   },
+   "held": {
+    "states": 1800,
+    "judgements": 6932
+   },
+   "test": {
+    "states": 4500,
+    "judgements": 17269
+   }
+  },
+  "seconds": 10465.9,
+  "judge_prompt": "Question: <question>\nKnown: <row read>\nNext fact: <candidate>\nIs the next fact right:",
+  "command": "scripts/evaluator_fit.py features --features state/features/eval --layers 12,16,20",
+  "sha": "6ff15e80",
+  "taken_at": "20261028T154401Z"
+ },
+ "inputs": "time",
+ "chosen": {
+  "layer": 12,
+  "lam": 1.0,
+  "threshold": 0.162
+ },
+ "sweep": [
+  {
+   "layer": 12,
+   "lam": 1.0,
+   "threshold": 0.162,
+   "held_recall@1": 0.714
+  },
+  {
+   "layer": 12,
+   "lam": 10.0,
+   "threshold": 0.162,
+   "held_recall@1": 0.714
+  },
+  {
+   "layer": 12,
+   "lam": 100.0,
+   "threshold": 0.1622,
+   "held_recall@1": 0.714
+  },
+  {
+   "layer": 12,
+   "lam": 1000.0,
+   "threshold": 0.1581,
+   "held_recall@1": 0.714
+  },
+  {
+   "layer": 16,
+   "lam": 1.0,
+   "threshold": 0.162,
+   "held_recall@1": 0.714
+  },
+  {
+   "layer": 16,
+   "lam": 10.0,
+   "threshold": 0.162,
+   "held_recall@1": 0.714
+  },
+  {
+   "layer": 16,
+   "lam": 100.0,
+   "threshold": 0.1622,
+   "held_recall@1": 0.714
+  },
+  {
+   "layer": 16,
+   "lam": 1000.0,
+   "threshold": 0.1581,
+   "held_recall@1": 0.714
+  },
+  {
+   "layer": 20,
+   "lam": 1.0,
+   "threshold": 0.162,
+   "held_recall@1": 0.714
+  },
+  {
+   "layer": 20,
+   "lam": 10.0,
+   "threshold": 0.162,
+   "held_recall@1": 0.714
+  },
+  {
+   "layer": 20,
+   "lam": 100.0,
+   "threshold": 0.1622,
+   "held_recall@1": 0.714
+  },
+  {
+   "layer": 20,
+   "lam": 1000.0,
+   "threshold": 0.1581,
+   "held_recall@1": 0.714
+  }
+ ],
+ "teacher_forced": {
+  "test": {
+   "task1-done": {
+    "n": 500,
+    "stopped": 0.77
+   },
+   "task1-hop1": {
+    "n": 500,
+    "target_in_topk": 0.986,
+    "eval_recall@1": 0.659,
+    "walker_recall@1": 0.588,
+    "went_on": 0.998
+   },
+   "task2-done": {
+    "n": 500,
+    "stopped": 0.736
+   },
+   "task2-hop1": {
+    "n": 500,
+    "target_in_topk": 0.964,
+    "eval_recall@1": 0.707,
+    "walker_recall@1": 0.494,
+    "went_on": 1.0
+   },
+   "task2-hop2": {
+    "n": 500,
+    "target_in_topk": 0.964,
+    "eval_recall@1": 0.494,
+    "walker_recall@1": 0.5,
+    "went_on": 0.486
+   },
+   "task3-done": {
+    "n": 500,
+    "stopped": 0.47
+   },
+   "task3-hop1": {
+    "n": 500,
+    "target_in_topk": 0.722,
+    "eval_recall@1": 0.925,
+    "walker_recall@1": 0.474,
+    "went_on": 0.944
+   },
+   "task3-hop2": {
+    "n": 500,
+    "target_in_topk": 0.98,
+    "eval_recall@1": 0.827,
+    "walker_recall@1": 0.571,
+    "went_on": 0.93
+   },
+   "task3-hop3": {
+    "n": 500,
+    "target_in_topk": 0.624,
+    "eval_recall@1": 0.862,
+    "walker_recall@1": 0.362,
+    "went_on": 0.73
+   }
+  },
+  "held": {
+   "task1-done": {
+    "n": 200,
+    "stopped": 0.71
+   },
+   "task1-hop1": {
+    "n": 200,
+    "target_in_topk": 0.98,
+    "eval_recall@1": 0.668,
+    "walker_recall@1": 0.571,
+    "went_on": 0.995
+   },
+   "task2-done": {
+    "n": 200,
+    "stopped": 0.71
+   },
+   "task2-hop1": {
+    "n": 200,
+    "target_in_topk": 0.935,
+    "eval_recall@1": 0.727,
+    "walker_recall@1": 0.535,
+    "went_on": 0.97
+   },
+   "task2-hop2": {
+    "n": 200,
+    "target_in_topk": 0.955,
+    "eval_recall@1": 0.487,
+    "walker_recall@1": 0.586,
+    "went_on": 0.58
+   },
+   "task3-done": {
+    "n": 200,
+    "stopped": 0.52
+   },
+   "task3-hop1": {
+    "n": 200,
+    "target_in_topk": 0.82,
+    "eval_recall@1": 0.866,
+    "walker_recall@1": 0.598,
+    "went_on": 0.98
+   },
+   "task3-hop2": {
+    "n": 200,
+    "target_in_topk": 0.985,
+    "eval_recall@1": 0.787,
+    "walker_recall@1": 0.619,
+    "went_on": 0.865
+   },
+   "task3-hop3": {
+    "n": 200,
+    "target_in_topk": 0.705,
+    "eval_recall@1": 0.787,
+    "walker_recall@1": 0.44,
+    "went_on": 0.69
+   }
+  }
+ },
+ "evaluator_path": "state\\walker-step2\\evaluator-time-only.npz",
+ "command": "scripts/evaluator_fit.py fit --features state/features/eval --inputs time --out state/walker-step2 --note control: when-heard features alone, no judge state",
+ "sha": "6ff15e80",
+ "taken_at": "20261028T155155Z",
+ "note": "control: when-heard features alone, no judge state"
+}

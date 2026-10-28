@@ -181,14 +181,29 @@ Each step says what it decides. A step is struck when it is done.
      the evaluator choosing and stopping, the trunk shown only the chain: 2.0 rows on task 2
      and 2.8 on task 3, **0.41/0.27**. The chain is exactly the supporting set 40%/7% of the
      time, and when it is the trunk scores 0.80/0.97, the oracle.
-   So the shape is settled: propose, judge, stop, hand the trunk the chain. What is left is
-   the choice at each hop, which both linear heads get right about half the time. Next is
-   the fork the plan named: a gradient-trained head over the same hidden states and labels
-   (a small MLP first, a LoRA on the trunk's query path if that is not enough), with
-   checkpoint and resume, which has to beat 0.77/0.55 on task 2's hops and 0.46/0.55/0.39
-   on task 3's at first place. Step 2 is struck when the chain reaches the oracle on task 2.
-   A walker covers composition over facts and nothing else: arithmetic, counting and
-   planning (bAbI tasks 7 and 19 first) are covered by nothing yet.
+   - The gradient head, and time (`readings/evaluator-fit-2026102815*`,
+     `readings/evaluator-train-*`): the judge state of every candidate cached once (12,600
+     states, 52k judgements, three hours on the shared card), every head then fitted from the
+     cache in seconds. An MLP over the judge state alone reads as the linear head does
+     (0.77/0.52 and 0.49/0.55/0.45): capacity was not the wall. What the prompt lacks is when
+     each row was heard, so four when-heard numbers (the row's place in the story, its
+     distance from the last row read, before or after it) go in beside the state. Linear,
+     that gives 0.84/0.80 and 0.84/0.94/0.88 at first place; the MLP, **0.96/0.93 and
+     0.94/0.99/0.97**, and it stops right at 100% of done states. The control, when-heard
+     alone and no judge state: 0.71/0.49 and 0.93/0.83/0.86, stopping right at only 45-77%.
+     So task 3's hops are mostly time (the walker's four candidates hold the right rows and
+     time orders them); task 2's second hop and every stop decision need the trunk's
+     judgement; together they carry each hop. These are among states whose target is in the
+     walker's top four, which is 96% on task 2 and 72%/98%/62% on task 3's hops, so the
+     walker's recall is now what bounds task 3. Time belongs in the row (step 4); the
+     evaluator reading it as numbers beside the state is that step's first form, arrived
+     early.
+   So the shape is settled: propose, judge, stop, hand the trunk the chain, with time in
+   front of the judge. The end-to-end chain with the gradient head is being read; step 2 is
+   struck when it reaches the oracle on task 2. If it does, the walker's recall on task 3
+   (62% at the third hop) is the next head to train by gradient. A walker covers
+   composition over facts and nothing else: arithmetic, counting and planning (bAbI tasks 7
+   and 19 first) are covered by nothing yet.
 
 3. **The evaluator and search.** A second head over the trunk's hidden state: given a candidate
    step, is it good. Its first form, a linear head judging the walker's candidates with bAbI's

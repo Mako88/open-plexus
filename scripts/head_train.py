@@ -9,7 +9,7 @@ recall@1 kept. The reading is the same teacher-forced table as the closed form's
 stories, so the two heads are read side by side.
 
     .venv/Scripts/python scripts/head_train.py --features state/features/eval --layer 16 \
-        [--time] --out state/walker-step2
+        [--inputs state+time] --out state/walker-step2
 
 Writes <out>/evaluator-mlp[-time].pt and readings/evaluator-train-*.json. Runs on the card if
 it is free and on the CPU if not; the model is small enough for either.
@@ -31,7 +31,7 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "src"))
 sys.path.insert(0, str(ROOT / "scripts"))
 
-from evaluator_fit import SPLITS, features, load_split, overall_recall, read  # noqa: E402
+from evaluator_fit import INPUTS, SPLITS, features, head_name, load_split, overall_recall, read  # noqa: E402
 from openplexus.heads import MLPHead  # noqa: E402
 
 
@@ -70,7 +70,8 @@ def main() -> None:
     p = argparse.ArgumentParser()
     p.add_argument("--features", default="state/features/eval")
     p.add_argument("--layer", type=int, default=16)
-    p.add_argument("--time", action="store_true", help="add when-heard features")
+    p.add_argument("--inputs", default="state", choices=sorted(INPUTS),
+                   help="the judge state, the state plus when-heard, or when-heard alone")
     p.add_argument("--hidden", type=int, default=256)
     p.add_argument("--epochs", type=int, default=30)
     p.add_argument("--lr", type=float, default=1e-3)
@@ -90,10 +91,11 @@ def main() -> None:
     about = json.loads((feats / "features.json").read_text(encoding="utf-8"))
     k = about["k"]
     data = {split: load_split(feats, split) for split in SPLITS}
-    x = {split: features(data[split][0], data[split][1], args.layer, args.time) for split in SPLITS}
+    x = {split: features(data[split][0], data[split][1], args.layer, args.inputs)
+         for split in SPLITS}
     mean, std = x["fit"].mean(0), x["fit"].std(0) + 1e-6
-    key = "label+time" if args.time else "label"
-    name = "evaluator-mlp-time.pt" if args.time else "evaluator-mlp.pt"
+    key = INPUTS[args.inputs]
+    name = head_name("evaluator-mlp", args.inputs, ".pt")
     out = Path(args.out)
     out.mkdir(parents=True, exist_ok=True)
     ckpt_path = out / (name + ".ckpt")
@@ -157,7 +159,7 @@ def main() -> None:
         "kind": "evaluator-train",
         "step": 3,
         "features": {"path": str(feats), **about},
-        "time_features": args.time,
+        "inputs": args.inputs,
         "layer": args.layer,
         "hidden": args.hidden,
         "epochs": args.epochs,

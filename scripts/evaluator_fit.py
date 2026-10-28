@@ -146,9 +146,20 @@ def time_features(exs: list[dict], arrays: dict) -> np.ndarray:
                      for ei, row in zip(arrays["cand_ex"], arrays["cand_row"])], dtype=np.float32)
 
 
-def features(exs: list[dict], arrays: dict, layer: int, with_time: bool) -> np.ndarray:
+INPUTS = {"state": "label", "state+time": "label+time", "time": "time-only"}
+
+
+def features(exs: list[dict], arrays: dict, layer: int, inputs: str) -> np.ndarray:
+    """The judge state, the judge state followed by the when-heard features, or the when-heard
+    features alone (the control that shows what the judgement adds over time)."""
+    if inputs == "time":
+        return time_features(exs, arrays)
     x = arrays[f"judge_{layer}"]
-    return np.concatenate([x, time_features(exs, arrays)], axis=1) if with_time else x
+    return np.concatenate([x, time_features(exs, arrays)], axis=1) if inputs == "state+time" else x
+
+
+def head_name(stem: str, inputs: str, suffix: str) -> str:
+    return stem + {"state": "", "state+time": "-time", "time": "-time-only"}[inputs] + suffix
 
 
 # --- the reading -----------------------------------------------------------------------------
@@ -296,7 +307,7 @@ def fit(args) -> None:
 
     def xy(split: str, layer: int):
         exs, arrays = data[split]
-        return features(exs, arrays, layer, args.time), arrays["cand_label"]
+        return features(exs, arrays, layer, args.inputs), arrays["cand_label"]
 
     sweep, best = [], None
     for layer in layers:
@@ -320,12 +331,12 @@ def fit(args) -> None:
     x_all = np.concatenate([x_fit, x_held])
     mean, std = x_all.mean(0), x_all.std(0) + 1e-6
     evaluator = LinearHead.fit((x_all - mean) / std, np.concatenate([y_fit, y_held])[:, None],
-                               lam, layer, "label+time" if args.time else "label")
+                               lam, layer, INPUTS[args.inputs])
     evaluator.threshold = tau
     evaluator.mean, evaluator.std = mean, std
     out = Path(args.out)
     out.mkdir(parents=True, exist_ok=True)
-    name = "evaluator-time.npz" if args.time else "evaluator.npz"
+    name = head_name("evaluator", args.inputs, ".npz")
     evaluator.save(out / name)
     held_mean, held_std = x_fit.mean(0), x_fit.std(0) + 1e-6
     held_head = LinearHead.fit((x_fit - held_mean) / held_std, y_fit[:, None], lam, layer,
@@ -335,7 +346,7 @@ def fit(args) -> None:
         "kind": "evaluator-fit",
         "step": 3,
         "features": {"path": str(feats), **about},
-        "time_features": args.time,
+        "inputs": args.inputs,
         "chosen": {"layer": layer, "lam": lam, "threshold": round(tau, 4)},
         "sweep": sweep,
         "teacher_forced": {
@@ -373,7 +384,8 @@ def main() -> None:
     p.add_argument("--store", default="state/store-step1")
     p.add_argument("--test-stories", type=int, default=100)
     p.add_argument("--batch", type=int, default=8)
-    p.add_argument("--time", action="store_true", help="fit: add when-heard features")
+    p.add_argument("--inputs", default="state", choices=sorted(INPUTS),
+                   help="fit: the judge state, the state plus when-heard, or when-heard alone")
     p.add_argument("--note", default="")
     args = p.parse_args()
     if args.phase == "features":

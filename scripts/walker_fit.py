@@ -36,7 +36,7 @@ sys.path.insert(0, str(ROOT / "src"))
 from openplexus.babi import Story, stories  # noqa: E402
 from openplexus.store import Store  # noqa: E402
 from openplexus.trunk import LocalTrunk  # noqa: E402
-from openplexus.walker import LinearWalker, hop_prompt  # noqa: E402
+from openplexus.heads import LinearHead, hop_prompt  # noqa: E402
 
 
 def examples(ss: list[Story]) -> list[dict]:
@@ -150,7 +150,7 @@ def main() -> None:
     for layer in layers:
         for lam in lams:
             t0 = time.perf_counter()
-            w = LinearWalker.fit(fit_h[layer], fit_targets, lam, layer, "minilm")
+            w = LinearHead.fit(fit_h[layer], fit_targets, lam, layer, "minilm")
             r = recall(w.query(held_h[layer]), held_ex, train_key)
             sweep.append({"layer": layer, "lam": lam, "held": r,
                           "fit_seconds": round(time.perf_counter() - t0, 2)})
@@ -161,7 +161,7 @@ def main() -> None:
     all_ex = fit_ex + held_ex
     all_h = np.concatenate([fit_h[layer], held_h[layer]])
     all_targets = np.stack([train_key(ex["story"], ex["target"]) for ex in all_ex])
-    walker = LinearWalker.fit(all_h, all_targets, lam, layer, "minilm")
+    walker = LinearHead.fit(all_h, all_targets, lam, layer, "minilm")
     walker.save(out / "walker-minilm.npz")
 
     reading = {
@@ -181,7 +181,7 @@ def main() -> None:
             "untrained_test": by_task_and_hop(untrained_queries(test_ex, test_key), test_ex,
                                               test_key),
             "walker_held": by_task_and_hop(
-                LinearWalker.fit(fit_h[layer], fit_targets, lam, layer, "minilm")
+                LinearHead.fit(fit_h[layer], fit_targets, lam, layer, "minilm")
                 .query(held_h[layer]), held_ex, train_key),
             "untrained_held": by_task_and_hop(untrained_queries(held_ex, train_key), held_ex,
                                               train_key),

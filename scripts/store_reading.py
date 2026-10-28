@@ -25,7 +25,10 @@ the hop with its choice disabled, and `store:<embedder>:<k*depth>` is the same n
 with no hop at all. `walker:<k>:<depth>` is the trained hop: the query at each hop is the
 walker's map of the trunk's hidden state after reading the question and the rows followed so
 far (`walker_fit.py`), which needs `--trunk local`, the trunk in PyTorch. Rows always stand
-in the story in the order they were heard. A hop or walker arm with `:f` appended shows the
+in the story in the order they were heard. `select:<k>:<depth>` adds the evaluator
+(`evaluator_fit.py`, `--evaluator`): at each hop the walker's top-k are judged, the best is
+followed if its score clears the evaluator's threshold and the walk stops otherwise, and the
+trunk sees only the rows followed. A hop or walker arm with `:f` appended shows the
 trunk only the rows it followed, one a hop, instead of everything it found: step 2's first
 reading showed the trunk given the right two rows among five others scores 0.48 against 0.77
 given the two alone, so what is left out matters as much as what is found. Writes
@@ -53,7 +56,7 @@ from ceiling import correct  # noqa: E402
 from openplexus.babi import Story, stories  # noqa: E402
 from openplexus.store import Hit, Store  # noqa: E402
 from openplexus.trunk import LocalTrunk, ServedTrunk, question_messages  # noqa: E402
-from openplexus.walker import LinearWalker, hop_prompt  # noqa: E402
+from openplexus.heads import LinearHead, hop_prompt, judge_prompt  # noqa: E402
 
 
 def chosen(args) -> list[Story]:
@@ -109,7 +112,8 @@ def hear(args) -> None:
 
 class Arm:
     trunk = None  # a LocalTrunk, for the walker arm's hidden states
-    walker: LinearWalker | None = None
+    walker: LinearHead | None = None
+    evaluator: LinearHead | None = None
 
     def __init__(self, spec: str):
         parts = spec.split(":")
@@ -121,9 +125,9 @@ class Arm:
         keyed = self.kind in ("store", "unscoped", "hops", "hops-random")
         self.embedder = parts[1] if keyed else None
         self.k = int(parts[2]) if keyed else (
-            int(parts[1]) if self.kind in ("random", "walker") else None)
+            int(parts[1]) if self.kind in ("random", "walker", "select") else None)
         self.depth = int(parts[3]) if self.kind in ("hops", "hops-random") else (
-            int(parts[2]) if self.kind == "walker" else 1)
+            int(parts[2]) if self.kind in ("walker", "select") else 1)
 
     def walk(self, store: Store, s: Story, qi: int, before: int) -> tuple[list, float]:
         """The trained hop: at each hop the trunk reads the question and the rows followed so
@@ -147,6 +151,36 @@ class Arm:
         shown = followed if self.followed_only else [h.row for h in found.values()]
         return sorted(shown, key=lambda r: r.id), ms
 
+    def select(self, store: Store, s: Story, qi: int, before: int) -> tuple[list, float]:
+        """The walker proposes its top-k, the evaluator judges each given what was read, the
+        best is followed if judged good enough, else the walk stops. The trunk sees only the
+        rows followed; if the walk stops at once, the best-judged candidate alone."""
+        q = s.questions[qi]
+        followed: list = []
+        fallback = None
+        started = time.perf_counter()
+        for _ in range(self.depth):
+            read = [r.text for r in followed]
+            h = self.trunk.hidden([hop_prompt(q.text, read)],
+                                  [self.walker.layer])[self.walker.layer][0]
+            hits = [h_ for h_ in store.search(self.walker.key, self.walker.query(h), self.k
+                                              + len(followed), episode=s.episode, before=before)
+                    if h_.row not in followed][:self.k]
+            if not hits:
+                break
+            states = self.trunk.hidden([judge_prompt(q.text, read, h_.row.text) for h_ in hits],
+                                       [self.evaluator.layer])[self.evaluator.layer]
+            scores = self.evaluator.query(states)[:, 0]
+            best = int(np.argmax(scores))
+            if fallback is None:
+                fallback = hits[best].row
+            if scores[best] <= self.evaluator.threshold:
+                break
+            followed.append(hits[best].row)
+        ms = 1000 * (time.perf_counter() - started)
+        shown = followed or ([fallback] if fallback else [])
+        return sorted(shown, key=lambda r: r.id), ms
+
     def rows_for(self, store: Store, s: Story, qi: int, first_id: int, queries,
                  rng) -> tuple[list, float]:
         """The rows to place in front of the trunk, in time order, and the lookup's ms."""
@@ -161,6 +195,8 @@ class Arm:
             return [rows[i] for i in sorted(q.supporting)], 0.0
         if self.kind == "walker":
             return self.walk(store, s, qi, before)
+        if self.kind == "select":
+            return self.select(store, s, qi, before)
         if self.kind == "random":
             rows = store.in_episode(s.episode, before)
             picked = rng.sample(rows, min(self.k, len(rows)))
@@ -220,7 +256,9 @@ def ask(args) -> None:
     else:
         trunk = ServedTrunk(parallel=args.parallel, max_new=args.max_new)
     if args.walker:
-        Arm.walker = LinearWalker.load(args.walker)
+        Arm.walker = LinearHead.load(args.walker)
+    if args.evaluator:
+        Arm.evaluator = LinearHead.load(args.evaluator)
     tasks = sorted({s.task for s in chosen_stories})
     reading: dict = {
         "kind": "store",
@@ -242,6 +280,10 @@ def ask(args) -> None:
         "walker": ({"path": args.walker, "layer": Arm.walker.layer, "lam": Arm.walker.lam,
                     "key": Arm.walker.key, "prompt": hop_prompt("<question>", ["<row read>"])}
                    if Arm.walker else None),
+        "evaluator": ({"path": args.evaluator, "layer": Arm.evaluator.layer,
+                       "lam": Arm.evaluator.lam, "threshold": Arm.evaluator.threshold,
+                       "prompt": judge_prompt("<question>", ["<row read>"], "<candidate>")}
+                      if Arm.evaluator else None),
         "arms": {},
     }
     items = [(s, i) for s in chosen_stories for i in range(len(s.questions))]
@@ -306,10 +348,11 @@ def ask(args) -> None:
 
     # The restart: the same store opened again from disk, in this process, must retrieve the
     # same rows for every question; and the trunk, asked again late with thousands of rows
-    # heard since, must say the same for the first stories' questions.
+    # heard since, must say the same for the first stories' questions. Arms that walk with
+    # the trunk are left out of the reload check: it would re-run them whole, and the walker
+    # arms passed it once (readings/store-minilm-trunk-20261028T032951Z.json).
     again = Store(args.store)
-    store_arms = [a for a in arms
-                  if a.kind in ("store", "unscoped", "hops", "hops-random", "walker")]
+    store_arms = [a for a in arms if a.kind in ("store", "unscoped", "hops", "hops-random")]
     identity: dict = {"rows_identical_after_reload": {}, "reask": {}}
     for arm in store_arms:
         rng = random.Random(args.seed)
@@ -356,6 +399,7 @@ def main() -> None:
     p.add_argument("--parallel", type=int, default=8, help="server streams, or local batch")
     p.add_argument("--trunk", default="served", choices=["served", "local"])
     p.add_argument("--walker", default=None, help="a walker-*.npz from walker_fit.py")
+    p.add_argument("--evaluator", default=None, help="an evaluator.npz from evaluator_fit.py")
     p.add_argument("--max-new", type=int, default=8)
     p.add_argument("--seed", type=int, default=0)
     p.add_argument("--note", default="")

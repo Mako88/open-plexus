@@ -171,29 +171,39 @@ Each step says what it decides. A step is struck when it is done.
      only the rows the walker followed, one a hop, it drops to 0.24/0.03, because the
      walker's first choice is right only half the time. The set is found; what is missing
      is choosing it from among what was found.
-   So what remains of this step is selection, which is step 3's evaluator in its first
-   form, and step 2 stays open until the selected set reaches the oracle on task 2. A
-   gradient-trained walker (nonlinear head, or a LoRA on the trunk's query path) is the
-   fork if task 3's third hop stays at 0.62 once selection is in. A walker covers
-   composition over facts and nothing else: arithmetic, counting and planning (bAbI tasks 7
-   and 19 first) are covered by nothing yet.
+   - The evaluator, step 3's first form (`readings/evaluator-fit-*`,
+     `readings/store-*-20261028T054705Z`): the same recipe over "Question ... Known ... Next
+     fact: <candidate> Is the next fact right:", judging the walker's top four. Its stop rule
+     is right at 99.6-100% of states with nothing left to find and goes on at 97-100% of the
+     rest, so the number of hops is the glue's call, not a parameter. Its first choice is
+     right 77% of the time at task 2's first hop (the walker's: 49%) and no better than the
+     walker's at the other hops (0.55, 0.46, 0.55, 0.39). End to end, the walker proposing,
+     the evaluator choosing and stopping, the trunk shown only the chain: 2.0 rows on task 2
+     and 2.8 on task 3, **0.41/0.27**. The chain is exactly the supporting set 40%/7% of the
+     time, and when it is the trunk scores 0.80/0.97, the oracle.
+   So the shape is settled: propose, judge, stop, hand the trunk the chain. What is left is
+   the choice at each hop, which both linear heads get right about half the time. Next is
+   the fork the plan named: a gradient-trained head over the same hidden states and labels
+   (a small MLP first, a LoRA on the trunk's query path if that is not enough), with
+   checkpoint and resume, which has to beat 0.77/0.55 on task 2's hops and 0.46/0.55/0.39
+   on task 3's at first place. Step 2 is struck when the chain reaches the oracle on task 2.
+   A walker covers composition over facts and nothing else: arithmetic, counting and
+   planning (bAbI tasks 7 and 19 first) are covered by nothing yet.
 
 3. **The evaluator and search.** A second head over the trunk's hidden state: given a candidate
-   step, is it good. Labels first from bAbI, where a row the walker found is good if it is a
-   supporting row and not otherwise, so the walker's own training data serves, and the first
-   reading is the trunk given only the rows the evaluator keeps, against step 2's 0.42/0.29 and
-   the oracle's 0.78/0.92; then from step-labelled maths (PRM800K, 800k human labels on steps of
-   MATH solutions) and bAbI's path finding (task 19), which is planning in miniature. As in step
-   2, the first evaluator is linear and fitted in closed form, and the gradient-trained one has
-   to beat it. Search in code: beam over hops first, then a tree with backtracking, budgeted in
-   forward passes. Counting and arithmetic go to a tool: an aggregation over rows for the first,
-   a Python call the trunk writes for the second, read on bAbI task 7 and on GSM8K. Decides
-   whether a small evaluator with search beats the trunk's own chain of thought at matched
-   forward passes. This is the step the frontier claim lives or dies on. It fails if search with
-   the trained evaluator is no better than chain of thought at the same budget on a problem the
-   12B with thinking gets right; that would mean the evaluator, not the search, is the wall, and
-   the next question is whether a bigger label set or a LoRA under the head moves it. Training
-   here is in daytime bursts with checkpoints, as everything is.
+   step, is it good. Its first form, a linear head judging the walker's candidates with bAbI's
+   supporting lines as labels, is read under step 2; then labels from step-labelled maths
+   (PRM800K, 800k human labels on steps of MATH solutions) and bAbI's path finding (task 19),
+   which is planning in miniature. The gradient-trained evaluator has to beat the linear one.
+   Search in code: beam over hops first, then a tree with backtracking, budgeted in forward
+   passes. Counting and arithmetic go to a tool: an aggregation over rows for the first, a Python
+   call the trunk writes for the second, read on bAbI task 7 and on GSM8K. Decides whether a
+   small evaluator with search beats the trunk's own chain of thought at matched forward passes.
+   This is the step the frontier claim lives or dies on. It fails if search with the trained
+   evaluator is no better than chain of thought at the same budget on a problem the 12B with
+   thinking gets right; that would mean the evaluator, not the search, is the wall, and the next
+   question is whether a bigger label set or a LoRA under the head moves it. Training here is in
+   daytime bursts with checkpoints, as everything is.
 
 4. **Writing.** What goes in a row: the raw sentence, or the trunk's own restatement with
    names resolved ("John is in the hallway", not "he went there"), one fact a row. Rows carry

@@ -36,3 +36,45 @@ def test_the_judge_prompt_adds_the_candidate_and_a_label_head_keeps_its_threshol
     assert LinearHead.load(tmp_path / "e.npz").threshold == 0.3
     LinearHead(np.zeros((4, 1), dtype=np.float32), 1, 1.0, "minilm").save(tmp_path / "w.npz")
     assert LinearHead.load(tmp_path / "w.npz").threshold is None
+
+
+def test_a_standardised_head_applies_its_mean_and_std_after_loading(tmp_path):
+    from openplexus.heads import when_heard
+
+    rng = np.random.default_rng(1)
+    x = rng.normal(size=(200, 6)).astype(np.float32) * 10 + 5
+    y = (x[:, :1] > 5).astype(np.float32) * 2 - 1
+    mean, std = x.mean(0), x.std(0)
+    w = LinearHead.fit((x - mean) / std, y, 1.0, layer=16, key="label+time")
+    w.mean, w.std = mean, std
+    w.save(tmp_path / "e.npz")
+    again = LinearHead.load(tmp_path / "e.npz")
+    assert again.key == "label+time" and np.array_equal(again.query(x), w.query(x))
+    assert np.mean((again.query(x)[:, 0] > 0) == (y[:, 0] > 0)) > 0.9
+    assert when_heard(2, 10, -1) == [0.2, 0.0, 0.0, 0.0]
+    assert when_heard(2, 10, 6) == [0.2, -0.4, 1.0, 0.0]
+
+
+def test_an_mlp_head_learns_a_listwise_choice_and_round_trips(tmp_path):
+    import torch
+
+    from openplexus.heads import MLPHead, load_head
+
+    rng = np.random.default_rng(2)
+    x = rng.normal(size=(64, 4, 6)).astype(np.float32)
+    target = np.array([int(np.argmax(x[i, :, 0])) for i in range(64)])  # the first feature wins
+    head = MLPHead(6, layer=16, key="label", hidden=32)
+    opt = torch.optim.Adam(head.parameters(), lr=1e-2)
+    xt, yt = torch.as_tensor(x), torch.as_tensor(target)
+    for _ in range(300):
+        logits = torch.cat([head.logits(xt), head.stop.expand(64, 1)], dim=1)
+        loss = torch.nn.functional.cross_entropy(logits, yt)
+        opt.zero_grad()
+        loss.backward()
+        opt.step()
+    scores = head.query(x.reshape(-1, 6)).reshape(64, 4)
+    assert np.mean(scores.argmax(1) == target) > 0.9
+    head.save(tmp_path / "e.pt")
+    again = load_head(tmp_path / "e.pt")
+    assert again.threshold == 0.0
+    assert np.allclose(again.query(x.reshape(-1, 6)), scores.reshape(-1, 1))

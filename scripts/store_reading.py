@@ -56,7 +56,8 @@ from ceiling import correct  # noqa: E402
 from openplexus.babi import Story, stories  # noqa: E402
 from openplexus.store import Hit, Store  # noqa: E402
 from openplexus.trunk import LocalTrunk, ServedTrunk, question_messages  # noqa: E402
-from openplexus.heads import LinearHead, hop_prompt, judge_prompt  # noqa: E402
+from openplexus.heads import (LinearHead, hop_prompt, judge_prompt, load_head,  # noqa: E402
+                              when_heard)
 
 
 def chosen(args) -> list[Story]:
@@ -113,7 +114,7 @@ def hear(args) -> None:
 class Arm:
     trunk = None  # a LocalTrunk, for the walker arm's hidden states
     walker: LinearHead | None = None
-    evaluator: LinearHead | None = None
+    evaluator = None  # a LinearHead or an MLPHead
 
     def __init__(self, spec: str):
         parts = spec.split(":")
@@ -151,7 +152,8 @@ class Arm:
         shown = followed if self.followed_only else [h.row for h in found.values()]
         return sorted(shown, key=lambda r: r.id), ms
 
-    def select(self, store: Store, s: Story, qi: int, before: int) -> tuple[list, float]:
+    def select(self, store: Store, s: Story, qi: int, before: int,
+               first_id: int) -> tuple[list, float]:
         """The walker proposes its top-k, the evaluator judges each given what was read, the
         best is followed if judged good enough, else the walk stops. The trunk sees only the
         rows followed; if the walk stops at once, the best-judged candidate alone."""
@@ -170,6 +172,12 @@ class Arm:
                 break
             states = self.trunk.hidden([judge_prompt(q.text, read, h_.row.text) for h_ in hits],
                                        [self.evaluator.layer])[self.evaluator.layer]
+            if self.evaluator.key == "label+time":
+                heard = before - first_id
+                last = followed[-1].id - first_id if followed else -1
+                when = np.array([when_heard(h_.row.id - first_id, heard, last) for h_ in hits],
+                                dtype=np.float32)
+                states = np.concatenate([states, when], axis=1)
             scores = self.evaluator.query(states)[:, 0]
             best = int(np.argmax(scores))
             if fallback is None:
@@ -196,7 +204,7 @@ class Arm:
         if self.kind == "walker":
             return self.walk(store, s, qi, before)
         if self.kind == "select":
-            return self.select(store, s, qi, before)
+            return self.select(store, s, qi, before, first_id)
         if self.kind == "random":
             rows = store.in_episode(s.episode, before)
             picked = rng.sample(rows, min(self.k, len(rows)))
@@ -258,7 +266,7 @@ def ask(args) -> None:
     if args.walker:
         Arm.walker = LinearHead.load(args.walker)
     if args.evaluator:
-        Arm.evaluator = LinearHead.load(args.evaluator)
+        Arm.evaluator = load_head(args.evaluator)
     tasks = sorted({s.task for s in chosen_stories})
     reading: dict = {
         "kind": "store",
@@ -282,6 +290,7 @@ def ask(args) -> None:
                    if Arm.walker else None),
         "evaluator": ({"path": args.evaluator, "layer": Arm.evaluator.layer,
                        "lam": Arm.evaluator.lam, "threshold": Arm.evaluator.threshold,
+                       "features": Arm.evaluator.key,
                        "prompt": judge_prompt("<question>", ["<row read>"], "<candidate>")}
                       if Arm.evaluator else None),
         "arms": {},
@@ -399,7 +408,8 @@ def main() -> None:
     p.add_argument("--parallel", type=int, default=8, help="server streams, or local batch")
     p.add_argument("--trunk", default="served", choices=["served", "local"])
     p.add_argument("--walker", default=None, help="a walker-*.npz from walker_fit.py")
-    p.add_argument("--evaluator", default=None, help="an evaluator.npz from evaluator_fit.py")
+    p.add_argument("--evaluator", default=None,
+                   help="an evaluator*.npz from evaluator_fit.py or *.pt from head_train.py")
     p.add_argument("--max-new", type=int, default=8)
     p.add_argument("--seed", type=int, default=0)
     p.add_argument("--note", default="")

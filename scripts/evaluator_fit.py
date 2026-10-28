@@ -1,23 +1,29 @@
-"""Step 3, first form: fit the evaluator in closed form and read it teacher-forced.
+"""Step 3, first form: the evaluator, fitted from cached hidden states and read teacher-forced.
 
 The walker finds the right row in its top four nearly always and in first place about half
 the time (`walker_fit.py`), and the trunk given exactly the right rows far outscores the trunk
 given those rows among others. So the evaluator judges each row the walker proposes: the
-trunk reads the question, the rows read so far and one candidate (`judge_prompt`), its
-last-token state at a chosen layer is the input, and the target is +1 if the candidate is the
-next supporting row and -1 otherwise. Ridge regression, seconds, no training loop.
+trunk reads the question, the rows read so far and one candidate (`judge_prompt`), and its
+last-token state is the input.
 
-Examples come from the train split, teacher-forced: at each hop of each question the walker's
-top-k among the story's rows heard so far, with the rows already read excluded, and one more
-state per question after every supporting row has been read, where every candidate is wrong
-and the right call is to stop. Layer, ridge and the stop threshold are picked on held-out
-train stories. The reading is on the test stories: recall@1 of the re-ranked top-k against
-the walker's own, per task and hop, and how often the stop state is recognised.
+Two phases, because the states take half an hour on the card and every head is then fitted
+from them in seconds. `features` builds the states: for every question in the train split
+(fit and held-out stories) and the test stories, one state per hop, teacher-forced, plus the
+done state after the last supporting row, where every candidate is wrong and the right call
+is to stop; at each, the walker's top-k among the story's rows heard so far (read rows
+excluded) and the judge state of each. `fit` is the closed-form head: ridge to +1/-1, layer
+and ridge and stop threshold picked on the held-out stories. With `--time` the features also
+carry when the candidate was heard relative to the row last read, which the judge prompt
+itself does not say: the right second row of a two-fact question is the carrier's latest move
+before the hand-over, which no one candidate's text can show.
 
-    .venv/Scripts/python scripts/evaluator_fit.py --walker state/walker-step2/walker-minilm.npz \
-        --out state/walker-step2 --store state/store-step1
+    .venv/Scripts/python scripts/evaluator_fit.py features --out state/features/eval
+    .venv/Scripts/python scripts/evaluator_fit.py fit --features state/features/eval \
+        --out state/walker-step2 [--time]
 
-Writes <out>/evaluator.npz and readings/evaluator-fit-*.json. Needs the card to itself.
+The reading is on the test stories: recall@1 of the re-ranked top-k against the walker's own,
+per task and hop, and how often the stop state is recognised. Writes <out>/evaluator.npz and
+readings/evaluator-fit-*.json. `features` needs the card to itself.
 """
 
 from __future__ import annotations
@@ -37,9 +43,10 @@ sys.path.insert(0, str(ROOT / "src"))
 sys.path.insert(0, str(ROOT / "scripts"))
 
 from openplexus.babi import Story, stories  # noqa: E402
-from openplexus.heads import LinearHead, hop_prompt, judge_prompt  # noqa: E402
+from openplexus.heads import LinearHead, hop_prompt, judge_prompt, when_heard  # noqa: E402
 from openplexus.store import Store  # noqa: E402
-from openplexus.trunk import LocalTrunk  # noqa: E402
+
+SPLITS = ("fit", "held", "test")
 
 
 def states(ss: list[Story]) -> list[dict]:
@@ -80,9 +87,71 @@ def judge_prompts(exs: list[dict]) -> list[str]:
             for ex in exs for c in ex["cands"]]
 
 
-def flat_labels(exs: list[dict]) -> np.ndarray:
-    return np.array([lab for ex in exs for lab in ex["labels"]], dtype=np.float32)
+# --- the cache -----------------------------------------------------------------------------
 
+def save_split(out: Path, split: str, exs: list[dict], hop_hidden: np.ndarray,
+               judge_hidden: dict[int, np.ndarray]) -> None:
+    """Per example: task, hop, heard, target, last row read, and a JSON of candidates; per
+    candidate: example index, row, label; the hop state and each layer's judge states."""
+    meta = {
+        "examples": [{"task": ex["story"].task, "episode": ex["story"].episode, "qi": ex["qi"],
+                      "hop": ex["hop"], "heard": ex["story"].questions[ex["qi"]].heard,
+                      "target": -1 if ex["target"] is None else ex["target"],
+                      "last_read": ex["read"][-1] if ex["read"] else -1,
+                      "cands": ex["cands"], "labels": ex["labels"]} for ex in exs],
+    }
+    (out / f"{split}.json").write_text(json.dumps(meta), encoding="utf-8")
+    arrays = {"hop_hidden": hop_hidden.astype(np.float32),
+              "cand_ex": np.array([i for i, ex in enumerate(exs) for _ in ex["cands"]], np.int32),
+              "cand_row": np.array([c for ex in exs for c in ex["cands"]], np.int32),
+              "cand_label": np.array([lab for ex in exs for lab in ex["labels"]], np.float32)}
+    for layer, h in judge_hidden.items():
+        arrays[f"judge_{layer}"] = h.astype(np.float32)
+    np.savez(out / f"{split}.npz", **arrays)
+
+
+def judge_states_resumable(trunk, prompts: list[str], layers: list[int], part: Path,
+                           chunk: int = 512) -> dict[int, np.ndarray]:
+    """The judge states in chunks, each appended to a raw float32 file per layer as it is
+    done, so a run killed for the card (it is shared) resumes where it stopped."""
+    dim = None
+    done = 0
+    for layer in layers:
+        f = part.with_suffix(f".judge{layer}.f32")
+        if f.exists():
+            n = f.stat().st_size // 4
+            dim = dim or int(trunk.model.config.get_text_config().hidden_size)
+            done = n // dim if done == 0 else min(done, n // dim)
+    for at in range(done, len(prompts), chunk):
+        h = trunk.hidden(prompts[at:at + chunk], layers)
+        for layer in layers:
+            with open(part.with_suffix(f".judge{layer}.f32"), "ab") as f:
+                f.write(h[layer].astype(np.float32).tobytes())
+        print(f"  judge states {min(at + chunk, len(prompts))}/{len(prompts)}", flush=True)
+    out = {}
+    for layer in layers:
+        raw = np.fromfile(part.with_suffix(f".judge{layer}.f32"), dtype=np.float32)
+        out[layer] = raw.reshape(len(prompts), -1)
+    return out
+
+
+def load_split(path: Path, split: str) -> tuple[list[dict], dict]:
+    exs = json.loads((path / f"{split}.json").read_text(encoding="utf-8"))["examples"]
+    arrays = dict(np.load(path / f"{split}.npz"))
+    return exs, arrays
+
+
+def time_features(exs: list[dict], arrays: dict) -> np.ndarray:
+    return np.array([when_heard(int(row), exs[int(ei)]["heard"], exs[int(ei)]["last_read"])
+                     for ei, row in zip(arrays["cand_ex"], arrays["cand_row"])], dtype=np.float32)
+
+
+def features(exs: list[dict], arrays: dict, layer: int, with_time: bool) -> np.ndarray:
+    x = arrays[f"judge_{layer}"]
+    return np.concatenate([x, time_features(exs, arrays)], axis=1) if with_time else x
+
+
+# --- the reading -----------------------------------------------------------------------------
 
 def read(scores: np.ndarray, exs: list[dict], threshold: float | None) -> dict:
     """Per task and hop: among states whose target is in the walker's top-k, how often the
@@ -95,8 +164,8 @@ def read(scores: np.ndarray, exs: list[dict], threshold: float | None) -> dict:
         n = len(ex["cands"])
         sc = scores[at:at + n]
         at += n
-        t = ex["story"].task
-        name = f"task{t}-hop{ex['hop'] + 1}" if ex["target"] is not None else f"task{t}-done"
+        t, done = ex["task"], ex["target"] < 0
+        name = f"task{t}-done" if done else f"task{t}-hop{ex['hop'] + 1}"
         d = per.setdefault(name, {"n": 0, "in_topk": 0, "eval@1": 0, "walker@1": 0,
                                   "stop": 0, "go": 0})
         d["n"] += 1
@@ -104,7 +173,7 @@ def read(scores: np.ndarray, exs: list[dict], threshold: float | None) -> dict:
             d["stop"] += 1  # nothing left to follow
             continue
         best = int(np.argmax(sc))
-        if ex["target"] is None:
+        if done:
             if threshold is not None and sc[best] <= threshold:
                 d["stop"] += 1
             continue
@@ -126,6 +195,13 @@ def read(scores: np.ndarray, exs: list[dict], threshold: float | None) -> dict:
     return out
 
 
+def overall_recall(r: dict) -> float:
+    hits = sum(v["eval_recall@1"] * v["target_in_topk"] * v["n"]
+               for k, v in r.items() if not k.endswith("done"))
+    n = sum(v["target_in_topk"] * v["n"] for k, v in r.items() if not k.endswith("done"))
+    return hits / max(1, n)
+
+
 def pick_threshold(scores: np.ndarray, labels: np.ndarray) -> float:
     """The score that best separates right candidates from wrong ones on the held-out set, by
     balanced accuracy over a sweep of the scores' range."""
@@ -138,41 +214,33 @@ def pick_threshold(scores: np.ndarray, labels: np.ndarray) -> float:
     return best[1]
 
 
-def main() -> None:
-    p = argparse.ArgumentParser()
-    p.add_argument("--tasks", default="1,2,3")
-    p.add_argument("--layers", default="12,16,20,24")
-    p.add_argument("--lams", default="1,10,100,1000")
-    p.add_argument("--k", type=int, default=4)
-    p.add_argument("--holdout", type=int, default=160)
-    p.add_argument("--train-stories", type=int, default=None,
-                   help="cap on train stories a task; a small cap smokes the whole script in a "
-                        "minute before a long run")
-    p.add_argument("--walker", default="state/walker-step2/walker-minilm.npz")
-    p.add_argument("--out", default="state/walker-step2")
-    p.add_argument("--store", default="state/store-step1")
-    p.add_argument("--test-stories", type=int, default=100)
-    p.add_argument("--batch", type=int, default=8)
-    p.add_argument("--note", default="")
-    args = p.parse_args()
+def sha() -> str:
+    return subprocess.run(["git", "rev-parse", "--short", "HEAD"], capture_output=True,
+                          text=True, cwd=ROOT).stdout.strip()
+
+
+# --- phases ----------------------------------------------------------------------------------
+
+def build_features(args) -> None:
+    from openplexus.embed import MiniLM
+    from openplexus.trunk import LocalTrunk
+
     tasks = [int(t) for t in args.tasks.split(",")]
     layers = [int(x) for x in args.layers.split(",")]
-    lams = [float(x) for x in args.lams.split(",")]
     walker = LinearHead.load(args.walker)
-    Path(args.out).mkdir(parents=True, exist_ok=True)
+    out = Path(args.out)
+    out.mkdir(parents=True, exist_ok=True)
 
     train = stories(tasks, split="train")
     if args.train_stories:
         train = [s for s in train if s.index < args.train_stories]
-    fit_part = [s for s in train if s.index < args.holdout]
-    held = [s for s in train if s.index >= args.holdout]
-    test = [s for s in stories(tasks) if s.index < args.test_stories]
+    parts = {"fit": [s for s in train if s.index < args.holdout],
+             "held": [s for s in train if s.index >= args.holdout],
+             "test": [s for s in stories(tasks) if s.index < args.test_stories]}
     store = Store(args.store)
     first_id: dict[str, int] = {}
     for r in store.rows:
         first_id.setdefault(r.episode, r.id)
-
-    from openplexus.embed import MiniLM
 
     minilm = MiniLM()
     train_keys = {s.episode: minilm(s.sentences) for s in train}
@@ -184,72 +252,100 @@ def main() -> None:
     def test_key(s: Story, i: int) -> np.ndarray:
         return store.vector("minilm", first_id[s.episode] + i)
 
-    fit_ex, held_ex, test_ex = states(fit_part), states(held), states(test)
-    print(f"states: fit {len(fit_ex)} held {len(held_ex)} test {len(test_ex)}", flush=True)
-
     trunk = LocalTrunk(batch=args.batch)
     started = time.perf_counter()
-    for exs, key_of in ((fit_ex, train_key), (held_ex, train_key), (test_ex, test_key)):
-        h = trunk.hidden([ex["prompt"] for ex in exs], [walker.layer])[walker.layer]
-        candidates(walker, h, exs, key_of, args.k)
-    walk_seconds = time.perf_counter() - started
-    started = time.perf_counter()
-    fit_h = trunk.hidden(judge_prompts(fit_ex), layers)
-    held_h = trunk.hidden(judge_prompts(held_ex), layers)
-    test_h = trunk.hidden(judge_prompts(test_ex), layers)
-    judge_seconds = time.perf_counter() - started
-    print(f"walker states in {walk_seconds:.0f}s, judge states in {judge_seconds:.0f}s", flush=True)
+    counts = {}
+    for split, ss in parts.items():
+        exs = states(ss)
+        if (out / f"{split}.npz").exists():
+            saved = json.loads((out / f"{split}.json").read_text(encoding="utf-8"))["examples"]
+            counts[split] = {"states": len(saved),
+                             "judgements": int(sum(len(ex["cands"]) for ex in saved))}
+            print(f"{split}: already built", flush=True)
+            continue
+        hop_h = trunk.hidden([ex["prompt"] for ex in exs], [walker.layer])[walker.layer]
+        candidates(walker, hop_h, exs, test_key if split == "test" else train_key, args.k)
+        counts[split] = {"states": len(exs),
+                         "judgements": int(sum(len(ex["cands"]) for ex in exs))}
+        print(f"{split}: {len(exs)} hop states in {time.perf_counter() - started:.0f}s", flush=True)
+        judge_h = judge_states_resumable(trunk, judge_prompts(exs), layers, out / f"{split}.part")
+        save_split(out, split, exs, hop_h, judge_h)
+        for layer in layers:
+            (out / f"{split}.part").with_suffix(f".judge{layer}.f32").unlink()
+        print(f"{split}: {counts[split]} in {time.perf_counter() - started:.0f}s so far",
+              flush=True)
     trunk.close()
+    (out / "features.json").write_text(json.dumps({
+        "trunk": trunk.served_model(), "walker": {"path": args.walker, "layer": walker.layer,
+                                                   "lam": walker.lam},
+        "k": args.k, "tasks": tasks, "layers": layers, "train_stories_fit": args.holdout,
+        "counts": counts, "seconds": round(time.perf_counter() - started, 1),
+        "judge_prompt": judge_prompt("<question>", ["<row read>"], "<candidate>"),
+        "command": " ".join(sys.argv), "sha": sha(),
+        "taken_at": datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ"),
+    }, indent=1), encoding="utf-8")
+    print("wrote", out)
 
-    fit_y, held_y, test_y = flat_labels(fit_ex), flat_labels(held_ex), flat_labels(test_ex)
+
+def fit(args) -> None:
+    feats = Path(args.features)
+    about = json.loads((feats / "features.json").read_text(encoding="utf-8"))
+    layers = [int(x) for x in args.layers.split(",")] if args.layers else about["layers"]
+    lams = [float(x) for x in args.lams.split(",")]
+    data = {split: load_split(feats, split) for split in SPLITS}
+
+    def xy(split: str, layer: int):
+        exs, arrays = data[split]
+        return features(exs, arrays, layer, args.time), arrays["cand_label"]
+
     sweep, best = [], None
     for layer in layers:
+        x_fit, y_fit = xy("fit", layer)
+        x_held, y_held = xy("held", layer)
+        mean, std = x_fit.mean(0), x_fit.std(0) + 1e-6
         for lam in lams:
-            head = LinearHead.fit(fit_h[layer], fit_y[:, None], lam, layer, "label")
-            sc = head.query(held_h[layer])[:, 0]
-            tau = pick_threshold(sc, held_y)
-            r = read(sc, held_ex, tau)
-            # the number to pick on: recall@1 over every held state whose target is in the top-k
-            hits = sum(v["eval_recall@1"] * v["target_in_topk"] * v["n"]
-                       for k_, v in r.items() if not k_.endswith("done"))
-            n = sum(v["target_in_topk"] * v["n"] for k_, v in r.items() if not k_.endswith("done"))
-            score = hits / max(1, n)
+            head = LinearHead.fit((x_fit - mean) / std, y_fit[:, None], lam, layer, "label")
+            sc = head.query((x_held - mean) / std)[:, 0]
+            tau = pick_threshold(sc, y_held)
+            score = overall_recall(read(sc, data["held"][0], tau))
             sweep.append({"layer": layer, "lam": lam, "threshold": round(tau, 4),
                           "held_recall@1": round(score, 3)})
             print(f"layer {layer} lam {lam}: held recall@1 {score:.3f} tau {tau:.3f}", flush=True)
             if best is None or score > best[0]:
                 best = (score, layer, lam, tau)
     _, layer, lam, tau = best
-    all_h = np.concatenate([fit_h[layer], held_h[layer]])
-    all_y = np.concatenate([fit_y, held_y])
-    evaluator = LinearHead.fit(all_h, all_y[:, None], lam, layer, "label")
+    x_fit, y_fit = xy("fit", layer)
+    x_held, y_held = xy("held", layer)
+    x_test, _ = xy("test", layer)
+    x_all = np.concatenate([x_fit, x_held])
+    mean, std = x_all.mean(0), x_all.std(0) + 1e-6
+    evaluator = LinearHead.fit((x_all - mean) / std, np.concatenate([y_fit, y_held])[:, None],
+                               lam, layer, "label+time" if args.time else "label")
     evaluator.threshold = tau
-    evaluator.save(Path(args.out) / "evaluator.npz")
+    evaluator.mean, evaluator.std = mean, std
+    out = Path(args.out)
+    out.mkdir(parents=True, exist_ok=True)
+    name = "evaluator-time.npz" if args.time else "evaluator.npz"
+    evaluator.save(out / name)
+    held_mean, held_std = x_fit.mean(0), x_fit.std(0) + 1e-6
+    held_head = LinearHead.fit((x_fit - held_mean) / held_std, y_fit[:, None], lam, layer,
+                               "label")
 
-    held_head = LinearHead.fit(fit_h[layer], fit_y[:, None], lam, layer, "label")
     reading = {
         "kind": "evaluator-fit",
         "step": 3,
-        "trunk": trunk.served_model(),
-        "walker": {"path": args.walker, "layer": walker.layer, "lam": walker.lam},
-        "k": args.k,
-        "tasks": tasks,
-        "train_stories_fit": args.holdout,
-        "states": {"fit": len(fit_ex), "held": len(held_ex), "test": len(test_ex)},
-        "judgements": {"fit": int(len(fit_y)), "held": int(len(held_y)), "test": int(len(test_y))},
-        "prompt_example": judge_prompts(test_ex[1:2])[0] if len(test_ex) > 1 else None,
+        "features": {"path": str(feats), **about},
+        "time_features": args.time,
         "chosen": {"layer": layer, "lam": lam, "threshold": round(tau, 4)},
         "sweep": sweep,
-        "seconds": {"walker_states": round(walk_seconds, 1),
-                    "judge_states": round(judge_seconds, 1)},
         "teacher_forced": {
-            "test": read(evaluator.query(test_h[layer])[:, 0], test_ex, tau),
-            "held": read(held_head.query(held_h[layer])[:, 0], held_ex, tau),
+            "test": read(evaluator.query(x_test)[:, 0], data["test"][0], tau),
+            "held": read(held_head.query((x_held - held_mean) / held_std)[:, 0],
+                         data["held"][0], tau),
         },
-        "evaluator_path": str(Path(args.out) / "evaluator.npz"),
+        "evaluator_path": str(out / name),
         "command": " ".join(sys.argv),
-        "sha": subprocess.run(["git", "rev-parse", "--short", "HEAD"], capture_output=True,
-                              text=True, cwd=ROOT).stdout.strip(),
+        "sha": sha(),
         "taken_at": datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ"),
         "note": args.note,
     }
@@ -257,6 +353,36 @@ def main() -> None:
     path = ROOT / "readings" / f"evaluator-fit-{reading['taken_at']}.json"
     path.write_text(json.dumps(reading, indent=1), encoding="utf-8")
     print("wrote", path)
+
+
+def main() -> None:
+    p = argparse.ArgumentParser()
+    p.add_argument("phase", choices=["features", "fit"])
+    p.add_argument("--tasks", default="1,2,3")
+    p.add_argument("--layers", default=None, help="features: layers to cache (default 12,16,20); "
+                                                  "fit: layers to sweep (default: all cached)")
+    p.add_argument("--lams", default="1,10,100,1000")
+    p.add_argument("--k", type=int, default=4)
+    p.add_argument("--holdout", type=int, default=160)
+    p.add_argument("--train-stories", type=int, default=None,
+                   help="cap on train stories a task; a small cap smokes the whole script in a "
+                        "minute before a long run")
+    p.add_argument("--walker", default="state/walker-step2/walker-minilm.npz")
+    p.add_argument("--features", default="state/features/eval")
+    p.add_argument("--out", default=None)
+    p.add_argument("--store", default="state/store-step1")
+    p.add_argument("--test-stories", type=int, default=100)
+    p.add_argument("--batch", type=int, default=8)
+    p.add_argument("--time", action="store_true", help="fit: add when-heard features")
+    p.add_argument("--note", default="")
+    args = p.parse_args()
+    if args.phase == "features":
+        args.layers = args.layers or "12,16,20"
+        args.out = args.out or args.features
+        build_features(args)
+    else:
+        args.out = args.out or "state/walker-step2"
+        fit(args)
 
 
 if __name__ == "__main__":

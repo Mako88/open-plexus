@@ -10,3 +10,5 @@ data/*
 !data/babi/
 models/
 out/
+# Stores and other run state live here; a store is rebuilt by hearing.
+state/

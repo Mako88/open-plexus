@@ -121,41 +121,54 @@ Each step says what it decides. A step is struck when it is done.
    within 2,048 tokens on 16 of 120 questions, restating the story and looping, at about
    1,900 tokens a one-word answer. So: the one-fact task scales with size and is solved at
    4B; the two- and three-fact tasks are solved at no size we can run, with or without
-   thinking. The composing is therefore the glue's job, by hops (step 2), and the trunk is
-   judged on reading one fact from rows in front of it. **The trunk is Qwen3.5-2B**, the
-   largest that trains adapters in fp32 on the card; the 4B (0.92 against 0.76 on task 1,
+   thinking. (Step 1 then showed the same trunk composes them given only the supporting
+   rows: the wall is finding the facts, which is the glue's job by hops in step 2.) **The
+   trunk is Qwen3.5-2B**, the largest that trains adapters in fp32 on the card; the 4B
+   (0.92 against 0.76 on task 1,
    serving only, since fp16 training is not an option on Pascal) is the step up if the
    2B's one-fact ceiling bounds step 1. Open fork: a small model with a reasoning mode
    that terminates (Phi-4-mini-reasoning, SmolLM3) as a second trunk family, if hops
    need the trunk to reason within a hop. The scorer is checked by `tests/test_scorer.py`
    and the floors are near 0, so the wiring is not in doubt.
 
-1. **The store, with no training.** Rows are a story's sentences as heard, each with a vector
-   (a small embedding model, or the trunk's own pooled hidden state; try both) in an on-disk
-   index. Brute-force numpy first; an ANN index only when it is the bottleneck. Hear N
-   stories; after each, ask its questions with the top-k rows placed in the trunk's context.
-   Also ask early stories' questions late, with thousands of rows in between. Save the store,
-   restart the process, load it, and the answers must be identical. Decides whether a store
-   that is appended to counts as memory, and what a row costs.
+1. ~~**The store, with no training.**~~ Struck 2026-10-28, `readings/store-minilm-trunk-*`.
+   10,702 rows from 300 stories appended as heard, brute-force cosine in numpy: 0.1 ms a
+   lookup, 10 KB a row (8 KB of it the trunk's 2048-float key), and identical retrieval after
+   a restart and after thousands of rows heard since. Within the episode, MiniLM top-4 puts
+   task 1 at the ceiling (0.76, recall 0.98 of the supporting row); tasks 2 and 3 fall to
+   0.13 and 0.03, below four random rows of the story (0.15, 0.14), because similarity to
+   "Where is the milk?" returns the rows about the milk (86% of what is shown, 13% at random)
+   and misses the row saying where its carrier went. The trunk's own mean-pooled state is a
+   worse key on every task (recall 0.76/0.41/0.17). Over the whole store with no episode,
+   retrieval reads the floor (0.06): four names across 300 stories, so a store with no
+   episode or time is not memory, and the reader must carry both (step 4). The finding that
+   matters most: **the oracle arm**, the trunk given exactly the supporting rows and nothing
+   else, reads **1.00 / 0.77 / 0.93** against the whole-story ceiling of 0.76 / 0.37 / 0.23.
+   The 2B composes two and three facts in one pass when handed only them; what it cannot do
+   is find them in the story. Step 0's wall was distraction, not composition.
 
 2. **Reading across rows, by hops.** Tasks 2 and 3 with the supporting facts as separate
-   rows among thousands of others. Step 0 showed the trunk cannot do a two-fact question in
-   one pass at any size we can run, so the glue turns it into one-fact questions: retrieve,
-   read one fact, re-query with what was read, retrieve again. First as a loop with no
-   training, the re-query being the trunk's own hidden state after reading. Then a trained
-   query: LoRA on the trunk's query path or a small trained retriever, trained on the train
-   split's supporting line numbers (every row carries them), with checkpoint and resume.
-   The first trained query is a linear head over the hidden state fitted in closed form by
-   least squares, which takes seconds and needs no training loop; gradient training comes
-   in only when that head is beaten by a nonlinear one or by a LoRA on the trunk.
-   Decides whether composing over the store works when each hop is a one-fact read, and
-   whether training the glue buys anything over the loop. This is the step the bet lives or
-   dies on, and the ceiling it is read against is the trunk's one-fact score, not its
-   two-fact one. If the trained walker does not reach that ceiling on task 2, the wall is
-   the trunk's representation of what it read, not its reasoning, and the core has to be
-   rethought at that level. A walker covers composition over facts and nothing else:
-   arithmetic, counting and planning (bAbI tasks 7 and 19 first) are covered by nothing
-   yet, and are where a different reasoning mechanism would be needed.
+   rows among thousands of others. Step 1 showed the trunk answers a two- or three-fact
+   question once the supporting rows, and only they, stand in front of it, and that
+   similarity to the question finds the row about the object but not the row about its
+   carrier. So the glue's job is to assemble the supporting set: retrieve by the question,
+   read the row, re-query with what was read ("Sandra put down the milk" asks "Where is
+   Sandra?"), retrieve again, and hand the set to the trunk in one pass. First as a loop
+   with no training, the re-query being the text of the row read, embedded by the same
+   MiniLM, since the trunk's raw pooled state read poorly as a key in step 1. Then a trained
+   query over the trunk's hidden state after reading: a linear head fitted in closed form by
+   least squares on the train split's supporting line numbers (every row carries them),
+   which takes seconds and needs no training loop; gradient training, a nonlinear head or a
+   LoRA on the trunk's query path, comes in only when that head is beaten, and with
+   checkpoint and resume. Decides whether composing over the store works when each hop is a
+   one-fact read, and whether training the glue buys anything over the loop. This is the
+   step the bet lives or dies on, and its ceiling is step 1's oracle, 1.00 / 0.77 / 0.93:
+   recall of the supporting set is the number to watch, and the trunk's score follows it.
+   If the trained walker does not reach that recall on task 2, the wall is the trunk's
+   representation of what it read, not its reasoning, and the core has to be rethought at
+   that level. A walker covers composition over facts and nothing else: arithmetic,
+   counting and planning (bAbI tasks 7 and 19 first) are covered by nothing yet, and are
+   where a different reasoning mechanism would be needed.
 
 3. **The evaluator and search.** A second head over the trunk's hidden state: given a
    candidate step, is it good. Labels first from bAbI, where a hop that lands on a
@@ -223,7 +236,9 @@ credit signal might not cost it much. It runs in minutes and never touches the t
 - Models live in the Hugging Face cache (`~/.cache/huggingface/hub`). Qwen3.5-0.8B, 2B and 4B
   are there as safetensors for in-process use and as Q8 GGUFs; Gemma 4 12B at 4-bit is in
   `D:\Downloads`. llama.cpp is built at `D:\tools\llama.cpp-src\build\bin\Release`.
-  Inference-only readings go through llama-server (`local:` in `ceiling.py`), which is
+  Inference-only readings go through llama-server (`local:` in `ceiling.py`; launch:
+  `llama-server -m <Qwen_Qwen3.5-2B-Q8_0.gguf> --port 8093 --jinja --reasoning-budget 0
+  -ngl 99 -np 8 -c 32768`), which is
   several times faster on this card than fp32 PyTorch, whose Qwen3.5 linear-attention
   layers run on fallback kernels here. PyTorch is for anything that needs hidden states or
   gradients.

@@ -1,0 +1,380 @@
+{
+ "kind": "walker-fit",
+ "step": 2,
+ "trunk": "Qwen/Qwen3.5-2B fp32 in process",
+ "key": "minilm",
+ "tasks": [
+  1,
+  2,
+  3
+ ],
+ "train_stories_fit": 160,
+ "examples": {
+  "fit": 4800,
+  "held": 1200,
+  "test": 3000
+ },
+ "prompt_example": "Question: Where is John?\nNext fact:",
+ "chosen": {
+  "layer": 16,
+  "lam": 10.0
+ },
+ "sweep": [
+  {
+   "layer": 8,
+   "lam": 1.0,
+   "held": {
+    "recall@1": 0.471,
+    "recall@4": 0.871,
+    "n": 1200
+   },
+   "fit_seconds": 0.72
+  },
+  {
+   "layer": 8,
+   "lam": 10.0,
+   "held": {
+    "recall@1": 0.431,
+    "recall@4": 0.847,
+    "n": 1200
+   },
+   "fit_seconds": 0.58
+  },
+  {
+   "layer": 8,
+   "lam": 100.0,
+   "held": {
+    "recall@1": 0.283,
+    "recall@4": 0.682,
+    "n": 1200
+   },
+   "fit_seconds": 0.56
+  },
+  {
+   "layer": 8,
+   "lam": 1000.0,
+   "held": {
+    "recall@1": 0.152,
+    "recall@4": 0.449,
+    "n": 1200
+   },
+   "fit_seconds": 0.56
+  },
+  {
+   "layer": 12,
+   "lam": 1.0,
+   "held": {
+    "recall@1": 0.468,
+    "recall@4": 0.88,
+    "n": 1200
+   },
+   "fit_seconds": 0.57
+  },
+  {
+   "layer": 12,
+   "lam": 10.0,
+   "held": {
+    "recall@1": 0.453,
+    "recall@4": 0.873,
+    "n": 1200
+   },
+   "fit_seconds": 0.56
+  },
+  {
+   "layer": 12,
+   "lam": 100.0,
+   "held": {
+    "recall@1": 0.319,
+    "recall@4": 0.718,
+    "n": 1200
+   },
+   "fit_seconds": 0.59
+  },
+  {
+   "layer": 12,
+   "lam": 1000.0,
+   "held": {
+    "recall@1": 0.164,
+    "recall@4": 0.464,
+    "n": 1200
+   },
+   "fit_seconds": 0.57
+  },
+  {
+   "layer": 16,
+   "lam": 1.0,
+   "held": {
+    "recall@1": 0.472,
+    "recall@4": 0.883,
+    "n": 1200
+   },
+   "fit_seconds": 0.55
+  },
+  {
+   "layer": 16,
+   "lam": 10.0,
+   "held": {
+    "recall@1": 0.48,
+    "recall@4": 0.882,
+    "n": 1200
+   },
+   "fit_seconds": 0.56
+  },
+  {
+   "layer": 16,
+   "lam": 100.0,
+   "held": {
+    "recall@1": 0.463,
+    "recall@4": 0.878,
+    "n": 1200
+   },
+   "fit_seconds": 0.56
+  },
+  {
+   "layer": 16,
+   "lam": 1000.0,
+   "held": {
+    "recall@1": 0.389,
+    "recall@4": 0.778,
+    "n": 1200
+   },
+   "fit_seconds": 0.55
+  },
+  {
+   "layer": 20,
+   "lam": 1.0,
+   "held": {
+    "recall@1": 0.464,
+    "recall@4": 0.88,
+    "n": 1200
+   },
+   "fit_seconds": 0.6
+  },
+  {
+   "layer": 20,
+   "lam": 10.0,
+   "held": {
+    "recall@1": 0.47,
+    "recall@4": 0.877,
+    "n": 1200
+   },
+   "fit_seconds": 0.56
+  },
+  {
+   "layer": 20,
+   "lam": 100.0,
+   "held": {
+    "recall@1": 0.46,
+    "recall@4": 0.873,
+    "n": 1200
+   },
+   "fit_seconds": 0.59
+  },
+  {
+   "layer": 20,
+   "lam": 1000.0,
+   "held": {
+    "recall@1": 0.458,
+    "recall@4": 0.876,
+    "n": 1200
+   },
+   "fit_seconds": 0.55
+  },
+  {
+   "layer": 24,
+   "lam": 1.0,
+   "held": {
+    "recall@1": 0.463,
+    "recall@4": 0.877,
+    "n": 1200
+   },
+   "fit_seconds": 0.58
+  },
+  {
+   "layer": 24,
+   "lam": 10.0,
+   "held": {
+    "recall@1": 0.46,
+    "recall@4": 0.875,
+    "n": 1200
+   },
+   "fit_seconds": 0.57
+  },
+  {
+   "layer": 24,
+   "lam": 100.0,
+   "held": {
+    "recall@1": 0.471,
+    "recall@4": 0.881,
+    "n": 1200
+   },
+   "fit_seconds": 0.55
+  },
+  {
+   "layer": 24,
+   "lam": 1000.0,
+   "held": {
+    "recall@1": 0.469,
+    "recall@4": 0.88,
+    "n": 1200
+   },
+   "fit_seconds": 0.64
+  }
+ ],
+ "hidden_seconds": 225.2,
+ "teacher_forced": {
+  "walker_test": {
+   "task1-hop1": {
+    "recall@1": 0.582,
+    "recall@4": 0.988,
+    "n": 500
+   },
+   "task2-hop1": {
+    "recall@1": 0.476,
+    "recall@4": 0.962,
+    "n": 500
+   },
+   "task2-hop2": {
+    "recall@1": 0.482,
+    "recall@4": 0.964,
+    "n": 500
+   },
+   "task3-hop1": {
+    "recall@1": 0.34,
+    "recall@4": 0.722,
+    "n": 500
+   },
+   "task3-hop2": {
+    "recall@1": 0.566,
+    "recall@4": 0.98,
+    "n": 500
+   },
+   "task3-hop3": {
+    "recall@1": 0.226,
+    "recall@4": 0.624,
+    "n": 500
+   },
+   "all": {
+    "recall@1": 0.445,
+    "recall@4": 0.873,
+    "n": 3000
+   }
+  },
+  "untrained_test": {
+   "task1-hop1": {
+    "recall@1": 0.57,
+    "recall@4": 0.98,
+    "n": 500
+   },
+   "task2-hop1": {
+    "recall@1": 0.252,
+    "recall@4": 0.942,
+    "n": 500
+   },
+   "task2-hop2": {
+    "recall@1": 0.09,
+    "recall@4": 0.696,
+    "n": 500
+   },
+   "task3-hop1": {
+    "recall@1": 0.178,
+    "recall@4": 0.618,
+    "n": 500
+   },
+   "task3-hop2": {
+    "recall@1": 0.016,
+    "recall@4": 0.186,
+    "n": 500
+   },
+   "task3-hop3": {
+    "recall@1": 0.144,
+    "recall@4": 0.568,
+    "n": 500
+   },
+   "all": {
+    "recall@1": 0.208,
+    "recall@4": 0.665,
+    "n": 3000
+   }
+  },
+  "walker_held": {
+   "task1-hop1": {
+    "recall@1": 0.565,
+    "recall@4": 0.98,
+    "n": 200
+   },
+   "task2-hop1": {
+    "recall@1": 0.465,
+    "recall@4": 0.945,
+    "n": 200
+   },
+   "task2-hop2": {
+    "recall@1": 0.5,
+    "recall@4": 0.955,
+    "n": 200
+   },
+   "task3-hop1": {
+    "recall@1": 0.475,
+    "recall@4": 0.785,
+    "n": 200
+   },
+   "task3-hop2": {
+    "recall@1": 0.605,
+    "recall@4": 0.98,
+    "n": 200
+   },
+   "task3-hop3": {
+    "recall@1": 0.27,
+    "recall@4": 0.645,
+    "n": 200
+   },
+   "all": {
+    "recall@1": 0.48,
+    "recall@4": 0.882,
+    "n": 1200
+   }
+  },
+  "untrained_held": {
+   "task1-hop1": {
+    "recall@1": 0.62,
+    "recall@4": 1.0,
+    "n": 200
+   },
+   "task2-hop1": {
+    "recall@1": 0.24,
+    "recall@4": 0.94,
+    "n": 200
+   },
+   "task2-hop2": {
+    "recall@1": 0.065,
+    "recall@4": 0.62,
+    "n": 200
+   },
+   "task3-hop1": {
+    "recall@1": 0.185,
+    "recall@4": 0.74,
+    "n": 200
+   },
+   "task3-hop2": {
+    "recall@1": 0.025,
+    "recall@4": 0.255,
+    "n": 200
+   },
+   "task3-hop3": {
+    "recall@1": 0.195,
+    "recall@4": 0.555,
+    "n": 200
+   },
+   "all": {
+    "recall@1": 0.222,
+    "recall@4": 0.685,
+    "n": 1200
+   }
+  }
+ },
+ "walker_path": "state\\walker-step2\\walker-minilm.npz",
+ "command": "scripts/walker_fit.py --tasks 1,2,3 --layers 8,12,16,20,24 --lams 1,10,100,1000 --out state/walker-step2 --store state/store-step1 --note step 2: closed-form linear walker over the trunk's last-token state; read rows are not candidates",
+ "sha": "898f4432",
+ "taken_at": "20261028T041233Z",
+ "note": "step 2: closed-form linear walker over the trunk's last-token state; read rows are not candidates"
+}

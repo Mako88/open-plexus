@@ -149,43 +149,51 @@ Each step says what it decides. A step is struck when it is done.
 
 2. **Reading across rows, by hops.** Tasks 2 and 3 with the supporting facts as separate
    rows among thousands of others. Step 1 showed the trunk answers a two- or three-fact
-   question once the supporting rows, and only they, stand in front of it, and that
-   similarity to the question finds the row about the object but not the row about its
-   carrier. So the glue's job is to assemble the supporting set: retrieve by the question,
-   read the row, re-query with what was read ("Sandra put down the milk" asks "Where is
-   Sandra?"), retrieve again, and hand the set to the trunk in one pass. First as a loop
-   with no training, the re-query being the text of the row read, embedded by the same
-   MiniLM, since the trunk's raw pooled state read poorly as a key in step 1. Then a trained
-   query over the trunk's hidden state after reading: a linear head fitted in closed form by
-   least squares on the train split's supporting line numbers (every row carries them),
-   which takes seconds and needs no training loop; gradient training, a nonlinear head or a
-   LoRA on the trunk's query path, comes in only when that head is beaten, and with
-   checkpoint and resume. Decides whether composing over the store works when each hop is a
-   one-fact read, and whether training the glue buys anything over the loop. This is the
-   step the bet lives or dies on, and its ceiling is step 1's oracle, 1.00 / 0.77 / 0.93:
-   recall of the supporting set is the number to watch, and the trunk's score follows it.
-   If the trained walker does not reach that recall on task 2, the wall is the trunk's
-   representation of what it read, not its reasoning, and the core has to be rethought at
-   that level. A walker covers composition over facts and nothing else: arithmetic,
-   counting and planning (bAbI tasks 7 and 19 first) are covered by nothing yet, and are
-   where a different reasoning mechanism would be needed.
+   question once the supporting rows, and only they, stand in front of it, so the glue's job
+   is to assemble that set: retrieve, read the row, re-query with what was read, retrieve
+   again, and hand the set to the trunk in one pass. Read so far (2026-10-28,
+   `readings/store-*-2026102802*`, `readings/walker-fit-*`), tasks 2/3, oracle 0.78/0.92:
+   - Untrained hops, the re-query being the read row's own MiniLM key, top-4 a hop, three
+     hops: 0.39/0.14, recall of the supporting set 0.89/0.46. Twelve rows with no hop:
+     0.30/0.15, recall 0.85/0.61. Following a random row instead: 0.30/0.18. So the
+     untrained hop is worth something on task 2 and nothing on task 3.
+   - The trained walker: a linear map from the trunk's last-token state at layer 16, after
+     reading "Question: ... Known: <rows so far> Next fact:", to the MiniLM key of the next
+     supporting row, ridge-fitted in closed form on the train split in seconds.
+     Teacher-forced, it ranks the next right row in its top four 96-98% of the time on
+     task 2's hops and task 3's first two, and 62% on task 3's third; in first place only
+     34-57%. End to end with its own choices, one hop, top-4 shown: **0.42/0.29**, recall
+     0.93/0.57; two hops 0.41/0.27, recall 0.94/0.63. Training buys +0.04 recall on task 2
+     and +0.16 on task 3 over the untrained hop, and task 2 is above the whole-story
+     ceiling (0.37).
+   - The gap to the oracle is not recall. With the whole supporting pair among the six or
+     seven rows shown, the trunk scores 0.46 on task 2; given the pair alone, 0.78. Shown
+     only the rows the walker followed, one a hop, it drops to 0.24/0.03, because the
+     walker's first choice is right only half the time. The set is found; what is missing
+     is choosing it from among what was found.
+   So what remains of this step is selection, which is step 3's evaluator in its first
+   form, and step 2 stays open until the selected set reaches the oracle on task 2. A
+   gradient-trained walker (nonlinear head, or a LoRA on the trunk's query path) is the
+   fork if task 3's third hop stays at 0.62 once selection is in. A walker covers
+   composition over facts and nothing else: arithmetic, counting and planning (bAbI tasks 7
+   and 19 first) are covered by nothing yet.
 
-3. **The evaluator and search.** A second head over the trunk's hidden state: given a
-   candidate step, is it good. Labels first from bAbI, where a hop that lands on a
-   supporting line is good and any other is not, so the walker's own training data
-   serves; then from step-labelled maths (PRM800K, 800k human labels on steps of MATH
-   solutions) and bAbI's path finding (task 19), which is planning in miniature. As in
-   step 2, the first evaluator is linear and fitted in closed form, and the gradient-trained
-   one has to beat it. Search in
-   code: beam over hops first, then a tree with backtracking, budgeted in forward passes.
-   Counting and arithmetic go to a tool: an aggregation over rows for the first, a Python
-   call the trunk writes for the second, read on bAbI task 7 and on GSM8K. Decides whether
-   a small evaluator with search beats the trunk's own chain of thought at matched forward
-   passes. This is the step the frontier claim lives or dies on. It fails if search with
-   the trained evaluator is no better than chain of thought at the same budget on a problem
-   the 12B with thinking gets right; that would mean the evaluator, not the search, is the
-   wall, and the next question is whether a bigger label set or a LoRA under the head moves
-   it. Training here is in daytime bursts with checkpoints, as everything is.
+3. **The evaluator and search.** A second head over the trunk's hidden state: given a candidate
+   step, is it good. Labels first from bAbI, where a row the walker found is good if it is a
+   supporting row and not otherwise, so the walker's own training data serves, and the first
+   reading is the trunk given only the rows the evaluator keeps, against step 2's 0.42/0.29 and
+   the oracle's 0.78/0.92; then from step-labelled maths (PRM800K, 800k human labels on steps of
+   MATH solutions) and bAbI's path finding (task 19), which is planning in miniature. As in step
+   2, the first evaluator is linear and fitted in closed form, and the gradient-trained one has
+   to beat it. Search in code: beam over hops first, then a tree with backtracking, budgeted in
+   forward passes. Counting and arithmetic go to a tool: an aggregation over rows for the first,
+   a Python call the trunk writes for the second, read on bAbI task 7 and on GSM8K. Decides
+   whether a small evaluator with search beats the trunk's own chain of thought at matched
+   forward passes. This is the step the frontier claim lives or dies on. It fails if search with
+   the trained evaluator is no better than chain of thought at the same budget on a problem the
+   12B with thinking gets right; that would mean the evaluator, not the search, is the wall, and
+   the next question is whether a bigger label set or a LoRA under the head moves it. Training
+   here is in daytime bursts with checkpoints, as everything is.
 
 4. **Writing.** What goes in a row: the raw sentence, or the trunk's own restatement with
    names resolved ("John is in the hallway", not "he went there"), one fact a row. Rows carry

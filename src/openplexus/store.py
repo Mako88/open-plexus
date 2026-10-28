@@ -122,6 +122,10 @@ class Store:
         order = np.lexsort((ids, -scores))[:k]
         return [Hit(self.rows[int(ids[i])], float(scores[i])) for i in order]
 
+    def vector(self, name: str, row_id: int) -> np.ndarray:
+        """A row's own key, which is what a hop re-queries with."""
+        return self._vectors[name][row_id]
+
     def in_episode(self, episode: str, before: int | None = None) -> list[Row]:
         n = len(self.rows) if before is None else min(before, len(self.rows))
         return [r for r in self.rows[:n] if r.episode == episode]

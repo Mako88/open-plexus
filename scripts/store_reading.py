@@ -17,7 +17,19 @@ failure from a reading failure), `store:<embedder>:<k>` (top-k by cosine within 
 as of the question), `unscoped:<embedder>:<k>` (top-k over everything heard so far in any
 episode, where bAbI's four names clash across stories), and `random:<k>` (k rows of the
 episode drawn at random: the store arm with its retrieval disabled, which must read lower).
-Rows always stand in the story in the order they were heard. Writes readings/store-*.json.
+Step 2's untrained hops are arms of the same reading: `hops:<embedder>:<k>:<depth>` takes
+the top-k by the question, then for each further hop re-queries with the stored vector of the
+best row not yet followed and adds its top-k, so the trunk sees up to k*depth rows;
+`hops-random:<embedder>:<k>:<depth>` follows a random row of the episode instead, which is
+the hop with its choice disabled, and `store:<embedder>:<k*depth>` is the same number of rows
+with no hop at all. `walker:<k>:<depth>` is the trained hop: the query at each hop is the
+walker's map of the trunk's hidden state after reading the question and the rows followed so
+far (`walker_fit.py`), which needs `--trunk local`, the trunk in PyTorch. Rows always stand
+in the story in the order they were heard. A hop or walker arm with `:f` appended shows the
+trunk only the rows it followed, one a hop, instead of everything it found: step 2's first
+reading showed the trunk given the right two rows among five others scores 0.48 against 0.77
+given the two alone, so what is left out matters as much as what is found. Writes
+readings/store-*.json.
 """
 
 from __future__ import annotations
@@ -39,8 +51,9 @@ sys.path.insert(0, str(ROOT / "scripts"))
 
 from ceiling import correct  # noqa: E402
 from openplexus.babi import Story, stories  # noqa: E402
-from openplexus.store import Store  # noqa: E402
-from openplexus.trunk import ServedTrunk, question_messages  # noqa: E402
+from openplexus.store import Hit, Store  # noqa: E402
+from openplexus.trunk import LocalTrunk, ServedTrunk, question_messages  # noqa: E402
+from openplexus.walker import LinearWalker, hop_prompt  # noqa: E402
 
 
 def chosen(args) -> list[Story]:
@@ -60,7 +73,8 @@ def hear(args) -> None:
     if len(store):
         raise SystemExit(f"{args.store} already holds {len(store)} rows; hear into a fresh one")
     sentences = [t for s in chosen_stories for t in s.sentences]
-    questions = [(query_key(s, i), q.text) for s in chosen_stories for i, q in enumerate(s.questions)]
+    questions = [(query_key(s, i), q.text)
+                 for s in chosen_stories for i, q in enumerate(s.questions)]
     vectors: dict[str, np.ndarray] = {}
     stats: dict = {"rows": len(sentences), "embedders": {}}
     for name in args.embedders.split(","):
@@ -94,14 +108,47 @@ def hear(args) -> None:
 
 
 class Arm:
+    trunk = None  # a LocalTrunk, for the walker arm's hidden states
+    walker: LinearWalker | None = None
+
     def __init__(self, spec: str):
         parts = spec.split(":")
         self.spec = spec
+        self.followed_only = parts[-1] == "f"
+        if self.followed_only:
+            parts = parts[:-1]
         self.kind = parts[0]
-        self.embedder = parts[1] if self.kind in ("store", "unscoped") else None
-        self.k = int(parts[-1]) if self.kind in ("store", "unscoped", "random") else None
+        keyed = self.kind in ("store", "unscoped", "hops", "hops-random")
+        self.embedder = parts[1] if keyed else None
+        self.k = int(parts[2]) if keyed else (
+            int(parts[1]) if self.kind in ("random", "walker") else None)
+        self.depth = int(parts[3]) if self.kind in ("hops", "hops-random") else (
+            int(parts[2]) if self.kind == "walker" else 1)
 
-    def rows_for(self, store: Store, s: Story, qi: int, first_id: int, queries, rng) -> tuple[list, float]:
+    def walk(self, store: Store, s: Story, qi: int, before: int) -> tuple[list, float]:
+        """The trained hop: at each hop the trunk reads the question and the rows followed so
+        far, the walker maps its state to a key, and the best unfollowed row found is read."""
+        q = s.questions[qi]
+        followed: list = []
+        found: dict[int, Hit] = {}
+        started = time.perf_counter()
+        for _ in range(self.depth):
+            h = self.trunk.hidden([hop_prompt(q.text, [r.text for r in followed])],
+                                  [self.walker.layer])[self.walker.layer][0]
+            for hit in store.search(self.walker.key, self.walker.query(h), self.k,
+                                    episode=s.episode, before=before):
+                if hit.row.id not in found:
+                    found[hit.row.id] = hit
+            candidates = [h for h in found.values() if h.row not in followed]
+            if not candidates:
+                break
+            followed.append(max(candidates, key=lambda h: (h.score, -h.row.id)).row)
+        ms = 1000 * (time.perf_counter() - started)
+        shown = followed if self.followed_only else [h.row for h in found.values()]
+        return sorted(shown, key=lambda r: r.id), ms
+
+    def rows_for(self, store: Store, s: Story, qi: int, first_id: int, queries,
+                 rng) -> tuple[list, float]:
         """The rows to place in front of the trunk, in time order, and the lookup's ms."""
         q = s.questions[qi]
         before = first_id + q.heard
@@ -112,6 +159,8 @@ class Arm:
         if self.kind == "oracle":
             rows = store.in_episode(s.episode, before)
             return [rows[i] for i in sorted(q.supporting)], 0.0
+        if self.kind == "walker":
+            return self.walk(store, s, qi, before)
         if self.kind == "random":
             rows = store.in_episode(s.episode, before)
             picked = rng.sample(rows, min(self.k, len(rows)))
@@ -119,9 +168,36 @@ class Arm:
         vec = queries[self.embedder][query_key(s, qi)]
         started = time.perf_counter()
         hits = store.search(self.embedder, vec, self.k,
-                            episode=s.episode if self.kind == "store" else None, before=before)
+                            episode=s.episode if self.kind != "unscoped" else None, before=before)
+        found = {h.row.id: h for h in hits}
+        followed: list = []
+
+        def best_unfollowed():
+            # best meaning highest score at the hop that found it
+            candidates = [h for h in found.values() if h.row not in followed]
+            return max(candidates, key=lambda h: (h.score, -h.row.id)).row if candidates else None
+
+        for hop in range(self.depth):
+            if self.kind == "hops-random":
+                pool = [r for r in store.in_episode(s.episode, before) if r not in followed]
+                next_row = rng.choice(pool) if pool else None
+            else:
+                next_row = best_unfollowed()
+            if next_row is None:
+                break
+            followed.append(next_row)
+            if next_row.id not in found:
+                found[next_row.id] = Hit(next_row, 0.0)
+            if hop == self.depth - 1:
+                break  # the last row read is not re-queried from
+            # the row's own stored vector is the re-query
+            for h in store.search(self.embedder, store.vector(self.embedder, next_row.id),
+                                  self.k + 1, episode=s.episode, before=before):
+                if h.row.id != next_row.id and h.row.id not in found:
+                    found[h.row.id] = h
         ms = 1000 * (time.perf_counter() - started)
-        return sorted((h.row for h in hits), key=lambda r: r.id), ms
+        shown = followed if self.followed_only else [h.row for h in found.values()]
+        return sorted(shown, key=lambda r: r.id), ms
 
 
 def ask(args) -> None:
@@ -138,7 +214,13 @@ def ask(args) -> None:
         rows = store.in_episode(s.episode)
         if [r.text for r in rows] != s.sentences:
             raise SystemExit(f"{s.episode}: the store's rows are not the story's sentences")
-    trunk = ServedTrunk(parallel=args.parallel, max_new=args.max_new)
+    if args.trunk == "local":
+        trunk = LocalTrunk(batch=args.parallel, max_new=args.max_new)
+        Arm.trunk = trunk
+    else:
+        trunk = ServedTrunk(parallel=args.parallel, max_new=args.max_new)
+    if args.walker:
+        Arm.walker = LinearWalker.load(args.walker)
     tasks = sorted({s.task for s in chosen_stories})
     reading: dict = {
         "kind": "store",
@@ -157,6 +239,9 @@ def ask(args) -> None:
                               text=True, cwd=ROOT).stdout.strip(),
         "taken_at": datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ"),
         "note": args.note,
+        "walker": ({"path": args.walker, "layer": Arm.walker.layer, "lam": Arm.walker.lam,
+                    "key": Arm.walker.key, "prompt": hop_prompt("<question>", ["<row read>"])}
+                   if Arm.walker else None),
         "arms": {},
     }
     items = [(s, i) for s in chosen_stories for i in range(len(s.questions))]
@@ -223,7 +308,8 @@ def ask(args) -> None:
     # same rows for every question; and the trunk, asked again late with thousands of rows
     # heard since, must say the same for the first stories' questions.
     again = Store(args.store)
-    store_arms = [a for a in arms if a.kind in ("store", "unscoped")]
+    store_arms = [a for a in arms
+                  if a.kind in ("store", "unscoped", "hops", "hops-random", "walker")]
     identity: dict = {"rows_identical_after_reload": {}, "reask": {}}
     for arm in store_arms:
         rng = random.Random(args.seed)
@@ -267,7 +353,9 @@ def main() -> None:
                                      "store:trunk:4,random:4,unscoped:minilm:4")
     p.add_argument("--reask", type=int, default=20,
                    help="re-ask the first N stories' questions of each task after all arms")
-    p.add_argument("--parallel", type=int, default=8)
+    p.add_argument("--parallel", type=int, default=8, help="server streams, or local batch")
+    p.add_argument("--trunk", default="served", choices=["served", "local"])
+    p.add_argument("--walker", default=None, help="a walker-*.npz from walker_fit.py")
     p.add_argument("--max-new", type=int, default=8)
     p.add_argument("--seed", type=int, default=0)
     p.add_argument("--note", default="")

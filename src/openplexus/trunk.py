@@ -67,3 +67,64 @@ def question_messages(rows: list[str], question: str) -> list[dict]:
     story = "\n".join(rows) if rows else "(no story given)"
     return [{"role": "system", "content": SYSTEM},
             {"role": "user", "content": f"Story:\n{story}\n\nQuestion: {question}"}]
+
+
+class LocalTrunk:
+    """The trunk in PyTorch, for a reading that needs its hidden states as well as its answers.
+    Several times slower than the served trunk on this card; use it only when a reading needs
+    what the server cannot give."""
+
+    def __init__(self, model_id: str = "Qwen/Qwen3.5-2B", batch: int = 8, max_new: int = 8):
+        import torch
+        from transformers import AutoModelForCausalLM, AutoTokenizer
+
+        self.torch = torch
+        self.model_id = model_id
+        self.tok = AutoTokenizer.from_pretrained(model_id)
+        self.tok.padding_side = "left"
+        if self.tok.pad_token is None:
+            self.tok.pad_token = self.tok.eos_token
+        self.model = AutoModelForCausalLM.from_pretrained(model_id, dtype=torch.float32)
+        self.model = self.model.to("cuda").eval()
+        self.batch = batch
+        self.max_new = max_new
+        self.tokens_in = 0
+        self.tokens_out = 0
+
+    def served_model(self) -> str:
+        return f"{self.model_id} fp32 in process"
+
+    def ask_many(self, prompts: list[list[dict]]) -> list[str]:
+        out: list[str] = []
+        for i in range(0, len(prompts), self.batch):
+            texts = [self.tok.apply_chat_template(m, tokenize=False, add_generation_prompt=True,
+                                                  enable_thinking=False)
+                     for m in prompts[i:i + self.batch]]
+            enc = self.tok(texts, return_tensors="pt", padding=True).to("cuda")
+            with self.torch.no_grad():
+                gen = self.model.generate(**enc, max_new_tokens=self.max_new, do_sample=False,
+                                          temperature=None, top_p=None, top_k=None,
+                                          pad_token_id=self.tok.pad_token_id)
+            new = gen[:, enc["input_ids"].shape[1]:]
+            self.tokens_in += int(enc["attention_mask"].sum())
+            self.tokens_out += int((new != self.tok.pad_token_id).sum())
+            out.extend(self.tok.decode(ids, skip_special_tokens=True).strip() for ids in new)
+        return out
+
+    def hidden(self, texts: list[str], layers: list[int]):
+        """The last token's hidden state at each of `layers` (0 is the embeddings), one row per
+        text, as float32 numpy arrays keyed by layer."""
+        import numpy as np
+
+        out = {layer: [] for layer in layers}
+        for i in range(0, len(texts), self.batch):
+            enc = self.tok(texts[i:i + self.batch], return_tensors="pt", padding=True).to("cuda")
+            with self.torch.no_grad():
+                hs = self.model(**enc, output_hidden_states=True).hidden_states
+            for layer in layers:
+                out[layer].append(hs[layer][:, -1, :].float().cpu().numpy())  # left padding
+        return {layer: np.concatenate(v) for layer, v in out.items()}
+
+    def close(self) -> None:
+        del self.model
+        self.torch.cuda.empty_cache()

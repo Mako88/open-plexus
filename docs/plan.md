@@ -145,6 +145,9 @@ Each step says what it decides. A step is struck when it is done.
    training, the re-query being the trunk's own hidden state after reading. Then a trained
    query: LoRA on the trunk's query path or a small trained retriever, trained on the train
    split's supporting line numbers (every row carries them), with checkpoint and resume.
+   The first trained query is a linear head over the hidden state fitted in closed form by
+   least squares, which takes seconds and needs no training loop; gradient training comes
+   in only when that head is beaten by a nonlinear one or by a LoRA on the trunk.
    Decides whether composing over the store works when each hop is a one-fact read, and
    whether training the glue buys anything over the loop. This is the step the bet lives or
    dies on, and the ceiling it is read against is the trunk's one-fact score, not its
@@ -158,7 +161,9 @@ Each step says what it decides. A step is struck when it is done.
    candidate step, is it good. Labels first from bAbI, where a hop that lands on a
    supporting line is good and any other is not, so the walker's own training data
    serves; then from step-labelled maths (PRM800K, 800k human labels on steps of MATH
-   solutions) and bAbI's path finding (task 19), which is planning in miniature. Search in
+   solutions) and bAbI's path finding (task 19), which is planning in miniature. As in
+   step 2, the first evaluator is linear and fitted in closed form, and the gradient-trained
+   one has to beat it. Search in
    code: beam over hops first, then a tree with backtracking, budgeted in forward passes.
    Counting and arithmetic go to a tool: an aggregation over rows for the first, a Python
    call the trunk writes for the second, read on bAbI task 7 and on GSM8K. Decides whether

@@ -9,6 +9,12 @@ that produced them and in a reading under `readings/`, never in the doc.
 - **Work in long stretches without asking.** Take the likelier of two routes yourself and
   switch if it does not pay. Stop only when a step needs John: a decision that changes the
   plan, spending money, or anything that cannot be undone.
+- **Consult a Fable session when a step needs a design decision the plan does not make**, or
+  when a reading refutes something the plan says and the next step is not obvious. The plan
+  was written with Fable, and a design question is cheaper to ask than to guess. Put the
+  question in a sentence with the reading beside it, and record the answer where it belongs:
+  in the plan if it changes a step, in the commit if it explains a result. Implementation
+  choices inside a step are yours.
 - **The GPU is shared.** Ember plays Minecraft on this machine in the evenings, so no job may
   need an unbroken day. Any training job checkpoints every few minutes and resumes from its
   checkpoint; any long reading writes rows as it goes and can be re-run to fill in the rest.

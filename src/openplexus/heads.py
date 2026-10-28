@@ -6,7 +6,9 @@ The walker's head maps the state after reading the question and the rows found s
 key space of the store: which row to read next. The evaluator's head maps the state after
 reading those and one candidate row to a score: whether that row is the right one. `MLPHead`
 is the gradient-trained form of a label head, over the same features, trained listwise
-against a stop option (`scripts/head_train.py`); `load_head` opens either kind.
+against a stop option (`scripts/head_train.py`). `RankWalker` is the gradient-trained walker:
+instead of a query vector it scores every row heard so far from the hop state, the row's key
+and when it was heard (`scripts/walker_train.py`). `load_head` opens any of them.
 """
 
 from __future__ import annotations
@@ -141,7 +143,101 @@ class MLPHead:
         return head.to(device)
 
 
+class RankWalker:
+    """The walker as a ranker. For one hop state and the rows heard so far, a score per row
+    from the state's projection, the row's store key, their product and the row's when-heard
+    numbers; the top-k by score are the candidates. `key` names the store embedder whose
+    vectors it reads; `kind` tells the reading arm to rank rather than search by a query."""
+    kind = "rank"
+
+    def __init__(self, state_dim: int, key_dim: int, layer: int, key: str, hidden: int = 256,
+                 mean: np.ndarray | None = None, std: np.ndarray | None = None):
+        import torch
+        from torch import nn
+
+        self.torch = torch
+        self.layer = layer
+        self.key = key
+        self.lam = 0.0
+        self.mean = mean  # standardisation of the hop state
+        self.std = std
+        self.state_dim, self.key_dim, self.hidden = state_dim, key_dim, hidden
+        self.state_proj = nn.Linear(state_dim, hidden)
+        self.key_proj = nn.Linear(key_dim, hidden)
+        self.net = nn.Sequential(nn.Linear(3 * hidden + 4, hidden), nn.GELU(), nn.Linear(hidden, 1))
+
+    def modules(self):
+        return [self.state_proj, self.key_proj, self.net]
+
+    def parameters(self):
+        return [p for m in self.modules() for p in m.parameters()]
+
+    def to(self, device):
+        for m in self.modules():
+            m.to(device)
+        return self
+
+    @property
+    def device(self):
+        return next(self.net.parameters()).device
+
+    def train(self, mode: bool = True):
+        for m in self.modules():
+            m.train(mode)
+
+    def logits(self, state, keys, when):
+        """state (b, state_dim) standardised, keys (b, n, key_dim), when (b, n, 4) -> (b, n)."""
+        hp = self.state_proj(state).unsqueeze(1).expand(-1, keys.shape[1], -1)
+        kp = self.key_proj(keys)
+        return self.net(self.torch.cat([hp, kp, hp * kp, when], dim=-1)).squeeze(-1)
+
+    def score(self, state: np.ndarray, keys: np.ndarray, when: np.ndarray) -> np.ndarray:
+        """One hop: the state (state_dim,), the candidates' keys (n, key_dim) and their
+        when-heard numbers (n, 4); a score per candidate."""
+        x = np.asarray(state, dtype=np.float32)
+        if self.mean is not None:
+            x = (x - self.mean) / self.std
+        t = lambda a: self.torch.as_tensor(np.asarray(a, dtype=np.float32), device=self.device)
+        self.train(False)
+        with self.torch.no_grad():
+            s = self.logits(t(x)[None], t(keys)[None], t(when)[None])
+        return s[0].cpu().numpy()
+
+    def state_dict(self) -> dict:
+        return {"kind": self.kind, "state_proj": self.state_proj.state_dict(),
+                "key_proj": self.key_proj.state_dict(), "net": self.net.state_dict(),
+                "state_dim": self.state_dim, "key_dim": self.key_dim, "hidden": self.hidden,
+                "layer": self.layer, "key": self.key, "mean": self.mean, "std": self.std}
+
+    def load_state_dict(self, z: dict) -> None:
+        self.state_proj.load_state_dict(z["state_proj"])
+        self.key_proj.load_state_dict(z["key_proj"])
+        self.net.load_state_dict(z["net"])
+
+    def save(self, path: str | Path) -> None:
+        self.torch.save(self.state_dict(), Path(path))
+
+    @classmethod
+    def from_state(cls, z: dict, device: str = "cpu"):
+        head = cls(z["state_dim"], z["key_dim"], z["layer"], z["key"], z["hidden"], z["mean"],
+                   z["std"])
+        head.load_state_dict(z)
+        return head.to(device)
+
+    @classmethod
+    def load(cls, path: str | Path, device: str = "cpu"):
+        import torch
+
+        return cls.from_state(torch.load(Path(path), weights_only=False, map_location="cpu"),
+                              device)
+
+
 def load_head(path: str | Path):
-    """A LinearHead from .npz, an MLPHead from .pt."""
+    """A LinearHead from .npz; from .pt, a RankWalker if it says so, else an MLPHead."""
     path = Path(path)
-    return MLPHead.load(path) if path.suffix == ".pt" else LinearHead.load(path)
+    if path.suffix != ".pt":
+        return LinearHead.load(path)
+    import torch
+
+    z = torch.load(path, weights_only=False, map_location="cpu")
+    return RankWalker.from_state(z) if z.get("kind") == "rank" else MLPHead.load(path)

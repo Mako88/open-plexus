@@ -198,12 +198,28 @@ Each step says what it decides. A step is struck when it is done.
      walker's recall is now what bounds task 3. Time belongs in the row (step 4); the
      evaluator reading it as numbers beside the state is that step's first form, arrived
      early.
+   - The ranking walker (`readings/walker-train-*`): the walker trained by gradient, scoring
+     every row heard so far from the hop state, the row's MiniLM key and when it was heard,
+     listwise over the pool, from the same cache, ten minutes on the CPU. Teacher-forced, it
+     puts the next right row first 98% of the time and in its top four 100%, at every hop of
+     every task (the linear walker: 45% and 87%). Controls: without time it reads as the
+     linear walker does (0.49 first); without the hop state, 0.47. The three together carry
+     it, as with the evaluator.
+   - End to end (`readings/store-*-20261028T154900Z`, `-161358Z`), the glue proposing,
+     judging and stopping, the trunk shown only the chain: with the linear walker and the
+     gradient evaluator **0.97/0.67/0.38**, recall of the supporting set 0.97/0.88/0.62;
+     with the ranking walker **0.99/0.69/0.58**, recall 0.99/0.90/0.80, 2.0 and 2.8 rows
+     shown, 0.8 s a lookup at fp32. On task 2 the chain is exactly the supporting pair 84%
+     of the time and the trunk then scores 0.80, the oracle; 14% of chains hold a wrong row
+     and 2% stop early. On task 3, 60% exact (the trunk 0.92 on those), 19% short, 20% a
+     wrong row. The wrong rows are the evaluator's: it was fitted on the linear walker's
+     candidates and now judges the ranker's, whose first is right 98% of the time.
    So the shape is settled: propose, judge, stop, hand the trunk the chain, with time in
-   front of the judge. The end-to-end chain with the gradient head is being read; step 2 is
-   struck when it reaches the oracle on task 2. If it does, the walker's recall on task 3
-   (62% at the third hop) is the next head to train by gradient. A walker covers
-   composition over facts and nothing else: arithmetic, counting and planning (bAbI tasks 7
-   and 19 first) are covered by nothing yet.
+   front of both heads. Next: the evaluator's states re-cached on the ranking walker's
+   candidates (three hours on the card) and both evaluator forms refitted, then the chain
+   read again. Step 2 is struck when the chain reaches the oracle on task 2 (0.78). A walker
+   covers composition over facts and nothing else: arithmetic, counting and planning (bAbI
+   tasks 7 and 19 first) are covered by nothing yet.
 
 3. **The evaluator and search.** A second head over the trunk's hidden state: given a candidate
    step, is it good. Its first form, a linear head judging the walker's candidates with bAbI's

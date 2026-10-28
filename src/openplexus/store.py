@@ -126,6 +126,10 @@ class Store:
         """A row's own key, which is what a hop re-queries with."""
         return self._vectors[name][row_id]
 
+    def vectors(self, name: str, row_ids: list[int]) -> np.ndarray:
+        """Several rows' keys at once, (len(row_ids), dim), for a head that ranks them."""
+        return self._vectors[name][np.asarray(row_ids, dtype=np.int64)]
+
     def in_episode(self, episode: str, before: int | None = None) -> list[Row]:
         n = len(self.rows) if before is None else min(before, len(self.rows))
         return [r for r in self.rows[:n] if r.episode == episode]

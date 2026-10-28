@@ -130,9 +130,29 @@ class Arm:
         self.depth = int(parts[3]) if self.kind in ("hops", "hops-random") else (
             int(parts[2]) if self.kind in ("walker", "select") else 1)
 
-    def walk(self, store: Store, s: Story, qi: int, before: int) -> tuple[list, float]:
+    def propose(self, store: Store, s: Story, h: np.ndarray, followed: list, before: int,
+                first_id: int) -> list[Hit]:
+        """The walker's top-k among the episode's rows heard so far and not followed: a key
+        walker's query by cosine through the store's search, a ranking walker's score over
+        every such row with its key and when it was heard."""
+        if getattr(self.walker, "kind", None) != "rank":
+            hits = store.search(self.walker.key, self.walker.query(h), self.k + len(followed),
+                                episode=s.episode, before=before)
+            return [h_ for h_ in hits if h_.row not in followed][:self.k]
+        rows = [r for r in store.in_episode(s.episode, before) if r not in followed]
+        if not rows:
+            return []
+        heard = before - first_id
+        last = followed[-1].id - first_id if followed else -1
+        when = np.array([when_heard(r.id - first_id, heard, last) for r in rows], np.float32)
+        scores = self.walker.score(h, store.vectors(self.walker.key, [r.id for r in rows]), when)
+        order = np.lexsort((np.array([r.id for r in rows]), -scores))[:self.k]
+        return [Hit(rows[i], float(scores[i])) for i in order]
+
+    def walk(self, store: Store, s: Story, qi: int, before: int,
+             first_id: int) -> tuple[list, float]:
         """The trained hop: at each hop the trunk reads the question and the rows followed so
-        far, the walker maps its state to a key, and the best unfollowed row found is read."""
+        far, the walker proposes, and the best unfollowed row found is read."""
         q = s.questions[qi]
         followed: list = []
         found: dict[int, Hit] = {}
@@ -140,8 +160,7 @@ class Arm:
         for _ in range(self.depth):
             h = self.trunk.hidden([hop_prompt(q.text, [r.text for r in followed])],
                                   [self.walker.layer])[self.walker.layer][0]
-            for hit in store.search(self.walker.key, self.walker.query(h), self.k,
-                                    episode=s.episode, before=before):
+            for hit in self.propose(store, s, h, followed, before, first_id):
                 if hit.row.id not in found:
                     found[hit.row.id] = hit
             candidates = [h for h in found.values() if h.row not in followed]
@@ -165,9 +184,7 @@ class Arm:
             read = [r.text for r in followed]
             h = self.trunk.hidden([hop_prompt(q.text, read)],
                                   [self.walker.layer])[self.walker.layer][0]
-            hits = [h_ for h_ in store.search(self.walker.key, self.walker.query(h), self.k
-                                              + len(followed), episode=s.episode, before=before)
-                    if h_.row not in followed][:self.k]
+            hits = self.propose(store, s, h, followed, before, first_id)
             if not hits:
                 break
             states = self.trunk.hidden([judge_prompt(q.text, read, h_.row.text) for h_ in hits],
@@ -204,7 +221,7 @@ class Arm:
             rows = store.in_episode(s.episode, before)
             return [rows[i] for i in sorted(q.supporting)], 0.0
         if self.kind == "walker":
-            return self.walk(store, s, qi, before)
+            return self.walk(store, s, qi, before, first_id)
         if self.kind == "select":
             return self.select(store, s, qi, before, first_id)
         if self.kind == "random":
@@ -266,7 +283,7 @@ def ask(args) -> None:
     else:
         trunk = ServedTrunk(parallel=args.parallel, max_new=args.max_new)
     if args.walker:
-        Arm.walker = LinearHead.load(args.walker)
+        Arm.walker = load_head(args.walker)
     if args.evaluator:
         Arm.evaluator = load_head(args.evaluator)
     tasks = sorted({s.task for s in chosen_stories})
@@ -409,7 +426,8 @@ def main() -> None:
                    help="re-ask the first N stories' questions of each task after all arms")
     p.add_argument("--parallel", type=int, default=8, help="server streams, or local batch")
     p.add_argument("--trunk", default="served", choices=["served", "local"])
-    p.add_argument("--walker", default=None, help="a walker-*.npz from walker_fit.py")
+    p.add_argument("--walker", default=None,
+                   help="a walker*.npz from walker_fit.py or walker-rank.pt from walker_train.py")
     p.add_argument("--evaluator", default=None,
                    help="an evaluator*.npz from evaluator_fit.py or *.pt from head_train.py")
     p.add_argument("--max-new", type=int, default=8)

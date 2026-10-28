@@ -43,7 +43,7 @@ sys.path.insert(0, str(ROOT / "src"))
 sys.path.insert(0, str(ROOT / "scripts"))
 
 from openplexus.babi import Story, stories  # noqa: E402
-from openplexus.heads import LinearHead, hop_prompt, judge_prompt, when_heard  # noqa: E402
+from openplexus.heads import LinearHead, hop_prompt, judge_prompt, load_head, when_heard  # noqa: E402
 from openplexus.store import Store  # noqa: E402
 
 SPLITS = ("fit", "held", "test")
@@ -63,10 +63,12 @@ def states(ss: list[Story]) -> list[dict]:
     return out
 
 
-def candidates(walker: LinearHead, hidden: np.ndarray, exs: list[dict], key_of, k: int) -> None:
+def candidates(walker, hidden: np.ndarray, exs: list[dict], key_of, k: int) -> None:
     """The walker's top-k among the story's rows heard so far, read rows excluded, written
-    onto each example as `cands` with `labels`."""
-    queries = walker.query(hidden)
+    onto each example as `cands` with `labels`: a key walker's by cosine to its query, a
+    ranking walker's by its score over the pool with each row's key and when it was heard."""
+    ranking = getattr(walker, "kind", None) == "rank"
+    queries = hidden if ranking else walker.query(hidden)
     for q, ex in zip(queries, exs):
         s, question = ex["story"], ex["story"].questions[ex["qi"]]
         pool = [i for i in range(question.heard) if i not in ex["read"]]
@@ -74,7 +76,12 @@ def candidates(walker: LinearHead, hidden: np.ndarray, exs: list[dict], key_of, 
             ex["cands"], ex["labels"] = [], []
             continue
         keys = np.stack([key_of(s, i) for i in pool])
-        scores = keys @ (q / max(float(np.linalg.norm(q)), 1e-12))
+        if ranking:
+            last = ex["read"][-1] if ex["read"] else -1
+            when = np.array([when_heard(i, question.heard, last) for i in pool], np.float32)
+            scores = walker.score(q, keys, when)
+        else:
+            scores = keys @ (q / max(float(np.linalg.norm(q)), 1e-12))
         order = np.lexsort((np.arange(len(scores)), -scores))[:k]
         ex["cands"] = [pool[i] for i in order]
         ex["labels"] = [1.0 if c == ex["target"] else -1.0 for c in ex["cands"]]
@@ -238,7 +245,7 @@ def build_features(args) -> None:
 
     tasks = [int(t) for t in args.tasks.split(",")]
     layers = [int(x) for x in args.layers.split(",")]
-    walker = LinearHead.load(args.walker)
+    walker = load_head(args.walker)
     out = Path(args.out)
     out.mkdir(parents=True, exist_ok=True)
 

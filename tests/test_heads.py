@@ -78,3 +78,30 @@ def test_an_mlp_head_learns_a_listwise_choice_and_round_trips(tmp_path):
     again = load_head(tmp_path / "e.pt")
     assert again.threshold == 0.0
     assert np.allclose(again.query(x.reshape(-1, 6)), scores.reshape(-1, 1))
+
+
+def test_a_rank_walker_learns_to_match_state_to_key_and_round_trips(tmp_path):
+    import torch
+
+    from openplexus.heads import RankWalker, load_head
+
+    rng = np.random.default_rng(3)
+    n, keys_per = 96, 5
+    keys = rng.normal(size=(n, keys_per, 8)).astype(np.float32)
+    target = rng.integers(0, keys_per, n)
+    state = np.concatenate([keys[np.arange(n), target], rng.normal(size=(n, 4))], 1).astype(np.float32)
+    when = np.zeros((n, keys_per, 4), np.float32)  # the right key is the state's first eight numbers
+    walker = RankWalker(12, 8, layer=16, key="minilm", hidden=32)
+    opt = torch.optim.Adam(walker.parameters(), lr=1e-2)
+    st, kt, wt, yt = (torch.as_tensor(a) for a in (state, keys, when, target))
+    for _ in range(400):
+        loss = torch.nn.functional.cross_entropy(walker.logits(st, kt, wt), yt)
+        opt.zero_grad()
+        loss.backward()
+        opt.step()
+    picks = [int(np.argmax(walker.score(state[i], keys[i], when[i]))) for i in range(n)]
+    assert np.mean(np.array(picks) == target) > 0.9
+    walker.save(tmp_path / "w.pt")
+    again = load_head(tmp_path / "w.pt")
+    assert again.kind == "rank" and again.key == "minilm"
+    assert np.allclose(again.score(state[0], keys[0], when[0]), walker.score(state[0], keys[0], when[0]))

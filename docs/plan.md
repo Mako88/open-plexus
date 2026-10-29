@@ -255,11 +255,15 @@ Each step says what it decides. A step is struck when it is done.
      Wider beams lose at every stage (0.266 at 20 passes, 0.254 at 36); the gradient evaluator
      is behind at every width (0.23-0.25) with no better stop. So the trunk's judgement of a
      move, read by a linear head and searched in code, beats its own chain of thought at a
-     fortieth of the passes; the wall is the first move, which is the whole map composed in one
-     pass, and the evaluator's score is a decision, not a probability to sum. Not yet read: the
-     chain of thought at 2048, and whether a bigger trunk with thinking gets task 19 right at
-     all, which is the premise of the refutation line above (Qwen3.5-9B Q8 and Gemma 4 12B are
-     on disk).
+     fortieth of the passes, and the evaluator's score is a decision, not a probability to sum.
+     But chain of thought at a 2048-token budget scores **0.752** (2047 passes), and handed
+     exactly the two supporting sentences the one-pass trunk scores 0.146: the trunk can do the
+     task, thinking, and cannot compose two directional facts into an ordered path in one pass.
+     So no store and no number of search passes over a one-pass judgement of a whole move reach
+     it; the wall is one-pass composition, and the step prompt still asks the trunk to compose.
+     Next form: steps that are single facts ("from the bathroom, north leads to which room"),
+     the search in code walking rooms to the goal, the composition never asked of the trunk. A
+     LoRA under the head is the form after, if that does not move it.
 
 4. **Writing.** What goes in a row: the raw sentence, or the trunk's own restatement with
    names resolved ("John is in the hallway", not "he went there"), one fact a row. Rows carry

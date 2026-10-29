@@ -1,0 +1,3528 @@
+{
+ "kind": "path",
+ "step": 3,
+ "task": 19,
+ "stories": 500,
+ "scorer": "ordered moves, letters or words (openplexus.paths.path_correct)",
+ "arms": {
+  "cot:2048": {
+   "kind": "cot",
+   "think": true,
+   "budget": 2048,
+   "max_new": 2080,
+   "served_model": "C:\\Users\\John\\.cache\\huggingface\\hub\\models--bartowski--Qwen_Qwen3.5-2B-GGUF\\snapshots\\7d26695454df6de5fbcce2e58681e62dae06ce43\\Qwen_Qwen3.5-2B-Q8_0.gguf",
+   "score": 0.752,
+   "n": 500,
+   "passes_per_question": 2047.0,
+   "tokens_in_per_question": 135.0,
+   "empty_replies": 0,
+   "seconds": 4714.5,
+   "rows": [
+    {
+     "episode": "t19s0",
+     "question": "How do you go from the bathroom to the hallway?",
+     "answer": "s,s",
+     "said": "s",
+     "correct": false
+    },
+    {
+     "episode": "t19s1",
+     "question": "How do you go from the bedroom to the hallway?",
+     "answer": "e,e",
+     "said": "e,e",
+     "correct": true
+    },
+    {
+     "episode": "t19s2",
+     "question": "How do you go from the bathroom to the hallway?",
+     "answer": "n,e",
+     "said": "n,e",
+     "correct": true
+    },
+    {
+     "episode": "t19s3",
+     "question": "How do you go from the kitchen to the bathroom?",
+     "answer": "n,w",
+     "said": "n,w",
+     "correct": true
+    },
+    {
+     "episode": "t19s4",
+     "question": "How do you go from the bedroom to the kitchen?",
+     "answer": "s,s",
+     "said": "s,s",
+     "correct": true
+    },
+    {
+     "episode": "t19s5",
+     "question": "How do you go from the garden to the bathroom?",
+     "answer": "n,n",
+     "said": "s",
+     "correct": false
+    },
+    {
+     "episode": "t19s6",
+     "question": "How do you go from the bedroom to the kitchen?",
+     "answer": "w,n",
+     "said": "w,n",
+     "correct": true
+    },
+    {
+     "episode": "t19s7",
+     "question": "How do you go from the garden to the bedroom?",
+     "answer": "w,n",
+     "said": "W,N",
+     "correct": true
+    },
+    {
+     "episode": "t19s8",
+     "question": "How do you go from the kitchen to the garden?",
+     "answer": "n,w",
+     "said": "w",
+     "correct": false
+    },
+    {
+     "episode": "t19s9",
+     "question": "How do you go from the hallway to the office?",
+     "answer": "s,e",
+     "said": "s,e",
+     "correct": true
+    },
+    {
+     "episode": "t19s10",
+     "question": "How do you go from the office to the hallway?",
+     "answer": "n,e",
+     "said": "N,E",
+     "correct": true
+    },
+    {
+     "episode": "t19s11",
+     "question": "How do you go from the kitchen to the office?",
+     "answer": "w,n",
+     "said": "w,n",
+     "correct": true
+    },
+    {
+     "episode": "t19s12",
+     "question": "How do you go from the bathroom to the kitchen?",
+     "answer": "s,w",
+     "said": "s,w",
+     "correct": true
+    },
+    {
+     "episode": "t19s13",
+     "question": "How do you go from the kitchen to the garden?",
+     "answer": "s,w",
+     "said": "s,w",
+     "correct": true
+    },
+    {
+     "episode": "t19s14",
+     "question": "How do you go from the bedroom to the office?",
+     "answer": "s,w",
+     "said": "s,w",
+     "correct": true
+    },
+    {
+     "episode": "t19s15",
+     "question": "How do you go from the garden to the hallway?",
+     "answer": "s,w",
+     "said": "S,W",
+     "correct": true
+    },
+    {
+     "episode": "t19s16",
+     "question": "How do you go from the hallway to the bathroom?",
+     "answer": "e,n",
+     "said": "E,N",
+     "correct": true
+    },
+    {
+     "episode": "t19s17",
+     "question": "How do you go from the bathroom to the kitchen?",
+     "answer": "w,s",
+     "said": "w,s",
+     "correct": true
+    },
+    {
+     "episode": "t19s18",
+     "question": "How do you go from the bedroom to the garden?",
+     "answer": "s,e",
+     "said": "S,E",
+     "correct": true
+    },
+    {
+     "episode": "t19s19",
+     "question": "How do you go from the kitchen to the bedroom?",
+     "answer": "w,w",
+     "said": "w,w",
+     "correct": true
+    },
+    {
+     "episode": "t19s20",
+     "question": "How do you go from the office to the garden?",
+     "answer": "e,s",
+     "said": "s",
+     "correct": false
+    },
+    {
+     "episode": "t19s21",
+     "question": "How do you go from the bathroom to the kitchen?",
+     "answer": "e,e",
+     "said": "e,e",
+     "correct": true
+    },
+    {
+     "episode": "t19s22",
+     "question": "How do you go from the bedroom to the bathroom?",
+     "answer": "s,s",
+     "said": "s,s",
+     "correct": true
+    },
+    {
+     "episode": "t19s23",
+     "question": "How do you go from the bathroom to the bedroom?",
+     "answer": "e,s",
+     "said": "E,S",
+     "correct": true
+    },
+    {
+     "episode": "t19s24",
+     "question": "How do you go from the bedroom to the hallway?",
+     "answer": "e,e",
+     "said": "e",
+     "correct": false
+    },
+    {
+     "episode": "t19s25",
+     "question": "How do you go from the bathroom to the office?",
+     "answer": "n,e",
+     "said": "n,e",
+     "correct": true
+    },
+    {
+     "episode": "t19s26",
+     "question": "How do you go from the bedroom to the hallway?",
+     "answer": "e,e",
+     "said": "e",
+     "correct": false
+    },
+    {
+     "episode": "t19s27",
+     "question": "How do you go from the bathroom to the office?",
+     "answer": "w,n",
+     "said": "w,n",
+     "correct": true
+    },
+    {
+     "episode": "t19s28",
+     "question": "How do you go from the bathroom to the garden?",
+     "answer": "s,w",
+     "said": "s,w",
+     "correct": true
+    },
+    {
+     "episode": "t19s29",
+     "question": "How do you go from the garden to the office?",
+     "answer": "s,w",
+     "said": "w",
+     "correct": false
+    },
+    {
+     "episode": "t19s30",
+     "question": "How do you go from the bedroom to the kitchen?",
+     "answer": "e,e",
+     "said": "e,e",
+     "correct": true
+    },
+    {
+     "episode": "t19s31",
+     "question": "How do you go from the kitchen to the bathroom?",
+     "answer": "s,e",
+     "said": "S,E",
+     "correct": true
+    },
+    {
+     "episode": "t19s32",
+     "question": "How do you go from the garden to the bathroom?",
+     "answer": "n,w",
+     "said": "N,W",
+     "correct": true
+    },
+    {
+     "episode": "t19s33",
+     "question": "How do you go from the bedroom to the hallway?",
+     "answer": "n,w",
+     "said": "w,n",
+     "correct": false
+    },
+    {
+     "episode": "t19s34",
+     "question": "How do you go from the kitchen to the hallway?",
+     "answer": "w,s",
+     "said": "w,s",
+     "correct": true
+    },
+    {
+     "episode": "t19s35",
+     "question": "How do you go from the garden to the bedroom?",
+     "answer": "n,e",
+     "said": "n,e",
+     "correct": true
+    },
+    {
+     "episode": "t19s36",
+     "question": "How do you go from the hallway to the office?",
+     "answer": "n,w",
+     "said": "n,w",
+     "correct": true
+    },
+    {
+     "episode": "t19s37",
+     "question": "How do you go from the bathroom to the bedroom?",
+     "answer": "w,n",
+     "said": "w,n",
+     "correct": true
+    },
+    {
+     "episode": "t19s38",
+     "question": "How do you go from the bathroom to the bedroom?",
+     "answer": "s,e",
+     "said": "s,e",
+     "correct": true
+    },
+    {
+     "episode": "t19s39",
+     "question": "How do you go from the office to the kitchen?",
+     "answer": "e,n",
+     "said": "E,N",
+     "correct": true
+    },
+    {
+     "episode": "t19s40",
+     "question": "How do you go from the bathroom to the kitchen?",
+     "answer": "n,w",
+     "said": "N,W",
+     "correct": true
+    },
+    {
+     "episode": "t19s41",
+     "question": "How do you go from the bedroom to the office?",
+     "answer": "w,n",
+     "said": "w,n",
+     "correct": true
+    },
+    {
+     "episode": "t19s42",
+     "question": "How do you go from the kitchen to the bedroom?",
+     "answer": "s,s",
+     "said": "s",
+     "correct": false
+    },
+    {
+     "episode": "t19s43",
+     "question": "How do you go from the garden to the bathroom?",
+     "answer": "n,w",
+     "said": "s,e",
+     "correct": false
+    },
+    {
+     "episode": "t19s44",
+     "question": "How do you go from the office to the garden?",
+     "answer": "s,s",
+     "said": "S,S",
+     "correct": true
+    },
+    {
+     "episode": "t19s45",
+     "question": "How do you go from the office to the bedroom?",
+     "answer": "w,n",
+     "said": "w,n",
+     "correct": true
+    },
+    {
+     "episode": "t19s46",
+     "question": "How do you go from the garden to the bedroom?",
+     "answer": "w,n",
+     "said": "w,n",
+     "correct": true
+    },
+    {
+     "episode": "t19s47",
+     "question": "How do you go from the bedroom to the garden?",
+     "answer": "w,s",
+     "said": "W,S",
+     "correct": true
+    },
+    {
+     "episode": "t19s48",
+     "question": "How do you go from the hallway to the bedroom?",
+     "answer": "e,n",
+     "said": "e,n",
+     "correct": true
+    },
+    {
+     "episode": "t19s49",
+     "question": "How do you go from the office to the garden?",
+     "answer": "n,w",
+     "said": "N,W",
+     "correct": true
+    },
+    {
+     "episode": "t19s50",
+     "question": "How do you go from the hallway to the bedroom?",
+     "answer": "s,e",
+     "said": "s,e",
+     "correct": true
+    },
+    {
+     "episode": "t19s51",
+     "question": "How do you go from the garden to the office?",
+     "answer": "n,e",
+     "said": "s,e",
+     "correct": false
+    },
+    {
+     "episode": "t19s52",
+     "question": "How do you go from the bedroom to the hallway?",
+     "answer": "s,s",
+     "said": "s",
+     "correct": false
+    },
+    {
+     "episode": "t19s53",
+     "question": "How do you go from the bathroom to the garden?",
+     "answer": "w,w",
+     "said": "w",
+     "correct": false
+    },
+    {
+     "episode": "t19s54",
+     "question": "How do you go from the bedroom to the office?",
+     "answer": "n,w",
+     "said": "N,W",
+     "correct": true
+    },
+    {
+     "episode": "t19s55",
+     "question": "How do you go from the hallway to the bedroom?",
+     "answer": "w,s",
+     "said": "w,s",
+     "correct": true
+    },
+    {
+     "episode": "t19s56",
+     "question": "How do you go from the hallway to the bedroom?",
+     "answer": "e,n",
+     "said": "e,n",
+     "correct": true
+    },
+    {
+     "episode": "t19s57",
+     "question": "How do you go from the hallway to the garden?",
+     "answer": "e,s",
+     "said": "e,s",
+     "correct": true
+    },
+    {
+     "episode": "t19s58",
+     "question": "How do you go from the hallway to the bedroom?",
+     "answer": "e,s",
+     "said": "s",
+     "correct": false
+    },
+    {
+     "episode": "t19s59",
+     "question": "How do you go from the garden to the bathroom?",
+     "answer": "n,w",
+     "said": "n,s",
+     "correct": false
+    },
+    {
+     "episode": "t19s60",
+     "question": "How do you go from the hallway to the bathroom?",
+     "answer": "n,w",
+     "said": "N,W",
+     "correct": true
+    },
+    {
+     "episode": "t19s61",
+     "question": "How do you go from the bedroom to the hallway?",
+     "answer": "s,w",
+     "said": "S,W",
+     "correct": true
+    },
+    {
+     "episode": "t19s62",
+     "question": "How do you go from the hallway to the garden?",
+     "answer": "n,n",
+     "said": "n,n",
+     "correct": true
+    },
+    {
+     "episode": "t19s63",
+     "question": "How do you go from the hallway to the garden?",
+     "answer": "n,w",
+     "said": "N,W",
+     "correct": true
+    },
+    {
+     "episode": "t19s64",
+     "question": "How do you go from the garden to the bedroom?",
+     "answer": "n,e",
+     "said": "n,e",
+     "correct": true
+    },
+    {
+     "episode": "t19s65",
+     "question": "How do you go from the bedroom to the office?",
+     "answer": "w,s",
+     "said": "s,e",
+     "correct": false
+    },
+    {
+     "episode": "t19s66",
+     "question": "How do you go from the bedroom to the bathroom?",
+     "answer": "s,w",
+     "said": "s,w",
+     "correct": true
+    },
+    {
+     "episode": "t19s67",
+     "question": "How do you go from the garden to the office?",
+     "answer": "s,w",
+     "said": "w,s",
+     "correct": false
+    },
+    {
+     "episode": "t19s68",
+     "question": "How do you go from the bathroom to the kitchen?",
+     "answer": "e,e",
+     "said": "e,e",
+     "correct": true
+    },
+    {
+     "episode": "t19s69",
+     "question": "How do you go from the hallway to the bathroom?",
+     "answer": "n,n",
+     "said": "n",
+     "correct": false
+    },
+    {
+     "episode": "t19s70",
+     "question": "How do you go from the bedroom to the hallway?",
+     "answer": "s,s",
+     "said": "s,s",
+     "correct": true
+    },
+    {
+     "episode": "t19s71",
+     "question": "How do you go from the garden to the kitchen?",
+     "answer": "e,s",
+     "said": "w,s",
+     "correct": false
+    },
+    {
+     "episode": "t19s72",
+     "question": "How do you go from the garden to the bedroom?",
+     "answer": "w,s",
+     "said": "w,s",
+     "correct": true
+    },
+    {
+     "episode": "t19s73",
+     "question": "How do you go from the office to the hallway?",
+     "answer": "w,n",
+     "said": "w,n",
+     "correct": true
+    },
+    {
+     "episode": "t19s74",
+     "question": "How do you go from the hallway to the office?",
+     "answer": "e,e",
+     "said": "e",
+     "correct": false
+    },
+    {
+     "episode": "t19s75",
+     "question": "How do you go from the bedroom to the hallway?",
+     "answer": "e,e",
+     "said": "e",
+     "correct": false
+    },
+    {
+     "episode": "t19s76",
+     "question": "How do you go from the hallway to the bedroom?",
+     "answer": "w,w",
+     "said": "w",
+     "correct": false
+    },
+    {
+     "episode": "t19s77",
+     "question": "How do you go from the office to the garden?",
+     "answer": "s,w",
+     "said": "s,w",
+     "correct": true
+    },
+    {
+     "episode": "t19s78",
+     "question": "How do you go from the kitchen to the bathroom?",
+     "answer": "w,w",
+     "said": "w,w",
+     "correct": true
+    },
+    {
+     "episode": "t19s79",
+     "question": "How do you go from the kitchen to the office?",
+     "answer": "w,w",
+     "said": "w",
+     "correct": false
+    },
+    {
+     "episode": "t19s80",
+     "question": "How do you go from the office to the garden?",
+     "answer": "s,e",
+     "said": "s,e",
+     "correct": true
+    },
+    {
+     "episode": "t19s81",
+     "question": "How do you go from the office to the bedroom?",
+     "answer": "w,s",
+     "said": "w,s",
+     "correct": true
+    },
+    {
+     "episode": "t19s82",
+     "question": "How do you go from the hallway to the kitchen?",
+     "answer": "w,s",
+     "said": "W,S",
+     "correct": true
+    },
+    {
+     "episode": "t19s83",
+     "question": "How do you go from the garden to the office?",
+     "answer": "n,n",
+     "said": "n",
+     "correct": false
+    },
+    {
+     "episode": "t19s84",
+     "question": "How do you go from the hallway to the office?",
+     "answer": "n,w",
+     "said": "N,W",
+     "correct": true
+    },
+    {
+     "episode": "t19s85",
+     "question": "How do you go from the office to the bathroom?",
+     "answer": "w,n",
+     "said": "w,n",
+     "correct": true
+    },
+    {
+     "episode": "t19s86",
+     "question": "How do you go from the garden to the office?",
+     "answer": "s,e",
+     "said": "S,E",
+     "correct": true
+    },
+    {
+     "episode": "t19s87",
+     "question": "How do you go from the garden to the bathroom?",
+     "answer": "n,n",
+     "said": "n,n",
+     "correct": true
+    },
+    {
+     "episode": "t19s88",
+     "question": "How do you go from the bathroom to the kitchen?",
+     "answer": "n,e",
+     "said": "N,E",
+     "correct": true
+    },
+    {
+     "episode": "t19s89",
+     "question": "How do you go from the bedroom to the kitchen?",
+     "answer": "e,s",
+     "said": "E,S",
+     "correct": true
+    },
+    {
+     "episode": "t19s90",
+     "question": "How do you go from the office to the hallway?",
+     "answer": "e,e",
+     "said": "e",
+     "correct": false
+    },
+    {
+     "episode": "t19s91",
+     "question": "How do you go from the bedroom to the office?",
+     "answer": "e,e",
+     "said": "e,e",
+     "correct": true
+    },
+    {
+     "episode": "t19s92",
+     "question": "How do you go from the bedroom to the hallway?",
+     "answer": "n,n",
+     "said": "n",
+     "correct": false
+    },
+    {
+     "episode": "t19s93",
+     "question": "How do you go from the bathroom to the garden?",
+     "answer": "s,s",
+     "said": "s",
+     "correct": false
+    },
+    {
+     "episode": "t19s94",
+     "question": "How do you go from the bedroom to the garden?",
+     "answer": "e,n",
+     "said": "E,N",
+     "correct": true
+    },
+    {
+     "episode": "t19s95",
+     "question": "How do you go from the garden to the hallway?",
+     "answer": "e,e",
+     "said": "e",
+     "correct": false
+    },
+    {
+     "episode": "t19s96",
+     "question": "How do you go from the kitchen to the bathroom?",
+     "answer": "s,w",
+     "said": "s,w",
+     "correct": true
+    },
+    {
+     "episode": "t19s97",
+     "question": "How do you go from the kitchen to the office?",
+     "answer": "e,e",
+     "said": "E,E",
+     "correct": true
+    },
+    {
+     "episode": "t19s98",
+     "question": "How do you go from the bathroom to the office?",
+     "answer": "n,n",
+     "said": "n",
+     "correct": false
+    },
+    {
+     "episode": "t19s99",
+     "question": "How do you go from the office to the garden?",
+     "answer": "w,w",
+     "said": "w",
+     "correct": false
+    },
+    {
+     "episode": "t19s100",
+     "question": "How do you go from the bedroom to the garden?",
+     "answer": "w,n",
+     "said": "W,N",
+     "correct": true
+    },
+    {
+     "episode": "t19s101",
+     "question": "How do you go from the hallway to the garden?",
+     "answer": "w,s",
+     "said": "West, South",
+     "correct": true
+    },
+    {
+     "episode": "t19s102",
+     "question": "How do you go from the office to the bathroom?",
+     "answer": "e,e",
+     "said": "e",
+     "correct": false
+    },
+    {
+     "episode": "t19s103",
+     "question": "How do you go from the kitchen to the garden?",
+     "answer": "e,n",
+     "said": "E,N",
+     "correct": true
+    },
+    {
+     "episode": "t19s104",
+     "question": "How do you go from the bedroom to the hallway?",
+     "answer": "n,n",
+     "said": "n",
+     "correct": false
+    },
+    {
+     "episode": "t19s105",
+     "question": "How do you go from the kitchen to the garden?",
+     "answer": "n,w",
+     "said": "n,w",
+     "correct": true
+    },
+    {
+     "episode": "t19s106",
+     "question": "How do you go from the office to the hallway?",
+     "answer": "n,n",
+     "said": "n,n",
+     "correct": true
+    },
+    {
+     "episode": "t19s107",
+     "question": "How do you go from the bathroom to the garden?",
+     "answer": "n,n",
+     "said": "n",
+     "correct": false
+    },
+    {
+     "episode": "t19s108",
+     "question": "How do you go from the bedroom to the bathroom?",
+     "answer": "w,s",
+     "said": "W,S",
+     "correct": true
+    },
+    {
+     "episode": "t19s109",
+     "question": "How do you go from the kitchen to the garden?",
+     "answer": "s,e",
+     "said": "s,e",
+     "correct": true
+    },
+    {
+     "episode": "t19s110",
+     "question": "How do you go from the hallway to the bathroom?",
+     "answer": "w,n",
+     "said": "w,n",
+     "correct": true
+    },
+    {
+     "episode": "t19s111",
+     "question": "How do you go from the kitchen to the bathroom?",
+     "answer": "n,e",
+     "said": "N,E",
+     "correct": true
+    },
+    {
+     "episode": "t19s112",
+     "question": "How do you go from the bathroom to the office?",
+     "answer": "e,s",
+     "said": "e,s",
+     "correct": true
+    },
+    {
+     "episode": "t19s113",
+     "question": "How do you go from the office to the hallway?",
+     "answer": "e,e",
+     "said": "e",
+     "correct": false
+    },
+    {
+     "episode": "t19s114",
+     "question": "How do you go from the kitchen to the garden?",
+     "answer": "e,n",
+     "said": "e,n",
+     "correct": true
+    },
+    {
+     "episode": "t19s115",
+     "question": "How do you go from the garden to the hallway?",
+     "answer": "e,e",
+     "said": "e",
+     "correct": false
+    },
+    {
+     "episode": "t19s116",
+     "question": "How do you go from the hallway to the bedroom?",
+     "answer": "e,n",
+     "said": "E,N",
+     "correct": true
+    },
+    {
+     "episode": "t19s117",
+     "question": "How do you go from the bedroom to the garden?",
+     "answer": "e,s",
+     "said": "E,S",
+     "correct": true
+    },
+    {
+     "episode": "t19s118",
+     "question": "How do you go from the office to the hallway?",
+     "answer": "s,s",
+     "said": "s,s",
+     "correct": true
+    },
+    {
+     "episode": "t19s119",
+     "question": "How do you go from the office to the kitchen?",
+     "answer": "n,n",
+     "said": "n,n",
+     "correct": true
+    },
+    {
+     "episode": "t19s120",
+     "question": "How do you go from the bedroom to the hallway?",
+     "answer": "e,s",
+     "said": "n,s",
+     "correct": false
+    },
+    {
+     "episode": "t19s121",
+     "question": "How do you go from the kitchen to the hallway?",
+     "answer": "n,n",
+     "said": "N,N",
+     "correct": true
+    },
+    {
+     "episode": "t19s122",
+     "question": "How do you go from the bathroom to the office?",
+     "answer": "e,e",
+     "said": "e,e",
+     "correct": true
+    },
+    {
+     "episode": "t19s123",
+     "question": "How do you go from the bathroom to the office?",
+     "answer": "s,e",
+     "said": "S,E",
+     "correct": true
+    },
+    {
+     "episode": "t19s124",
+     "question": "How do you go from the bedroom to the bathroom?",
+     "answer": "w,s",
+     "said": "W,S",
+     "correct": true
+    },
+    {
+     "episode": "t19s125",
+     "question": "How do you go from the kitchen to the office?",
+     "answer": "n,w",
+     "said": "N,W",
+     "correct": true
+    },
+    {
+     "episode": "t19s126",
+     "question": "How do you go from the bathroom to the garden?",
+     "answer": "w,s",
+     "said": "W,S",
+     "correct": true
+    },
+    {
+     "episode": "t19s127",
+     "question": "How do you go from the bedroom to the garden?",
+     "answer": "n,n",
+     "said": "n,n",
+     "correct": true
+    },
+    {
+     "episode": "t19s128",
+     "question": "How do you go from the bedroom to the kitchen?",
+     "answer": "s,e",
+     "said": "S,E",
+     "correct": true
+    },
+    {
+     "episode": "t19s129",
+     "question": "How do you go from the bathroom to the bedroom?",
+     "answer": "e,s",
+     "said": "e,s",
+     "correct": true
+    },
+    {
+     "episode": "t19s130",
+     "question": "How do you go from the bedroom to the garden?",
+     "answer": "s,s",
+     "said": "s",
+     "correct": false
+    },
+    {
+     "episode": "t19s131",
+     "question": "How do you go from the bathroom to the kitchen?",
+     "answer": "n,n",
+     "said": "N,N",
+     "correct": true
+    },
+    {
+     "episode": "t19s132",
+     "question": "How do you go from the garden to the kitchen?",
+     "answer": "e,s",
+     "said": "s,e",
+     "correct": false
+    },
+    {
+     "episode": "t19s133",
+     "question": "How do you go from the bathroom to the hallway?",
+     "answer": "e,s",
+     "said": "s,e",
+     "correct": false
+    },
+    {
+     "episode": "t19s134",
+     "question": "How do you go from the hallway to the bedroom?",
+     "answer": "s,w",
+     "said": "S,W",
+     "correct": true
+    },
+    {
+     "episode": "t19s135",
+     "question": "How do you go from the kitchen to the bedroom?",
+     "answer": "s,s",
+     "said": "s,s",
+     "correct": true
+    },
+    {
+     "episode": "t19s136",
+     "question": "How do you go from the bedroom to the bathroom?",
+     "answer": "n,w",
+     "said": "e,w",
+     "correct": false
+    },
+    {
+     "episode": "t19s137",
+     "question": "How do you go from the hallway to the garden?",
+     "answer": "n,n",
+     "said": "n",
+     "correct": false
+    },
+    {
+     "episode": "t19s138",
+     "question": "How do you go from the hallway to the kitchen?",
+     "answer": "w,w",
+     "said": "w",
+     "correct": false
+    },
+    {
+     "episode": "t19s139",
+     "question": "How do you go from the hallway to the garden?",
+     "answer": "s,w",
+     "said": "s,w",
+     "correct": true
+    },
+    {
+     "episode": "t19s140",
+     "question": "How do you go from the kitchen to the bathroom?",
+     "answer": "n,n",
+     "said": "n",
+     "correct": false
+    },
+    {
+     "episode": "t19s141",
+     "question": "How do you go from the kitchen to the office?",
+     "answer": "s,s",
+     "said": "s,s",
+     "correct": true
+    },
+    {
+     "episode": "t19s142",
+     "question": "How do you go from the kitchen to the bathroom?",
+     "answer": "e,s",
+     "said": "E,S",
+     "correct": true
+    },
+    {
+     "episode": "t19s143",
+     "question": "How do you go from the bathroom to the kitchen?",
+     "answer": "w,s",
+     "said": "w,s",
+     "correct": true
+    },
+    {
+     "episode": "t19s144",
+     "question": "How do you go from the garden to the bedroom?",
+     "answer": "n,w",
+     "said": "N,W",
+     "correct": true
+    },
+    {
+     "episode": "t19s145",
+     "question": "How do you go from the kitchen to the garden?",
+     "answer": "w,n",
+     "said": "W,N",
+     "correct": true
+    },
+    {
+     "episode": "t19s146",
+     "question": "How do you go from the hallway to the kitchen?",
+     "answer": "e,e",
+     "said": "e,e",
+     "correct": true
+    },
+    {
+     "episode": "t19s147",
+     "question": "How do you go from the bedroom to the kitchen?",
+     "answer": "n,e",
+     "said": "n,e",
+     "correct": true
+    },
+    {
+     "episode": "t19s148",
+     "question": "How do you go from the bathroom to the office?",
+     "answer": "e,n",
+     "said": "e,n",
+     "correct": true
+    },
+    {
+     "episode": "t19s149",
+     "question": "How do you go from the hallway to the office?",
+     "answer": "n,e",
+     "said": "S,E",
+     "correct": false
+    },
+    {
+     "episode": "t19s150",
+     "question": "How do you go from the bathroom to the hallway?",
+     "answer": "s,w",
+     "said": "S,W",
+     "correct": true
+    },
+    {
+     "episode": "t19s151",
+     "question": "How do you go from the bathroom to the hallway?",
+     "answer": "e,e",
+     "said": "e",
+     "correct": false
+    },
+    {
+     "episode": "t19s152",
+     "question": "How do you go from the kitchen to the garden?",
+     "answer": "s,e",
+     "said": "e,s",
+     "correct": false
+    },
+    {
+     "episode": "t19s153",
+     "question": "How do you go from the kitchen to the hallway?",
+     "answer": "s,e",
+     "said": "s,e",
+     "correct": true
+    },
+    {
+     "episode": "t19s154",
+     "question": "How do you go from the office to the hallway?",
+     "answer": "e,s",
+     "said": "e,s",
+     "correct": true
+    },
+    {
+     "episode": "t19s155",
+     "question": "How do you go from the bedroom to the garden?",
+     "answer": "w,s",
+     "said": "w,s",
+     "correct": true
+    },
+    {
+     "episode": "t19s156",
+     "question": "How do you go from the bedroom to the bathroom?",
+     "answer": "w,n",
+     "said": "W,N",
+     "correct": true
+    },
+    {
+     "episode": "t19s157",
+     "question": "How do you go from the bathroom to the hallway?",
+     "answer": "s,s",
+     "said": "s,s",
+     "correct": true
+    },
+    {
+     "episode": "t19s158",
+     "question": "How do you go from the bedroom to the office?",
+     "answer": "s,e",
+     "said": "s,e",
+     "correct": true
+    },
+    {
+     "episode": "t19s159",
+     "question": "How do you go from the kitchen to the bathroom?",
+     "answer": "w,n",
+     "said": "West,North",
+     "correct": true
+    },
+    {
+     "episode": "t19s160",
+     "question": "How do you go from the office to the hallway?",
+     "answer": "e,n",
+     "said": "E,N",
+     "correct": true
+    },
+    {
+     "episode": "t19s161",
+     "question": "How do you go from the garden to the bedroom?",
+     "answer": "n,n",
+     "said": "n",
+     "correct": false
+    },
+    {
+     "episode": "t19s162",
+     "question": "How do you go from the bathroom to the garden?",
+     "answer": "w,s",
+     "said": "w,s",
+     "correct": true
+    },
+    {
+     "episode": "t19s163",
+     "question": "How do you go from the hallway to the bathroom?",
+     "answer": "w,s",
+     "said": "w,s",
+     "correct": true
+    },
+    {
+     "episode": "t19s164",
+     "question": "How do you go from the office to the garden?",
+     "answer": "n,e",
+     "said": "n,e",
+     "correct": true
+    },
+    {
+     "episode": "t19s165",
+     "question": "How do you go from the kitchen to the bedroom?",
+     "answer": "s,w",
+     "said": "w,s",
+     "correct": false
+    },
+    {
+     "episode": "t19s166",
+     "question": "How do you go from the office to the bedroom?",
+     "answer": "n,w",
+     "said": "N,W",
+     "correct": true
+    },
+    {
+     "episode": "t19s167",
+     "question": "How do you go from the office to the bathroom?",
+     "answer": "e,s",
+     "said": "s,e",
+     "correct": false
+    },
+    {
+     "episode": "t19s168",
+     "question": "How do you go from the hallway to the office?",
+     "answer": "n,n",
+     "said": "North",
+     "correct": false
+    },
+    {
+     "episode": "t19s169",
+     "question": "How do you go from the garden to the hallway?",
+     "answer": "n,w",
+     "said": "w,n",
+     "correct": false
+    },
+    {
+     "episode": "t19s170",
+     "question": "How do you go from the bedroom to the office?",
+     "answer": "e,n",
+     "said": "e,n",
+     "correct": true
+    },
+    {
+     "episode": "t19s171",
+     "question": "How do you go from the hallway to the bathroom?",
+     "answer": "e,e",
+     "said": "e,e",
+     "correct": true
+    },
+    {
+     "episode": "t19s172",
+     "question": "How do you go from the kitchen to the office?",
+     "answer": "n,w",
+     "said": "w",
+     "correct": false
+    },
+    {
+     "episode": "t19s173",
+     "question": "How do you go from the bathroom to the hallway?",
+     "answer": "n,n",
+     "said": "n,n",
+     "correct": true
+    },
+    {
+     "episode": "t19s174",
+     "question": "How do you go from the office to the hallway?",
+     "answer": "n,n",
+     "said": "n",
+     "correct": false
+    },
+    {
+     "episode": "t19s175",
+     "question": "How do you go from the bathroom to the kitchen?",
+     "answer": "s,w",
+     "said": "s,w",
+     "correct": true
+    },
+    {
+     "episode": "t19s176",
+     "question": "How do you go from the bedroom to the garden?",
+     "answer": "n,n",
+     "said": "n,n",
+     "correct": true
+    },
+    {
+     "episode": "t19s177",
+     "question": "How do you go from the office to the kitchen?",
+     "answer": "n,n",
+     "said": "n,n",
+     "correct": true
+    },
+    {
+     "episode": "t19s178",
+     "question": "How do you go from the office to the bathroom?",
+     "answer": "e,n",
+     "said": "E,N",
+     "correct": true
+    },
+    {
+     "episode": "t19s179",
+     "question": "How do you go from the garden to the office?",
+     "answer": "n,w",
+     "said": "n,w",
+     "correct": true
+    },
+    {
+     "episode": "t19s180",
+     "question": "How do you go from the bedroom to the hallway?",
+     "answer": "e,n",
+     "said": "e,n",
+     "correct": true
+    },
+    {
+     "episode": "t19s181",
+     "question": "How do you go from the hallway to the bathroom?",
+     "answer": "n,e",
+     "said": "n,e",
+     "correct": true
+    },
+    {
+     "episode": "t19s182",
+     "question": "How do you go from the hallway to the bathroom?",
+     "answer": "s,e",
+     "said": "s,e",
+     "correct": true
+    },
+    {
+     "episode": "t19s183",
+     "question": "How do you go from the garden to the office?",
+     "answer": "n,e",
+     "said": "N,E",
+     "correct": true
+    },
+    {
+     "episode": "t19s184",
+     "question": "How do you go from the office to the bedroom?",
+     "answer": "s,w",
+     "said": "S,W",
+     "correct": true
+    },
+    {
+     "episode": "t19s185",
+     "question": "How do you go from the bathroom to the kitchen?",
+     "answer": "w,w",
+     "said": "w,w",
+     "correct": true
+    },
+    {
+     "episode": "t19s186",
+     "question": "How do you go from the garden to the bathroom?",
+     "answer": "n,n",
+     "said": "n,s",
+     "correct": false
+    },
+    {
+     "episode": "t19s187",
+     "question": "How do you go from the garden to the hallway?",
+     "answer": "w,n",
+     "said": "w,n",
+     "correct": true
+    },
+    {
+     "episode": "t19s188",
+     "question": "How do you go from the kitchen to the garden?",
+     "answer": "n,n",
+     "said": "n,s",
+     "correct": false
+    },
+    {
+     "episode": "t19s189",
+     "question": "How do you go from the bathroom to the hallway?",
+     "answer": "s,s",
+     "said": "s",
+     "correct": false
+    },
+    {
+     "episode": "t19s190",
+     "question": "How do you go from the bathroom to the hallway?",
+     "answer": "e,s",
+     "said": "e,s",
+     "correct": true
+    },
+    {
+     "episode": "t19s191",
+     "question": "How do you go from the office to the bathroom?",
+     "answer": "w,n",
+     "said": "s,e",
+     "correct": false
+    },
+    {
+     "episode": "t19s192",
+     "question": "How do you go from the office to the bedroom?",
+     "answer": "n,n",
+     "said": "n,n",
+     "correct": true
+    },
+    {
+     "episode": "t19s193",
+     "question": "How do you go from the kitchen to the office?",
+     "answer": "e,e",
+     "said": "w,e",
+     "correct": false
+    },
+    {
+     "episode": "t19s194",
+     "question": "How do you go from the garden to the hallway?",
+     "answer": "n,w",
+     "said": "n,w",
+     "correct": true
+    },
+    {
+     "episode": "t19s195",
+     "question": "How do you go from the bathroom to the bedroom?",
+     "answer": "w,n",
+     "said": "w,n",
+     "correct": true
+    },
+    {
+     "episode": "t19s196",
+     "question": "How do you go from the hallway to the kitchen?",
+     "answer": "w,n",
+     "said": "w,n",
+     "correct": true
+    },
+    {
+     "episode": "t19s197",
+     "question": "How do you go from the office to the bedroom?",
+     "answer": "s,s",
+     "said": "S,S",
+     "correct": true
+    },
+    {
+     "episode": "t19s198",
+     "question": "How do you go from the garden to the hallway?",
+     "answer": "n,e",
+     "said": "n,e",
+     "correct": true
+    },
+    {
+     "episode": "t19s199",
+     "question": "How do you go from the kitchen to the bathroom?",
+     "answer": "e,n",
+     "said": "e,n",
+     "correct": true
+    },
+    {
+     "episode": "t19s200",
+     "question": "How do you go from the hallway to the garden?",
+     "answer": "w,w",
+     "said": "w",
+     "correct": false
+    },
+    {
+     "episode": "t19s201",
+     "question": "How do you go from the garden to the hallway?",
+     "answer": "e,e",
+     "said": "e",
+     "correct": false
+    },
+    {
+     "episode": "t19s202",
+     "question": "How do you go from the office to the bathroom?",
+     "answer": "w,s",
+     "said": "w,s",
+     "correct": true
+    },
+    {
+     "episode": "t19s203",
+     "question": "How do you go from the kitchen to the hallway?",
+     "answer": "s,w",
+     "said": "S,E",
+     "correct": false
+    },
+    {
+     "episode": "t19s204",
+     "question": "How do you go from the bathroom to the office?",
+     "answer": "n,n",
+     "said": "n",
+     "correct": false
+    },
+    {
+     "episode": "t19s205",
+     "question": "How do you go from the bedroom to the bathroom?",
+     "answer": "w,w",
+     "said": "w,w",
+     "correct": true
+    },
+    {
+     "episode": "t19s206",
+     "question": "How do you go from the office to the hallway?",
+     "answer": "e,s",
+     "said": "s",
+     "correct": false
+    },
+    {
+     "episode": "t19s207",
+     "question": "How do you go from the garden to the office?",
+     "answer": "w,n",
+     "said": "w,n",
+     "correct": true
+    },
+    {
+     "episode": "t19s208",
+     "question": "How do you go from the office to the bathroom?",
+     "answer": "s,w",
+     "said": "s,w",
+     "correct": true
+    },
+    {
+     "episode": "t19s209",
+     "question": "How do you go from the kitchen to the garden?",
+     "answer": "s,s",
+     "said": "s,s",
+     "correct": true
+    },
+    {
+     "episode": "t19s210",
+     "question": "How do you go from the bedroom to the garden?",
+     "answer": "w,s",
+     "said": "W,S",
+     "correct": true
+    },
+    {
+     "episode": "t19s211",
+     "question": "How do you go from the kitchen to the office?",
+     "answer": "w,s",
+     "said": "West, South",
+     "correct": true
+    },
+    {
+     "episode": "t19s212",
+     "question": "How do you go from the bedroom to the kitchen?",
+     "answer": "n,n",
+     "said": "n",
+     "correct": false
+    },
+    {
+     "episode": "t19s213",
+     "question": "How do you go from the bedroom to the bathroom?",
+     "answer": "w,w",
+     "said": "West, West",
+     "correct": true
+    },
+    {
+     "episode": "t19s214",
+     "question": "How do you go from the kitchen to the bathroom?",
+     "answer": "e,s",
+     "said": "e,s",
+     "correct": true
+    },
+    {
+     "episode": "t19s215",
+     "question": "How do you go from the hallway to the bathroom?",
+     "answer": "w,n",
+     "said": "W,N",
+     "correct": true
+    },
+    {
+     "episode": "t19s216",
+     "question": "How do you go from the bedroom to the garden?",
+     "answer": "n,e",
+     "said": "N,E",
+     "correct": true
+    },
+    {
+     "episode": "t19s217",
+     "question": "How do you go from the hallway to the garden?",
+     "answer": "n,w",
+     "said": "n,w",
+     "correct": true
+    },
+    {
+     "episode": "t19s218",
+     "question": "How do you go from the garden to the bathroom?",
+     "answer": "n,n",
+     "said": "n",
+     "correct": false
+    },
+    {
+     "episode": "t19s219",
+     "question": "How do you go from the hallway to the garden?",
+     "answer": "w,w",
+     "said": "w",
+     "correct": false
+    },
+    {
+     "episode": "t19s220",
+     "question": "How do you go from the bedroom to the office?",
+     "answer": "e,n",
+     "said": "e,n",
+     "correct": true
+    },
+    {
+     "episode": "t19s221",
+     "question": "How do you go from the bedroom to the hallway?",
+     "answer": "e,n",
+     "said": "E,N",
+     "correct": true
+    },
+    {
+     "episode": "t19s222",
+     "question": "How do you go from the garden to the bathroom?",
+     "answer": "s,e",
+     "said": "s,e",
+     "correct": true
+    },
+    {
+     "episode": "t19s223",
+     "question": "How do you go from the bathroom to the hallway?",
+     "answer": "n,n",
+     "said": "n",
+     "correct": false
+    },
+    {
+     "episode": "t19s224",
+     "question": "How do you go from the office to the garden?",
+     "answer": "w,w",
+     "said": "w,w",
+     "correct": true
+    },
+    {
+     "episode": "t19s225",
+     "question": "How do you go from the garden to the hallway?",
+     "answer": "n,e",
+     "said": "n,e",
+     "correct": true
+    },
+    {
+     "episode": "t19s226",
+     "question": "How do you go from the hallway to the bathroom?",
+     "answer": "e,s",
+     "said": "e,s",
+     "correct": true
+    },
+    {
+     "episode": "t19s227",
+     "question": "How do you go from the garden to the bedroom?",
+     "answer": "w,s",
+     "said": "W,S",
+     "correct": true
+    },
+    {
+     "episode": "t19s228",
+     "question": "How do you go from the garden to the hallway?",
+     "answer": "w,w",
+     "said": "w,w",
+     "correct": true
+    },
+    {
+     "episode": "t19s229",
+     "question": "How do you go from the bedroom to the kitchen?",
+     "answer": "w,w",
+     "said": "w,w",
+     "correct": true
+    },
+    {
+     "episode": "t19s230",
+     "question": "How do you go from the hallway to the garden?",
+     "answer": "w,n",
+     "said": "w,n",
+     "correct": true
+    },
+    {
+     "episode": "t19s231",
+     "question": "How do you go from the garden to the hallway?",
+     "answer": "s,w",
+     "said": "s,w",
+     "correct": true
+    },
+    {
+     "episode": "t19s232",
+     "question": "How do you go from the bathroom to the office?",
+     "answer": "n,w",
+     "said": "n,w",
+     "correct": true
+    },
+    {
+     "episode": "t19s233",
+     "question": "How do you go from the kitchen to the bathroom?",
+     "answer": "e,n",
+     "said": "e,n",
+     "correct": true
+    },
+    {
+     "episode": "t19s234",
+     "question": "How do you go from the bathroom to the garden?",
+     "answer": "w,w",
+     "said": "w,w",
+     "correct": true
+    },
+    {
+     "episode": "t19s235",
+     "question": "How do you go from the bedroom to the bathroom?",
+     "answer": "w,s",
+     "said": "w,s",
+     "correct": true
+    },
+    {
+     "episode": "t19s236",
+     "question": "How do you go from the bedroom to the office?",
+     "answer": "s,s",
+     "said": "s",
+     "correct": false
+    },
+    {
+     "episode": "t19s237",
+     "question": "How do you go from the kitchen to the bathroom?",
+     "answer": "w,s",
+     "said": "w,s",
+     "correct": true
+    },
+    {
+     "episode": "t19s238",
+     "question": "How do you go from the bedroom to the garden?",
+     "answer": "w,w",
+     "said": "W,W",
+     "correct": true
+    },
+    {
+     "episode": "t19s239",
+     "question": "How do you go from the office to the kitchen?",
+     "answer": "s,e",
+     "said": "s,e",
+     "correct": true
+    },
+    {
+     "episode": "t19s240",
+     "question": "How do you go from the garden to the hallway?",
+     "answer": "w,w",
+     "said": "w",
+     "correct": false
+    },
+    {
+     "episode": "t19s241",
+     "question": "How do you go from the kitchen to the hallway?",
+     "answer": "n,w",
+     "said": "n,w",
+     "correct": true
+    },
+    {
+     "episode": "t19s242",
+     "question": "How do you go from the garden to the office?",
+     "answer": "e,n",
+     "said": "E,N",
+     "correct": true
+    },
+    {
+     "episode": "t19s243",
+     "question": "How do you go from the hallway to the bathroom?",
+     "answer": "s,e",
+     "said": "S,E",
+     "correct": true
+    },
+    {
+     "episode": "t19s244",
+     "question": "How do you go from the kitchen to the office?",
+     "answer": "e,e",
+     "said": "e,e",
+     "correct": true
+    },
+    {
+     "episode": "t19s245",
+     "question": "How do you go from the garden to the kitchen?",
+     "answer": "e,e",
+     "said": "e",
+     "correct": false
+    },
+    {
+     "episode": "t19s246",
+     "question": "How do you go from the office to the bathroom?",
+     "answer": "w,s",
+     "said": "w,s",
+     "correct": true
+    },
+    {
+     "episode": "t19s247",
+     "question": "How do you go from the kitchen to the hallway?",
+     "answer": "s,w",
+     "said": "s,w",
+     "correct": true
+    },
+    {
+     "episode": "t19s248",
+     "question": "How do you go from the office to the hallway?",
+     "answer": "w,n",
+     "said": "w,n",
+     "correct": true
+    },
+    {
+     "episode": "t19s249",
+     "question": "How do you go from the bedroom to the hallway?",
+     "answer": "s,e",
+     "said": "S,E",
+     "correct": true
+    },
+    {
+     "episode": "t19s250",
+     "question": "How do you go from the bathroom to the office?",
+     "answer": "w,s",
+     "said": "w,s",
+     "correct": true
+    },
+    {
+     "episode": "t19s251",
+     "question": "How do you go from the bedroom to the garden?",
+     "answer": "e,s",
+     "said": "e,s",
+     "correct": true
+    },
+    {
+     "episode": "t19s252",
+     "question": "How do you go from the hallway to the kitchen?",
+     "answer": "n,n",
+     "said": "N,N",
+     "correct": true
+    },
+    {
+     "episode": "t19s253",
+     "question": "How do you go from the bedroom to the hallway?",
+     "answer": "s,e",
+     "said": "s,e",
+     "correct": true
+    },
+    {
+     "episode": "t19s254",
+     "question": "How do you go from the bathroom to the kitchen?",
+     "answer": "s,s",
+     "said": "s",
+     "correct": false
+    },
+    {
+     "episode": "t19s255",
+     "question": "How do you go from the hallway to the bedroom?",
+     "answer": "w,s",
+     "said": "West, South",
+     "correct": true
+    },
+    {
+     "episode": "t19s256",
+     "question": "How do you go from the garden to the hallway?",
+     "answer": "n,w",
+     "said": "w,n",
+     "correct": false
+    },
+    {
+     "episode": "t19s257",
+     "question": "How do you go from the bathroom to the hallway?",
+     "answer": "s,w",
+     "said": "s,w",
+     "correct": true
+    },
+    {
+     "episode": "t19s258",
+     "question": "How do you go from the bedroom to the kitchen?",
+     "answer": "n,e",
+     "said": "n,e",
+     "correct": true
+    },
+    {
+     "episode": "t19s259",
+     "question": "How do you go from the hallway to the office?",
+     "answer": "s,s",
+     "said": "s,s",
+     "correct": true
+    },
+    {
+     "episode": "t19s260",
+     "question": "How do you go from the garden to the kitchen?",
+     "answer": "s,e",
+     "said": "s,e",
+     "correct": true
+    },
+    {
+     "episode": "t19s261",
+     "question": "How do you go from the bedroom to the bathroom?",
+     "answer": "e,s",
+     "said": "s",
+     "correct": false
+    },
+    {
+     "episode": "t19s262",
+     "question": "How do you go from the office to the garden?",
+     "answer": "n,n",
+     "said": "n,n",
+     "correct": true
+    },
+    {
+     "episode": "t19s263",
+     "question": "How do you go from the kitchen to the office?",
+     "answer": "e,s",
+     "said": "E,N",
+     "correct": false
+    },
+    {
+     "episode": "t19s264",
+     "question": "How do you go from the garden to the bathroom?",
+     "answer": "s,s",
+     "said": "s",
+     "correct": false
+    },
+    {
+     "episode": "t19s265",
+     "question": "How do you go from the kitchen to the bathroom?",
+     "answer": "n,w",
+     "said": "n,w",
+     "correct": true
+    },
+    {
+     "episode": "t19s266",
+     "question": "How do you go from the garden to the hallway?",
+     "answer": "s,e",
+     "said": "S,E",
+     "correct": true
+    },
+    {
+     "episode": "t19s267",
+     "question": "How do you go from the garden to the hallway?",
+     "answer": "w,s",
+     "said": "w,s",
+     "correct": true
+    },
+    {
+     "episode": "t19s268",
+     "question": "How do you go from the bedroom to the kitchen?",
+     "answer": "s,e",
+     "said": "S,E",
+     "correct": true
+    },
+    {
+     "episode": "t19s269",
+     "question": "How do you go from the bedroom to the bathroom?",
+     "answer": "e,e",
+     "said": "e,e",
+     "correct": true
+    },
+    {
+     "episode": "t19s270",
+     "question": "How do you go from the hallway to the bedroom?",
+     "answer": "s,w",
+     "said": "s,w",
+     "correct": true
+    },
+    {
+     "episode": "t19s271",
+     "question": "How do you go from the bedroom to the kitchen?",
+     "answer": "s,s",
+     "said": "s,s",
+     "correct": true
+    },
+    {
+     "episode": "t19s272",
+     "question": "How do you go from the garden to the hallway?",
+     "answer": "e,e",
+     "said": "E,E",
+     "correct": true
+    },
+    {
+     "episode": "t19s273",
+     "question": "How do you go from the hallway to the garden?",
+     "answer": "s,s",
+     "said": "s,s",
+     "correct": true
+    },
+    {
+     "episode": "t19s274",
+     "question": "How do you go from the bathroom to the office?",
+     "answer": "e,n",
+     "said": "e,n",
+     "correct": true
+    },
+    {
+     "episode": "t19s275",
+     "question": "How do you go from the garden to the bathroom?",
+     "answer": "e,n",
+     "said": "e,n",
+     "correct": true
+    },
+    {
+     "episode": "t19s276",
+     "question": "How do you go from the kitchen to the bathroom?",
+     "answer": "s,w",
+     "said": "s,w",
+     "correct": true
+    },
+    {
+     "episode": "t19s277",
+     "question": "How do you go from the bathroom to the office?",
+     "answer": "w,w",
+     "said": "w",
+     "correct": false
+    },
+    {
+     "episode": "t19s278",
+     "question": "How do you go from the bedroom to the hallway?",
+     "answer": "s,e",
+     "said": "S,E",
+     "correct": true
+    },
+    {
+     "episode": "t19s279",
+     "question": "How do you go from the bedroom to the kitchen?",
+     "answer": "s,w",
+     "said": "s,w",
+     "correct": true
+    },
+    {
+     "episode": "t19s280",
+     "question": "How do you go from the garden to the hallway?",
+     "answer": "n,e",
+     "said": "e",
+     "correct": false
+    },
+    {
+     "episode": "t19s281",
+     "question": "How do you go from the office to the hallway?",
+     "answer": "w,n",
+     "said": "w,n",
+     "correct": true
+    },
+    {
+     "episode": "t19s282",
+     "question": "How do you go from the bathroom to the hallway?",
+     "answer": "s,e",
+     "said": "e",
+     "correct": false
+    },
+    {
+     "episode": "t19s283",
+     "question": "How do you go from the kitchen to the bedroom?",
+     "answer": "s,e",
+     "said": "s,e",
+     "correct": true
+    },
+    {
+     "episode": "t19s284",
+     "question": "How do you go from the garden to the kitchen?",
+     "answer": "e,e",
+     "said": "e,e",
+     "correct": true
+    },
+    {
+     "episode": "t19s285",
+     "question": "How do you go from the garden to the hallway?",
+     "answer": "w,w",
+     "said": "w,w",
+     "correct": true
+    },
+    {
+     "episode": "t19s286",
+     "question": "How do you go from the garden to the hallway?",
+     "answer": "w,s",
+     "said": "W,S",
+     "correct": true
+    },
+    {
+     "episode": "t19s287",
+     "question": "How do you go from the bathroom to the garden?",
+     "answer": "e,s",
+     "said": "e,s",
+     "correct": true
+    },
+    {
+     "episode": "t19s288",
+     "question": "How do you go from the office to the garden?",
+     "answer": "w,n",
+     "said": "w,n",
+     "correct": true
+    },
+    {
+     "episode": "t19s289",
+     "question": "How do you go from the garden to the hallway?",
+     "answer": "n,n",
+     "said": "n,n",
+     "correct": true
+    },
+    {
+     "episode": "t19s290",
+     "question": "How do you go from the bathroom to the garden?",
+     "answer": "s,e",
+     "said": "s,e",
+     "correct": true
+    },
+    {
+     "episode": "t19s291",
+     "question": "How do you go from the bedroom to the kitchen?",
+     "answer": "w,s",
+     "said": "w,s",
+     "correct": true
+    },
+    {
+     "episode": "t19s292",
+     "question": "How do you go from the kitchen to the garden?",
+     "answer": "e,s",
+     "said": "E,S",
+     "correct": true
+    },
+    {
+     "episode": "t19s293",
+     "question": "How do you go from the office to the kitchen?",
+     "answer": "e,s",
+     "said": "E,S",
+     "correct": true
+    },
+    {
+     "episode": "t19s294",
+     "question": "How do you go from the bathroom to the bedroom?",
+     "answer": "n,e",
+     "said": "N,E",
+     "correct": true
+    },
+    {
+     "episode": "t19s295",
+     "question": "How do you go from the bathroom to the office?",
+     "answer": "n,w",
+     "said": "N,W",
+     "correct": true
+    },
+    {
+     "episode": "t19s296",
+     "question": "How do you go from the kitchen to the bathroom?",
+     "answer": "n,n",
+     "said": "N,N",
+     "correct": true
+    },
+    {
+     "episode": "t19s297",
+     "question": "How do you go from the office to the kitchen?",
+     "answer": "s,s",
+     "said": "s,s",
+     "correct": true
+    },
+    {
+     "episode": "t19s298",
+     "question": "How do you go from the kitchen to the garden?",
+     "answer": "e,e",
+     "said": "e,e",
+     "correct": true
+    },
+    {
+     "episode": "t19s299",
+     "question": "How do you go from the bathroom to the kitchen?",
+     "answer": "e,s",
+     "said": "e,s",
+     "correct": true
+    },
+    {
+     "episode": "t19s300",
+     "question": "How do you go from the bathroom to the bedroom?",
+     "answer": "n,e",
+     "said": "N,E",
+     "correct": true
+    },
+    {
+     "episode": "t19s301",
+     "question": "How do you go from the hallway to the office?",
+     "answer": "w,s",
+     "said": "w,s",
+     "correct": true
+    },
+    {
+     "episode": "t19s302",
+     "question": "How do you go from the hallway to the bathroom?",
+     "answer": "w,n",
+     "said": "W,N",
+     "correct": true
+    },
+    {
+     "episode": "t19s303",
+     "question": "How do you go from the bedroom to the bathroom?",
+     "answer": "n,w",
+     "said": "n,w",
+     "correct": true
+    },
+    {
+     "episode": "t19s304",
+     "question": "How do you go from the office to the garden?",
+     "answer": "n,n",
+     "said": "n",
+     "correct": false
+    },
+    {
+     "episode": "t19s305",
+     "question": "How do you go from the bedroom to the garden?",
+     "answer": "n,e",
+     "said": "N,E",
+     "correct": true
+    },
+    {
+     "episode": "t19s306",
+     "question": "How do you go from the hallway to the kitchen?",
+     "answer": "w,w",
+     "said": "W,W",
+     "correct": true
+    },
+    {
+     "episode": "t19s307",
+     "question": "How do you go from the garden to the bathroom?",
+     "answer": "w,s",
+     "said": "W,S",
+     "correct": true
+    },
+    {
+     "episode": "t19s308",
+     "question": "How do you go from the kitchen to the bathroom?",
+     "answer": "e,s",
+     "said": "E,S",
+     "correct": true
+    },
+    {
+     "episode": "t19s309",
+     "question": "How do you go from the garden to the bathroom?",
+     "answer": "e,s",
+     "said": "e,s",
+     "correct": true
+    },
+    {
+     "episode": "t19s310",
+     "question": "How do you go from the garden to the office?",
+     "answer": "e,s",
+     "said": "e,s",
+     "correct": true
+    },
+    {
+     "episode": "t19s311",
+     "question": "How do you go from the office to the bedroom?",
+     "answer": "e,e",
+     "said": "E,E",
+     "correct": true
+    },
+    {
+     "episode": "t19s312",
+     "question": "How do you go from the garden to the bathroom?",
+     "answer": "w,n",
+     "said": "w,n",
+     "correct": true
+    },
+    {
+     "episode": "t19s313",
+     "question": "How do you go from the kitchen to the garden?",
+     "answer": "s,e",
+     "said": "S,E",
+     "correct": true
+    },
+    {
+     "episode": "t19s314",
+     "question": "How do you go from the kitchen to the bedroom?",
+     "answer": "w,s",
+     "said": "w,s",
+     "correct": true
+    },
+    {
+     "episode": "t19s315",
+     "question": "How do you go from the hallway to the kitchen?",
+     "answer": "s,s",
+     "said": "S,S",
+     "correct": true
+    },
+    {
+     "episode": "t19s316",
+     "question": "How do you go from the garden to the bathroom?",
+     "answer": "e,s",
+     "said": "e,s",
+     "correct": true
+    },
+    {
+     "episode": "t19s317",
+     "question": "How do you go from the hallway to the office?",
+     "answer": "n,e",
+     "said": "n,e",
+     "correct": true
+    },
+    {
+     "episode": "t19s318",
+     "question": "How do you go from the garden to the bedroom?",
+     "answer": "w,w",
+     "said": "w,w",
+     "correct": true
+    },
+    {
+     "episode": "t19s319",
+     "question": "How do you go from the garden to the bathroom?",
+     "answer": "n,e",
+     "said": "n,e",
+     "correct": true
+    },
+    {
+     "episode": "t19s320",
+     "question": "How do you go from the bedroom to the bathroom?",
+     "answer": "n,e",
+     "said": "N,E",
+     "correct": true
+    },
+    {
+     "episode": "t19s321",
+     "question": "How do you go from the bathroom to the office?",
+     "answer": "w,w",
+     "said": "w",
+     "correct": false
+    },
+    {
+     "episode": "t19s322",
+     "question": "How do you go from the bedroom to the bathroom?",
+     "answer": "w,s",
+     "said": "w,s",
+     "correct": true
+    },
+    {
+     "episode": "t19s323",
+     "question": "How do you go from the bedroom to the office?",
+     "answer": "e,n",
+     "said": "E,N",
+     "correct": true
+    },
+    {
+     "episode": "t19s324",
+     "question": "How do you go from the bathroom to the bedroom?",
+     "answer": "s,w",
+     "said": "s,e",
+     "correct": false
+    },
+    {
+     "episode": "t19s325",
+     "question": "How do you go from the hallway to the garden?",
+     "answer": "s,w",
+     "said": "S,W",
+     "correct": true
+    },
+    {
+     "episode": "t19s326",
+     "question": "How do you go from the office to the hallway?",
+     "answer": "e,e",
+     "said": "e,e",
+     "correct": true
+    },
+    {
+     "episode": "t19s327",
+     "question": "How do you go from the garden to the bedroom?",
+     "answer": "w,s",
+     "said": "W,S",
+     "correct": true
+    },
+    {
+     "episode": "t19s328",
+     "question": "How do you go from the garden to the bathroom?",
+     "answer": "w,w",
+     "said": "w,w",
+     "correct": true
+    },
+    {
+     "episode": "t19s329",
+     "question": "How do you go from the bathroom to the office?",
+     "answer": "s,s",
+     "said": "s,s",
+     "correct": true
+    },
+    {
+     "episode": "t19s330",
+     "question": "How do you go from the hallway to the kitchen?",
+     "answer": "e,s",
+     "said": "E,S",
+     "correct": true
+    },
+    {
+     "episode": "t19s331",
+     "question": "How do you go from the bathroom to the kitchen?",
+     "answer": "s,w",
+     "said": "s,w",
+     "correct": true
+    },
+    {
+     "episode": "t19s332",
+     "question": "How do you go from the bedroom to the hallway?",
+     "answer": "w,w",
+     "said": "w,w",
+     "correct": true
+    },
+    {
+     "episode": "t19s333",
+     "question": "How do you go from the kitchen to the bedroom?",
+     "answer": "s,e",
+     "said": "s,e",
+     "correct": true
+    },
+    {
+     "episode": "t19s334",
+     "question": "How do you go from the garden to the kitchen?",
+     "answer": "e,s",
+     "said": "e,s",
+     "correct": true
+    },
+    {
+     "episode": "t19s335",
+     "question": "How do you go from the bathroom to the office?",
+     "answer": "s,w",
+     "said": "s,w",
+     "correct": true
+    },
+    {
+     "episode": "t19s336",
+     "question": "How do you go from the garden to the bathroom?",
+     "answer": "e,n",
+     "said": "n",
+     "correct": false
+    },
+    {
+     "episode": "t19s337",
+     "question": "How do you go from the bathroom to the garden?",
+     "answer": "w,s",
+     "said": "w,s",
+     "correct": true
+    },
+    {
+     "episode": "t19s338",
+     "question": "How do you go from the office to the bathroom?",
+     "answer": "e,e",
+     "said": "e,e",
+     "correct": true
+    },
+    {
+     "episode": "t19s339",
+     "question": "How do you go from the garden to the bedroom?",
+     "answer": "s,w",
+     "said": "n,w",
+     "correct": false
+    },
+    {
+     "episode": "t19s340",
+     "question": "How do you go from the kitchen to the bathroom?",
+     "answer": "w,n",
+     "said": "w,n",
+     "correct": true
+    },
+    {
+     "episode": "t19s341",
+     "question": "How do you go from the garden to the office?",
+     "answer": "e,n",
+     "said": "e,n",
+     "correct": true
+    },
+    {
+     "episode": "t19s342",
+     "question": "How do you go from the bedroom to the bathroom?",
+     "answer": "n,n",
+     "said": "N,N",
+     "correct": true
+    },
+    {
+     "episode": "t19s343",
+     "question": "How do you go from the hallway to the bathroom?",
+     "answer": "s,w",
+     "said": "s,w",
+     "correct": true
+    },
+    {
+     "episode": "t19s344",
+     "question": "How do you go from the garden to the hallway?",
+     "answer": "w,w",
+     "said": "w,w",
+     "correct": true
+    },
+    {
+     "episode": "t19s345",
+     "question": "How do you go from the kitchen to the bathroom?",
+     "answer": "e,s",
+     "said": "e,s",
+     "correct": true
+    },
+    {
+     "episode": "t19s346",
+     "question": "How do you go from the garden to the kitchen?",
+     "answer": "s,w",
+     "said": "s,w",
+     "correct": true
+    },
+    {
+     "episode": "t19s347",
+     "question": "How do you go from the office to the bathroom?",
+     "answer": "w,s",
+     "said": "W,S",
+     "correct": true
+    },
+    {
+     "episode": "t19s348",
+     "question": "How do you go from the garden to the office?",
+     "answer": "w,n",
+     "said": "w,n",
+     "correct": true
+    },
+    {
+     "episode": "t19s349",
+     "question": "How do you go from the garden to the kitchen?",
+     "answer": "n,n",
+     "said": "n",
+     "correct": false
+    },
+    {
+     "episode": "t19s350",
+     "question": "How do you go from the garden to the hallway?",
+     "answer": "s,w",
+     "said": "s,w",
+     "correct": true
+    },
+    {
+     "episode": "t19s351",
+     "question": "How do you go from the kitchen to the office?",
+     "answer": "e,e",
+     "said": "E,E",
+     "correct": true
+    },
+    {
+     "episode": "t19s352",
+     "question": "How do you go from the bathroom to the garden?",
+     "answer": "s,w",
+     "said": "s,e",
+     "correct": false
+    },
+    {
+     "episode": "t19s353",
+     "question": "How do you go from the kitchen to the bedroom?",
+     "answer": "e,e",
+     "said": "e,e",
+     "correct": true
+    },
+    {
+     "episode": "t19s354",
+     "question": "How do you go from the kitchen to the bathroom?",
+     "answer": "s,e",
+     "said": "s,e",
+     "correct": true
+    },
+    {
+     "episode": "t19s355",
+     "question": "How do you go from the office to the kitchen?",
+     "answer": "e,s",
+     "said": "e,s",
+     "correct": true
+    },
+    {
+     "episode": "t19s356",
+     "question": "How do you go from the bathroom to the office?",
+     "answer": "s,s",
+     "said": "s,s",
+     "correct": true
+    },
+    {
+     "episode": "t19s357",
+     "question": "How do you go from the hallway to the office?",
+     "answer": "w,w",
+     "said": "w",
+     "correct": false
+    },
+    {
+     "episode": "t19s358",
+     "question": "How do you go from the office to the hallway?",
+     "answer": "s,e",
+     "said": "S,E",
+     "correct": true
+    },
+    {
+     "episode": "t19s359",
+     "question": "How do you go from the office to the bedroom?",
+     "answer": "n,n",
+     "said": "n",
+     "correct": false
+    },
+    {
+     "episode": "t19s360",
+     "question": "How do you go from the garden to the kitchen?",
+     "answer": "n,n",
+     "said": "n",
+     "correct": false
+    },
+    {
+     "episode": "t19s361",
+     "question": "How do you go from the hallway to the bathroom?",
+     "answer": "n,n",
+     "said": "n",
+     "correct": false
+    },
+    {
+     "episode": "t19s362",
+     "question": "How do you go from the kitchen to the bathroom?",
+     "answer": "e,e",
+     "said": "e",
+     "correct": false
+    },
+    {
+     "episode": "t19s363",
+     "question": "How do you go from the hallway to the garden?",
+     "answer": "n,e",
+     "said": "e,n",
+     "correct": false
+    },
+    {
+     "episode": "t19s364",
+     "question": "How do you go from the bedroom to the office?",
+     "answer": "w,n",
+     "said": "w,n",
+     "correct": true
+    },
+    {
+     "episode": "t19s365",
+     "question": "How do you go from the office to the hallway?",
+     "answer": "n,w",
+     "said": "n,w",
+     "correct": true
+    },
+    {
+     "episode": "t19s366",
+     "question": "How do you go from the hallway to the garden?",
+     "answer": "w,s",
+     "said": "w,s",
+     "correct": true
+    },
+    {
+     "episode": "t19s367",
+     "question": "How do you go from the bedroom to the kitchen?",
+     "answer": "s,e",
+     "said": "s,e",
+     "correct": true
+    },
+    {
+     "episode": "t19s368",
+     "question": "How do you go from the bathroom to the kitchen?",
+     "answer": "e,e",
+     "said": "E",
+     "correct": false
+    },
+    {
+     "episode": "t19s369",
+     "question": "How do you go from the bathroom to the hallway?",
+     "answer": "s,e",
+     "said": "S,E",
+     "correct": true
+    },
+    {
+     "episode": "t19s370",
+     "question": "How do you go from the garden to the bathroom?",
+     "answer": "s,e",
+     "said": "s,e",
+     "correct": true
+    },
+    {
+     "episode": "t19s371",
+     "question": "How do you go from the hallway to the garden?",
+     "answer": "n,n",
+     "said": "n",
+     "correct": false
+    },
+    {
+     "episode": "t19s372",
+     "question": "How do you go from the hallway to the office?",
+     "answer": "n,w",
+     "said": "N,W",
+     "correct": true
+    },
+    {
+     "episode": "t19s373",
+     "question": "How do you go from the office to the hallway?",
+     "answer": "s,w",
+     "said": "South, West",
+     "correct": true
+    },
+    {
+     "episode": "t19s374",
+     "question": "How do you go from the bathroom to the kitchen?",
+     "answer": "e,s",
+     "said": "e,s",
+     "correct": true
+    },
+    {
+     "episode": "t19s375",
+     "question": "How do you go from the bathroom to the hallway?",
+     "answer": "e,s",
+     "said": "s,e",
+     "correct": false
+    },
+    {
+     "episode": "t19s376",
+     "question": "How do you go from the kitchen to the garden?",
+     "answer": "n,n",
+     "said": "n",
+     "correct": false
+    },
+    {
+     "episode": "t19s377",
+     "question": "How do you go from the bedroom to the garden?",
+     "answer": "w,n",
+     "said": "w,n",
+     "correct": true
+    },
+    {
+     "episode": "t19s378",
+     "question": "How do you go from the kitchen to the hallway?",
+     "answer": "s,s",
+     "said": "s",
+     "correct": false
+    },
+    {
+     "episode": "t19s379",
+     "question": "How do you go from the bedroom to the garden?",
+     "answer": "s,w",
+     "said": "s,w",
+     "correct": true
+    },
+    {
+     "episode": "t19s380",
+     "question": "How do you go from the office to the kitchen?",
+     "answer": "w,s",
+     "said": "w,s",
+     "correct": true
+    },
+    {
+     "episode": "t19s381",
+     "question": "How do you go from the bedroom to the office?",
+     "answer": "n,w",
+     "said": "s,n",
+     "correct": false
+    },
+    {
+     "episode": "t19s382",
+     "question": "How do you go from the office to the bathroom?",
+     "answer": "n,e",
+     "said": "N,E",
+     "correct": true
+    },
+    {
+     "episode": "t19s383",
+     "question": "How do you go from the garden to the bathroom?",
+     "answer": "s,s",
+     "said": "s,s",
+     "correct": true
+    },
+    {
+     "episode": "t19s384",
+     "question": "How do you go from the office to the bedroom?",
+     "answer": "w,s",
+     "said": "West, South",
+     "correct": true
+    },
+    {
+     "episode": "t19s385",
+     "question": "How do you go from the bedroom to the office?",
+     "answer": "s,s",
+     "said": "s,s",
+     "correct": true
+    },
+    {
+     "episode": "t19s386",
+     "question": "How do you go from the bathroom to the kitchen?",
+     "answer": "n,n",
+     "said": "n",
+     "correct": false
+    },
+    {
+     "episode": "t19s387",
+     "question": "How do you go from the bedroom to the hallway?",
+     "answer": "w,s",
+     "said": "w,s",
+     "correct": true
+    },
+    {
+     "episode": "t19s388",
+     "question": "How do you go from the bedroom to the hallway?",
+     "answer": "s,s",
+     "said": "s",
+     "correct": false
+    },
+    {
+     "episode": "t19s389",
+     "question": "How do you go from the bedroom to the hallway?",
+     "answer": "s,e",
+     "said": "S,E",
+     "correct": true
+    },
+    {
+     "episode": "t19s390",
+     "question": "How do you go from the hallway to the garden?",
+     "answer": "e,e",
+     "said": "e,e",
+     "correct": true
+    },
+    {
+     "episode": "t19s391",
+     "question": "How do you go from the bathroom to the bedroom?",
+     "answer": "e,e",
+     "said": "e,e",
+     "correct": true
+    },
+    {
+     "episode": "t19s392",
+     "question": "How do you go from the garden to the bedroom?",
+     "answer": "n,e",
+     "said": "n,e",
+     "correct": true
+    },
+    {
+     "episode": "t19s393",
+     "question": "How do you go from the hallway to the bedroom?",
+     "answer": "s,w",
+     "said": "w",
+     "correct": false
+    },
+    {
+     "episode": "t19s394",
+     "question": "How do you go from the office to the bedroom?",
+     "answer": "n,n",
+     "said": "n,n",
+     "correct": true
+    },
+    {
+     "episode": "t19s395",
+     "question": "How do you go from the garden to the bathroom?",
+     "answer": "w,s",
+     "said": "w,s",
+     "correct": true
+    },
+    {
+     "episode": "t19s396",
+     "question": "How do you go from the office to the bedroom?",
+     "answer": "s,e",
+     "said": "s,e",
+     "correct": true
+    },
+    {
+     "episode": "t19s397",
+     "question": "How do you go from the bedroom to the bathroom?",
+     "answer": "s,e",
+     "said": "s,e",
+     "correct": true
+    },
+    {
+     "episode": "t19s398",
+     "question": "How do you go from the kitchen to the office?",
+     "answer": "w,n",
+     "said": "W,N",
+     "correct": true
+    },
+    {
+     "episode": "t19s399",
+     "question": "How do you go from the hallway to the garden?",
+     "answer": "e,n",
+     "said": "e,n\n\nWait, I need to check the moves.\nStart: Hallway.\nTarget: Garden.\nHallway is West of Bedroom",
+     "correct": false
+    },
+    {
+     "episode": "t19s400",
+     "question": "How do you go from the office to the bathroom?",
+     "answer": "s,s",
+     "said": "s,s",
+     "correct": true
+    },
+    {
+     "episode": "t19s401",
+     "question": "How do you go from the office to the hallway?",
+     "answer": "w,n",
+     "said": "w,n",
+     "correct": true
+    },
+    {
+     "episode": "t19s402",
+     "question": "How do you go from the hallway to the garden?",
+     "answer": "n,e",
+     "said": "e",
+     "correct": false
+    },
+    {
+     "episode": "t19s403",
+     "question": "How do you go from the office to the garden?",
+     "answer": "e,e",
+     "said": "e",
+     "correct": false
+    },
+    {
+     "episode": "t19s404",
+     "question": "How do you go from the garden to the bathroom?",
+     "answer": "e,n",
+     "said": "e,n",
+     "correct": true
+    },
+    {
+     "episode": "t19s405",
+     "question": "How do you go from the bedroom to the garden?",
+     "answer": "s,s",
+     "said": "s",
+     "correct": false
+    },
+    {
+     "episode": "t19s406",
+     "question": "How do you go from the hallway to the bathroom?",
+     "answer": "n,w",
+     "said": "n,w",
+     "correct": true
+    },
+    {
+     "episode": "t19s407",
+     "question": "How do you go from the bathroom to the bedroom?",
+     "answer": "s,w",
+     "said": "S,W",
+     "correct": true
+    },
+    {
+     "episode": "t19s408",
+     "question": "How do you go from the office to the kitchen?",
+     "answer": "s,w",
+     "said": "s,w",
+     "correct": true
+    },
+    {
+     "episode": "t19s409",
+     "question": "How do you go from the bathroom to the garden?",
+     "answer": "w,n",
+     "said": "W,N",
+     "correct": true
+    },
+    {
+     "episode": "t19s410",
+     "question": "How do you go from the office to the bedroom?",
+     "answer": "w,n",
+     "said": "W,N",
+     "correct": true
+    },
+    {
+     "episode": "t19s411",
+     "question": "How do you go from the kitchen to the hallway?",
+     "answer": "e,n",
+     "said": "e,n",
+     "correct": true
+    },
+    {
+     "episode": "t19s412",
+     "question": "How do you go from the bathroom to the kitchen?",
+     "answer": "n,w",
+     "said": "N,W",
+     "correct": true
+    },
+    {
+     "episode": "t19s413",
+     "question": "How do you go from the bedroom to the kitchen?",
+     "answer": "w,n",
+     "said": "w,n",
+     "correct": true
+    },
+    {
+     "episode": "t19s414",
+     "question": "How do you go from the bathroom to the bedroom?",
+     "answer": "n,n",
+     "said": "n",
+     "correct": false
+    },
+    {
+     "episode": "t19s415",
+     "question": "How do you go from the garden to the office?",
+     "answer": "e,e",
+     "said": "e,e",
+     "correct": true
+    },
+    {
+     "episode": "t19s416",
+     "question": "How do you go from the bathroom to the garden?",
+     "answer": "s,e",
+     "said": "s,e",
+     "correct": true
+    },
+    {
+     "episode": "t19s417",
+     "question": "How do you go from the bathroom to the hallway?",
+     "answer": "n,w",
+     "said": "N,W",
+     "correct": true
+    },
+    {
+     "episode": "t19s418",
+     "question": "How do you go from the hallway to the office?",
+     "answer": "n,n",
+     "said": "n",
+     "correct": false
+    },
+    {
+     "episode": "t19s419",
+     "question": "How do you go from the hallway to the office?",
+     "answer": "s,s",
+     "said": "s",
+     "correct": false
+    },
+    {
+     "episode": "t19s420",
+     "question": "How do you go from the kitchen to the bathroom?",
+     "answer": "e,e",
+     "said": "e,e",
+     "correct": true
+    },
+    {
+     "episode": "t19s421",
+     "question": "How do you go from the hallway to the office?",
+     "answer": "w,s",
+     "said": "w,s",
+     "correct": true
+    },
+    {
+     "episode": "t19s422",
+     "question": "How do you go from the bedroom to the kitchen?",
+     "answer": "n,n",
+     "said": "n",
+     "correct": false
+    },
+    {
+     "episode": "t19s423",
+     "question": "How do you go from the garden to the office?",
+     "answer": "n,n",
+     "said": "n",
+     "correct": false
+    },
+    {
+     "episode": "t19s424",
+     "question": "How do you go from the garden to the bedroom?",
+     "answer": "n,n",
+     "said": "n",
+     "correct": false
+    },
+    {
+     "episode": "t19s425",
+     "question": "How do you go from the bedroom to the bathroom?",
+     "answer": "s,w",
+     "said": "s,w",
+     "correct": true
+    },
+    {
+     "episode": "t19s426",
+     "question": "How do you go from the hallway to the bathroom?",
+     "answer": "e,s",
+     "said": "e,s",
+     "correct": true
+    },
+    {
+     "episode": "t19s427",
+     "question": "How do you go from the bathroom to the office?",
+     "answer": "n,w",
+     "said": "n,w",
+     "correct": true
+    },
+    {
+     "episode": "t19s428",
+     "question": "How do you go from the hallway to the kitchen?",
+     "answer": "s,s",
+     "said": "s,s",
+     "correct": true
+    },
+    {
+     "episode": "t19s429",
+     "question": "How do you go from the kitchen to the bedroom?",
+     "answer": "n,e",
+     "said": "n,e",
+     "correct": true
+    },
+    {
+     "episode": "t19s430",
+     "question": "How do you go from the bedroom to the hallway?",
+     "answer": "n,w",
+     "said": "s,w",
+     "correct": false
+    },
+    {
+     "episode": "t19s431",
+     "question": "How do you go from the bedroom to the bathroom?",
+     "answer": "s,w",
+     "said": "S,W",
+     "correct": true
+    },
+    {
+     "episode": "t19s432",
+     "question": "How do you go from the hallway to the kitchen?",
+     "answer": "e,e",
+     "said": "e",
+     "correct": false
+    },
+    {
+     "episode": "t19s433",
+     "question": "How do you go from the office to the garden?",
+     "answer": "n,n",
+     "said": "n,n",
+     "correct": true
+    },
+    {
+     "episode": "t19s434",
+     "question": "How do you go from the kitchen to the garden?",
+     "answer": "s,e",
+     "said": "s,e",
+     "correct": true
+    },
+    {
+     "episode": "t19s435",
+     "question": "How do you go from the bedroom to the bathroom?",
+     "answer": "s,s",
+     "said": "s,s",
+     "correct": true
+    },
+    {
+     "episode": "t19s436",
+     "question": "How do you go from the kitchen to the bathroom?",
+     "answer": "e,e",
+     "said": "E,E",
+     "correct": true
+    },
+    {
+     "episode": "t19s437",
+     "question": "How do you go from the bedroom to the bathroom?",
+     "answer": "w,s",
+     "said": "w,s",
+     "correct": true
+    },
+    {
+     "episode": "t19s438",
+     "question": "How do you go from the bedroom to the bathroom?",
+     "answer": "w,s",
+     "said": "w,s",
+     "correct": true
+    },
+    {
+     "episode": "t19s439",
+     "question": "How do you go from the garden to the office?",
+     "answer": "n,w",
+     "said": "n,w",
+     "correct": true
+    },
+    {
+     "episode": "t19s440",
+     "question": "How do you go from the kitchen to the bedroom?",
+     "answer": "e,e",
+     "said": "e,e",
+     "correct": true
+    },
+    {
+     "episode": "t19s441",
+     "question": "How do you go from the hallway to the kitchen?",
+     "answer": "w,n",
+     "said": "W,N",
+     "correct": true
+    },
+    {
+     "episode": "t19s442",
+     "question": "How do you go from the office to the hallway?",
+     "answer": "w,s",
+     "said": "w,s",
+     "correct": true
+    },
+    {
+     "episode": "t19s443",
+     "question": "How do you go from the garden to the bedroom?",
+     "answer": "n,w",
+     "said": "s,e",
+     "correct": false
+    },
+    {
+     "episode": "t19s444",
+     "question": "How do you go from the office to the hallway?",
+     "answer": "e,n",
+     "said": "E,N",
+     "correct": true
+    },
+    {
+     "episode": "t19s445",
+     "question": "How do you go from the bedroom to the hallway?",
+     "answer": "s,e",
+     "said": "s,e",
+     "correct": true
+    },
+    {
+     "episode": "t19s446",
+     "question": "How do you go from the office to the garden?",
+     "answer": "w,n",
+     "said": "W,N",
+     "correct": true
+    },
+    {
+     "episode": "t19s447",
+     "question": "How do you go from the kitchen to the bathroom?",
+     "answer": "n,n",
+     "said": "n",
+     "correct": false
+    },
+    {
+     "episode": "t19s448",
+     "question": "How do you go from the garden to the hallway?",
+     "answer": "s,e",
+     "said": "S,E",
+     "correct": true
+    },
+    {
+     "episode": "t19s449",
+     "question": "How do you go from the bathroom to the garden?",
+     "answer": "e,e",
+     "said": "e,e",
+     "correct": true
+    },
+    {
+     "episode": "t19s450",
+     "question": "How do you go from the office to the hallway?",
+     "answer": "e,e",
+     "said": "e",
+     "correct": false
+    },
+    {
+     "episode": "t19s451",
+     "question": "How do you go from the bathroom to the hallway?",
+     "answer": "e,e",
+     "said": "e,e",
+     "correct": true
+    },
+    {
+     "episode": "t19s452",
+     "question": "How do you go from the bedroom to the office?",
+     "answer": "s,e",
+     "said": "s,e",
+     "correct": true
+    },
+    {
+     "episode": "t19s453",
+     "question": "How do you go from the garden to the hallway?",
+     "answer": "e,n",
+     "said": "s",
+     "correct": false
+    },
+    {
+     "episode": "t19s454",
+     "question": "How do you go from the bedroom to the office?",
+     "answer": "n,w",
+     "said": "N,W",
+     "correct": true
+    },
+    {
+     "episode": "t19s455",
+     "question": "How do you go from the kitchen to the hallway?",
+     "answer": "w,w",
+     "said": "w",
+     "correct": false
+    },
+    {
+     "episode": "t19s456",
+     "question": "How do you go from the kitchen to the garden?",
+     "answer": "s,w",
+     "said": "s,w",
+     "correct": true
+    },
+    {
+     "episode": "t19s457",
+     "question": "How do you go from the bedroom to the hallway?",
+     "answer": "s,s",
+     "said": "S,S",
+     "correct": true
+    },
+    {
+     "episode": "t19s458",
+     "question": "How do you go from the bedroom to the office?",
+     "answer": "n,n",
+     "said": "n,n",
+     "correct": true
+    },
+    {
+     "episode": "t19s459",
+     "question": "How do you go from the kitchen to the hallway?",
+     "answer": "w,w",
+     "said": "w,w",
+     "correct": true
+    },
+    {
+     "episode": "t19s460",
+     "question": "How do you go from the bedroom to the garden?",
+     "answer": "n,w",
+     "said": "N,W",
+     "correct": true
+    },
+    {
+     "episode": "t19s461",
+     "question": "How do you go from the garden to the bathroom?",
+     "answer": "n,e",
+     "said": "n,e",
+     "correct": true
+    },
+    {
+     "episode": "t19s462",
+     "question": "How do you go from the bathroom to the kitchen?",
+     "answer": "e,n",
+     "said": "e,n",
+     "correct": true
+    },
+    {
+     "episode": "t19s463",
+     "question": "How do you go from the office to the garden?",
+     "answer": "s,e",
+     "said": "S,E",
+     "correct": true
+    },
+    {
+     "episode": "t19s464",
+     "question": "How do you go from the bathroom to the garden?",
+     "answer": "e,n",
+     "said": "e,n",
+     "correct": true
+    },
+    {
+     "episode": "t19s465",
+     "question": "How do you go from the office to the kitchen?",
+     "answer": "n,e",
+     "said": "n,e",
+     "correct": true
+    },
+    {
+     "episode": "t19s466",
+     "question": "How do you go from the office to the bathroom?",
+     "answer": "n,e",
+     "said": "s,e",
+     "correct": false
+    },
+    {
+     "episode": "t19s467",
+     "question": "How do you go from the bedroom to the office?",
+     "answer": "n,e",
+     "said": "n,e",
+     "correct": true
+    },
+    {
+     "episode": "t19s468",
+     "question": "How do you go from the kitchen to the bedroom?",
+     "answer": "e,n",
+     "said": "E,N",
+     "correct": true
+    },
+    {
+     "episode": "t19s469",
+     "question": "How do you go from the bathroom to the hallway?",
+     "answer": "s,s",
+     "said": "S",
+     "correct": false
+    },
+    {
+     "episode": "t19s470",
+     "question": "How do you go from the kitchen to the hallway?",
+     "answer": "e,n",
+     "said": "e,n",
+     "correct": true
+    },
+    {
+     "episode": "t19s471",
+     "question": "How do you go from the garden to the hallway?",
+     "answer": "e,n",
+     "said": "w,n",
+     "correct": false
+    },
+    {
+     "episode": "t19s472",
+     "question": "How do you go from the bathroom to the office?",
+     "answer": "e,e",
+     "said": "E,E",
+     "correct": true
+    },
+    {
+     "episode": "t19s473",
+     "question": "How do you go from the bathroom to the hallway?",
+     "answer": "s,w",
+     "said": "s,w",
+     "correct": true
+    },
+    {
+     "episode": "t19s474",
+     "question": "How do you go from the office to the kitchen?",
+     "answer": "n,e",
+     "said": "n,e",
+     "correct": true
+    },
+    {
+     "episode": "t19s475",
+     "question": "How do you go from the hallway to the office?",
+     "answer": "w,s",
+     "said": "w,s",
+     "correct": true
+    },
+    {
+     "episode": "t19s476",
+     "question": "How do you go from the bathroom to the kitchen?",
+     "answer": "s,w",
+     "said": "w",
+     "correct": false
+    },
+    {
+     "episode": "t19s477",
+     "question": "How do you go from the bathroom to the hallway?",
+     "answer": "n,n",
+     "said": "n",
+     "correct": false
+    },
+    {
+     "episode": "t19s478",
+     "question": "How do you go from the office to the garden?",
+     "answer": "n,e",
+     "said": "N,E",
+     "correct": true
+    },
+    {
+     "episode": "t19s479",
+     "question": "How do you go from the kitchen to the hallway?",
+     "answer": "e,s",
+     "said": "e,s",
+     "correct": true
+    },
+    {
+     "episode": "t19s480",
+     "question": "How do you go from the bedroom to the kitchen?",
+     "answer": "s,s",
+     "said": "s,s",
+     "correct": true
+    },
+    {
+     "episode": "t19s481",
+     "question": "How do you go from the hallway to the bathroom?",
+     "answer": "s,s",
+     "said": "s",
+     "correct": false
+    },
+    {
+     "episode": "t19s482",
+     "question": "How do you go from the hallway to the bathroom?",
+     "answer": "w,w",
+     "said": "West, West",
+     "correct": true
+    },
+    {
+     "episode": "t19s483",
+     "question": "How do you go from the garden to the office?",
+     "answer": "n,w",
+     "said": "n,w",
+     "correct": true
+    },
+    {
+     "episode": "t19s484",
+     "question": "How do you go from the bedroom to the hallway?",
+     "answer": "s,e",
+     "said": "s,e",
+     "correct": true
+    },
+    {
+     "episode": "t19s485",
+     "question": "How do you go from the hallway to the garden?",
+     "answer": "s,w",
+     "said": "s,w",
+     "correct": true
+    },
+    {
+     "episode": "t19s486",
+     "question": "How do you go from the hallway to the bedroom?",
+     "answer": "w,s",
+     "said": "W,S",
+     "correct": true
+    },
+    {
+     "episode": "t19s487",
+     "question": "How do you go from the kitchen to the bathroom?",
+     "answer": "w,w",
+     "said": "w,w",
+     "correct": true
+    },
+    {
+     "episode": "t19s488",
+     "question": "How do you go from the office to the bathroom?",
+     "answer": "e,s",
+     "said": "e,s",
+     "correct": true
+    },
+    {
+     "episode": "t19s489",
+     "question": "How do you go from the bedroom to the hallway?",
+     "answer": "s,s",
+     "said": "s,s",
+     "correct": true
+    },
+    {
+     "episode": "t19s490",
+     "question": "How do you go from the hallway to the bathroom?",
+     "answer": "w,s",
+     "said": "s",
+     "correct": false
+    },
+    {
+     "episode": "t19s491",
+     "question": "How do you go from the bathroom to the hallway?",
+     "answer": "n,e",
+     "said": "N,E",
+     "correct": true
+    },
+    {
+     "episode": "t19s492",
+     "question": "How do you go from the kitchen to the hallway?",
+     "answer": "s,s",
+     "said": "S,S",
+     "correct": true
+    },
+    {
+     "episode": "t19s493",
+     "question": "How do you go from the garden to the office?",
+     "answer": "s,s",
+     "said": "s,s",
+     "correct": true
+    },
+    {
+     "episode": "t19s494",
+     "question": "How do you go from the office to the bedroom?",
+     "answer": "w,n",
+     "said": "West,North",
+     "correct": true
+    },
+    {
+     "episode": "t19s495",
+     "question": "How do you go from the hallway to the kitchen?",
+     "answer": "n,w",
+     "said": "n,w",
+     "correct": true
+    },
+    {
+     "episode": "t19s496",
+     "question": "How do you go from the bedroom to the kitchen?",
+     "answer": "e,n",
+     "said": "e,n",
+     "correct": true
+    },
+    {
+     "episode": "t19s497",
+     "question": "How do you go from the bedroom to the office?",
+     "answer": "n,w",
+     "said": "n,w",
+     "correct": true
+    },
+    {
+     "episode": "t19s498",
+     "question": "How do you go from the kitchen to the office?",
+     "answer": "n,n",
+     "said": "n,n",
+     "correct": true
+    },
+    {
+     "episode": "t19s499",
+     "question": "How do you go from the bathroom to the hallway?",
+     "answer": "n,e",
+     "said": "N,E",
+     "correct": true
+    }
+   ]
+  }
+ },
+ "command": "scripts/path_reading.py ask --arms cot:2048 --note server --reasoning-budget 2048",
+ "sha": "49c5b269",
+ "taken_at": "20261029T022757Z",
+ "note": "server --reasoning-budget 2048"
+}

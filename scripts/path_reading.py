@@ -141,14 +141,23 @@ def build_features(args) -> None:
 # --- the arms ---------------------------------------------------------------------------------
 
 def served_arm(kind: str, budget: int | None, ss: list[Story], args) -> dict:
-    """floor (no story), ceiling (the story, one pass) and cot (the story, thinking on, the
-    server cutting the thinking at `budget` tokens, then the answer), through llama-server."""
+    """floor (no story), ceiling (the story, one pass), oracle (the two supporting sentences
+    alone, one pass: step 2's chain handed over, were a walker to find them) and cot (the story,
+    thinking on, the server cutting the thinking at `budget` tokens, then the answer), through
+    llama-server."""
     from openplexus.trunk import ServedTrunk
 
     think = kind == "cot"
     trunk = ServedTrunk(url=args.url, max_new=budget + 32 if think else args.max_new,
                         parallel=args.parallel, think=think)
-    prompts = [path_messages([] if kind == "floor" else s.sentences, s.questions[0].text) for s in ss]
+    def shown(s: Story) -> list[str]:
+        if kind == "floor":
+            return []
+        if kind == "oracle":
+            return [s.sentences[i] for i in s.questions[0].supporting]
+        return s.sentences
+
+    prompts = [path_messages(shown(s), s.questions[0].text) for s in ss]
     started = time.perf_counter()
     replies: list[str] = []
     chunk = args.parallel * 4
@@ -246,7 +255,7 @@ def ask(args) -> None:
     evaluator = None
     for spec in specs:
         parts = spec.split(":")
-        if parts[0] in ("floor", "ceiling", "cot"):
+        if parts[0] in ("floor", "ceiling", "oracle", "cot"):
             budget = int(parts[1]) if len(parts) > 1 else None
             arm = served_arm(parts[0], budget, ss, args)
         elif parts[0] == "search":

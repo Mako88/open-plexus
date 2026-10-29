@@ -83,7 +83,8 @@ class LocalTrunk:
     Several times slower than the served trunk on this card; use it only when a reading needs
     what the server cannot give."""
 
-    def __init__(self, model_id: str = "Qwen/Qwen3.5-2B", batch: int = 8, max_new: int = 8):
+    def __init__(self, model_id: str = "Qwen/Qwen3.5-2B", batch: int = 8, max_new: int = 8,
+                 dtype: str = "float32"):
         import torch
         from transformers import AutoModelForCausalLM, AutoTokenizer
 
@@ -93,7 +94,8 @@ class LocalTrunk:
         self.tok.padding_side = "left"
         if self.tok.pad_token is None:
             self.tok.pad_token = self.tok.eos_token
-        self.model = AutoModelForCausalLM.from_pretrained(model_id, dtype=torch.float32)
+        self.dtype = dtype  # bfloat16 halves the card the trunk takes, to sit beside the server
+        self.model = AutoModelForCausalLM.from_pretrained(model_id, dtype=getattr(torch, dtype))
         self.model = self.model.to("cuda").eval()
         self.batch = batch
         self.max_new = max_new
@@ -101,7 +103,7 @@ class LocalTrunk:
         self.tokens_out = 0
 
     def served_model(self) -> str:
-        return f"{self.model_id} fp32 in process"
+        return f"{self.model_id} {self.dtype} in process"
 
     def ask_many(self, prompts: list[list[dict]]) -> list[str]:
         out: list[str] = []

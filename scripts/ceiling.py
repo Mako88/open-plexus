@@ -46,8 +46,14 @@ def rows(tasks: list[int], n: int, seed: int, split: str = "test") -> list[dict]
     return out
 
 
+NUMBER_WORDS = {"none": "0", "zero": "0", "one": "1", "two": "2", "three": "3", "four": "4",
+                "five": "5", "six": "6", "seven": "7", "eight": "8", "nine": "9", "ten": "10"}
+
+
 def normalise(s: str) -> list[str]:
-    return re.findall(r"[a-z0-9]+", s.lower())
+    """Lower-case words, number words as digits: task 7's gold is "one" and the trunk says "1",
+    and the first reading of it scored 0.0 on that alone."""
+    return [NUMBER_WORDS.get(w, w) for w in re.findall(r"[a-z0-9]+", s.lower())]
 
 
 def correct(gold: str, reply: str) -> bool:

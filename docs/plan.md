@@ -281,6 +281,16 @@ Each step says what it decides. A step is struck when it is done.
      and checking one. So on the first reasoning task, one fact a pass plus code beats the
      trunk's own thinking at a thirty-fifth of the passes, and the evaluator-and-search form
      is the loser here; it stays for maths, where the steps are not a map.
+   - Counting (`readings/count-*`, `scripts/count_reading.py`), bAbI task 7, how many objects
+     someone is carrying, 1,000 questions over 200 stories. The same shape: the trunk restates
+     each sentence as one event, `person|took|object`, `person|dropped|object`,
+     `giver|gave|object|receiver` or `none`, one pass a sentence, and code replays the events
+     to the question and counts. **0.989 at 23 passes a question**; the one-pass trunk given
+     the story 0.502 (`readings/ceiling-*-20261029T151659Z`), given nothing 0.468, which is the
+     share of "none" answers. 2,458 of 2,470 events read right; the twelve wrong all swap giver
+     and receiver in "handed the apple to Sandra". Not chased: a verification pass would double
+     the cost for a point. The scorer now reads number words as digits; the first reading of
+     task 7 scored 0.0 on "one" against "1".
 
 4. **Writing.** What goes in a row: the raw sentence, or the trunk's own restatement with
    names resolved ("John is in the hallway", not "he went there"), one fact a row. Rows carry

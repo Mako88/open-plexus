@@ -27,3 +27,8 @@ def test_a_wrong_word_or_nothing_does_not_score():
     assert not correct("hallway", "kitchen")
     assert not correct("hallway", "")
     assert not correct("milk,apple", "milk")
+
+
+def test_number_words_and_digits_score_alike():
+    assert correct("one", "1") and correct("none", "0") and correct("two", "She has 2.")
+    assert not correct("one", "2") and not correct("none", "1")

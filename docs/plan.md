@@ -321,6 +321,17 @@ Each step says what it decides. A step is struck when it is done.
     toward the tool's 0.989. A head that lifts the score has to judge which conclusion is
     right, which is the evaluator's job, not the stop's. The same counterfactual on GSM8K
     needs thoughts in the rows; `ServedTrunk` now keeps them, and the reading is re-taken.
+  - Decided with John 2026-10-29: step 3 goes on as written, the evaluator over steps of maths
+    solutions with search in code and the stop inside it, not a stop head on its own. The
+    refutation line, in words: if at matched passes the trained evaluator searching the trunk's
+    own steps does not beat the trunk's chain of thought on GSM8K, after the step size the
+    trunk handles in one pass and the labels we can get have both been tried, then the glue is
+    not where the reasoning comes from and this is a harness around a small model, which no
+    trunk that fits the card makes frontier. The fallback agreed then is to unfreeze the trunk:
+    an adapter on it trained from the search's own wins, so the trunk is a learning piece of
+    the system rather than a fixed organ. The frozen trunk only makes sense if the system
+    around a small one reaches frontier-level reasoning on the card; that is the bet, and this
+    is the step that reads it.
 
 4. **Writing.** What goes in a row: the raw sentence, or the trunk's own restatement with
    names resolved ("John is in the hallway", not "he went there"), one fact a row. Rows carry

@@ -306,11 +306,7 @@ Each step says what it decides. A step is struck when it is done.
     199 whose thinking finished inside the budget were right. So on arithmetic the trunk's own
     thinking is the strong mechanism and the tool is the cheap one, and the thinking fails by
     length, not by reasoning: it circles and re-checks until the budget cuts it. That is the
-    stop, the one job the step-2 evaluator did well. Proposed to John 2026-10-29, not yet
-    decided: the next form is the trunk thinking with the glue pruning, a stop head over the
-    thinking stream that ends it when the answer is in hand and a budget spent on the problems
-    that need it. The evaluator-and-search form over steps of maths (PRM800K) has not been
-    read; it is the fallback if the stop head does not move the cost.
+    stop, the one job the step-2 evaluator did well.
   - The stop, read on recorded thoughts before any head is trained (`readings/stop-*`,
     `scripts/stop_reading.py`): a regex for "the answer is N" stands in for the stop, and the
     thought is cut at its k-th stated conclusion. On task 7's 300 thoughts, cutting at the
@@ -335,6 +331,15 @@ Each step says what it decides. A step is struck when it is done.
     the system rather than a fixed organ. The frozen trunk only makes sense if the system
     around a small one reaches frontier-level reasoning on the card; that is the bet, and this
     is the step that reads it.
+  - The step evaluator (`readings/step-evaluator-fit-*`, `scripts/step_evaluator.py`,
+    `openplexus.steps`): a ridge head over the trunk's last-token state at layer 12 of a judge
+    prompt (the problem, the last six steps so far, the candidate, "Is the next step right:"),
+    fitted to 8,000 PRM800K steps of MATH solutions, as many rated wrong as right. On 1,500
+    test candidates from solutions it never saw: **balanced accuracy 0.727, AUC 0.79**, chance
+    0.5; 0.70 of right steps pass and 0.755 of wrong steps fail. Layers 12 to 20 read alike.
+    So the frozen trunk's state carries a real but middling signal about whether a maths step
+    is right; whether that signal, applied k times a step, beats the trunk's own thought is
+    the search reading next.
 
 4. **Writing.** What goes in a row: the raw sentence, or the trunk's own restatement with
    names resolved ("John is in the hallway", not "he went there"), one fact a row. Rows carry

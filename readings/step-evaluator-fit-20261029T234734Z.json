@@ -1,0 +1,156 @@
+{
+ "kind": "step-evaluator-fit",
+ "step": 3,
+ "features": {
+  "path": "state\\features\\steps6",
+  "model": "Qwen/Qwen3.5-2B float32 in process",
+  "layers": [
+   12,
+   16,
+   20
+  ],
+  "n": 8000,
+  "n_test": 1500,
+  "seed": 0,
+  "prompt": "openplexus.steps.judge_prompt",
+  "max_steps_shown": 6,
+  "labels": "PRM800K rating -1 -> -1, 0 or 1 -> +1",
+  "sizes": {
+   "fit": 6408,
+   "held": 1592,
+   "test": 1500
+  },
+  "seconds": 316.3,
+  "sha": "79901780",
+  "command": "scripts\\step_evaluator.py features --n 8000 --n-test 1500 --layers 12,16,20 --max-steps 6 --batch 6 --out state\\features\\steps6"
+ },
+ "chosen": {
+  "layer": 12,
+  "lam": 1000.0,
+  "threshold": 0.033
+ },
+ "sweep": [
+  {
+   "layer": 12,
+   "lam": 1.0,
+   "threshold": 0.1019,
+   "held_balanced_accuracy": 0.684,
+   "held_auc": 0.733
+  },
+  {
+   "layer": 12,
+   "lam": 10.0,
+   "threshold": 0.1138,
+   "held_balanced_accuracy": 0.693,
+   "held_auc": 0.743
+  },
+  {
+   "layer": 12,
+   "lam": 100.0,
+   "threshold": -0.0101,
+   "held_balanced_accuracy": 0.714,
+   "held_auc": 0.77
+  },
+  {
+   "layer": 12,
+   "lam": 1000.0,
+   "threshold": 0.033,
+   "held_balanced_accuracy": 0.725,
+   "held_auc": 0.789
+  },
+  {
+   "layer": 12,
+   "lam": 10000.0,
+   "threshold": -0.0118,
+   "held_balanced_accuracy": 0.719,
+   "held_auc": 0.785
+  },
+  {
+   "layer": 16,
+   "lam": 1.0,
+   "threshold": 0.1189,
+   "held_balanced_accuracy": 0.676,
+   "held_auc": 0.724
+  },
+  {
+   "layer": 16,
+   "lam": 10.0,
+   "threshold": 0.1491,
+   "held_balanced_accuracy": 0.679,
+   "held_auc": 0.733
+  },
+  {
+   "layer": 16,
+   "lam": 100.0,
+   "threshold": -0.1273,
+   "held_balanced_accuracy": 0.702,
+   "held_auc": 0.759
+  },
+  {
+   "layer": 16,
+   "lam": 1000.0,
+   "threshold": 0.0328,
+   "held_balanced_accuracy": 0.717,
+   "held_auc": 0.783
+  },
+  {
+   "layer": 16,
+   "lam": 10000.0,
+   "threshold": 0.0405,
+   "held_balanced_accuracy": 0.718,
+   "held_auc": 0.789
+  },
+  {
+   "layer": 20,
+   "lam": 1.0,
+   "threshold": -0.1068,
+   "held_balanced_accuracy": 0.674,
+   "held_auc": 0.724
+  },
+  {
+   "layer": 20,
+   "lam": 10.0,
+   "threshold": 0.1366,
+   "held_balanced_accuracy": 0.677,
+   "held_auc": 0.73
+  },
+  {
+   "layer": 20,
+   "lam": 100.0,
+   "threshold": -0.0001,
+   "held_balanced_accuracy": 0.696,
+   "held_auc": 0.753
+  },
+  {
+   "layer": 20,
+   "lam": 1000.0,
+   "threshold": -0.0108,
+   "held_balanced_accuracy": 0.722,
+   "held_auc": 0.778
+  },
+  {
+   "layer": 20,
+   "lam": 10000.0,
+   "threshold": -0.0268,
+   "held_balanced_accuracy": 0.712,
+   "held_auc": 0.777
+  }
+ ],
+ "test": {
+  "n": 1500,
+  "balanced_accuracy": 0.727,
+  "auc": 0.79,
+  "right_candidates_passed": 0.699,
+  "wrong_candidates_failed": 0.755,
+  "neutral_candidates_passed": 0.661
+ },
+ "chance": {
+  "balanced_accuracy": 0.5,
+  "auc": 0.5
+ },
+ "evaluator_path": "state\\steps\\evaluator.npz",
+ "command": "scripts/step_evaluator.py fit --features state/features/steps6 --out state/steps",
+ "sha": "79901780",
+ "taken_at": "20261029T234734Z",
+ "note": ""
+}

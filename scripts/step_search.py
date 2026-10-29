@@ -62,7 +62,7 @@ def arm(spec: str, ps: list[dict], trunk, evaluator: LinearHead, args) -> dict:
         counted["prefills"] += len(asks)
         if kind == "random":
             return [rng.random() for _ in asks]
-        x = trunk.hidden([judge_prompt(p, s, c) for p, s, c in asks], [evaluator.layer])[evaluator.layer]
+        x = trunk.hidden([judge_prompt(p, s, c, last=args.max_steps) for p, s, c in asks], [evaluator.layer])[evaluator.layer]
         return evaluator.query(x)[:, 0].tolist()
 
     started = time.perf_counter()
@@ -87,7 +87,7 @@ def arm(spec: str, ps: list[dict], trunk, evaluator: LinearHead, args) -> dict:
     n = len(rows)
     return {
         "kind": kind, "k": k, "beam": beam, "depth": args.depth, "temperature": args.temperature if k > 1 else 0.0,
-        "max_step_tokens": args.max_step, "system_prompt": STEP_SYSTEM, "evaluator": str(args.evaluator),
+        "max_step_tokens": args.max_step, "max_steps_shown": args.max_steps, "system_prompt": STEP_SYSTEM, "evaluator": str(args.evaluator),
         "evaluator_layer": evaluator.layer, "served_model": trunk.served_model(),
         "inputs_the_deployed_system_has": "all: the question",
         "score": round(sum(r["correct"] for r in rows) / n, 3), "n": n,
@@ -106,6 +106,7 @@ def main() -> None:
     p.add_argument("--model", default="Qwen/Qwen3.5-2B")
     p.add_argument("--parallel", type=int, default=8, help="questions searched in lockstep")
     p.add_argument("--depth", type=int, default=12)
+    p.add_argument("--max-steps", type=int, default=6, help="steps so far the judge prompt shows, as the evaluator was trained")
     p.add_argument("--max-step", type=int, default=48, help="tokens a proposed step may take")
     p.add_argument("--temperature", type=float, default=0.7)
     p.add_argument("--seed", type=int, default=0)

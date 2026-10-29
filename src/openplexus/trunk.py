@@ -94,7 +94,9 @@ class LocalTrunk:
         self.tok.padding_side = "left"
         if self.tok.pad_token is None:
             self.tok.pad_token = self.tok.eos_token
-        self.dtype = dtype  # bfloat16 halves the card the trunk takes, to sit beside the server
+        # float32 on this card: a GTX 1080 Ti has no bfloat16 and slow float16, so a half-precision
+        # trunk sits beside the server but runs several times slower; the option is for a newer card
+        self.dtype = dtype
         self.model = AutoModelForCausalLM.from_pretrained(model_id, dtype=getattr(torch, dtype))
         self.model = self.model.to("cuda").eval()
         self.batch = batch

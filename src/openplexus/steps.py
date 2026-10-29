@@ -87,3 +87,55 @@ def answer_of(step: str) -> str | None:
     """The final number if the step is an answer line, else None."""
     m = re.match(r"\s*\**\s*answer\s*:?\**\s*(.+)", step, re.I)
     return number_in(m.group(1)) if m else None
+
+
+class Path:
+    """A partial solution under search: its steps, the evaluator's score of each, and whether
+    its last step is an answer line. Paths are compared by mean score a step, as in the path
+    search of task 19, so a short finished path does not win by having fewer scores to sum."""
+
+    def __init__(self, steps: list[str], scores: list[float]):
+        self.steps = steps
+        self.scores = scores
+        self.done = bool(steps) and answer_of(steps[-1]) is not None
+
+    def mean(self) -> float:
+        return sum(self.scores) / len(self.scores) if self.scores else 0.0
+
+    def answer(self) -> str | None:
+        return answer_of(self.steps[-1]) if self.steps else None
+
+
+def search_many(problems: list[str], propose_many, judge_many, k: int = 4, beam: int = 1,
+                depth: int = 12) -> list[Path]:
+    """Beam search over solution steps for every problem at once, in lockstep so the trunk is
+    asked in batches. `propose_many([(problem, steps), ...], k)` returns k candidate next steps
+    for each; `judge_many([(problem, steps, candidate), ...])` returns the evaluator's score of
+    each. At every depth each live path is extended by its candidates, every path is scored by
+    mean step score, and the best `beam` are kept, finished paths among them; the search ends
+    when the kept paths are all finished or the depth is spent. Returns the best path a problem.
+    With k=1 and beam=1 the evaluator chooses nothing: that is the control."""
+    beams: list[list[Path]] = [[Path([], [])] for _ in problems]
+    for _ in range(depth):
+        asks = [(i, p) for i, b in enumerate(beams) for p in b if not p.done]
+        if not asks:
+            break
+        proposals = propose_many([(problems[i], p.steps) for i, p in asks], k)
+        judge_asks, owners = [], []
+        for (i, p), cands in zip(asks, proposals):
+            for c in dict.fromkeys(c.strip() for c in cands if c.strip()):
+                judge_asks.append((problems[i], p.steps, c))
+                owners.append((i, p))
+        scores = judge_many(judge_asks) if judge_asks else []
+        children: list[list[Path]] = [[] for _ in problems]
+        for (i, p), (_, _, c), s in zip(owners, judge_asks, scores):
+            children[i].append(Path(p.steps + [c], p.scores + [float(s)]))
+        for i, b in enumerate(beams):
+            pool = children[i] + [p for p in b if p.done]
+            if not children[i] and not pool:
+                pool = b  # nothing proposed: the live paths stand as they are, unfinished
+            beams[i] = sorted(pool, key=Path.mean, reverse=True)[:beam] if pool else b
+            if not children[i]:
+                for p in beams[i]:
+                    p.done = True  # a path the trunk could not extend ends without an answer
+    return [max(b, key=Path.mean) for b in beams]

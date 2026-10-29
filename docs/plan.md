@@ -45,6 +45,13 @@ of thought at the same number of forward passes, on problems the trunk cannot do
 pass. The part that cannot be outsourced to code is the evaluator, and whether a small one
 can be trained well from labels we can get is the question the whole design turns on.
 
+The standard, set 2026-10-29: frontier-level answers from this card, by any mechanism that
+runs on it. Whether the trunk "really reasons" or code does the composing is not the question;
+a decomposition we write, a tool, a search shape we chose for the problem are all fair. The one
+thing that is not fair is a crutch the deployed system will not have: labels, supporting facts
+or an oracle's choice available in the reading but not in the world. Each reading says which
+of its inputs the deployed system would also have.
+
 This shape has been tried twice before. Memory networks (Sukhbaatar et al., 2015) solved
 most of bAbI with a tiny gradient-trained controller doing three hops over sentence rows,
 and died because their language side could not scale; a pretrained trunk is that side
@@ -147,7 +154,8 @@ Each step says what it decides. A step is struck when it is done.
    The 2B composes two and three facts in one pass when handed only them; what it cannot do
    is find them in the story. Step 0's wall was distraction, not composition.
 
-2. **Reading across rows, by hops.** Tasks 2 and 3 with the supporting facts as separate
+2. ~~**Reading across rows, by hops.**~~ Struck 2026-10-29 at 0.75 against the oracle's 0.78 on
+   task 2, `readings/store-minilm-trunk-*`. Tasks 2 and 3 with the supporting facts as separate
    rows among thousands of others. Step 1 showed the trunk answers a two- or three-fact
    question once the supporting rows, and only they, stand in front of it, so the glue's job
    is to assemble that set: retrieve, read the row, re-query with what was read, retrieve

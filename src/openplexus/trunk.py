@@ -29,6 +29,7 @@ class ServedTrunk:
         self.think = think
         self.tokens_in = 0
         self.tokens_out = 0
+        self.thoughts: dict[int, str] = {}  # id(messages) -> the reasoning the server returned
 
     def served_model(self) -> str:
         """What the server says it is serving, for the reading's record."""
@@ -54,11 +55,19 @@ class ServedTrunk:
         u = reply.get("usage", {})
         self.tokens_in += int(u.get("prompt_tokens", 0))
         self.tokens_out += int(u.get("completion_tokens", 0))
-        return (reply["choices"][0]["message"].get("content") or "").strip()
+        msg = reply["choices"][0]["message"]
+        if self.think:
+            self.thoughts[id(messages)] = (msg.get("reasoning_content") or msg.get("reasoning") or "").strip()
+        return (msg.get("content") or "").strip()
 
     def ask_many(self, prompts: list[list[dict]]) -> list[str]:
         with ThreadPoolExecutor(max_workers=self.parallel) as pool:
             return list(pool.map(self.ask, prompts))
+
+    def thought_of(self, messages: list[dict]) -> str | None:
+        """The reasoning the server returned for a thinking turn already asked, for the
+        reading's rows: a stop over the thinking stream is read first on recorded thoughts."""
+        return self.thoughts.get(id(messages))
 
 
 def question_messages(rows: list[str], question: str) -> list[dict]:

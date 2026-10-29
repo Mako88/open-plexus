@@ -311,6 +311,16 @@ Each step says what it decides. A step is struck when it is done.
     thinking stream that ends it when the answer is in hand and a budget spent on the problems
     that need it. The evaluator-and-search form over steps of maths (PRM800K) has not been
     read; it is the fallback if the stop head does not move the cost.
+  - The stop, read on recorded thoughts before any head is trained (`readings/stop-*`,
+    `scripts/stop_reading.py`): a regex for "the answer is N" stands in for the stop, and the
+    thought is cut at its k-th stated conclusion. On task 7's 300 thoughts, cutting at the
+    first conclusion scores 0.653 against the trunk's own end 0.64, at 0.37 of the thought;
+    the second and third conclusions are no better (0.62, 0.63). So on counting the stop buys
+    the cost, two and a half times fewer tokens, and not the accuracy: the trunk's first
+    conclusion is as often wrong as its last, and a head that only stops cannot lift 0.64
+    toward the tool's 0.989. A head that lifts the score has to judge which conclusion is
+    right, which is the evaluator's job, not the stop's. The same counterfactual on GSM8K
+    needs thoughts in the rows; `ServedTrunk` now keeps them, and the reading is re-taken.
 
 4. **Writing.** What goes in a row: the raw sentence, or the trunk's own restatement with
    names resolved ("John is in the hallway", not "he went there"), one fact a row. Rows carry

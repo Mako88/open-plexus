@@ -39,13 +39,16 @@ def arm(kind: str, budget: int | None, ps: list[dict], args) -> dict:
     trunk = ServedTrunk(url=args.url, max_new=max_new, parallel=args.parallel, think=think)
     started = time.perf_counter()
     replies: list[str] = []
+    thoughts: list[str | None] = []
     chunk = args.parallel * 4
     for at in range(0, len(ps), chunk):
-        replies.extend(trunk.ask_many([messages(kind, p["question"]) for p in ps[at:at + chunk]]))
+        turns = [messages(kind, p["question"]) for p in ps[at:at + chunk]]
+        replies.extend(trunk.ask_many(turns))
+        thoughts.extend(trunk.thought_of(m) for m in turns)
         print(f"{kind}{':' + str(budget) if budget else ''} {len(replies)}/{len(ps)}", flush=True)
     rows = []
     ran = failed = 0
-    for p, reply in zip(ps, replies):
+    for p, reply, thought in zip(ps, replies, thoughts):
         if kind == "python":
             code = program_in(reply)
             said = run_program(code, timeout=args.timeout)
@@ -54,7 +57,7 @@ def arm(kind: str, budget: int | None, ps: list[dict], args) -> dict:
             extra = {"program": code}
         else:
             said = number_in(reply)
-            extra = {"reply": reply}
+            extra = {"reply": reply, **({"thought": thought} if think else {})}
         rows.append({"question": p["question"], "answer": p["answer"], "said": said,
                      "correct": same_number(said, p["answer"]), **extra})
     n = len(rows)

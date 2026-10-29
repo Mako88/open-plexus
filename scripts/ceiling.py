@@ -133,7 +133,7 @@ def main() -> None:
             req = urllib.request.Request(url, body, headers)
             for attempt in range(5):
                 try:
-                    with urllib.request.urlopen(req, timeout=120) as resp:
+                    with urllib.request.urlopen(req, timeout=1800) as resp:
                         reply = json.loads(resp.read())
                     break
                 except Exception as e:  # noqa: BLE001

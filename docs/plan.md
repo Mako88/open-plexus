@@ -287,7 +287,9 @@ Each step says what it decides. A step is struck when it is done.
      `giver|gave|object|receiver` or `none`, one pass a sentence, and code replays the events
      to the question and counts. **0.989 at 23 passes a question**; the one-pass trunk given
      the story 0.502 (`readings/ceiling-*-20261029T151659Z`), given nothing 0.468, which is the
-     share of "none" answers. 2,458 of 2,470 events read right; the twelve wrong all swap giver
+     share of "none" answers; chain of thought at a 2048-token budget **0.64** on 300 questions
+    at 1,872 passes (`readings/ceiling-*think-20261029T155653Z`), the thinking circling on
+    whether a handed-over object is still carried. 2,458 of 2,470 events read right; the twelve wrong all swap giver
      and receiver in "handed the apple to Sandra". Not chased: a verification pass would double
      the cost for a point. The scorer now reads number words as digits; the first reading of
      task 7 scored 0.0 on "one" against "1".

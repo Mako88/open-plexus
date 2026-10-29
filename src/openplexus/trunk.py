@@ -44,7 +44,7 @@ class ServedTrunk:
         req = urllib.request.Request(self.url, body, {"Content-Type": "application/json"})
         for attempt in range(5):
             try:
-                with urllib.request.urlopen(req, timeout=300) as resp:
+                with urllib.request.urlopen(req, timeout=1800) as resp:
                     reply = json.loads(resp.read())
                 break
             except Exception:  # noqa: BLE001

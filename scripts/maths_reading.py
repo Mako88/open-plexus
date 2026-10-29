@@ -2,7 +2,9 @@
 
 Three arms through llama-server. `direct` asks for the number alone, thinking off; `cot:<budget>`
 lets the trunk think, the server cutting the thinking at the budget (launch it with
-`--reasoning-budget <budget>`), then answer; `python` asks for a program whose last line prints
+`--reasoning-budget <budget>`), then answer in up to `--max-answer` tokens: after a cut thought
+the trunk writes its working again before the number, and 64 tokens cut 301 of 500 answers
+mid-sentence in the first reading; `python` asks for a program whose last line prints
 the answer, thinking off, and runs it in a fresh interpreter with a timeout. Passes a question
 are the tokens generated plus one prefill.
 
@@ -33,7 +35,7 @@ def arm(kind: str, budget: int | None, ps: list[dict], args) -> dict:
     from openplexus.trunk import ServedTrunk
 
     think = kind == "cot"
-    max_new = {"direct": 16, "cot": (budget or 0) + 64, "python": args.max_program}[kind]
+    max_new = {"direct": 16, "cot": (budget or 0) + args.max_answer, "python": args.max_program}[kind]
     trunk = ServedTrunk(url=args.url, max_new=max_new, parallel=args.parallel, think=think)
     started = time.perf_counter()
     replies: list[str] = []
@@ -58,6 +60,7 @@ def arm(kind: str, budget: int | None, ps: list[dict], args) -> dict:
     n = len(rows)
     return {
         "kind": kind, "think": think, "budget": budget, "max_new": max_new,
+        "max_answer": args.max_answer if think else None,
         "system_prompt": {"direct": DIRECT_SYSTEM, "cot": THINK_SYSTEM, "python": PYTHON_SYSTEM}[kind],
         "served_model": trunk.served_model(),
         "inputs_the_deployed_system_has": "all: the question",
@@ -77,6 +80,7 @@ def main() -> None:
     p.add_argument("--url", default=None)
     p.add_argument("--parallel", type=int, default=8)
     p.add_argument("--max-program", type=int, default=384, help="tokens for the python arm")
+    p.add_argument("--max-answer", type=int, default=512, help="tokens for the answer after the thinking, cot arms")
     p.add_argument("--timeout", type=float, default=5.0, help="seconds a program may run")
     p.add_argument("--note", default="")
     args = p.parse_args()

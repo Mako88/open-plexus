@@ -293,6 +293,24 @@ Each step says what it decides. A step is struck when it is done.
      and receiver in "handed the apple to Sandra". Not chased: a verification pass would double
      the cost for a point. The scorer now reads number words as digits; the first reading of
      task 7 scored 0.0 on "one" against "1".
+  - Arithmetic (`readings/maths-*`, `scripts/maths_reading.py`), GSM8K test, the first 500 of
+    1,319 grade-school word problems, the deployed system holding every input: the question.
+    Asked for the number alone the trunk scores 0.048 at 5 passes. Asked for a Python program
+    whose last line prints the answer, run by code in a fresh interpreter with a timeout,
+    **0.622 at 102 passes**; 19 programs crash (a name typed two ways) and 170 run to the
+    wrong number, mostly a quantity misread ("increased the value by 150%" of the purchase,
+    not the total). Chain of thought at a 2048-token budget **0.87 at 1,953 passes**, 430 of
+    the 461 that end in an answer right. The first thinking reading left 64 tokens for the
+    answer after the cut thought, enough for a bAbI word, not for the worked solution the trunk
+    writes before its number: 301 of 500 were cut mid-sentence and it read 0.40, but 196 of the
+    199 whose thinking finished inside the budget were right. So on arithmetic the trunk's own
+    thinking is the strong mechanism and the tool is the cheap one, and the thinking fails by
+    length, not by reasoning: it circles and re-checks until the budget cuts it. That is the
+    stop, the one job the step-2 evaluator did well. Proposed to John 2026-10-29, not yet
+    decided: the next form is the trunk thinking with the glue pruning, a stop head over the
+    thinking stream that ends it when the answer is in hand and a budget spent on the problems
+    that need it. The evaluator-and-search form over steps of maths (PRM800K) has not been
+    read; it is the fallback if the stop head does not move the cost.
 
 4. **Writing.** What goes in a row: the raw sentence, or the trunk's own restatement with
    names resolved ("John is in the hallway", not "he went there"), one fact a row. Rows carry

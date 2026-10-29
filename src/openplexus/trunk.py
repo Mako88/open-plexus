@@ -158,7 +158,9 @@ class LocalTrunk:
         for i in range(0, len(texts), self.batch):
             enc = self.tok(texts[i:i + self.batch], return_tensors="pt", padding=True).to("cuda")
             with self.torch.no_grad():
-                hs = self.model(**enc, output_hidden_states=True).hidden_states
+                # logits only for the last position: over every position the vocabulary's logits
+                # are gigabytes a batch, and the first PRM800K feature run died of them
+                hs = self.model(**enc, output_hidden_states=True, logits_to_keep=1).hidden_states
             for layer in layers:
                 out[layer].append(hs[layer][:, -1, :].float().cpu().numpy())  # left padding
         return {layer: np.concatenate(v) for layer, v in out.items()}

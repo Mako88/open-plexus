@@ -24,6 +24,12 @@ Two phases, because the states take a while on the card and the heads fit in sec
     # local trunk and an evaluator, so they run in their own invocation.
     .venv/Scripts/python scripts/path_reading.py ask --arms floor,ceiling,cot:512   # server --reasoning-budget 512
     .venv/Scripts/python scripts/path_reading.py ask --arms cot:2048                # server --reasoning-budget 2048
+
+    # the edge form: the trunk restates each sentence as room|direction|room and verifies the
+    # restatement against the sentence, two passes a sentence through llama-server with
+    # thinking off, and code builds the map and walks it. edges:regex reads the edges with a
+    # regular expression instead, the tool's own ceiling.
+    .venv/Scripts/python scripts/path_reading.py ask --arms edges:regex,edges:trunk
     .venv/Scripts/python scripts/path_reading.py ask --arms search:greedy,search:beam:2 \
         --evaluator state/path-step3/evaluator-mlp.pt
 
@@ -49,7 +55,9 @@ sys.path.insert(0, str(ROOT / "scripts"))
 from evaluator_fit import judge_states_resumable  # noqa: E402
 from openplexus.babi import Story, stories  # noqa: E402
 from openplexus.heads import load_head  # noqa: E402
-from openplexus.paths import LETTERS, moves_in, path_correct, path_messages, step_prompt  # noqa: E402
+from openplexus.paths import (EDGE_SYSTEM, LETTERS, VERIFY_SYSTEM, edge_messages, edge_of,  # noqa: E402
+                              moves_in, parse_question, path_correct, path_messages,
+                              shortest_path, step_prompt, verify_messages)
 
 TASK = 19
 
@@ -181,6 +189,76 @@ def served_arm(kind: str, budget: int | None, ss: list[Story], args) -> dict:
     }
 
 
+def edges_arm(reader: str, ss: list[Story], args) -> dict:
+    """The trunk never composes: each sentence becomes one edge, by the trunk's restatement
+    verified against the sentence (`trunk`, two passes a sentence, thinking off) or by a
+    regular expression (`regex`, the tool's ceiling), and code walks the shortest path from
+    the start room to the goal. The restatement names the two rooms and the direction right
+    and swaps the rooms' order one time in eight; asked yes or no whether the first room lies
+    in that direction of the second, the trunk catches every swap. The deployed system has
+    every input here: the story and the question, nothing from the gold."""
+    from openplexus.trunk import ServedTrunk
+
+    started = time.perf_counter()
+    sentences = [x for s in ss for x in s.sentences]
+    asked = 0
+    fixed = 0
+    if reader == "trunk":
+        trunk = ServedTrunk(url=args.url, max_new=args.max_new, parallel=args.parallel, think=False)
+        lines = []
+        chunk = args.parallel * 8
+        for at in range(0, len(sentences), chunk):
+            lines.extend(trunk.ask_many([edge_messages(x) for x in sentences[at:at + chunk]]))
+            print(f"edges:trunk {len(lines)}/{len(sentences)} sentences restated", flush=True)
+        asked = len(sentences)
+        edges = [edge_of(x) for x in lines]
+        todo = [i for i, e in enumerate(edges) if e]
+        answers = []
+        for at in range(0, len(todo), chunk):
+            answers.extend(trunk.ask_many([verify_messages(sentences[i], edges[i])
+                                           for i in todo[at:at + chunk]]))
+            print(f"edges:trunk {len(answers)}/{len(todo)} restatements verified", flush=True)
+        asked += len(todo)
+        for i, said in zip(todo, answers):
+            a, d, b = edges[i]
+            if said.strip().strip(".").lower().startswith("no"):
+                lines[i] = f"{b}|{d}|{a}"
+                fixed += 1
+        served, tokens_in, tokens_out = trunk.served_model(), trunk.tokens_in, trunk.tokens_out
+    else:
+        lines, served, tokens_in, tokens_out = sentences, None, 0, 0
+    rows = []
+    at = 0
+    for s in ss:
+        q = s.questions[0]
+        said_lines = lines[at:at + len(s.sentences)]
+        at += len(s.sentences)
+        edges = [e for e in (edge_of(x) for x in said_lines) if e]
+        true_edges = [e for e in (edge_of(x) for x in s.sentences) if e]
+        ends = parse_question(q.text)
+        path = shortest_path(edges, *ends) if ends else None
+        said = ",".join(path) if path else ""
+        rows.append({"episode": s.episode, "question": q.text, "answer": q.answer, "said": said,
+                     "correct": path_correct(q.answer, said), "edges_read": len(edges),
+                     "edges_right": sum(e in true_edges for e in edges),
+                     "restated": said_lines if reader != "regex" else None})
+    n = len(rows)
+    return {
+        "kind": "edges", "reader": reader, "think": False, "served_model": served,
+        "edge_prompt": EDGE_SYSTEM if reader == "trunk" else None,
+        "verify_prompt": VERIFY_SYSTEM if reader == "trunk" else None,
+        "orders_swapped_by_verification": fixed if reader == "trunk" else None,
+        "inputs_the_deployed_system_has": "all: the story's sentences and the question",
+        "score": round(sum(r["correct"] for r in rows) / n, 3), "n": n,
+        "no_path": sum(not r["said"] for r in rows),
+        "edges_right_per_story": round(sum(r["edges_right"] for r in rows) / n, 2),
+        "queries_per_question": round(asked / n, 1),
+        "passes_per_question": round((tokens_out + asked) / n, 1),
+        "tokens_in_per_question": round(tokens_in / n, 1),
+        "seconds": round(time.perf_counter() - started, 1), "rows": rows,
+    }
+
+
 def search_arm(mode: str, beam: int, ss: list[Story], trunk, evaluator, args) -> dict:
     """The search: at each step the four moves are judged by the evaluator from the trunk's
     state, and the best is followed (greedy, a path ends when stop wins at its node) or the
@@ -258,6 +336,8 @@ def ask(args) -> None:
         if parts[0] in ("floor", "ceiling", "oracle", "cot"):
             budget = int(parts[1]) if len(parts) > 1 else None
             arm = served_arm(parts[0], budget, ss, args)
+        elif parts[0] == "edges":
+            arm = edges_arm(parts[1], ss, args)
         elif parts[0] == "search":
             if local is None:
                 from openplexus.trunk import LocalTrunk

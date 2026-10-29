@@ -268,10 +268,19 @@ Each step says what it decides. A step is struck when it is done.
      exactly the two supporting sentences the one-pass trunk scores 0.146: the trunk can do the
      task, thinking, and cannot compose two directional facts into an ordered path in one pass.
      So no store and no number of search passes over a one-pass judgement of a whole move reach
-     it; the wall is one-pass composition, and the step prompt still asks the trunk to compose.
-     Next form: steps that are single facts ("from the bathroom, north leads to which room"),
-     the search in code walking rooms to the goal, the composition never asked of the trunk. A
-     LoRA under the head is the form after, if that does not move it.
+     it; the wall is one-pass composition, and the step prompt asked the trunk to compose.
+   - The edge form (`readings/path-20261029T14*`, `edges:trunk`): the trunk never composes.
+     It restates each sentence as `room|direction|room`, then verifies its restatement against
+     the sentence, yes or no; code adds the inverse of every edge and walks the shortest path.
+     **1.0 on all 500 stories at 58 passes a question**, every one of 2,500 edges right, against
+     chain of thought's 0.752 at 2,047. The restatement alone swaps the two rooms one time in
+     eight (0.726); asked which room lies in the direction of the other, the trunk swaps more
+     (0.486); asked to verify, it catches every swap. The deployed system has every input:
+     the story and the question. What is ours: the edge format, the verification question and
+     the walk, chosen for the problem; what is the trunk's: reading one sentence into a relation
+     and checking one. So on the first reasoning task, one fact a pass plus code beats the
+     trunk's own thinking at a thirty-fifth of the passes, and the evaluator-and-search form
+     is the loser here; it stays for maths, where the steps are not a map.
 
 4. **Writing.** What goes in a row: the raw sentence, or the trunk's own restatement with
    names resolved ("John is in the hallway", not "he went there"), one fact a row. Rows carry

@@ -28,6 +28,8 @@ def test_the_judge_prompt_and_the_step_turn_carry_the_pieces():
     assert p.endswith("Next step: p = 0.41.\nIs the next step right:")
     m = step_messages("Three pencils cost 1.24.", [])
     assert m[1]["content"].endswith("Steps so far:\n(none yet)\nNext step:")
+    short = judge_prompt("P", [f"step {i}" for i in range(10)], "c", last=3)
+    assert "(7 earlier steps left out)\n8. step 7\n9. step 8\n10. step 9\n" in short and "1. step 0" not in short
 
 
 def test_an_answer_line_is_told_from_a_step():

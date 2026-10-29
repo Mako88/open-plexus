@@ -67,14 +67,22 @@ def prm_examples(split: str, n: int | None = None, seed: int = 0) -> list[dict]:
     return picked
 
 
-def steps_text(steps: list[str]) -> str:
+def steps_text(steps: list[str], last: int | None = None) -> str:
+    """The steps numbered one a line; with `last`, only that many of the most recent, the
+    earlier ones noted as left out, which bounds a MATH solution of fifty steps to a prompt the
+    card reads in a second."""
+    if last is not None and len(steps) > last:
+        skipped = len(steps) - last
+        return f"({skipped} earlier steps left out)\n" + "".join(
+            f"{i + 1}. {s}\n" for i, s in enumerate(steps) if i >= skipped)
     return "".join(f"{i + 1}. {s}\n" for i, s in enumerate(steps)) or "(none yet)\n"
 
 
-def judge_prompt(problem: str, steps: list[str], candidate: str) -> str:
-    """What the trunk reads before its state is taken: the problem, the steps so far, the
-    candidate, and a cue that a judgement follows."""
-    return f"Problem: {problem}\nSolution so far:\n{steps_text(steps)}Next step: {candidate}\nIs the next step right:"
+def judge_prompt(problem: str, steps: list[str], candidate: str, last: int | None = None) -> str:
+    """What the trunk reads before its state is taken: the problem, the steps so far (the last
+    `last` of them if given), the candidate, and a cue that a judgement follows."""
+    return (f"Problem: {problem}\nSolution so far:\n{steps_text(steps, last)}Next step: {candidate}\n"
+            "Is the next step right:")
 
 
 def step_messages(problem: str, steps: list[str]) -> list[dict]:

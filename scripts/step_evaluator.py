@@ -73,7 +73,7 @@ def build_features(args) -> None:
     trunk = LocalTrunk(args.model, batch=args.batch, dtype=args.dtype)
     started = time.perf_counter()
     for split, exs in splits.items():
-        prompts = [judge_prompt(x["problem"], x["steps"], x["candidate"]) for x in exs]
+        prompts = [judge_prompt(x["problem"], x["steps"], x["candidate"], last=args.max_steps) for x in exs]
         hidden = states_resumable(trunk, prompts, layers, out / f"{split}.part", chunk=args.batch * 32)
         np.savez(out / f"{split}.npz", cand_label=np.array([x["label"] for x in exs], dtype=np.float32),
                  rating=np.array([x["rating"] for x in exs], dtype=np.int8),
@@ -82,7 +82,8 @@ def build_features(args) -> None:
         print(f"{split}: {len(exs)} candidates, {sum(x['label'] > 0 for x in exs)} right", flush=True)
     (out / "features.json").write_text(json.dumps({
         "model": trunk.served_model(), "layers": layers, "n": args.n, "n_test": args.n_test, "seed": args.seed,
-        "prompt": "openplexus.steps.judge_prompt", "labels": "PRM800K rating -1 -> -1, 0 or 1 -> +1",
+        "prompt": "openplexus.steps.judge_prompt", "max_steps_shown": args.max_steps,
+        "labels": "PRM800K rating -1 -> -1, 0 or 1 -> +1",
         "sizes": {k: len(v) for k, v in splits.items()}, "seconds": round(time.perf_counter() - started, 1),
         "sha": sha(), "command": " ".join(sys.argv),
     }, indent=1), encoding="utf-8")
@@ -174,6 +175,7 @@ def main() -> None:
     f.add_argument("--n", type=int, default=24000, help="train candidates drawn, half wrong")
     f.add_argument("--n-test", type=int, default=4000)
     f.add_argument("--layers", default="12,16,20")
+    f.add_argument("--max-steps", type=int, default=6, help="steps so far shown in the judge prompt, the latest")
     f.add_argument("--model", default="Qwen/Qwen3.5-2B")
     f.add_argument("--dtype", default="float32")
     f.add_argument("--batch", type=int, default=8)

@@ -1,0 +1,170 @@
+{
+ "kind": "evaluator-fit",
+ "step": 3,
+ "features": {
+  "path": "state\\features\\path",
+  "trunk": "Qwen/Qwen3.5-2B fp32 in process",
+  "walker": {
+   "path": null,
+   "layer": null,
+   "lam": null,
+   "note": "no walker: the four moves are the candidates"
+  },
+  "k": 4,
+  "tasks": [
+   19
+  ],
+  "layers": [
+   12,
+   16,
+   20
+  ],
+  "train_stories_fit": 800,
+  "counts": {
+   "fit": {
+    "states": 2400,
+    "judgements": 9600
+   },
+   "held": {
+    "states": 600,
+    "judgements": 2400
+   },
+   "test": {
+    "states": 1500,
+    "judgements": 6000
+   }
+  },
+  "seconds": 1067.6,
+  "judge_prompt": "Facts:\n<story>\nQuestion: <question>\nMoves so far: north\nNext move: east\nIs the next move right:",
+  "command": "scripts/path_reading.py features --features state/features/path",
+  "sha": "699a6de7",
+  "taken_at": "20261028T202636Z"
+ },
+ "inputs": "state",
+ "chosen": {
+  "layer": 16,
+  "lam": 10.0,
+  "threshold": 0.0315
+ },
+ "sweep": [
+  {
+   "layer": 12,
+   "lam": 1.0,
+   "threshold": 0.1102,
+   "held_recall@1": 0.522
+  },
+  {
+   "layer": 12,
+   "lam": 10.0,
+   "threshold": 0.1078,
+   "held_recall@1": 0.517
+  },
+  {
+   "layer": 12,
+   "lam": 100.0,
+   "threshold": -0.0142,
+   "held_recall@1": 0.515
+  },
+  {
+   "layer": 12,
+   "lam": 1000.0,
+   "threshold": -0.0069,
+   "held_recall@1": 0.46
+  },
+  {
+   "layer": 16,
+   "lam": 1.0,
+   "threshold": 0.1801,
+   "held_recall@1": 0.555
+  },
+  {
+   "layer": 16,
+   "lam": 10.0,
+   "threshold": 0.0315,
+   "held_recall@1": 0.578
+  },
+  {
+   "layer": 16,
+   "lam": 100.0,
+   "threshold": 0.0124,
+   "held_recall@1": 0.537
+  },
+  {
+   "layer": 16,
+   "lam": 1000.0,
+   "threshold": -0.0382,
+   "held_recall@1": 0.507
+  },
+  {
+   "layer": 20,
+   "lam": 1.0,
+   "threshold": 0.1395,
+   "held_recall@1": 0.557
+  },
+  {
+   "layer": 20,
+   "lam": 10.0,
+   "threshold": 0.0557,
+   "held_recall@1": 0.555
+  },
+  {
+   "layer": 20,
+   "lam": 100.0,
+   "threshold": -0.007,
+   "held_recall@1": 0.522
+  },
+  {
+   "layer": 20,
+   "lam": 1000.0,
+   "threshold": 0.0535,
+   "held_recall@1": 0.48
+  }
+ ],
+ "teacher_forced": {
+  "test": {
+   "task19-done": {
+    "n": 500,
+    "stopped": 0.824
+   },
+   "task19-hop1": {
+    "n": 500,
+    "target_in_topk": 1.0,
+    "eval_recall@1": 0.472,
+    "walker_recall@1": 0.268,
+    "went_on": 0.976
+   },
+   "task19-hop2": {
+    "n": 500,
+    "target_in_topk": 1.0,
+    "eval_recall@1": 0.676,
+    "walker_recall@1": 0.252,
+    "went_on": 0.998
+   }
+  },
+  "held": {
+   "task19-done": {
+    "n": 200,
+    "stopped": 0.74
+   },
+   "task19-hop1": {
+    "n": 200,
+    "target_in_topk": 1.0,
+    "eval_recall@1": 0.435,
+    "walker_recall@1": 0.255,
+    "went_on": 0.985
+   },
+   "task19-hop2": {
+    "n": 200,
+    "target_in_topk": 1.0,
+    "eval_recall@1": 0.72,
+    "walker_recall@1": 0.225,
+    "went_on": 0.995
+   }
+  }
+ },
+ "evaluator_path": "state\\path-step3\\evaluator.npz",
+ "command": "scripts/evaluator_fit.py fit --features state/features/path --inputs state --out state/path-step3",
+ "sha": "699a6de7",
+ "taken_at": "20261028T202709Z",
+ "note": ""
+}

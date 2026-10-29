@@ -242,6 +242,24 @@ Each step says what it decides. A step is struck when it is done.
    thinking gets right; that would mean the evaluator, not the search, is the wall, and the next
    question is whether a bigger label set or a LoRA under the head moves it. Training here is in
    daytime bursts with checkpoints, as everything is.
+   - Path finding (`readings/path-*`, `scripts/path_reading.py`), bAbI task 19, five rooms placed
+     relative to each other, the answer two moves in order, chance one in sixteen, 500 test
+     stories. The step evaluator reads the trunk's state over the story, the question, the moves
+     so far and one candidate move, labels from the gold path; the search is over the four moves
+     with a stop, three steps at most, four prefill passes a step a partial path. Floor 0.016,
+     ceiling 0.104 (the trunk says "w,s" to half the stories whatever they say), chain of thought
+     0.262 at a 512-token budget, 517 passes a question; left to itself the 2B loops in its
+     thinking and has not answered by 2048 tokens, so the server cuts the thinking at the budget
+     and the model then answers. Greedy search with the linear step evaluator **0.29 at 12
+     passes**: the first move right 46%, the second given a right first 74%, the stop 85%.
+     Wider beams lose at every stage (0.266 at 20 passes, 0.254 at 36); the gradient evaluator
+     is behind at every width (0.23-0.25) with no better stop. So the trunk's judgement of a
+     move, read by a linear head and searched in code, beats its own chain of thought at a
+     fortieth of the passes; the wall is the first move, which is the whole map composed in one
+     pass, and the evaluator's score is a decision, not a probability to sum. Not yet read: the
+     chain of thought at 2048, and whether a bigger trunk with thinking gets task 19 right at
+     all, which is the premise of the refutation line above (Qwen3.5-9B Q8 and Gemma 4 12B are
+     on disk).
 
 4. **Writing.** What goes in a row: the raw sentence, or the trunk's own restatement with
    names resolved ("John is in the hallway", not "he went there"), one fact a row. Rows carry

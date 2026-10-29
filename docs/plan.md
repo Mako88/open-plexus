@@ -319,8 +319,11 @@ Each step says what it decides. A step is struck when it is done.
     the cost, two and a half times fewer tokens, and not the accuracy: the trunk's first
     conclusion is as often wrong as its last, and a head that only stops cannot lift 0.64
     toward the tool's 0.989. A head that lifts the score has to judge which conclusion is
-    right, which is the evaluator's job, not the stop's. The same counterfactual on GSM8K
-    needs thoughts in the rows; `ServedTrunk` now keeps them, and the reading is re-taken.
+    right, which is the evaluator's job, not the stop's. The same on GSM8K's 500 recorded
+    thoughts (`readings/maths-20261029T205854Z`, the re-take scoring 0.852, within run-to-run
+    noise of 0.87): cut at the first stated answer 0.824 at 0.51 of the thought, at the second
+    0.836, at the third 0.838. The same shape on both tasks: a stop alone halves the cost and
+    keeps or slightly lowers the score. The pruning form is not built.
   - Decided with John 2026-10-29: step 3 goes on as written, the evaluator over steps of maths
     solutions with search in code and the stop inside it, not a stop head on its own. The
     refutation line, in words: if at matched passes the trained evaluator searching the trunk's

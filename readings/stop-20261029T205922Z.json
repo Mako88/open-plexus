@@ -1,0 +1,4037 @@
+{
+ "kind": "stop",
+ "step": 3,
+ "source_reading": "readings/maths-20261029T205854Z.json",
+ "source_arm": "cot:2048",
+ "model": "C:\\Users\\John\\.cache\\huggingface\\hub\\models--bartowski--Qwen_Qwen3.5-2B-GGUF\\snapshots\\7d26695454df6de5fbcce2e58681e62dae06ce43\\Qwen_Qwen3.5-2B-Q8_0.gguf",
+ "pattern": "(?:the answer is|final answer:?(?: is)?|answer:|the total is|so the total is|so (?:he|she|they|it|there) \\w+ (?:a total of )?)\\s*\\**\\s*\\$?\\s*(-?\\d[\\d,]*(?:\\.\\d+)?)",
+ "scorer": "the conclusion's number against the gold, number words as digits",
+ "n": 500,
+ "trunks_own_end": 0.852,
+ "stops": {
+  "conclusion_1": {
+   "score": 0.824,
+   "found_in": 375,
+   "thought_fraction_median": 0.509,
+   "thought_fraction_mean": 0.527
+  },
+  "conclusion_2": {
+   "score": 0.836,
+   "found_in": 375,
+   "thought_fraction_median": 0.653,
+   "thought_fraction_mean": 0.64
+  },
+  "conclusion_3": {
+   "score": 0.838,
+   "found_in": 375,
+   "thought_fraction_median": 0.719,
+   "thought_fraction_mean": 0.699
+  }
+ },
+ "rows": [
+  {
+   "answer": "18",
+   "trunk_said": "18",
+   "stopped_said": "18",
+   "stopped_at": 0.333,
+   "correct": true,
+   "conclusions": 7
+  },
+  {
+   "answer": "3",
+   "trunk_said": "3",
+   "stopped_said": "3",
+   "stopped_at": 0.436,
+   "correct": true,
+   "conclusions": 6
+  },
+  {
+   "answer": "70000",
+   "trunk_said": "70000",
+   "stopped_said": "70000",
+   "stopped_at": 1.0,
+   "correct": true,
+   "conclusions": 0
+  },
+  {
+   "answer": "540",
+   "trunk_said": "540",
+   "stopped_said": "540",
+   "stopped_at": 1.0,
+   "correct": true,
+   "conclusions": 0
+  },
+  {
+   "answer": "20",
+   "trunk_said": "20",
+   "stopped_said": "20",
+   "stopped_at": 1.0,
+   "correct": true,
+   "conclusions": 0
+  },
+  {
+   "answer": "64",
+   "trunk_said": "64",
+   "stopped_said": "64",
+   "stopped_at": 1.0,
+   "correct": true,
+   "conclusions": 0
+  },
+  {
+   "answer": "260",
+   "trunk_said": "260",
+   "stopped_said": "260",
+   "stopped_at": 0.651,
+   "correct": true,
+   "conclusions": 5
+  },
+  {
+   "answer": "160",
+   "trunk_said": "120",
+   "stopped_said": "120",
+   "stopped_at": 0.463,
+   "correct": false,
+   "conclusions": 12
+  },
+  {
+   "answer": "45",
+   "trunk_said": "4",
+   "stopped_said": "4",
+   "stopped_at": 1.0,
+   "correct": false,
+   "conclusions": 0
+  },
+  {
+   "answer": "460",
+   "trunk_said": "460",
+   "stopped_said": "45",
+   "stopped_at": 0.561,
+   "correct": false,
+   "conclusions": 2
+  },
+  {
+   "answer": "366",
+   "trunk_said": "366",
+   "stopped_said": "366",
+   "stopped_at": 0.433,
+   "correct": true,
+   "conclusions": 4
+  },
+  {
+   "answer": "694",
+   "trunk_said": "694",
+   "stopped_said": "694",
+   "stopped_at": 0.609,
+   "correct": true,
+   "conclusions": 5
+  },
+  {
+   "answer": "13",
+   "trunk_said": "82.50",
+   "stopped_said": "82.50",
+   "stopped_at": 1.0,
+   "correct": false,
+   "conclusions": 0
+  },
+  {
+   "answer": "18",
+   "trunk_said": "18",
+   "stopped_said": "18",
+   "stopped_at": 0.474,
+   "correct": true,
+   "conclusions": 8
+  },
+  {
+   "answer": "60",
+   "trunk_said": "40",
+   "stopped_said": "40",
+   "stopped_at": 0.529,
+   "correct": false,
+   "conclusions": 4
+  },
+  {
+   "answer": "125",
+   "trunk_said": "125",
+   "stopped_said": "125",
+   "stopped_at": 0.437,
+   "correct": true,
+   "conclusions": 1
+  },
+  {
+   "answer": "230",
+   "trunk_said": "230",
+   "stopped_said": "230",
+   "stopped_at": 0.466,
+   "correct": true,
+   "conclusions": 5
+  },
+  {
+   "answer": "57500",
+   "trunk_said": "57500",
+   "stopped_said": "57500",
+   "stopped_at": 0.28,
+   "correct": true,
+   "conclusions": 6
+  },
+  {
+   "answer": "7",
+   "trunk_said": "7",
+   "stopped_said": "7",
+   "stopped_at": 0.632,
+   "correct": true,
+   "conclusions": 3
+  },
+  {
+   "answer": "6",
+   "trunk_said": "6",
+   "stopped_said": "6",
+   "stopped_at": 1.0,
+   "correct": true,
+   "conclusions": 0
+  },
+  {
+   "answer": "15",
+   "trunk_said": "15",
+   "stopped_said": "15",
+   "stopped_at": 1.0,
+   "correct": true,
+   "conclusions": 0
+  },
+  {
+   "answer": "14",
+   "trunk_said": "2",
+   "stopped_said": "2",
+   "stopped_at": 0.587,
+   "correct": false,
+   "conclusions": 6
+  },
+  {
+   "answer": "7",
+   "trunk_said": "7",
+   "stopped_said": "7",
+   "stopped_at": 0.565,
+   "correct": true,
+   "conclusions": 4
+  },
+  {
+   "answer": "8",
+   "trunk_said": "8",
+   "stopped_said": "8",
+   "stopped_at": 0.328,
+   "correct": true,
+   "conclusions": 8
+  },
+  {
+   "answer": "26",
+   "trunk_said": "26",
+   "stopped_said": "26",
+   "stopped_at": 0.817,
+   "correct": true,
+   "conclusions": 2
+  },
+  {
+   "answer": "2",
+   "trunk_said": "2",
+   "stopped_said": "2",
+   "stopped_at": 0.833,
+   "correct": true,
+   "conclusions": 3
+  },
+  {
+   "answer": "243",
+   "trunk_said": "243.00",
+   "stopped_said": "243.00",
+   "stopped_at": 0.496,
+   "correct": true,
+   "conclusions": 4
+  },
+  {
+   "answer": "16",
+   "trunk_said": "16",
+   "stopped_said": "16",
+   "stopped_at": 0.266,
+   "correct": true,
+   "conclusions": 12
+  },
+  {
+   "answer": "25",
+   "trunk_said": "25",
+   "stopped_said": "25",
+   "stopped_at": 0.353,
+   "correct": true,
+   "conclusions": 11
+  },
+  {
+   "answer": "104",
+   "trunk_said": "104",
+   "stopped_said": "104",
+   "stopped_at": 0.431,
+   "correct": true,
+   "conclusions": 4
+  },
+  {
+   "answer": "109",
+   "trunk_said": "109",
+   "stopped_said": "109",
+   "stopped_at": 0.821,
+   "correct": true,
+   "conclusions": 1
+  },
+  {
+   "answer": "80",
+   "trunk_said": "80",
+   "stopped_said": "80",
+   "stopped_at": 0.626,
+   "correct": true,
+   "conclusions": 1
+  },
+  {
+   "answer": "35",
+   "trunk_said": "35",
+   "stopped_said": "35",
+   "stopped_at": 0.704,
+   "correct": true,
+   "conclusions": 3
+  },
+  {
+   "answer": "70",
+   "trunk_said": "70",
+   "stopped_said": "70",
+   "stopped_at": 0.334,
+   "correct": true,
+   "conclusions": 13
+  },
+  {
+   "answer": "23",
+   "trunk_said": "23",
+   "stopped_said": "23",
+   "stopped_at": 0.789,
+   "correct": true,
+   "conclusions": 2
+  },
+  {
+   "answer": "9",
+   "trunk_said": "9",
+   "stopped_said": "9",
+   "stopped_at": 0.313,
+   "correct": true,
+   "conclusions": 5
+  },
+  {
+   "answer": "75",
+   "trunk_said": "75",
+   "stopped_said": "75",
+   "stopped_at": 0.299,
+   "correct": true,
+   "conclusions": 9
+  },
+  {
+   "answer": "2",
+   "trunk_said": "5",
+   "stopped_said": "5",
+   "stopped_at": 1.0,
+   "correct": false,
+   "conclusions": 0
+  },
+  {
+   "answer": "10",
+   "trunk_said": "10",
+   "stopped_said": "10",
+   "stopped_at": 1.0,
+   "correct": true,
+   "conclusions": 0
+  },
+  {
+   "answer": "18",
+   "trunk_said": "18",
+   "stopped_said": "18",
+   "stopped_at": 0.59,
+   "correct": true,
+   "conclusions": 1
+  },
+  {
+   "answer": "8",
+   "trunk_said": "8",
+   "stopped_said": "8",
+   "stopped_at": 0.282,
+   "correct": true,
+   "conclusions": 6
+  },
+  {
+   "answer": "200",
+   "trunk_said": "1",
+   "stopped_said": "1",
+   "stopped_at": 1.0,
+   "correct": false,
+   "conclusions": 0
+  },
+  {
+   "answer": "26",
+   "trunk_said": "26",
+   "stopped_said": "26",
+   "stopped_at": 0.491,
+   "correct": true,
+   "conclusions": 4
+  },
+  {
+   "answer": "48",
+   "trunk_said": "48",
+   "stopped_said": "48",
+   "stopped_at": 0.947,
+   "correct": true,
+   "conclusions": 1
+  },
+  {
+   "answer": "20",
+   "trunk_said": "20.00",
+   "stopped_said": "20.00",
+   "stopped_at": 0.457,
+   "correct": true,
+   "conclusions": 1
+  },
+  {
+   "answer": "104",
+   "trunk_said": "104",
+   "stopped_said": "104",
+   "stopped_at": 1.0,
+   "correct": true,
+   "conclusions": 0
+  },
+  {
+   "answer": "163",
+   "trunk_said": "163",
+   "stopped_said": "163",
+   "stopped_at": 1.0,
+   "correct": true,
+   "conclusions": 0
+  },
+  {
+   "answer": "800",
+   "trunk_said": "800",
+   "stopped_said": "800",
+   "stopped_at": 0.528,
+   "correct": true,
+   "conclusions": 2
+  },
+  {
+   "answer": "8",
+   "trunk_said": "8",
+   "stopped_said": "8",
+   "stopped_at": 0.643,
+   "correct": true,
+   "conclusions": 7
+  },
+  {
+   "answer": "30",
+   "trunk_said": "30",
+   "stopped_said": "30",
+   "stopped_at": 0.751,
+   "correct": true,
+   "conclusions": 4
+  },
+  {
+   "answer": "294",
+   "trunk_said": "294",
+   "stopped_said": "294",
+   "stopped_at": 0.36,
+   "correct": true,
+   "conclusions": 9
+  },
+  {
+   "answer": "5",
+   "trunk_said": "5",
+   "stopped_said": "5",
+   "stopped_at": 1.0,
+   "correct": true,
+   "conclusions": 0
+  },
+  {
+   "answer": "15",
+   "trunk_said": "15",
+   "stopped_said": "15",
+   "stopped_at": 0.363,
+   "correct": true,
+   "conclusions": 7
+  },
+  {
+   "answer": "40",
+   "trunk_said": "40",
+   "stopped_said": "40",
+   "stopped_at": 0.417,
+   "correct": true,
+   "conclusions": 3
+  },
+  {
+   "answer": "40",
+   "trunk_said": "40",
+   "stopped_said": "40",
+   "stopped_at": 1.0,
+   "correct": true,
+   "conclusions": 0
+  },
+  {
+   "answer": "14",
+   "trunk_said": "14",
+   "stopped_said": "30",
+   "stopped_at": 0.378,
+   "correct": false,
+   "conclusions": 7
+  },
+  {
+   "answer": "3",
+   "trunk_said": "3",
+   "stopped_said": "3",
+   "stopped_at": 0.178,
+   "correct": true,
+   "conclusions": 22
+  },
+  {
+   "answer": "83",
+   "trunk_said": "83",
+   "stopped_said": "83",
+   "stopped_at": 0.696,
+   "correct": true,
+   "conclusions": 2
+  },
+  {
+   "answer": "57",
+   "trunk_said": "57.00",
+   "stopped_said": "57.00",
+   "stopped_at": 1.0,
+   "correct": true,
+   "conclusions": 0
+  },
+  {
+   "answer": "187",
+   "trunk_said": "187",
+   "stopped_said": "187",
+   "stopped_at": 0.512,
+   "correct": true,
+   "conclusions": 5
+  },
+  {
+   "answer": "17",
+   "trunk_said": "17",
+   "stopped_said": "17",
+   "stopped_at": 1.0,
+   "correct": true,
+   "conclusions": 0
+  },
+  {
+   "answer": "1430",
+   "trunk_said": "1430",
+   "stopped_said": "1430",
+   "stopped_at": 0.396,
+   "correct": true,
+   "conclusions": 10
+  },
+  {
+   "answer": "25000",
+   "trunk_said": "30",
+   "stopped_said": "30",
+   "stopped_at": 1.0,
+   "correct": false,
+   "conclusions": 0
+  },
+  {
+   "answer": "1596",
+   "trunk_said": "1596",
+   "stopped_said": "1596",
+   "stopped_at": 0.948,
+   "correct": true,
+   "conclusions": 1
+  },
+  {
+   "answer": "300",
+   "trunk_said": "300",
+   "stopped_said": "300",
+   "stopped_at": 0.479,
+   "correct": true,
+   "conclusions": 3
+  },
+  {
+   "answer": "36",
+   "trunk_said": "36",
+   "stopped_said": "36",
+   "stopped_at": 0.508,
+   "correct": true,
+   "conclusions": 6
+  },
+  {
+   "answer": "48",
+   "trunk_said": "48",
+   "stopped_said": "48",
+   "stopped_at": 1.0,
+   "correct": true,
+   "conclusions": 0
+  },
+  {
+   "answer": "595",
+   "trunk_said": "595",
+   "stopped_said": "595",
+   "stopped_at": 0.45,
+   "correct": true,
+   "conclusions": 1
+  },
+  {
+   "answer": "36",
+   "trunk_said": "36",
+   "stopped_said": "36",
+   "stopped_at": 0.681,
+   "correct": true,
+   "conclusions": 1
+  },
+  {
+   "answer": "60",
+   "trunk_said": "60",
+   "stopped_said": "60",
+   "stopped_at": 0.792,
+   "correct": true,
+   "conclusions": 2
+  },
+  {
+   "answer": "7425",
+   "trunk_said": "7425",
+   "stopped_said": "7425",
+   "stopped_at": 1.0,
+   "correct": true,
+   "conclusions": 0
+  },
+  {
+   "answer": "60",
+   "trunk_said": "60",
+   "stopped_said": "60",
+   "stopped_at": 0.573,
+   "correct": true,
+   "conclusions": 3
+  },
+  {
+   "answer": "221",
+   "trunk_said": "221",
+   "stopped_said": "221",
+   "stopped_at": 0.498,
+   "correct": true,
+   "conclusions": 5
+  },
+  {
+   "answer": "255",
+   "trunk_said": "255",
+   "stopped_said": "255",
+   "stopped_at": 1.0,
+   "correct": true,
+   "conclusions": 0
+  },
+  {
+   "answer": "88",
+   "trunk_said": "88",
+   "stopped_said": "88",
+   "stopped_at": 0.356,
+   "correct": true,
+   "conclusions": 4
+  },
+  {
+   "answer": "60",
+   "trunk_said": "7.5",
+   "stopped_said": "7.5",
+   "stopped_at": 0.534,
+   "correct": false,
+   "conclusions": 1
+  },
+  {
+   "answer": "5",
+   "trunk_said": "5",
+   "stopped_said": "5",
+   "stopped_at": 0.708,
+   "correct": true,
+   "conclusions": 1
+  },
+  {
+   "answer": "100",
+   "trunk_said": "100",
+   "stopped_said": "100",
+   "stopped_at": 0.531,
+   "correct": true,
+   "conclusions": 9
+  },
+  {
+   "answer": "6",
+   "trunk_said": "6.00",
+   "stopped_said": "6.00",
+   "stopped_at": 0.469,
+   "correct": true,
+   "conclusions": 6
+  },
+  {
+   "answer": "70",
+   "trunk_said": "70",
+   "stopped_said": "70",
+   "stopped_at": 1.0,
+   "correct": true,
+   "conclusions": 1
+  },
+  {
+   "answer": "10",
+   "trunk_said": "10",
+   "stopped_said": "10",
+   "stopped_at": 0.37,
+   "correct": true,
+   "conclusions": 16
+  },
+  {
+   "answer": "17",
+   "trunk_said": "17",
+   "stopped_said": "17",
+   "stopped_at": 0.791,
+   "correct": true,
+   "conclusions": 2
+  },
+  {
+   "answer": "623",
+   "trunk_said": "623",
+   "stopped_said": "623",
+   "stopped_at": 0.273,
+   "correct": true,
+   "conclusions": 16
+  },
+  {
+   "answer": "600",
+   "trunk_said": "600",
+   "stopped_said": "600",
+   "stopped_at": 0.277,
+   "correct": true,
+   "conclusions": 14
+  },
+  {
+   "answer": "15",
+   "trunk_said": "15",
+   "stopped_said": "15",
+   "stopped_at": 0.223,
+   "correct": true,
+   "conclusions": 6
+  },
+  {
+   "answer": "44",
+   "trunk_said": "44",
+   "stopped_said": "44",
+   "stopped_at": 0.36,
+   "correct": true,
+   "conclusions": 4
+  },
+  {
+   "answer": "22",
+   "trunk_said": "22",
+   "stopped_said": "22",
+   "stopped_at": 1.0,
+   "correct": true,
+   "conclusions": 0
+  },
+  {
+   "answer": "9360",
+   "trunk_said": "60",
+   "stopped_said": "60",
+   "stopped_at": 1.0,
+   "correct": false,
+   "conclusions": 0
+  },
+  {
+   "answer": "8000",
+   "trunk_said": "8000",
+   "stopped_said": "8000",
+   "stopped_at": 1.0,
+   "correct": true,
+   "conclusions": 0
+  },
+  {
+   "answer": "24",
+   "trunk_said": "24",
+   "stopped_said": "24",
+   "stopped_at": 1.0,
+   "correct": true,
+   "conclusions": 0
+  },
+  {
+   "answer": "225",
+   "trunk_said": "225",
+   "stopped_said": "225",
+   "stopped_at": 0.273,
+   "correct": true,
+   "conclusions": 3
+  },
+  {
+   "answer": "28",
+   "trunk_said": "28",
+   "stopped_said": "28",
+   "stopped_at": 0.832,
+   "correct": true,
+   "conclusions": 1
+  },
+  {
+   "answer": "4",
+   "trunk_said": "4",
+   "stopped_said": "4",
+   "stopped_at": 0.366,
+   "correct": true,
+   "conclusions": 6
+  },
+  {
+   "answer": "36",
+   "trunk_said": "36",
+   "stopped_said": "36",
+   "stopped_at": 1.0,
+   "correct": true,
+   "conclusions": 0
+  },
+  {
+   "answer": "348",
+   "trunk_said": "348",
+   "stopped_said": "348",
+   "stopped_at": 0.822,
+   "correct": true,
+   "conclusions": 3
+  },
+  {
+   "answer": "40",
+   "trunk_said": "40",
+   "stopped_said": "40",
+   "stopped_at": 0.419,
+   "correct": true,
+   "conclusions": 3
+  },
+  {
+   "answer": "3",
+   "trunk_said": "3",
+   "stopped_said": "3",
+   "stopped_at": 0.479,
+   "correct": true,
+   "conclusions": 6
+  },
+  {
+   "answer": "12",
+   "trunk_said": "12",
+   "stopped_said": "12",
+   "stopped_at": 0.366,
+   "correct": true,
+   "conclusions": 3
+  },
+  {
+   "answer": "5",
+   "trunk_said": "5",
+   "stopped_said": "5",
+   "stopped_at": 0.449,
+   "correct": true,
+   "conclusions": 2
+  },
+  {
+   "answer": "58",
+   "trunk_said": "58",
+   "stopped_said": "58",
+   "stopped_at": 0.387,
+   "correct": true,
+   "conclusions": 1
+  },
+  {
+   "answer": "175",
+   "trunk_said": "2",
+   "stopped_said": "2",
+   "stopped_at": 1.0,
+   "correct": false,
+   "conclusions": 0
+  },
+  {
+   "answer": "6",
+   "trunk_said": "7.8",
+   "stopped_said": "7.8",
+   "stopped_at": 1.0,
+   "correct": false,
+   "conclusions": 0
+  },
+  {
+   "answer": "26",
+   "trunk_said": "26",
+   "stopped_said": "26",
+   "stopped_at": 1.0,
+   "correct": true,
+   "conclusions": 0
+  },
+  {
+   "answer": "140",
+   "trunk_said": "140",
+   "stopped_said": "140",
+   "stopped_at": 0.743,
+   "correct": true,
+   "conclusions": 2
+  },
+  {
+   "answer": "500",
+   "trunk_said": "500",
+   "stopped_said": "500",
+   "stopped_at": 0.767,
+   "correct": true,
+   "conclusions": 1
+  },
+  {
+   "answer": "20",
+   "trunk_said": "20",
+   "stopped_said": "20",
+   "stopped_at": 0.499,
+   "correct": true,
+   "conclusions": 5
+  },
+  {
+   "answer": "72",
+   "trunk_said": "72",
+   "stopped_said": "72",
+   "stopped_at": 1.0,
+   "correct": true,
+   "conclusions": 0
+  },
+  {
+   "answer": "3",
+   "trunk_said": "3",
+   "stopped_said": "3",
+   "stopped_at": 0.702,
+   "correct": true,
+   "conclusions": 2
+  },
+  {
+   "answer": "50",
+   "trunk_said": "50",
+   "stopped_said": "50",
+   "stopped_at": 0.569,
+   "correct": true,
+   "conclusions": 2
+  },
+  {
+   "answer": "28",
+   "trunk_said": "28.00",
+   "stopped_said": "28.00",
+   "stopped_at": 0.223,
+   "correct": true,
+   "conclusions": 4
+  },
+  {
+   "answer": "45",
+   "trunk_said": "45",
+   "stopped_said": "45",
+   "stopped_at": 1.0,
+   "correct": true,
+   "conclusions": 0
+  },
+  {
+   "answer": "16",
+   "trunk_said": "1",
+   "stopped_said": "1",
+   "stopped_at": 1.0,
+   "correct": false,
+   "conclusions": 0
+  },
+  {
+   "answer": "24",
+   "trunk_said": "24",
+   "stopped_said": "24",
+   "stopped_at": 1.0,
+   "correct": true,
+   "conclusions": 0
+  },
+  {
+   "answer": "25",
+   "trunk_said": "25",
+   "stopped_said": "25",
+   "stopped_at": 0.406,
+   "correct": true,
+   "conclusions": 9
+  },
+  {
+   "answer": "6",
+   "trunk_said": "6",
+   "stopped_said": "6",
+   "stopped_at": 1.0,
+   "correct": true,
+   "conclusions": 0
+  },
+  {
+   "answer": "90",
+   "trunk_said": "90",
+   "stopped_said": "90",
+   "stopped_at": 1.0,
+   "correct": true,
+   "conclusions": 0
+  },
+  {
+   "answer": "42",
+   "trunk_said": "42",
+   "stopped_said": "42",
+   "stopped_at": 0.714,
+   "correct": true,
+   "conclusions": 2
+  },
+  {
+   "answer": "360",
+   "trunk_said": "360",
+   "stopped_said": "360",
+   "stopped_at": 0.201,
+   "correct": true,
+   "conclusions": 13
+  },
+  {
+   "answer": "4",
+   "trunk_said": "4",
+   "stopped_said": "4",
+   "stopped_at": 0.385,
+   "correct": true,
+   "conclusions": 1
+  },
+  {
+   "answer": "95200",
+   "trunk_said": "1",
+   "stopped_said": "1",
+   "stopped_at": 1.0,
+   "correct": false,
+   "conclusions": 0
+  },
+  {
+   "answer": "240",
+   "trunk_said": "75",
+   "stopped_said": "75",
+   "stopped_at": 1.0,
+   "correct": false,
+   "conclusions": 0
+  },
+  {
+   "answer": "27",
+   "trunk_said": "27",
+   "stopped_said": "27",
+   "stopped_at": 0.418,
+   "correct": true,
+   "conclusions": 13
+  },
+  {
+   "answer": "48",
+   "trunk_said": "48",
+   "stopped_said": "48",
+   "stopped_at": 0.448,
+   "correct": true,
+   "conclusions": 2
+  },
+  {
+   "answer": "50",
+   "trunk_said": "50",
+   "stopped_said": "50",
+   "stopped_at": 0.861,
+   "correct": true,
+   "conclusions": 2
+  },
+  {
+   "answer": "10",
+   "trunk_said": "60",
+   "stopped_said": "30",
+   "stopped_at": 0.856,
+   "correct": false,
+   "conclusions": 1
+  },
+  {
+   "answer": "10",
+   "trunk_said": "10",
+   "stopped_said": "10",
+   "stopped_at": 0.554,
+   "correct": true,
+   "conclusions": 3
+  },
+  {
+   "answer": "82",
+   "trunk_said": "82",
+   "stopped_said": "82",
+   "stopped_at": 0.297,
+   "correct": true,
+   "conclusions": 12
+  },
+  {
+   "answer": "120",
+   "trunk_said": "120",
+   "stopped_said": "120",
+   "stopped_at": 0.523,
+   "correct": true,
+   "conclusions": 4
+  },
+  {
+   "answer": "880",
+   "trunk_said": "880",
+   "stopped_said": "880",
+   "stopped_at": 0.583,
+   "correct": true,
+   "conclusions": 5
+  },
+  {
+   "answer": "10000",
+   "trunk_said": "10000",
+   "stopped_said": "10000",
+   "stopped_at": 0.764,
+   "correct": true,
+   "conclusions": 2
+  },
+  {
+   "answer": "30",
+   "trunk_said": "30",
+   "stopped_said": "30",
+   "stopped_at": 0.407,
+   "correct": true,
+   "conclusions": 3
+  },
+  {
+   "answer": "940",
+   "trunk_said": "940",
+   "stopped_said": "940",
+   "stopped_at": 0.217,
+   "correct": true,
+   "conclusions": 26
+  },
+  {
+   "answer": "60",
+   "trunk_said": "60",
+   "stopped_said": "60",
+   "stopped_at": 0.521,
+   "correct": true,
+   "conclusions": 12
+  },
+  {
+   "answer": "13",
+   "trunk_said": "13",
+   "stopped_said": "13",
+   "stopped_at": 0.911,
+   "correct": true,
+   "conclusions": 1
+  },
+  {
+   "answer": "720",
+   "trunk_said": "720",
+   "stopped_said": "720",
+   "stopped_at": 0.238,
+   "correct": true,
+   "conclusions": 20
+  },
+  {
+   "answer": "40",
+   "trunk_said": "40",
+   "stopped_said": "40",
+   "stopped_at": 0.467,
+   "correct": true,
+   "conclusions": 7
+  },
+  {
+   "answer": "6",
+   "trunk_said": "6",
+   "stopped_said": "6",
+   "stopped_at": 0.275,
+   "correct": true,
+   "conclusions": 6
+  },
+  {
+   "answer": "29",
+   "trunk_said": "29.00",
+   "stopped_said": "29.00",
+   "stopped_at": 0.353,
+   "correct": true,
+   "conclusions": 2
+  },
+  {
+   "answer": "105",
+   "trunk_said": "105",
+   "stopped_said": "35",
+   "stopped_at": 0.771,
+   "correct": false,
+   "conclusions": 2
+  },
+  {
+   "answer": "70",
+   "trunk_said": "22",
+   "stopped_said": "22",
+   "stopped_at": 1.0,
+   "correct": false,
+   "conclusions": 0
+  },
+  {
+   "answer": "20",
+   "trunk_said": "20",
+   "stopped_said": "20",
+   "stopped_at": 0.213,
+   "correct": true,
+   "conclusions": 35
+  },
+  {
+   "answer": "400",
+   "trunk_said": "400",
+   "stopped_said": "400",
+   "stopped_at": 0.407,
+   "correct": true,
+   "conclusions": 8
+  },
+  {
+   "answer": "140",
+   "trunk_said": "140",
+   "stopped_said": "140",
+   "stopped_at": 0.304,
+   "correct": true,
+   "conclusions": 6
+  },
+  {
+   "answer": "16",
+   "trunk_said": "16",
+   "stopped_said": "16",
+   "stopped_at": 0.398,
+   "correct": true,
+   "conclusions": 11
+  },
+  {
+   "answer": "20",
+   "trunk_said": "20",
+   "stopped_said": "20",
+   "stopped_at": 0.461,
+   "correct": true,
+   "conclusions": 1
+  },
+  {
+   "answer": "4000",
+   "trunk_said": "4000",
+   "stopped_said": "4000",
+   "stopped_at": 0.429,
+   "correct": true,
+   "conclusions": 2
+  },
+  {
+   "answer": "2125",
+   "trunk_said": "2125",
+   "stopped_said": "500",
+   "stopped_at": 0.892,
+   "correct": false,
+   "conclusions": 2
+  },
+  {
+   "answer": "75",
+   "trunk_said": "30",
+   "stopped_said": "30",
+   "stopped_at": 1.0,
+   "correct": false,
+   "conclusions": 0
+  },
+  {
+   "answer": "30",
+   "trunk_said": "30",
+   "stopped_said": "30",
+   "stopped_at": 0.249,
+   "correct": true,
+   "conclusions": 8
+  },
+  {
+   "answer": "16",
+   "trunk_said": "16",
+   "stopped_said": "16",
+   "stopped_at": 0.564,
+   "correct": true,
+   "conclusions": 5
+  },
+  {
+   "answer": "4",
+   "trunk_said": "36",
+   "stopped_said": "36",
+   "stopped_at": 1.0,
+   "correct": false,
+   "conclusions": 0
+  },
+  {
+   "answer": "5",
+   "trunk_said": "5.00",
+   "stopped_said": "5.00",
+   "stopped_at": 0.486,
+   "correct": true,
+   "conclusions": 5
+  },
+  {
+   "answer": "4",
+   "trunk_said": "4",
+   "stopped_said": "4",
+   "stopped_at": 0.4,
+   "correct": true,
+   "conclusions": 6
+  },
+  {
+   "answer": "48",
+   "trunk_said": "14",
+   "stopped_said": "14",
+   "stopped_at": 1.0,
+   "correct": false,
+   "conclusions": 0
+  },
+  {
+   "answer": "272",
+   "trunk_said": "272",
+   "stopped_said": "272",
+   "stopped_at": 0.335,
+   "correct": true,
+   "conclusions": 7
+  },
+  {
+   "answer": "280",
+   "trunk_said": "280",
+   "stopped_said": "280",
+   "stopped_at": 0.744,
+   "correct": true,
+   "conclusions": 2
+  },
+  {
+   "answer": "1400",
+   "trunk_said": "1400",
+   "stopped_said": "0",
+   "stopped_at": 0.624,
+   "correct": false,
+   "conclusions": 3
+  },
+  {
+   "answer": "80",
+   "trunk_said": "3800",
+   "stopped_said": "3800",
+   "stopped_at": 1.0,
+   "correct": false,
+   "conclusions": 0
+  },
+  {
+   "answer": "34",
+   "trunk_said": "34",
+   "stopped_said": "34",
+   "stopped_at": 0.699,
+   "correct": true,
+   "conclusions": 3
+  },
+  {
+   "answer": "15",
+   "trunk_said": "6",
+   "stopped_said": "11",
+   "stopped_at": 0.807,
+   "correct": false,
+   "conclusions": 2
+  },
+  {
+   "answer": "16",
+   "trunk_said": "16",
+   "stopped_said": "16",
+   "stopped_at": 0.204,
+   "correct": true,
+   "conclusions": 12
+  },
+  {
+   "answer": "32",
+   "trunk_said": "32",
+   "stopped_said": "32",
+   "stopped_at": 0.727,
+   "correct": true,
+   "conclusions": 3
+  },
+  {
+   "answer": "92",
+   "trunk_said": "18",
+   "stopped_said": "18",
+   "stopped_at": 1.0,
+   "correct": false,
+   "conclusions": 0
+  },
+  {
+   "answer": "50",
+   "trunk_said": "50",
+   "stopped_said": "50",
+   "stopped_at": 0.38,
+   "correct": true,
+   "conclusions": 4
+  },
+  {
+   "answer": "15",
+   "trunk_said": "15",
+   "stopped_said": "15",
+   "stopped_at": 0.425,
+   "correct": true,
+   "conclusions": 5
+  },
+  {
+   "answer": "77",
+   "trunk_said": "77",
+   "stopped_said": "77",
+   "stopped_at": 0.655,
+   "correct": true,
+   "conclusions": 3
+  },
+  {
+   "answer": "5",
+   "trunk_said": "5",
+   "stopped_said": "5",
+   "stopped_at": 0.779,
+   "correct": true,
+   "conclusions": 2
+  },
+  {
+   "answer": "16",
+   "trunk_said": "16",
+   "stopped_said": "16",
+   "stopped_at": 0.361,
+   "correct": true,
+   "conclusions": 3
+  },
+  {
+   "answer": "18",
+   "trunk_said": "18",
+   "stopped_said": "18",
+   "stopped_at": 0.812,
+   "correct": true,
+   "conclusions": 2
+  },
+  {
+   "answer": "120",
+   "trunk_said": "120",
+   "stopped_said": "120",
+   "stopped_at": 0.347,
+   "correct": true,
+   "conclusions": 9
+  },
+  {
+   "answer": "150",
+   "trunk_said": "150",
+   "stopped_said": "150",
+   "stopped_at": 0.837,
+   "correct": true,
+   "conclusions": 1
+  },
+  {
+   "answer": "1210",
+   "trunk_said": "1210",
+   "stopped_said": "1210",
+   "stopped_at": 0.451,
+   "correct": true,
+   "conclusions": 9
+  },
+  {
+   "answer": "51",
+   "trunk_said": "51",
+   "stopped_said": "51",
+   "stopped_at": 0.667,
+   "correct": true,
+   "conclusions": 4
+  },
+  {
+   "answer": "18000",
+   "trunk_said": "18000",
+   "stopped_said": "18000",
+   "stopped_at": 0.337,
+   "correct": true,
+   "conclusions": 4
+  },
+  {
+   "answer": "95",
+   "trunk_said": "95",
+   "stopped_said": "95",
+   "stopped_at": 1.0,
+   "correct": true,
+   "conclusions": 0
+  },
+  {
+   "answer": "15",
+   "trunk_said": "15",
+   "stopped_said": "15",
+   "stopped_at": 0.688,
+   "correct": true,
+   "conclusions": 3
+  },
+  {
+   "answer": "100",
+   "trunk_said": "100",
+   "stopped_said": "100",
+   "stopped_at": 1.0,
+   "correct": true,
+   "conclusions": 0
+  },
+  {
+   "answer": "350",
+   "trunk_said": "350",
+   "stopped_said": "350",
+   "stopped_at": 0.865,
+   "correct": true,
+   "conclusions": 1
+  },
+  {
+   "answer": "122",
+   "trunk_said": "122",
+   "stopped_said": "122",
+   "stopped_at": 0.728,
+   "correct": true,
+   "conclusions": 4
+  },
+  {
+   "answer": "130",
+   "trunk_said": "130",
+   "stopped_said": "130",
+   "stopped_at": 0.792,
+   "correct": true,
+   "conclusions": 2
+  },
+  {
+   "answer": "20",
+   "trunk_said": "20",
+   "stopped_said": "20",
+   "stopped_at": 0.289,
+   "correct": true,
+   "conclusions": 16
+  },
+  {
+   "answer": "160",
+   "trunk_said": "160",
+   "stopped_said": "160",
+   "stopped_at": 0.724,
+   "correct": true,
+   "conclusions": 1
+  },
+  {
+   "answer": "23",
+   "trunk_said": "23",
+   "stopped_said": "23",
+   "stopped_at": 1.0,
+   "correct": true,
+   "conclusions": 0
+  },
+  {
+   "answer": "2",
+   "trunk_said": "2",
+   "stopped_said": "2",
+   "stopped_at": 0.739,
+   "correct": true,
+   "conclusions": 1
+  },
+  {
+   "answer": "25",
+   "trunk_said": "25",
+   "stopped_said": "25",
+   "stopped_at": 0.557,
+   "correct": true,
+   "conclusions": 1
+  },
+  {
+   "answer": "30",
+   "trunk_said": "30",
+   "stopped_said": "30",
+   "stopped_at": 0.555,
+   "correct": true,
+   "conclusions": 3
+  },
+  {
+   "answer": "5",
+   "trunk_said": "5",
+   "stopped_said": "5",
+   "stopped_at": 1.0,
+   "correct": true,
+   "conclusions": 0
+  },
+  {
+   "answer": "106",
+   "trunk_said": "106",
+   "stopped_said": "106",
+   "stopped_at": 1.0,
+   "correct": true,
+   "conclusions": 0
+  },
+  {
+   "answer": "50",
+   "trunk_said": "50",
+   "stopped_said": "50",
+   "stopped_at": 0.855,
+   "correct": true,
+   "conclusions": 1
+  },
+  {
+   "answer": "34",
+   "trunk_said": "25",
+   "stopped_said": "25",
+   "stopped_at": 0.62,
+   "correct": false,
+   "conclusions": 4
+  },
+  {
+   "answer": "360",
+   "trunk_said": "360",
+   "stopped_said": "360",
+   "stopped_at": 0.255,
+   "correct": true,
+   "conclusions": 18
+  },
+  {
+   "answer": "5",
+   "trunk_said": "0.5",
+   "stopped_said": "5",
+   "stopped_at": 0.698,
+   "correct": true,
+   "conclusions": 2
+  },
+  {
+   "answer": "91",
+   "trunk_said": "91",
+   "stopped_said": "91",
+   "stopped_at": 0.735,
+   "correct": true,
+   "conclusions": 2
+  },
+  {
+   "answer": "24",
+   "trunk_said": "24",
+   "stopped_said": "24",
+   "stopped_at": 1.0,
+   "correct": true,
+   "conclusions": 0
+  },
+  {
+   "answer": "10",
+   "trunk_said": "10",
+   "stopped_said": "10",
+   "stopped_at": 0.811,
+   "correct": true,
+   "conclusions": 3
+  },
+  {
+   "answer": "12",
+   "trunk_said": "12",
+   "stopped_said": "12",
+   "stopped_at": 0.196,
+   "correct": true,
+   "conclusions": 8
+  },
+  {
+   "answer": "120",
+   "trunk_said": "120",
+   "stopped_said": "120",
+   "stopped_at": 0.509,
+   "correct": true,
+   "conclusions": 6
+  },
+  {
+   "answer": "6277",
+   "trunk_said": "6277",
+   "stopped_said": "6277",
+   "stopped_at": 0.572,
+   "correct": true,
+   "conclusions": 3
+  },
+  {
+   "answer": "320",
+   "trunk_said": "320",
+   "stopped_said": "320",
+   "stopped_at": 1.0,
+   "correct": true,
+   "conclusions": 0
+  },
+  {
+   "answer": "7500",
+   "trunk_said": "7500",
+   "stopped_said": "1000",
+   "stopped_at": 0.382,
+   "correct": false,
+   "conclusions": 4
+  },
+  {
+   "answer": "55",
+   "trunk_said": "55",
+   "stopped_said": "55",
+   "stopped_at": 0.22,
+   "correct": true,
+   "conclusions": 7
+  },
+  {
+   "answer": "114200",
+   "trunk_said": "114200",
+   "stopped_said": "114200",
+   "stopped_at": 1.0,
+   "correct": true,
+   "conclusions": 0
+  },
+  {
+   "answer": "100",
+   "trunk_said": "100",
+   "stopped_said": "100",
+   "stopped_at": 0.698,
+   "correct": true,
+   "conclusions": 4
+  },
+  {
+   "answer": "31",
+   "trunk_said": "31",
+   "stopped_said": "31",
+   "stopped_at": 1.0,
+   "correct": true,
+   "conclusions": 0
+  },
+  {
+   "answer": "98",
+   "trunk_said": "98",
+   "stopped_said": "98",
+   "stopped_at": 0.306,
+   "correct": true,
+   "conclusions": 7
+  },
+  {
+   "answer": "98",
+   "trunk_said": "98",
+   "stopped_said": "98",
+   "stopped_at": 1.0,
+   "correct": true,
+   "conclusions": 0
+  },
+  {
+   "answer": "860",
+   "trunk_said": "860",
+   "stopped_said": "500",
+   "stopped_at": 0.497,
+   "correct": false,
+   "conclusions": 3
+  },
+  {
+   "answer": "2600",
+   "trunk_said": "2600",
+   "stopped_said": "2600",
+   "stopped_at": 0.473,
+   "correct": true,
+   "conclusions": 6
+  },
+  {
+   "answer": "76",
+   "trunk_said": "76",
+   "stopped_said": "76",
+   "stopped_at": 0.621,
+   "correct": true,
+   "conclusions": 2
+  },
+  {
+   "answer": "145",
+   "trunk_said": "145",
+   "stopped_said": "145",
+   "stopped_at": 1.0,
+   "correct": true,
+   "conclusions": 0
+  },
+  {
+   "answer": "10",
+   "trunk_said": "10",
+   "stopped_said": "10",
+   "stopped_at": 1.0,
+   "correct": true,
+   "conclusions": 0
+  },
+  {
+   "answer": "4",
+   "trunk_said": "4",
+   "stopped_said": "4",
+   "stopped_at": 0.509,
+   "correct": true,
+   "conclusions": 2
+  },
+  {
+   "answer": "5",
+   "trunk_said": "5",
+   "stopped_said": "5",
+   "stopped_at": 0.635,
+   "correct": true,
+   "conclusions": 4
+  },
+  {
+   "answer": "250",
+   "trunk_said": "250",
+   "stopped_said": "250",
+   "stopped_at": 0.705,
+   "correct": true,
+   "conclusions": 4
+  },
+  {
+   "answer": "8",
+   "trunk_said": "4",
+   "stopped_said": "4",
+   "stopped_at": 1.0,
+   "correct": false,
+   "conclusions": 0
+  },
+  {
+   "answer": "44",
+   "trunk_said": "44",
+   "stopped_said": "44",
+   "stopped_at": 0.297,
+   "correct": true,
+   "conclusions": 12
+  },
+  {
+   "answer": "220",
+   "trunk_said": "220",
+   "stopped_said": "220",
+   "stopped_at": 0.645,
+   "correct": true,
+   "conclusions": 1
+  },
+  {
+   "answer": "15",
+   "trunk_said": "15",
+   "stopped_said": "15",
+   "stopped_at": 0.796,
+   "correct": true,
+   "conclusions": 2
+  },
+  {
+   "answer": "45",
+   "trunk_said": "45",
+   "stopped_said": "45",
+   "stopped_at": 0.379,
+   "correct": true,
+   "conclusions": 7
+  },
+  {
+   "answer": "54",
+   "trunk_said": "54",
+   "stopped_said": "54",
+   "stopped_at": 0.678,
+   "correct": true,
+   "conclusions": 2
+  },
+  {
+   "answer": "70",
+   "trunk_said": "70",
+   "stopped_said": "70",
+   "stopped_at": 0.593,
+   "correct": true,
+   "conclusions": 4
+  },
+  {
+   "answer": "90",
+   "trunk_said": "90",
+   "stopped_said": "90",
+   "stopped_at": 0.585,
+   "correct": true,
+   "conclusions": 5
+  },
+  {
+   "answer": "140",
+   "trunk_said": "140",
+   "stopped_said": "140",
+   "stopped_at": 0.758,
+   "correct": true,
+   "conclusions": 2
+  },
+  {
+   "answer": "20000",
+   "trunk_said": "20000",
+   "stopped_said": "20000",
+   "stopped_at": 0.151,
+   "correct": true,
+   "conclusions": 18
+  },
+  {
+   "answer": "180",
+   "trunk_said": "180",
+   "stopped_said": "180",
+   "stopped_at": 0.621,
+   "correct": true,
+   "conclusions": 3
+  },
+  {
+   "answer": "9",
+   "trunk_said": "9",
+   "stopped_said": "9",
+   "stopped_at": 1.0,
+   "correct": true,
+   "conclusions": 0
+  },
+  {
+   "answer": "33",
+   "trunk_said": "33",
+   "stopped_said": "33",
+   "stopped_at": 0.577,
+   "correct": true,
+   "conclusions": 2
+  },
+  {
+   "answer": "9",
+   "trunk_said": "9.00",
+   "stopped_said": "9.00",
+   "stopped_at": 1.0,
+   "correct": true,
+   "conclusions": 0
+  },
+  {
+   "answer": "1",
+   "trunk_said": "1",
+   "stopped_said": "1",
+   "stopped_at": 0.699,
+   "correct": true,
+   "conclusions": 2
+  },
+  {
+   "answer": "21",
+   "trunk_said": "21",
+   "stopped_said": "21",
+   "stopped_at": 0.975,
+   "correct": true,
+   "conclusions": 1
+  },
+  {
+   "answer": "276000",
+   "trunk_said": "276000",
+   "stopped_said": "276,000",
+   "stopped_at": 0.645,
+   "correct": true,
+   "conclusions": 3
+  },
+  {
+   "answer": "50",
+   "trunk_said": "50",
+   "stopped_said": "50,",
+   "stopped_at": 0.694,
+   "correct": true,
+   "conclusions": 2
+  },
+  {
+   "answer": "75",
+   "trunk_said": "75",
+   "stopped_said": "75",
+   "stopped_at": 0.745,
+   "correct": true,
+   "conclusions": 3
+  },
+  {
+   "answer": "12",
+   "trunk_said": "12",
+   "stopped_said": "12",
+   "stopped_at": 1.0,
+   "correct": true,
+   "conclusions": 0
+  },
+  {
+   "answer": "21",
+   "trunk_said": "14",
+   "stopped_said": "14",
+   "stopped_at": 0.328,
+   "correct": false,
+   "conclusions": 7
+  },
+  {
+   "answer": "10",
+   "trunk_said": "10",
+   "stopped_said": "10",
+   "stopped_at": 0.553,
+   "correct": true,
+   "conclusions": 6
+  },
+  {
+   "answer": "31",
+   "trunk_said": "25",
+   "stopped_said": "25",
+   "stopped_at": 1.0,
+   "correct": false,
+   "conclusions": 0
+  },
+  {
+   "answer": "90",
+   "trunk_said": "90",
+   "stopped_said": "90",
+   "stopped_at": 0.235,
+   "correct": true,
+   "conclusions": 17
+  },
+  {
+   "answer": "68",
+   "trunk_said": "68",
+   "stopped_said": "68",
+   "stopped_at": 0.813,
+   "correct": true,
+   "conclusions": 1
+  },
+  {
+   "answer": "280",
+   "trunk_said": "280",
+   "stopped_said": "280",
+   "stopped_at": 0.414,
+   "correct": true,
+   "conclusions": 4
+  },
+  {
+   "answer": "21",
+   "trunk_said": "21",
+   "stopped_said": "21",
+   "stopped_at": 0.362,
+   "correct": true,
+   "conclusions": 6
+  },
+  {
+   "answer": "6",
+   "trunk_said": "6",
+   "stopped_said": "6",
+   "stopped_at": 0.354,
+   "correct": true,
+   "conclusions": 5
+  },
+  {
+   "answer": "3",
+   "trunk_said": "3",
+   "stopped_said": "3",
+   "stopped_at": 0.618,
+   "correct": true,
+   "conclusions": 1
+  },
+  {
+   "answer": "250",
+   "trunk_said": "250",
+   "stopped_said": "250",
+   "stopped_at": 0.541,
+   "correct": true,
+   "conclusions": 7
+  },
+  {
+   "answer": "20",
+   "trunk_said": "20",
+   "stopped_said": "20",
+   "stopped_at": 1.0,
+   "correct": true,
+   "conclusions": 0
+  },
+  {
+   "answer": "7",
+   "trunk_said": "7",
+   "stopped_said": "7",
+   "stopped_at": 1.0,
+   "correct": true,
+   "conclusions": 0
+  },
+  {
+   "answer": "27000",
+   "trunk_said": "27000",
+   "stopped_said": "27000",
+   "stopped_at": 0.693,
+   "correct": true,
+   "conclusions": 6
+  },
+  {
+   "answer": "32",
+   "trunk_said": "32",
+   "stopped_said": "32",
+   "stopped_at": 0.445,
+   "correct": true,
+   "conclusions": 4
+  },
+  {
+   "answer": "300",
+   "trunk_said": "300",
+   "stopped_said": "300",
+   "stopped_at": 0.739,
+   "correct": true,
+   "conclusions": 3
+  },
+  {
+   "answer": "5600",
+   "trunk_said": "5600",
+   "stopped_said": "5600",
+   "stopped_at": 0.425,
+   "correct": true,
+   "conclusions": 2
+  },
+  {
+   "answer": "17",
+   "trunk_said": "17",
+   "stopped_said": "17",
+   "stopped_at": 0.447,
+   "correct": true,
+   "conclusions": 3
+  },
+  {
+   "answer": "70",
+   "trunk_said": "70",
+   "stopped_said": "70",
+   "stopped_at": 0.185,
+   "correct": true,
+   "conclusions": 26
+  },
+  {
+   "answer": "73",
+   "trunk_said": "82",
+   "stopped_said": "82",
+   "stopped_at": 0.279,
+   "correct": false,
+   "conclusions": 1
+  },
+  {
+   "answer": "18",
+   "trunk_said": "18",
+   "stopped_said": "18",
+   "stopped_at": 0.229,
+   "correct": true,
+   "conclusions": 27
+  },
+  {
+   "answer": "84",
+   "trunk_said": "84",
+   "stopped_said": "84",
+   "stopped_at": 1.0,
+   "correct": true,
+   "conclusions": 0
+  },
+  {
+   "answer": "192",
+   "trunk_said": "8",
+   "stopped_said": "8",
+   "stopped_at": 1.0,
+   "correct": false,
+   "conclusions": 0
+  },
+  {
+   "answer": "45",
+   "trunk_said": "45",
+   "stopped_said": "45",
+   "stopped_at": 0.558,
+   "correct": true,
+   "conclusions": 5
+  },
+  {
+   "answer": "5600",
+   "trunk_said": "5600",
+   "stopped_said": "8000",
+   "stopped_at": 0.46,
+   "correct": false,
+   "conclusions": 3
+  },
+  {
+   "answer": "6",
+   "trunk_said": "6.00",
+   "stopped_said": "0.04",
+   "stopped_at": 0.463,
+   "correct": false,
+   "conclusions": 4
+  },
+  {
+   "answer": "168",
+   "trunk_said": "17",
+   "stopped_said": "174",
+   "stopped_at": 0.593,
+   "correct": false,
+   "conclusions": 1
+  },
+  {
+   "answer": "11",
+   "trunk_said": "11",
+   "stopped_said": "11",
+   "stopped_at": 0.625,
+   "correct": true,
+   "conclusions": 5
+  },
+  {
+   "answer": "62",
+   "trunk_said": "62.00",
+   "stopped_said": "62.00",
+   "stopped_at": 0.32,
+   "correct": true,
+   "conclusions": 4
+  },
+  {
+   "answer": "270",
+   "trunk_said": "270",
+   "stopped_said": "270",
+   "stopped_at": 0.615,
+   "correct": true,
+   "conclusions": 2
+  },
+  {
+   "answer": "8",
+   "trunk_said": "8",
+   "stopped_said": "8",
+   "stopped_at": 0.715,
+   "correct": true,
+   "conclusions": 3
+  },
+  {
+   "answer": "400",
+   "trunk_said": "400",
+   "stopped_said": "400",
+   "stopped_at": 0.382,
+   "correct": true,
+   "conclusions": 8
+  },
+  {
+   "answer": "9500",
+   "trunk_said": "9500",
+   "stopped_said": "9500",
+   "stopped_at": 0.451,
+   "correct": true,
+   "conclusions": 9
+  },
+  {
+   "answer": "118000",
+   "trunk_said": "368000",
+   "stopped_said": "368000",
+   "stopped_at": 1.0,
+   "correct": false,
+   "conclusions": 0
+  },
+  {
+   "answer": "91",
+   "trunk_said": "63",
+   "stopped_said": "63",
+   "stopped_at": 1.0,
+   "correct": false,
+   "conclusions": 0
+  },
+  {
+   "answer": "1375",
+   "trunk_said": "1375",
+   "stopped_said": "1375",
+   "stopped_at": 0.285,
+   "correct": true,
+   "conclusions": 9
+  },
+  {
+   "answer": "4",
+   "trunk_said": "4",
+   "stopped_said": "4",
+   "stopped_at": 0.6,
+   "correct": true,
+   "conclusions": 5
+  },
+  {
+   "answer": "762",
+   "trunk_said": "762",
+   "stopped_said": "762",
+   "stopped_at": 0.274,
+   "correct": true,
+   "conclusions": 8
+  },
+  {
+   "answer": "20",
+   "trunk_said": "20",
+   "stopped_said": "20",
+   "stopped_at": 0.981,
+   "correct": true,
+   "conclusions": 1
+  },
+  {
+   "answer": "5",
+   "trunk_said": "5.00",
+   "stopped_said": "5.00",
+   "stopped_at": 0.186,
+   "correct": true,
+   "conclusions": 2
+  },
+  {
+   "answer": "315",
+   "trunk_said": "315",
+   "stopped_said": "315",
+   "stopped_at": 0.888,
+   "correct": true,
+   "conclusions": 2
+  },
+  {
+   "answer": "3200",
+   "trunk_said": "3200",
+   "stopped_said": "3200",
+   "stopped_at": 0.23,
+   "correct": true,
+   "conclusions": 6
+  },
+  {
+   "answer": "138",
+   "trunk_said": "138",
+   "stopped_said": "84",
+   "stopped_at": 0.323,
+   "correct": false,
+   "conclusions": 2
+  },
+  {
+   "answer": "9",
+   "trunk_said": "9",
+   "stopped_said": "9",
+   "stopped_at": 0.599,
+   "correct": true,
+   "conclusions": 6
+  },
+  {
+   "answer": "4",
+   "trunk_said": "4",
+   "stopped_said": "4",
+   "stopped_at": 0.56,
+   "correct": true,
+   "conclusions": 4
+  },
+  {
+   "answer": "40",
+   "trunk_said": "40",
+   "stopped_said": "40",
+   "stopped_at": 0.54,
+   "correct": true,
+   "conclusions": 4
+  },
+  {
+   "answer": "6",
+   "trunk_said": "6",
+   "stopped_said": "6",
+   "stopped_at": 0.425,
+   "correct": true,
+   "conclusions": 6
+  },
+  {
+   "answer": "7",
+   "trunk_said": "7",
+   "stopped_said": "7",
+   "stopped_at": 0.47,
+   "correct": true,
+   "conclusions": 9
+  },
+  {
+   "answer": "2450",
+   "trunk_said": "2450",
+   "stopped_said": "2450",
+   "stopped_at": 0.419,
+   "correct": true,
+   "conclusions": 2
+  },
+  {
+   "answer": "195",
+   "trunk_said": "195",
+   "stopped_said": "12",
+   "stopped_at": 0.399,
+   "correct": false,
+   "conclusions": 1
+  },
+  {
+   "answer": "68",
+   "trunk_said": "68",
+   "stopped_said": "68",
+   "stopped_at": 0.786,
+   "correct": true,
+   "conclusions": 2
+  },
+  {
+   "answer": "360",
+   "trunk_said": "360",
+   "stopped_said": "3",
+   "stopped_at": 0.669,
+   "correct": false,
+   "conclusions": 1
+  },
+  {
+   "answer": "21",
+   "trunk_said": "21",
+   "stopped_said": "9",
+   "stopped_at": 0.24,
+   "correct": false,
+   "conclusions": 8
+  },
+  {
+   "answer": "90",
+   "trunk_said": "90",
+   "stopped_said": "90",
+   "stopped_at": 0.329,
+   "correct": true,
+   "conclusions": 9
+  },
+  {
+   "answer": "8",
+   "trunk_said": "8",
+   "stopped_said": "8",
+   "stopped_at": 0.325,
+   "correct": true,
+   "conclusions": 13
+  },
+  {
+   "answer": "3",
+   "trunk_said": "3",
+   "stopped_said": "3",
+   "stopped_at": 0.257,
+   "correct": true,
+   "conclusions": 25
+  },
+  {
+   "answer": "16",
+   "trunk_said": "16",
+   "stopped_said": "16",
+   "stopped_at": 0.491,
+   "correct": true,
+   "conclusions": 3
+  },
+  {
+   "answer": "390",
+   "trunk_said": "390",
+   "stopped_said": "1",
+   "stopped_at": 0.187,
+   "correct": false,
+   "conclusions": 2
+  },
+  {
+   "answer": "2",
+   "trunk_said": "2",
+   "stopped_said": "2",
+   "stopped_at": 0.832,
+   "correct": true,
+   "conclusions": 2
+  },
+  {
+   "answer": "75",
+   "trunk_said": "3",
+   "stopped_said": "3",
+   "stopped_at": 1.0,
+   "correct": false,
+   "conclusions": 0
+  },
+  {
+   "answer": "83",
+   "trunk_said": "18",
+   "stopped_said": "18",
+   "stopped_at": 1.0,
+   "correct": false,
+   "conclusions": 0
+  },
+  {
+   "answer": "3",
+   "trunk_said": "3",
+   "stopped_said": "3",
+   "stopped_at": 0.535,
+   "correct": true,
+   "conclusions": 4
+  },
+  {
+   "answer": "370",
+   "trunk_said": "370",
+   "stopped_said": "370",
+   "stopped_at": 0.5,
+   "correct": true,
+   "conclusions": 2
+  },
+  {
+   "answer": "3",
+   "trunk_said": "3",
+   "stopped_said": "3",
+   "stopped_at": 0.919,
+   "correct": true,
+   "conclusions": 1
+  },
+  {
+   "answer": "55",
+   "trunk_said": "55",
+   "stopped_said": "55",
+   "stopped_at": 1.0,
+   "correct": true,
+   "conclusions": 0
+  },
+  {
+   "answer": "500",
+   "trunk_said": "400",
+   "stopped_said": "400",
+   "stopped_at": 1.0,
+   "correct": false,
+   "conclusions": 0
+  },
+  {
+   "answer": "31800",
+   "trunk_said": "31800",
+   "stopped_said": "31800",
+   "stopped_at": 0.537,
+   "correct": true,
+   "conclusions": 3
+  },
+  {
+   "answer": "78",
+   "trunk_said": "78",
+   "stopped_said": "78",
+   "stopped_at": 0.23,
+   "correct": true,
+   "conclusions": 17
+  },
+  {
+   "answer": "8",
+   "trunk_said": "32",
+   "stopped_said": "32",
+   "stopped_at": 1.0,
+   "correct": false,
+   "conclusions": 0
+  },
+  {
+   "answer": "15",
+   "trunk_said": "15",
+   "stopped_said": "15",
+   "stopped_at": 0.678,
+   "correct": true,
+   "conclusions": 3
+  },
+  {
+   "answer": "1300",
+   "trunk_said": "1300",
+   "stopped_said": "1300",
+   "stopped_at": 1.0,
+   "correct": true,
+   "conclusions": 0
+  },
+  {
+   "answer": "3200",
+   "trunk_said": "1700",
+   "stopped_said": "1700",
+   "stopped_at": 1.0,
+   "correct": false,
+   "conclusions": 0
+  },
+  {
+   "answer": "4",
+   "trunk_said": "4",
+   "stopped_said": "4",
+   "stopped_at": 0.322,
+   "correct": true,
+   "conclusions": 10
+  },
+  {
+   "answer": "10",
+   "trunk_said": "10",
+   "stopped_said": "10",
+   "stopped_at": 0.663,
+   "correct": true,
+   "conclusions": 1
+  },
+  {
+   "answer": "16",
+   "trunk_said": "4",
+   "stopped_said": "4",
+   "stopped_at": 0.165,
+   "correct": false,
+   "conclusions": 4
+  },
+  {
+   "answer": "6",
+   "trunk_said": "6",
+   "stopped_said": "6",
+   "stopped_at": 0.562,
+   "correct": true,
+   "conclusions": 2
+  },
+  {
+   "answer": "8",
+   "trunk_said": "8",
+   "stopped_said": "8",
+   "stopped_at": 0.348,
+   "correct": true,
+   "conclusions": 6
+  },
+  {
+   "answer": "2050",
+   "trunk_said": "2050",
+   "stopped_said": "2050",
+   "stopped_at": 1.0,
+   "correct": true,
+   "conclusions": 0
+  },
+  {
+   "answer": "91",
+   "trunk_said": "91",
+   "stopped_said": "91",
+   "stopped_at": 0.343,
+   "correct": true,
+   "conclusions": 6
+  },
+  {
+   "answer": "32",
+   "trunk_said": "32",
+   "stopped_said": "32",
+   "stopped_at": 0.61,
+   "correct": true,
+   "conclusions": 2
+  },
+  {
+   "answer": "120000",
+   "trunk_said": "120000",
+   "stopped_said": "120000",
+   "stopped_at": 1.0,
+   "correct": true,
+   "conclusions": 0
+  },
+  {
+   "answer": "30",
+   "trunk_said": "30",
+   "stopped_said": "30",
+   "stopped_at": 0.502,
+   "correct": true,
+   "conclusions": 14
+  },
+  {
+   "answer": "14",
+   "trunk_said": "16",
+   "stopped_said": "16",
+   "stopped_at": 1.0,
+   "correct": false,
+   "conclusions": 0
+  },
+  {
+   "answer": "156",
+   "trunk_said": "156",
+   "stopped_said": "156",
+   "stopped_at": 0.36,
+   "correct": true,
+   "conclusions": 1
+  },
+  {
+   "answer": "12",
+   "trunk_said": "12",
+   "stopped_said": "12",
+   "stopped_at": 0.604,
+   "correct": true,
+   "conclusions": 5
+  },
+  {
+   "answer": "123",
+   "trunk_said": "123",
+   "stopped_said": "123",
+   "stopped_at": 0.464,
+   "correct": true,
+   "conclusions": 2
+  },
+  {
+   "answer": "15",
+   "trunk_said": "15",
+   "stopped_said": "15",
+   "stopped_at": 0.319,
+   "correct": true,
+   "conclusions": 15
+  },
+  {
+   "answer": "8",
+   "trunk_said": "8",
+   "stopped_said": "8",
+   "stopped_at": 0.347,
+   "correct": true,
+   "conclusions": 2
+  },
+  {
+   "answer": "1",
+   "trunk_said": "1",
+   "stopped_said": "1",
+   "stopped_at": 0.378,
+   "correct": true,
+   "conclusions": 5
+  },
+  {
+   "answer": "9",
+   "trunk_said": "9",
+   "stopped_said": "9",
+   "stopped_at": 1.0,
+   "correct": true,
+   "conclusions": 0
+  },
+  {
+   "answer": "75",
+   "trunk_said": "75",
+   "stopped_said": "75",
+   "stopped_at": 1.0,
+   "correct": true,
+   "conclusions": 0
+  },
+  {
+   "answer": "14",
+   "trunk_said": "7",
+   "stopped_said": "7",
+   "stopped_at": 1.0,
+   "correct": false,
+   "conclusions": 0
+  },
+  {
+   "answer": "224000",
+   "trunk_said": "224000",
+   "stopped_said": "224000",
+   "stopped_at": 0.846,
+   "correct": true,
+   "conclusions": 2
+  },
+  {
+   "answer": "14",
+   "trunk_said": "14",
+   "stopped_said": "14",
+   "stopped_at": 1.0,
+   "correct": true,
+   "conclusions": 0
+  },
+  {
+   "answer": "31",
+   "trunk_said": "31",
+   "stopped_said": "31",
+   "stopped_at": 0.32,
+   "correct": true,
+   "conclusions": 2
+  },
+  {
+   "answer": "2",
+   "trunk_said": "2",
+   "stopped_said": "2",
+   "stopped_at": 0.36,
+   "correct": true,
+   "conclusions": 17
+  },
+  {
+   "answer": "14",
+   "trunk_said": "14",
+   "stopped_said": "14",
+   "stopped_at": 0.732,
+   "correct": true,
+   "conclusions": 2
+  },
+  {
+   "answer": "31",
+   "trunk_said": "37",
+   "stopped_said": "37",
+   "stopped_at": 1.0,
+   "correct": false,
+   "conclusions": 0
+  },
+  {
+   "answer": "8400",
+   "trunk_said": "8400",
+   "stopped_said": "8400",
+   "stopped_at": 0.412,
+   "correct": true,
+   "conclusions": 4
+  },
+  {
+   "answer": "44",
+   "trunk_said": "44",
+   "stopped_said": "44",
+   "stopped_at": 0.703,
+   "correct": true,
+   "conclusions": 3
+  },
+  {
+   "answer": "100",
+   "trunk_said": "100",
+   "stopped_said": "100",
+   "stopped_at": 0.539,
+   "correct": true,
+   "conclusions": 1
+  },
+  {
+   "answer": "6",
+   "trunk_said": "6",
+   "stopped_said": "6",
+   "stopped_at": 1.0,
+   "correct": true,
+   "conclusions": 0
+  },
+  {
+   "answer": "310",
+   "trunk_said": "310",
+   "stopped_said": "310",
+   "stopped_at": 0.661,
+   "correct": true,
+   "conclusions": 2
+  },
+  {
+   "answer": "72",
+   "trunk_said": "72",
+   "stopped_said": "72",
+   "stopped_at": 0.46,
+   "correct": true,
+   "conclusions": 5
+  },
+  {
+   "answer": "1",
+   "trunk_said": "1",
+   "stopped_said": "1",
+   "stopped_at": 1.0,
+   "correct": true,
+   "conclusions": 0
+  },
+  {
+   "answer": "60",
+   "trunk_said": "60",
+   "stopped_said": "60",
+   "stopped_at": 0.511,
+   "correct": true,
+   "conclusions": 6
+  },
+  {
+   "answer": "160",
+   "trunk_said": "160",
+   "stopped_said": "160",
+   "stopped_at": 0.355,
+   "correct": true,
+   "conclusions": 14
+  },
+  {
+   "answer": "4",
+   "trunk_said": "1",
+   "stopped_said": "1",
+   "stopped_at": 0.692,
+   "correct": false,
+   "conclusions": 1
+  },
+  {
+   "answer": "260",
+   "trunk_said": "260",
+   "stopped_said": "260",
+   "stopped_at": 0.866,
+   "correct": true,
+   "conclusions": 2
+  },
+  {
+   "answer": "87",
+   "trunk_said": "87",
+   "stopped_said": "87",
+   "stopped_at": 1.0,
+   "correct": true,
+   "conclusions": 0
+  },
+  {
+   "answer": "180000",
+   "trunk_said": "180000",
+   "stopped_said": "180000",
+   "stopped_at": 1.0,
+   "correct": true,
+   "conclusions": 0
+  },
+  {
+   "answer": "2",
+   "trunk_said": "2",
+   "stopped_said": "2",
+   "stopped_at": 0.38,
+   "correct": true,
+   "conclusions": 14
+  },
+  {
+   "answer": "310",
+   "trunk_said": "310",
+   "stopped_said": "310",
+   "stopped_at": 0.67,
+   "correct": true,
+   "conclusions": 3
+  },
+  {
+   "answer": "9",
+   "trunk_said": "9",
+   "stopped_said": "9",
+   "stopped_at": 1.0,
+   "correct": true,
+   "conclusions": 0
+  },
+  {
+   "answer": "36",
+   "trunk_said": "36",
+   "stopped_said": "36",
+   "stopped_at": 0.636,
+   "correct": true,
+   "conclusions": 6
+  },
+  {
+   "answer": "10",
+   "trunk_said": "10",
+   "stopped_said": "50",
+   "stopped_at": 0.476,
+   "correct": false,
+   "conclusions": 6
+  },
+  {
+   "answer": "2640",
+   "trunk_said": "2740",
+   "stopped_said": "2740",
+   "stopped_at": 0.367,
+   "correct": false,
+   "conclusions": 4
+  },
+  {
+   "answer": "8",
+   "trunk_said": "8",
+   "stopped_said": "8",
+   "stopped_at": 0.695,
+   "correct": true,
+   "conclusions": 3
+  },
+  {
+   "answer": "10",
+   "trunk_said": "10",
+   "stopped_said": "10",
+   "stopped_at": 0.358,
+   "correct": true,
+   "conclusions": 12
+  },
+  {
+   "answer": "21",
+   "trunk_said": "11",
+   "stopped_said": "11",
+   "stopped_at": 1.0,
+   "correct": false,
+   "conclusions": 0
+  },
+  {
+   "answer": "20",
+   "trunk_said": "8",
+   "stopped_said": "8",
+   "stopped_at": 1.0,
+   "correct": false,
+   "conclusions": 0
+  },
+  {
+   "answer": "45",
+   "trunk_said": "45",
+   "stopped_said": "45",
+   "stopped_at": 0.63,
+   "correct": true,
+   "conclusions": 2
+  },
+  {
+   "answer": "34",
+   "trunk_said": "34",
+   "stopped_said": "34",
+   "stopped_at": 0.331,
+   "correct": true,
+   "conclusions": 7
+  },
+  {
+   "answer": "21",
+   "trunk_said": "21",
+   "stopped_said": "21",
+   "stopped_at": 0.551,
+   "correct": true,
+   "conclusions": 10
+  },
+  {
+   "answer": "2",
+   "trunk_said": "5",
+   "stopped_said": "5",
+   "stopped_at": 1.0,
+   "correct": false,
+   "conclusions": 0
+  },
+  {
+   "answer": "20",
+   "trunk_said": "20",
+   "stopped_said": "20",
+   "stopped_at": 0.265,
+   "correct": true,
+   "conclusions": 7
+  },
+  {
+   "answer": "4",
+   "trunk_said": "1",
+   "stopped_said": "4",
+   "stopped_at": 0.675,
+   "correct": true,
+   "conclusions": 1
+  },
+  {
+   "answer": "25",
+   "trunk_said": "25",
+   "stopped_said": "25",
+   "stopped_at": 0.608,
+   "correct": true,
+   "conclusions": 3
+  },
+  {
+   "answer": "20",
+   "trunk_said": "20",
+   "stopped_said": "20",
+   "stopped_at": 0.48,
+   "correct": true,
+   "conclusions": 2
+  },
+  {
+   "answer": "23",
+   "trunk_said": "23",
+   "stopped_said": "23",
+   "stopped_at": 0.97,
+   "correct": true,
+   "conclusions": 1
+  },
+  {
+   "answer": "6",
+   "trunk_said": "6",
+   "stopped_said": "6",
+   "stopped_at": 1.0,
+   "correct": true,
+   "conclusions": 0
+  },
+  {
+   "answer": "49",
+   "trunk_said": "49",
+   "stopped_said": "49",
+   "stopped_at": 1.0,
+   "correct": true,
+   "conclusions": 0
+  },
+  {
+   "answer": "18",
+   "trunk_said": "18",
+   "stopped_said": "18",
+   "stopped_at": 1.0,
+   "correct": true,
+   "conclusions": 0
+  },
+  {
+   "answer": "9",
+   "trunk_said": "9",
+   "stopped_said": "9",
+   "stopped_at": 0.798,
+   "correct": true,
+   "conclusions": 2
+  },
+  {
+   "answer": "19",
+   "trunk_said": "19",
+   "stopped_said": "19",
+   "stopped_at": 0.745,
+   "correct": true,
+   "conclusions": 1
+  },
+  {
+   "answer": "18",
+   "trunk_said": "14",
+   "stopped_said": "14",
+   "stopped_at": 1.0,
+   "correct": false,
+   "conclusions": 0
+  },
+  {
+   "answer": "1198",
+   "trunk_said": "1198",
+   "stopped_said": "1198",
+   "stopped_at": 0.921,
+   "correct": true,
+   "conclusions": 1
+  },
+  {
+   "answer": "320",
+   "trunk_said": "320",
+   "stopped_said": "320",
+   "stopped_at": 0.632,
+   "correct": true,
+   "conclusions": 3
+  },
+  {
+   "answer": "50",
+   "trunk_said": "100",
+   "stopped_said": "100,",
+   "stopped_at": 0.822,
+   "correct": false,
+   "conclusions": 1
+  },
+  {
+   "answer": "5",
+   "trunk_said": "5",
+   "stopped_said": "5",
+   "stopped_at": 0.514,
+   "correct": true,
+   "conclusions": 6
+  },
+  {
+   "answer": "240000",
+   "trunk_said": "240000",
+   "stopped_said": "240000",
+   "stopped_at": 1.0,
+   "correct": true,
+   "conclusions": 0
+  },
+  {
+   "answer": "45",
+   "trunk_said": "1",
+   "stopped_said": "45",
+   "stopped_at": 0.243,
+   "correct": true,
+   "conclusions": 1
+  },
+  {
+   "answer": "48",
+   "trunk_said": "48",
+   "stopped_said": "48",
+   "stopped_at": 0.816,
+   "correct": true,
+   "conclusions": 2
+  },
+  {
+   "answer": "15",
+   "trunk_said": "15",
+   "stopped_said": "15",
+   "stopped_at": 0.29,
+   "correct": true,
+   "conclusions": 15
+  },
+  {
+   "answer": "50",
+   "trunk_said": "50",
+   "stopped_said": "50",
+   "stopped_at": 0.405,
+   "correct": true,
+   "conclusions": 10
+  },
+  {
+   "answer": "15",
+   "trunk_said": "15",
+   "stopped_said": "15",
+   "stopped_at": 0.274,
+   "correct": true,
+   "conclusions": 12
+  },
+  {
+   "answer": "21",
+   "trunk_said": "21",
+   "stopped_said": "21",
+   "stopped_at": 0.214,
+   "correct": true,
+   "conclusions": 8
+  },
+  {
+   "answer": "803",
+   "trunk_said": "760.42",
+   "stopped_said": "3650",
+   "stopped_at": 0.781,
+   "correct": false,
+   "conclusions": 2
+  },
+  {
+   "answer": "67",
+   "trunk_said": "67",
+   "stopped_said": "67",
+   "stopped_at": 0.672,
+   "correct": true,
+   "conclusions": 3
+  },
+  {
+   "answer": "350",
+   "trunk_said": "350",
+   "stopped_said": "350",
+   "stopped_at": 0.322,
+   "correct": true,
+   "conclusions": 8
+  },
+  {
+   "answer": "2",
+   "trunk_said": "18",
+   "stopped_said": "18",
+   "stopped_at": 1.0,
+   "correct": false,
+   "conclusions": 0
+  },
+  {
+   "answer": "32",
+   "trunk_said": "32",
+   "stopped_said": "32",
+   "stopped_at": 0.327,
+   "correct": true,
+   "conclusions": 13
+  },
+  {
+   "answer": "16",
+   "trunk_said": "16",
+   "stopped_said": "16",
+   "stopped_at": 0.487,
+   "correct": true,
+   "conclusions": 3
+  },
+  {
+   "answer": "80",
+   "trunk_said": "80",
+   "stopped_said": "80",
+   "stopped_at": 0.478,
+   "correct": true,
+   "conclusions": 2
+  },
+  {
+   "answer": "36",
+   "trunk_said": "36",
+   "stopped_said": "36",
+   "stopped_at": 0.393,
+   "correct": true,
+   "conclusions": 5
+  },
+  {
+   "answer": "88",
+   "trunk_said": "88",
+   "stopped_said": "88",
+   "stopped_at": 0.73,
+   "correct": true,
+   "conclusions": 3
+  },
+  {
+   "answer": "6",
+   "trunk_said": "12",
+   "stopped_said": "12,",
+   "stopped_at": 0.89,
+   "correct": false,
+   "conclusions": 2
+  },
+  {
+   "answer": "12",
+   "trunk_said": "12",
+   "stopped_said": "12",
+   "stopped_at": 0.636,
+   "correct": true,
+   "conclusions": 5
+  },
+  {
+   "answer": "15",
+   "trunk_said": "15",
+   "stopped_said": "15",
+   "stopped_at": 1.0,
+   "correct": true,
+   "conclusions": 0
+  },
+  {
+   "answer": "34",
+   "trunk_said": "60",
+   "stopped_said": "60",
+   "stopped_at": 1.0,
+   "correct": false,
+   "conclusions": 0
+  },
+  {
+   "answer": "20",
+   "trunk_said": "20",
+   "stopped_said": "20",
+   "stopped_at": 0.341,
+   "correct": true,
+   "conclusions": 17
+  },
+  {
+   "answer": "92",
+   "trunk_said": "92",
+   "stopped_said": "92",
+   "stopped_at": 1.0,
+   "correct": true,
+   "conclusions": 0
+  },
+  {
+   "answer": "38",
+   "trunk_said": "38",
+   "stopped_said": "38",
+   "stopped_at": 0.362,
+   "correct": true,
+   "conclusions": 5
+  },
+  {
+   "answer": "3",
+   "trunk_said": "3",
+   "stopped_said": "3",
+   "stopped_at": 0.683,
+   "correct": true,
+   "conclusions": 1
+  },
+  {
+   "answer": "25",
+   "trunk_said": "25",
+   "stopped_said": "25",
+   "stopped_at": 0.344,
+   "correct": true,
+   "conclusions": 21
+  },
+  {
+   "answer": "168",
+   "trunk_said": "168",
+   "stopped_said": "168",
+   "stopped_at": 1.0,
+   "correct": true,
+   "conclusions": 0
+  },
+  {
+   "answer": "12",
+   "trunk_said": "12",
+   "stopped_said": "12",
+   "stopped_at": 0.815,
+   "correct": true,
+   "conclusions": 2
+  },
+  {
+   "answer": "48",
+   "trunk_said": "48",
+   "stopped_said": "48",
+   "stopped_at": 1.0,
+   "correct": true,
+   "conclusions": 1
+  },
+  {
+   "answer": "14400",
+   "trunk_said": "14400",
+   "stopped_said": "14400",
+   "stopped_at": 0.367,
+   "correct": true,
+   "conclusions": 2
+  },
+  {
+   "answer": "4",
+   "trunk_said": "4",
+   "stopped_said": "4",
+   "stopped_at": 1.0,
+   "correct": true,
+   "conclusions": 0
+  },
+  {
+   "answer": "81",
+   "trunk_said": "135",
+   "stopped_said": "135,",
+   "stopped_at": 0.814,
+   "correct": false,
+   "conclusions": 1
+  },
+  {
+   "answer": "22",
+   "trunk_said": "22",
+   "stopped_said": "22",
+   "stopped_at": 0.655,
+   "correct": true,
+   "conclusions": 1
+  },
+  {
+   "answer": "50",
+   "trunk_said": "50",
+   "stopped_said": "50.00",
+   "stopped_at": 0.262,
+   "correct": true,
+   "conclusions": 49
+  },
+  {
+   "answer": "200",
+   "trunk_said": "40",
+   "stopped_said": "120",
+   "stopped_at": 0.768,
+   "correct": false,
+   "conclusions": 1
+  },
+  {
+   "answer": "2000",
+   "trunk_said": "2000",
+   "stopped_said": "2000",
+   "stopped_at": 1.0,
+   "correct": true,
+   "conclusions": 0
+  },
+  {
+   "answer": "20",
+   "trunk_said": "20",
+   "stopped_said": "20",
+   "stopped_at": 0.516,
+   "correct": true,
+   "conclusions": 3
+  },
+  {
+   "answer": "168000",
+   "trunk_said": "40",
+   "stopped_said": "40",
+   "stopped_at": 1.0,
+   "correct": false,
+   "conclusions": 0
+  },
+  {
+   "answer": "3",
+   "trunk_said": "4.50",
+   "stopped_said": "4.50",
+   "stopped_at": 1.0,
+   "correct": false,
+   "conclusions": 0
+  },
+  {
+   "answer": "1110",
+   "trunk_said": "1110",
+   "stopped_said": "1110",
+   "stopped_at": 0.454,
+   "correct": true,
+   "conclusions": 2
+  },
+  {
+   "answer": "5",
+   "trunk_said": "5",
+   "stopped_said": "5",
+   "stopped_at": 0.598,
+   "correct": true,
+   "conclusions": 2
+  },
+  {
+   "answer": "25",
+   "trunk_said": "500",
+   "stopped_said": "500",
+   "stopped_at": 1.0,
+   "correct": false,
+   "conclusions": 0
+  },
+  {
+   "answer": "56",
+   "trunk_said": "56",
+   "stopped_said": "56",
+   "stopped_at": 0.636,
+   "correct": true,
+   "conclusions": 5
+  },
+  {
+   "answer": "350",
+   "trunk_said": "150",
+   "stopped_said": "500",
+   "stopped_at": 0.444,
+   "correct": false,
+   "conclusions": 1
+  },
+  {
+   "answer": "56",
+   "trunk_said": "56",
+   "stopped_said": "56",
+   "stopped_at": 0.655,
+   "correct": true,
+   "conclusions": 3
+  },
+  {
+   "answer": "3140",
+   "trunk_said": "3140",
+   "stopped_said": "3140",
+   "stopped_at": 0.558,
+   "correct": true,
+   "conclusions": 1
+  },
+  {
+   "answer": "40",
+   "trunk_said": "40",
+   "stopped_said": "40",
+   "stopped_at": 0.64,
+   "correct": true,
+   "conclusions": 3
+  },
+  {
+   "answer": "3000",
+   "trunk_said": "3000",
+   "stopped_said": "3000",
+   "stopped_at": 0.352,
+   "correct": true,
+   "conclusions": 3
+  },
+  {
+   "answer": "17000",
+   "trunk_said": "17000",
+   "stopped_said": "17000",
+   "stopped_at": 0.419,
+   "correct": true,
+   "conclusions": 5
+  },
+  {
+   "answer": "12",
+   "trunk_said": "12",
+   "stopped_said": "12",
+   "stopped_at": 0.32,
+   "correct": true,
+   "conclusions": 15
+  },
+  {
+   "answer": "284",
+   "trunk_said": "-12",
+   "stopped_said": "-12",
+   "stopped_at": 1.0,
+   "correct": false,
+   "conclusions": 0
+  },
+  {
+   "answer": "8",
+   "trunk_said": "6",
+   "stopped_said": "6",
+   "stopped_at": 1.0,
+   "correct": false,
+   "conclusions": 0
+  },
+  {
+   "answer": "570",
+   "trunk_said": "570",
+   "stopped_said": "570",
+   "stopped_at": 0.683,
+   "correct": true,
+   "conclusions": 2
+  },
+  {
+   "answer": "150",
+   "trunk_said": "60",
+   "stopped_said": "90",
+   "stopped_at": 0.986,
+   "correct": false,
+   "conclusions": 2
+  },
+  {
+   "answer": "11",
+   "trunk_said": "11",
+   "stopped_said": "11",
+   "stopped_at": 0.227,
+   "correct": true,
+   "conclusions": 11
+  },
+  {
+   "answer": "150",
+   "trunk_said": "50",
+   "stopped_said": "50",
+   "stopped_at": 1.0,
+   "correct": false,
+   "conclusions": 0
+  },
+  {
+   "answer": "26",
+   "trunk_said": "1",
+   "stopped_said": "1",
+   "stopped_at": 1.0,
+   "correct": false,
+   "conclusions": 0
+  },
+  {
+   "answer": "13",
+   "trunk_said": "13",
+   "stopped_said": "13",
+   "stopped_at": 0.218,
+   "correct": true,
+   "conclusions": 7
+  },
+  {
+   "answer": "132",
+   "trunk_said": "132.00",
+   "stopped_said": "132.00",
+   "stopped_at": 0.587,
+   "correct": true,
+   "conclusions": 4
+  },
+  {
+   "answer": "1",
+   "trunk_said": "1",
+   "stopped_said": "1",
+   "stopped_at": 0.549,
+   "correct": true,
+   "conclusions": 4
+  },
+  {
+   "answer": "30",
+   "trunk_said": "30",
+   "stopped_said": "30",
+   "stopped_at": 0.581,
+   "correct": true,
+   "conclusions": 3
+  },
+  {
+   "answer": "6",
+   "trunk_said": "6",
+   "stopped_said": "6",
+   "stopped_at": 1.0,
+   "correct": true,
+   "conclusions": 1
+  },
+  {
+   "answer": "5",
+   "trunk_said": "2",
+   "stopped_said": "2",
+   "stopped_at": 1.0,
+   "correct": false,
+   "conclusions": 0
+  },
+  {
+   "answer": "5",
+   "trunk_said": "5",
+   "stopped_said": "5",
+   "stopped_at": 0.617,
+   "correct": true,
+   "conclusions": 4
+  },
+  {
+   "answer": "15",
+   "trunk_said": "15",
+   "stopped_said": "15",
+   "stopped_at": 0.318,
+   "correct": true,
+   "conclusions": 11
+  },
+  {
+   "answer": "7",
+   "trunk_said": "7",
+   "stopped_said": "7",
+   "stopped_at": 0.343,
+   "correct": true,
+   "conclusions": 9
+  },
+  {
+   "answer": "2",
+   "trunk_said": "2",
+   "stopped_said": "2",
+   "stopped_at": 1.0,
+   "correct": true,
+   "conclusions": 0
+  },
+  {
+   "answer": "17",
+   "trunk_said": "17",
+   "stopped_said": "17",
+   "stopped_at": 1.0,
+   "correct": true,
+   "conclusions": 0
+  },
+  {
+   "answer": "98",
+   "trunk_said": "98",
+   "stopped_said": "98",
+   "stopped_at": 0.387,
+   "correct": true,
+   "conclusions": 4
+  },
+  {
+   "answer": "80",
+   "trunk_said": "80",
+   "stopped_said": "80",
+   "stopped_at": 0.34,
+   "correct": true,
+   "conclusions": 5
+  },
+  {
+   "answer": "49",
+   "trunk_said": "49",
+   "stopped_said": "49",
+   "stopped_at": 0.361,
+   "correct": true,
+   "conclusions": 7
+  },
+  {
+   "answer": "59",
+   "trunk_said": "59",
+   "stopped_said": "59",
+   "stopped_at": 1.0,
+   "correct": true,
+   "conclusions": 0
+  },
+  {
+   "answer": "20",
+   "trunk_said": "20",
+   "stopped_said": "20",
+   "stopped_at": 1.0,
+   "correct": true,
+   "conclusions": 1
+  },
+  {
+   "answer": "6",
+   "trunk_said": "6",
+   "stopped_said": "6",
+   "stopped_at": 0.726,
+   "correct": true,
+   "conclusions": 1
+  },
+  {
+   "answer": "2",
+   "trunk_said": "2",
+   "stopped_said": "2",
+   "stopped_at": 0.83,
+   "correct": true,
+   "conclusions": 2
+  },
+  {
+   "answer": "5",
+   "trunk_said": "5",
+   "stopped_said": "5",
+   "stopped_at": 0.549,
+   "correct": true,
+   "conclusions": 5
+  },
+  {
+   "answer": "539",
+   "trunk_said": "539",
+   "stopped_said": "539",
+   "stopped_at": 1.0,
+   "correct": true,
+   "conclusions": 0
+  },
+  {
+   "answer": "112",
+   "trunk_said": "112",
+   "stopped_said": "112",
+   "stopped_at": 0.586,
+   "correct": true,
+   "conclusions": 5
+  },
+  {
+   "answer": "4",
+   "trunk_said": "10",
+   "stopped_said": "10",
+   "stopped_at": 1.0,
+   "correct": false,
+   "conclusions": 0
+  },
+  {
+   "answer": "11050",
+   "trunk_said": "11050",
+   "stopped_said": "11050",
+   "stopped_at": 0.446,
+   "correct": true,
+   "conclusions": 8
+  },
+  {
+   "answer": "50",
+   "trunk_said": "50",
+   "stopped_said": "50",
+   "stopped_at": 0.662,
+   "correct": true,
+   "conclusions": 1
+  },
+  {
+   "answer": "6400",
+   "trunk_said": "6400",
+   "stopped_said": "6400",
+   "stopped_at": 1.0,
+   "correct": true,
+   "conclusions": 0
+  },
+  {
+   "answer": "150",
+   "trunk_said": "240",
+   "stopped_said": "240",
+   "stopped_at": 0.204,
+   "correct": false,
+   "conclusions": 24
+  },
+  {
+   "answer": "1920",
+   "trunk_said": "1920",
+   "stopped_said": "1920",
+   "stopped_at": 0.345,
+   "correct": true,
+   "conclusions": 7
+  },
+  {
+   "answer": "78",
+   "trunk_said": "78",
+   "stopped_said": "78",
+   "stopped_at": 0.841,
+   "correct": true,
+   "conclusions": 1
+  },
+  {
+   "answer": "45",
+   "trunk_said": "50",
+   "stopped_said": "50",
+   "stopped_at": 1.0,
+   "correct": false,
+   "conclusions": 0
+  },
+  {
+   "answer": "35",
+   "trunk_said": "35",
+   "stopped_said": "35",
+   "stopped_at": 0.198,
+   "correct": true,
+   "conclusions": 34
+  },
+  {
+   "answer": "2",
+   "trunk_said": "2",
+   "stopped_said": "2",
+   "stopped_at": 0.519,
+   "correct": true,
+   "conclusions": 1
+  },
+  {
+   "answer": "84",
+   "trunk_said": "84",
+   "stopped_said": "84",
+   "stopped_at": 0.629,
+   "correct": true,
+   "conclusions": 4
+  },
+  {
+   "answer": "9",
+   "trunk_said": "9",
+   "stopped_said": "9",
+   "stopped_at": 0.747,
+   "correct": true,
+   "conclusions": 2
+  },
+  {
+   "answer": "71",
+   "trunk_said": "71",
+   "stopped_said": "71",
+   "stopped_at": 0.192,
+   "correct": true,
+   "conclusions": 13
+  },
+  {
+   "answer": "18",
+   "trunk_said": "18",
+   "stopped_said": "18",
+   "stopped_at": 0.501,
+   "correct": true,
+   "conclusions": 3
+  },
+  {
+   "answer": "6",
+   "trunk_said": "1",
+   "stopped_said": "1",
+   "stopped_at": 1.0,
+   "correct": false,
+   "conclusions": 0
+  },
+  {
+   "answer": "30",
+   "trunk_said": "30",
+   "stopped_said": "30",
+   "stopped_at": 0.598,
+   "correct": true,
+   "conclusions": 2
+  },
+  {
+   "answer": "1",
+   "trunk_said": "1.00",
+   "stopped_said": "1.00",
+   "stopped_at": 0.373,
+   "correct": true,
+   "conclusions": 5
+  },
+  {
+   "answer": "1200",
+   "trunk_said": "1200",
+   "stopped_said": "1200",
+   "stopped_at": 0.617,
+   "correct": true,
+   "conclusions": 2
+  },
+  {
+   "answer": "120",
+   "trunk_said": "300",
+   "stopped_said": "300",
+   "stopped_at": 1.0,
+   "correct": false,
+   "conclusions": 0
+  },
+  {
+   "answer": "4",
+   "trunk_said": "4",
+   "stopped_said": "4",
+   "stopped_at": 0.603,
+   "correct": true,
+   "conclusions": 3
+  },
+  {
+   "answer": "3",
+   "trunk_said": "3",
+   "stopped_said": "3",
+   "stopped_at": 0.713,
+   "correct": true,
+   "conclusions": 1
+  },
+  {
+   "answer": "80",
+   "trunk_said": "80",
+   "stopped_said": "80",
+   "stopped_at": 1.0,
+   "correct": true,
+   "conclusions": 0
+  },
+  {
+   "answer": "6",
+   "trunk_said": "6",
+   "stopped_said": "6",
+   "stopped_at": 0.378,
+   "correct": true,
+   "conclusions": 5
+  },
+  {
+   "answer": "10",
+   "trunk_said": "10",
+   "stopped_said": "10",
+   "stopped_at": 0.357,
+   "correct": true,
+   "conclusions": 16
+  },
+  {
+   "answer": "80",
+   "trunk_said": "80",
+   "stopped_said": "80",
+   "stopped_at": 0.252,
+   "correct": true,
+   "conclusions": 16
+  },
+  {
+   "answer": "20",
+   "trunk_said": "20",
+   "stopped_said": "20",
+   "stopped_at": 0.22,
+   "correct": true,
+   "conclusions": 7
+  },
+  {
+   "answer": "5",
+   "trunk_said": "5",
+   "stopped_said": "5",
+   "stopped_at": 0.745,
+   "correct": true,
+   "conclusions": 4
+  },
+  {
+   "answer": "20",
+   "trunk_said": "20",
+   "stopped_said": "20",
+   "stopped_at": 0.978,
+   "correct": true,
+   "conclusions": 1
+  },
+  {
+   "answer": "621",
+   "trunk_said": "621",
+   "stopped_said": "600",
+   "stopped_at": 0.804,
+   "correct": false,
+   "conclusions": 2
+  },
+  {
+   "answer": "15400",
+   "trunk_said": "15400",
+   "stopped_said": "15400",
+   "stopped_at": 0.258,
+   "correct": true,
+   "conclusions": 5
+  },
+  {
+   "answer": "11",
+   "trunk_said": "11",
+   "stopped_said": "11",
+   "stopped_at": 0.318,
+   "correct": true,
+   "conclusions": 7
+  },
+  {
+   "answer": "84",
+   "trunk_said": "84",
+   "stopped_said": "84",
+   "stopped_at": 0.529,
+   "correct": true,
+   "conclusions": 6
+  },
+  {
+   "answer": "26",
+   "trunk_said": "26",
+   "stopped_said": "26",
+   "stopped_at": 0.271,
+   "correct": true,
+   "conclusions": 19
+  },
+  {
+   "answer": "40",
+   "trunk_said": "40",
+   "stopped_said": "40",
+   "stopped_at": 1.0,
+   "correct": true,
+   "conclusions": 0
+  },
+  {
+   "answer": "240",
+   "trunk_said": "240",
+   "stopped_said": "240",
+   "stopped_at": 0.398,
+   "correct": true,
+   "conclusions": 8
+  },
+  {
+   "answer": "220",
+   "trunk_said": "220",
+   "stopped_said": "220",
+   "stopped_at": 0.707,
+   "correct": true,
+   "conclusions": 3
+  },
+  {
+   "answer": "6",
+   "trunk_said": "6",
+   "stopped_said": "6",
+   "stopped_at": 0.439,
+   "correct": true,
+   "conclusions": 5
+  },
+  {
+   "answer": "4",
+   "trunk_said": "4",
+   "stopped_said": "4",
+   "stopped_at": 0.271,
+   "correct": true,
+   "conclusions": 12
+  },
+  {
+   "answer": "6",
+   "trunk_said": "6",
+   "stopped_said": "6",
+   "stopped_at": 0.757,
+   "correct": true,
+   "conclusions": 2
+  },
+  {
+   "answer": "-10",
+   "trunk_said": "-10",
+   "stopped_said": "-10",
+   "stopped_at": 0.393,
+   "correct": true,
+   "conclusions": 5
+  },
+  {
+   "answer": "4",
+   "trunk_said": "4",
+   "stopped_said": "4",
+   "stopped_at": 0.78,
+   "correct": true,
+   "conclusions": 2
+  },
+  {
+   "answer": "16",
+   "trunk_said": "16",
+   "stopped_said": "16",
+   "stopped_at": 0.801,
+   "correct": true,
+   "conclusions": 3
+  },
+  {
+   "answer": "32",
+   "trunk_said": "32",
+   "stopped_said": "3",
+   "stopped_at": 0.568,
+   "correct": false,
+   "conclusions": 5
+  },
+  {
+   "answer": "25",
+   "trunk_said": "25",
+   "stopped_said": "25",
+   "stopped_at": 1.0,
+   "correct": true,
+   "conclusions": 0
+  },
+  {
+   "answer": "21",
+   "trunk_said": "6",
+   "stopped_said": "6",
+   "stopped_at": 1.0,
+   "correct": false,
+   "conclusions": 0
+  },
+  {
+   "answer": "200",
+   "trunk_said": "200",
+   "stopped_said": "200",
+   "stopped_at": 1.0,
+   "correct": true,
+   "conclusions": 0
+  },
+  {
+   "answer": "38",
+   "trunk_said": "38",
+   "stopped_said": "38",
+   "stopped_at": 1.0,
+   "correct": true,
+   "conclusions": 0
+  },
+  {
+   "answer": "112",
+   "trunk_said": "28",
+   "stopped_said": "28",
+   "stopped_at": 1.0,
+   "correct": false,
+   "conclusions": 0
+  },
+  {
+   "answer": "40",
+   "trunk_said": "40",
+   "stopped_said": "40",
+   "stopped_at": 0.63,
+   "correct": true,
+   "conclusions": 3
+  },
+  {
+   "answer": "10",
+   "trunk_said": "10",
+   "stopped_said": "10",
+   "stopped_at": 0.499,
+   "correct": true,
+   "conclusions": 2
+  }
+ ],
+ "command": "scripts/stop_reading.py --reading readings/maths-20261029T205854Z.json --arm cot:2048 --kind maths --note GSM8K thoughts at a 2048 budget",
+ "sha": "84b40b67",
+ "taken_at": "20261029T205922Z",
+ "note": "GSM8K thoughts at a 2048 budget"
+}

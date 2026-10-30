@@ -421,7 +421,9 @@ Each step says what it decides. A step is struck when it is done.
     answered); forgetting as the adapter trains on (replay from the store, step 7, adapters a
     domain routed by the trunk's state, John's idea, and a fixed held-out set of every
     earlier task re-read each round, the regression check; not yet built); running out of
-    problems (generators with keys; not yet built).
+    problems (generators with keys; not yet built). The round is run by scripts/loop.py: rollouts,
+    features, fit, adapter, search, each a script of its own behind flags (--no-adapter, --fetch),
+    a stage whose output exists skipped, the server started and stopped around the rollouts.
 
 4. **Writing.** What goes in a row: the raw sentence, or the trunk's own restatement with
    names resolved ("John is in the hallway", not "he went there"), one fact a row. Rows carry

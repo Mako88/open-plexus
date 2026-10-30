@@ -96,12 +96,18 @@ def main() -> None:
         gradient_checkpointing=True, gradient_checkpointing_kwargs={"use_reentrant": False},
         logging_steps=1, save_steps=args.save_steps, save_total_limit=2, report_to="none",
         chat_template_kwargs={"enable_thinking": args.mode == "think"}, mask_truncated_completions=True,
-        model_init_kwargs={"dtype": torch.float32}, log_completions=False, bf16=False, fp16=False,
+        log_completions=False, bf16=False, fp16=False,
         torch_empty_cache_steps=1,
     )
     peft = LoraConfig(r=args.rank, lora_alpha=2 * args.rank, lora_dropout=0.0, target_modules=TARGETS,
                       task_type="CAUSAL_LM")
-    trainer = GRPOTrainer(model=args.model, reward_funcs=[correct, answer_line], args=config,
+    from transformers import AutoModelForCausalLM, AutoTokenizer
+
+    # the text model and its tokenizer, loaded here: given the name, TRL reaches for the trunk's
+    # vision processor, which needs image libraries this project does not carry
+    model = AutoModelForCausalLM.from_pretrained(args.model, dtype=torch.float32)
+    tok = AutoTokenizer.from_pretrained(args.model)
+    trainer = GRPOTrainer(model=model, processing_class=tok, reward_funcs=[correct, answer_line], args=config,
                           train_dataset=data, peft_config=peft)
     last = sorted(out.glob("checkpoint-*"), key=lambda d: int(d.name.split("-")[1]))
     started = time.perf_counter()

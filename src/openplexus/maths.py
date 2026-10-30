@@ -27,10 +27,12 @@ PYTHON_SYSTEM = (
 )
 
 
-def problems(n: int | None = None) -> list[dict]:
-    """The test problems, each {"question", "answer"} with the answer as the gold number."""
+def problems(n: int | None = None, split: str = "test") -> list[dict]:
+    """The problems of a split, each {"question", "answer"} with the answer as the gold number.
+    Readings are on "test"; "train" (7,473 problems, the same source) is for the system's own
+    rollouts, so nothing it learns from is a problem it is read on."""
     out = []
-    with open(ROOT / "data" / "gsm8k" / "test.jsonl", encoding="utf-8") as f:
+    with open(ROOT / "data" / "gsm8k" / f"{split}.jsonl", encoding="utf-8") as f:
         for i, line in enumerate(f):
             if n is not None and i >= n:
                 break

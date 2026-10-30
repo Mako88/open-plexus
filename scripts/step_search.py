@@ -91,9 +91,15 @@ def arm(spec: str, ps: list[dict], trunk, evaluator: LinearHead, args) -> dict:
                        "passes": round(passes, 1)}
                 done[p["question"]] = row
                 f.write(json.dumps(row, ensure_ascii=False) + "\n")
-        print(f"{spec} {min(at + args.parallel, len(todo))}/{len(todo)} "
-              f"running {sum(done[p['question']]['correct'] for p in ps[:len(done)]) / len(done):.3f}", flush=True)
-    rows = [done[p["question"]] for p in ps]
+        score = sum(done[p["question"]]["correct"] for p in ps[:len(done)]) / len(done)
+        print(f"{spec} {min(at + args.parallel, len(todo))}/{len(todo)} running {score:.3f}", flush=True)
+        if args.reference is not None and len(done) >= args.min_n:
+            se = max((score * (1 - score) / len(done)) ** 0.5, 1e-9)
+            if abs(score - args.reference) > args.clear * se:
+                print(f"{spec} stopped at {len(done)}: {score:.3f} is {abs(score - args.reference) / se:.1f} "
+                      f"standard errors from the reference {args.reference}", flush=True)
+                break
+    rows = [done[p["question"]] for p in ps if p["question"] in done]
     n = len(rows)
     return {
         "kind": kind, "k": k, "beam": beam, "depth": args.depth, "temperature": args.temperature if k > 1 else 0.0,
@@ -105,6 +111,7 @@ def arm(spec: str, ps: list[dict], trunk, evaluator: LinearHead, args) -> dict:
         "unfinished": sum(not r["finished"] for r in rows),
         "steps_per_question": round(sum(len(r["steps"]) for r in rows) / n, 1),
         "passes_per_question": round(sum(r["passes"] for r in rows) / n, 1),
+        "stopped_early": n < len(ps), "reference": args.reference,
         "seconds": round(time.perf_counter() - started, 1), "rows": rows,
     }
 
@@ -121,6 +128,10 @@ def main() -> None:
     p.add_argument("--max-step", type=int, default=48, help="tokens a proposed step may take")
     p.add_argument("--temperature", type=float, default=0.7)
     p.add_argument("--seed", type=int, default=0)
+    p.add_argument("--reference", type=float, default=None,
+                   help="a score to be told from: an arm stops once it is --clear standard errors from it")
+    p.add_argument("--min-n", type=int, default=100, help="questions read before an arm may stop")
+    p.add_argument("--clear", type=float, default=2.5)
     p.add_argument("--note", default="")
     args = p.parse_args()
 

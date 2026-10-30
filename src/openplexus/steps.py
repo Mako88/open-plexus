@@ -115,6 +115,44 @@ def answer_of(step: str) -> str | None:
     return number_in(m.group(1)) if m else None
 
 
+def rollout_many(starts: list[tuple[str, list[str]]], propose_many, answer_many,
+                 depth: int = 10) -> list[list[str]]:
+    """Each start, (problem, steps so far), continued by the trunk's own next steps, one a
+    round, until an answer line or `depth` more steps; a path still open then, or one the trunk
+    can only extend with a step already on it, is closed with the trunk's forced answer line
+    from `answer_many([(problem, steps), ...])`. In lockstep so the trunk is asked in batches.
+    Returns the steps added to each start, the last of them an answer line. This is how a
+    candidate step is labelled by outcome: roll it out several times and count the right
+    answers."""
+    paths = [list(s) for _, s in starts]
+    added: list[list[str]] = [[] for _ in starts]
+    live = list(range(len(starts)))
+    to_close: list[int] = []
+    for _ in range(depth):
+        if not live:
+            break
+        proposals = propose_many([(starts[i][0], paths[i]) for i in live], 1)
+        still = []
+        for i, cands in zip(live, proposals):
+            c = clean_step(cands[0]) if cands else ""
+            if not c or c in paths[i]:
+                to_close.append(i)
+                continue
+            paths[i].append(c)
+            added[i].append(c)
+            if answer_of(c) is None:
+                still.append(i)
+        live = still
+    to_close.extend(live)
+    if to_close:
+        answers = answer_many([(starts[i][0], paths[i]) for i in to_close])
+        for i, a in zip(to_close, answers):
+            a = clean_step(a)
+            paths[i].append(a)
+            added[i].append(a)
+    return added
+
+
 class Path:
     """A partial solution under search: its steps, the evaluator's score of each, and whether
     its last step is an answer line. Paths are compared by mean score a step, as in the path

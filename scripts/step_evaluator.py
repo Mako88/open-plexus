@@ -32,6 +32,7 @@ sys.path.insert(0, str(ROOT / "src"))
 
 from openplexus.heads import LinearHead  # noqa: E402
 from openplexus.steps import judge_prompt, prm_examples  # noqa: E402
+from openplexus.trunk import states_resumable  # noqa: E402
 
 SPLITS = ("fit", "held", "test")
 
@@ -39,20 +40,6 @@ SPLITS = ("fit", "held", "test")
 def sha() -> str:
     return subprocess.run(["git", "rev-parse", "--short", "HEAD"], capture_output=True, text=True,
                           cwd=ROOT).stdout.strip()
-
-
-def states_resumable(trunk, prompts: list[str], layers: list[int], part: Path, chunk: int = 256) -> dict:
-    dim = int(trunk.model.config.get_text_config().hidden_size)
-    done = min([part.with_suffix(f".l{layer}.f32").stat().st_size // 4 // dim
-                for layer in layers if part.with_suffix(f".l{layer}.f32").exists()] or [0])
-    for at in range(done, len(prompts), chunk):
-        h = trunk.hidden(prompts[at:at + chunk], layers)
-        for layer in layers:
-            with open(part.with_suffix(f".l{layer}.f32"), "ab") as f:
-                f.write(h[layer].astype(np.float32).tobytes())
-        print(f"  {part.name} {min(at + chunk, len(prompts))}/{len(prompts)}", flush=True)
-    return {layer: np.fromfile(part.with_suffix(f".l{layer}.f32"), dtype=np.float32).reshape(len(prompts), -1)
-            for layer in layers}
 
 
 def build_features(args) -> None:
@@ -154,10 +141,17 @@ def fit(args) -> None:
         "wrong_candidates_failed": round(float(np.mean(sc[y_test < 0] <= tau)), 3),
         "neutral_candidates_passed": round(float(np.mean(sc[rating == 0] > tau)), 3) if (rating == 0).any() else None,
     }
+    also = None
+    if args.also_test:
+        other = dict(np.load(Path(args.also_test) / "test.npz"))
+        sc2, y2 = evaluator.query(other[f"l{layer}"])[:, 0], other["cand_label"]
+        also = {"features": args.also_test, "n": int(len(y2)),
+                "balanced_accuracy": round(balanced_accuracy(sc2, y2, tau), 3), "auc": round(auc(sc2, y2), 3)}
+        print("also on", args.also_test, json.dumps(also))
     reading = {
         "kind": "step-evaluator-fit", "step": 3, "features": {"path": str(feats), **about},
         "chosen": {"layer": layer, "lam": lam, "threshold": round(tau, 4)}, "sweep": sweep,
-        "test": test, "chance": {"balanced_accuracy": 0.5, "auc": 0.5},
+        "test": test, "also_test": also, "chance": {"balanced_accuracy": 0.5, "auc": 0.5},
         "evaluator_path": str(out / "evaluator.npz"), "command": " ".join(sys.argv), "sha": sha(),
         "taken_at": datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ"), "note": args.note,
     }
@@ -186,6 +180,7 @@ def main() -> None:
     g.add_argument("--out", default="state/steps")
     g.add_argument("--layers", default=None)
     g.add_argument("--lams", default="1,10,100,1000,10000")
+    g.add_argument("--also-test", default=None, help="another features dir whose test split the head is read on")
     g.add_argument("--note", default="")
     g.set_defaults(run=fit)
     args = p.parse_args()

@@ -69,6 +69,46 @@ class ServedTrunk:
         reading's rows: a stop over the thinking stream is read first on recorded thoughts."""
         return self.thoughts.get(id(messages))
 
+    def propose(self, prompts: list[list[dict]], k: int, temperature: float, max_new: int,
+                prefix: str = "", seed: int = 0, model_id: str = "Qwen/Qwen3.5-2B") -> list[list[str]]:
+        """As `LocalTrunk.propose`, on the server: k one-line replies to each turn, sampled at
+        `temperature` with seeds `seed`, `seed + 1`, ... (greedy at 0), the reply started with
+        `prefix`. The chat template is rendered here with the model's tokenizer and sent to the
+        server's raw completion endpoint, since a chat request cannot start the reply; thinking
+        is off in the rendered template."""
+        if not hasattr(self, "_tok"):
+            from transformers import AutoTokenizer
+
+            self._tok = AutoTokenizer.from_pretrained(model_id)
+        base = self.url.rsplit("/", 2)[0] + "/completion"
+
+        def one(job):
+            text, j = job
+            body = json.dumps({"prompt": text, "n_predict": max_new, "temperature": temperature,
+                               "seed": seed + j, "stop": ["\n"], "cache_prompt": True}).encode()
+            req = urllib.request.Request(base, body, {"Content-Type": "application/json"})
+            for attempt in range(5):
+                try:
+                    with urllib.request.urlopen(req, timeout=600) as resp:
+                        reply = json.loads(resp.read())
+                    break
+                except Exception:  # noqa: BLE001
+                    if attempt == 4:
+                        raise
+                    time.sleep(2 ** attempt)
+            self.tokens_in += int(reply.get("tokens_evaluated", 0))
+            self.tokens_out += int(reply.get("tokens_predicted", 0))
+            return prefix + reply.get("content", "").split("\n")[0].rstrip()
+
+        jobs = []
+        for m in prompts:
+            text = self._tok.apply_chat_template(m, tokenize=False, add_generation_prompt=True,
+                                                 enable_thinking=False) + prefix
+            jobs.extend((text, j) for j in range(k))
+        with ThreadPoolExecutor(max_workers=self.parallel) as pool:
+            replies = list(pool.map(one, jobs))
+        return [replies[i * k:(i + 1) * k] for i in range(len(prompts))]
+
 
 def question_messages(rows: list[str], question: str) -> list[dict]:
     """The same turn as step 0's ceiling, so a store arm and the ceiling differ only in which
@@ -170,3 +210,22 @@ class LocalTrunk:
     def close(self) -> None:
         del self.model
         self.torch.cuda.empty_cache()
+
+
+def states_resumable(trunk: LocalTrunk, prompts: list[str], layers: list[int], part, chunk: int = 256) -> dict:
+    """`trunk.hidden` over many prompts with the rows appended to `<part>.l<layer>.f32` as each
+    chunk finishes, so a run killed for the card resumes at the rows done. Returns the states
+    by layer, one row a prompt."""
+    import numpy as np
+
+    dim = int(trunk.model.config.get_text_config().hidden_size)
+    done = min([part.with_suffix(f".l{layer}.f32").stat().st_size // 4 // dim
+                for layer in layers if part.with_suffix(f".l{layer}.f32").exists()] or [0])
+    for at in range(done, len(prompts), chunk):
+        h = trunk.hidden(prompts[at:at + chunk], layers)
+        for layer in layers:
+            with open(part.with_suffix(f".l{layer}.f32"), "ab") as f:
+                f.write(h[layer].astype(np.float32).tobytes())
+        print(f"  {part.name} {min(at + chunk, len(prompts))}/{len(prompts)}", flush=True)
+    return {layer: np.fromfile(part.with_suffix(f".l{layer}.f32"), dtype=np.float32).reshape(len(prompts), -1)
+            for layer in layers}

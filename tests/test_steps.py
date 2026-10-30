@@ -7,8 +7,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "src"))
 
-from openplexus.steps import (answer_of, clean_step, judge_prompt, prm_examples, search_many,  # noqa: E402
-                              step_messages)
+from openplexus.steps import (answer_of, clean_step, judge_prompt, prm_examples, rollout_many,  # noqa: E402
+                              search_many, step_messages)
 
 
 def test_candidates_load_with_their_steps_so_far_and_a_label():
@@ -91,6 +91,26 @@ def test_a_candidate_that_repeats_a_step_on_its_path_is_dropped():
     assert best[0].steps == ["a step 0"] and best[0].done and best[0].answer() is None
     assert best[1].steps == ["b step 0", "b step 1", "b step 2"]
     assert asked == ["a step 0", "b step 0", "b step 1", "b step 2"]
+
+
+def test_a_rollout_runs_to_an_answer_line_or_is_closed_with_a_forced_one():
+    # "a" answers on its own; "b" repeats itself and is closed; "c" runs out of depth and is closed
+    def propose(asks, k):
+        out = []
+        for problem, steps in asks:
+            out.append([{"a": ["a1", "Answer: 4"], "b": ["b1", "b1"], "c": ["c1", "c2", "c3", "c4"]}
+                        [problem][min(len(steps), 3)]])
+        return out
+
+    asked = []
+
+    def answer(asks):
+        asked.extend(p for p, _ in asks)
+        return ["Answer: 9" for _ in asks]
+
+    added = rollout_many([("a", []), ("b", []), ("c", [])], propose, answer, depth=3)
+    assert added == [["a1", "Answer: 4"], ["b1", "Answer: 9"], ["c1", "c2", "c3", "Answer: 9"]]
+    assert asked == ["b", "c"]
 
 
 def test_a_path_the_trunk_cannot_extend_ends_without_an_answer():

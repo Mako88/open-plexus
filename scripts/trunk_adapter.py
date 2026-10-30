@@ -84,6 +84,8 @@ def main() -> None:
     p.add_argument("--max-tokens", type=int, default=640, help="a turn longer than this is dropped")
     p.add_argument("--checkpoint-minutes", type=float, default=4.0)
     p.add_argument("--eval-every", type=int, default=50, help="optimiser steps between held-out losses")
+    p.add_argument("--patience", type=int, default=3,
+                   help="held-out reads without a new low before training stops; the best adapter is what is kept")
     p.add_argument("--seed", type=int, default=0)
     args = p.parse_args()
 
@@ -110,14 +112,14 @@ def main() -> None:
     model.gradient_checkpointing_enable()
     model.enable_input_require_grads()
     state_file = out / "train_state.json"
-    if (out / "adapter").exists() and state_file.exists():
-        model = PeftModel.from_pretrained(model, out / "adapter", is_trainable=True)
+    if (out / "adapter-last").exists() and state_file.exists():
+        model = PeftModel.from_pretrained(model, out / "adapter-last", is_trainable=True)
         state = json.loads(state_file.read_text(encoding="utf-8"))
         print(f"resuming at step {state['step']}", flush=True)
     else:
         model = get_peft_model(model, LoraConfig(r=args.rank, lora_alpha=args.alpha, lora_dropout=0.05,
                                                  target_modules=TARGETS, task_type="CAUSAL_LM"))
-        state = {"step": 0, "seen": 0, "log": []}
+        state = {"step": 0, "seen": 0, "log": [], "best_step": 0}
     model.print_trainable_parameters()
     params = [q for q in model.parameters() if q.requires_grad]
     opt = torch.optim.AdamW(params, lr=args.lr, weight_decay=0.0)
@@ -149,16 +151,27 @@ def main() -> None:
         return total / max(count, 1)
 
     def save() -> None:
-        model.save_pretrained(out / "adapter")
+        model.save_pretrained(out / "adapter-last")
         torch.save(opt.state_dict(), out / "optimizer.pt")
         state_file.write_text(json.dumps(state), encoding="utf-8")
+
+    def note_held(entry: dict) -> bool:
+        """Record a held-out read; keep the adapter at its lowest held loss as <out>/adapter, the one a
+        reading loads. Returns whether training should stop: `patience` reads without a new low."""
+        state["log"].append(entry)
+        lows = [e["held_loss"] for e in state["log"]]
+        if entry["held_loss"] <= min(lows):
+            model.save_pretrained(out / "adapter")
+            state["best_step"] = entry["step"]
+        since_best = len(lows) - 1 - min(range(len(lows)), key=lambda i: lows[i])
+        return since_best >= args.patience
 
     order_rng = random.Random(args.seed + 1)
     model.train()
     last_save = time.perf_counter()
     started = time.perf_counter()
     if state["step"] == 0:
-        state["log"].append({"step": 0, "held_loss": round(held_loss(), 4)})
+        note_held({"step": 0, "held_loss": round(held_loss(), 4)})
         print(f"step 0 held loss {state['log'][-1]['held_loss']}", flush=True)
     while state["step"] < total_steps:
         epoch = state["seen"] // len(train)
@@ -185,9 +198,13 @@ def main() -> None:
         if state["step"] % 10 == 0:
             print(f"step {state['step']}/{total_steps} loss {loss:.4f}", flush=True)
         if state["step"] % args.eval_every == 0 or state["step"] == total_steps:
-            state["log"].append({"step": state["step"], "train_loss": round(loss, 4),
-                                 "held_loss": round(held_loss(), 4)})
-            print(f"step {state['step']} held loss {state['log'][-1]['held_loss']}", flush=True)
+            stop = note_held({"step": state["step"], "train_loss": round(loss, 4), "held_loss": round(held_loss(), 4)})
+            print(f"step {state['step']} held loss {state['log'][-1]['held_loss']} (best at step {state['best_step']})",
+                  flush=True)
+            if stop:
+                print(f"stopping: no new low in {args.patience} reads", flush=True)
+                save()
+                break
         if time.perf_counter() - last_save > args.checkpoint_minutes * 60 or state["step"] == total_steps:
             save()
             last_save = time.perf_counter()
@@ -198,6 +215,7 @@ def main() -> None:
         "targets": TARGETS, "lr": args.lr, "warmup": args.warmup, "epochs": args.epochs, "batch": args.batch,
         "micro": args.micro,
         "steps": total_steps,
+        "patience": args.patience, "best_step": state["best_step"], "stopped_at": state["step"],
         "log": state["log"], "seconds": round(time.perf_counter() - started, 1), "sha": sha(),
         "command": " ".join(sys.argv),
     }, indent=1), encoding="utf-8")

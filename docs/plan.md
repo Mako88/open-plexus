@@ -8,7 +8,9 @@ training run; a model of that worth on an old consumer card changes who gets to 
 A frontier model does two things with one huge set of weights: it holds what it knows, and it
 reasons by one chain of tokens with no backtracking, a huge evaluator doing a weak search.
 The design here inverts both. Knowledge lives in a store on disk and is learnt by appending.
-Reasoning is a small trained evaluator and search in ordinary code, the way AlphaGo beat
+Reasoning is the trunk's own thought, trained by the system's own outcomes (since 2026-10-30;
+before that a small trained evaluator and search in ordinary code, which read as a harness
+around the trunk), with search in code and tools where they pay, the way AlphaGo beat
 players no network without search could touch, and the way a small model with search over
 its steps matched one fourteen times larger on maths (Snell et al., 2024; on the easy and
 middling problems, not the hard ones, which is the ceiling to beat). Arithmetic and
@@ -35,7 +37,7 @@ fact without a training run. Keep the three apart:
 - **The glue.** The reasoning core, and the part we design. Small heads over the trunk's
   hidden state, trained by gradient descent on the card and kept in training: a walker that
   says which rows to read next, and an evaluator that says whether a candidate step is good.
-  They are the only thing we train.
+  The glue and the trunk's adapter are what we train.
 - **The search.** Ordinary code. It keeps candidate steps, scores them with the evaluator,
   follows the best and backs up from the ones that fail. Its budget is counted in forward
   passes of the trunk, which is the unit chain of thought is also priced in.
@@ -467,6 +469,31 @@ Each step says what it decides. A step is struck when it is done.
     without writing a token; natural on this trunk, whose eighteen linear-attention layers
     already carry a state across tokens, and a coin flip against written thought at this size
     by the published results (Coconut 2024, recurrent-depth transformers 2025).
+  - From the same talk, the tests the design is held to. A brain is also many organs; what
+    makes it one learner is that every part learns from shared signals and they co-adapt, so
+    the test of this design is not how few parts it has but whether its joints learn: the
+    decisions between the parts (how many samples, when to stop, when to fetch, when to
+    compute) are the places learning stops today, and each is to become a learner credited by
+    outcome. An LLM is a cortex slice, not a brain; the store, the judge, the tools and the
+    loop are the missing organs, not a scaffold around a brain. Ensembles of small models buy
+    checking and calibration (agreement, debate, critique, routing: Mixture-of-Agents 2024),
+    not reasoning capacity, which has not been shown to ensemble; the 1991 Mixture of Experts
+    was separate learners under a gate, the modern one slices of one layer. The key-less judge,
+    off the shelf first: a published process reward model (Math-Shepherd 7B, Qwen2.5-Math-PRM
+    7B, Skywork-PRM 1.5B) as a comparison arm for our judge on maths; agreement across samples
+    as the first key-less signal, since it costs only passes; a small preference reward model
+    (Skywork-Reward, ArmoRM) when there is an open-ended task to read it on; generative judges
+    (Prometheus 2, self-taught evaluators, CriticGPT) and written principles (Constitutional
+    AI) after; nothing of our own built for key-less judging until those are read. Known: judges
+    are gamed (reward over-optimisation, 2022) and have tastes (length, position, their own
+    writing, 2024); the fixes are several judges trained differently with disagreement as
+    uncertainty, and the judge refreshed every round. The three inefficiencies of word-stream
+    reasoning and their answers here: every thought squeezed through a token (the latent loop
+    above; this trunk's linear-attention layers already keep a state), no backing up (search in
+    code, a backtrack as a rewarded action), no sense of how long to think (the stop and the
+    budget learnt from outcome, as R1's models learnt to think longer only where it paid).
+    Order: learning before reasoning, since a reasoner that does not learn is a search over a
+    fixed trunk, which is what the step form read as.
 
 4. **Writing.** What goes in a row: the raw sentence, or the trunk's own restatement with
    names resolved ("John is in the hallway", not "he went there"), one fact a row. Rows carry

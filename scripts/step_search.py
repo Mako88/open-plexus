@@ -1,16 +1,19 @@
 """Step 3 on maths: the search over solution steps with the step evaluator, read on GSM8K.
 
-The trunk in PyTorch proposes k next steps for each live partial solution, by sampling; the
+The trunk in PyTorch proposes k next steps for each live partial solution, by sampling, and
+one more candidate at every depth: its answer line, the reply forced to start "Answer:". The
 step evaluator (`step_evaluator.py`) scores each from the trunk's state over the judge prompt;
 the search keeps the best `beam` paths by mean step score until the kept paths end in answer
-lines (`steps.search_many`). Passes a question: tokens generated, plus one prefill a proposal
-and one a judgement. Arms: `search:<k>:<beam>`; `search:1:1` is the control, the trunk's own
-step-by-step with the evaluator choosing nothing, and `random:<k>` draws among k by chance in
-the evaluator's place. Rows are appended to state/ as each chunk of questions finishes, and a
+lines (`steps.search_many`), so the stop is the evaluator preferring the answer line. Passes a
+question: tokens generated, plus one prefill a proposal and one a judgement. Arms:
+`search:<k>:<beam>`, with `search:1:1` the stop alone (one greedy step against the answer line,
+the evaluator choosing between them); `trunk` is the control, the trunk's own greedy
+step-by-step with no answer candidate and the evaluator choosing nothing; `random:<k>` draws
+among the candidates by chance in the evaluator's place. Rows are appended to state/ as each chunk of questions finishes, and a
 re-run with the same arm skips the questions already read. The deployed system has every input:
 the question.
 
-    .venv/Scripts/python scripts/step_search.py --arms search:1:1,search:4:1,search:4:2 --n 500
+    .venv/Scripts/python scripts/step_search.py --arms trunk,search:4:1,search:4:2 --n 500
 
 Writes readings/step-search-*.json. Needs the card to itself.
 """
@@ -39,8 +42,9 @@ from openplexus.steps import STEP_SYSTEM, judge_prompt, search_many, step_messag
 def arm(spec: str, ps: list[dict], trunk, evaluator: LinearHead, args) -> dict:
     parts = spec.split(":")
     kind = parts[0]
-    k = int(parts[1])
+    k = int(parts[1]) if len(parts) > 1 else 1
     beam = int(parts[2]) if len(parts) > 2 else 1
+    answer_candidate = kind != "trunk"
     rng = random.Random(args.seed)
     part = ROOT / "state" / f"step-search-{spec.replace(':', '-')}.part.jsonl"
     done = {}
@@ -53,12 +57,18 @@ def arm(spec: str, ps: list[dict], trunk, evaluator: LinearHead, args) -> dict:
     def propose_many(asks, kk):
         counted["prefills"] += len(asks)
         before = trunk.tokens_out
-        out = trunk.propose([step_messages(p, s) for p, s in asks], kk, args.temperature if kk > 1 else 0.0,
-                            args.max_step)
+        turns = [step_messages(p, s) for p, s in asks]
+        out = trunk.propose(turns, kk, args.temperature if kk > 1 else 0.0, args.max_step)
+        if answer_candidate:
+            counted["prefills"] += len(asks)
+            for cands, ans in zip(out, trunk.propose(turns, 1, 0.0, 16, prefix="Answer:")):
+                cands.extend(ans)
         counted["tokens_out"] += trunk.tokens_out - before
         return out
 
     def judge_many(asks):
+        if kind == "trunk":
+            return [0.0] * len(asks)
         counted["prefills"] += len(asks)
         if kind == "random":
             return [rng.random() for _ in asks]
@@ -87,6 +97,7 @@ def arm(spec: str, ps: list[dict], trunk, evaluator: LinearHead, args) -> dict:
     n = len(rows)
     return {
         "kind": kind, "k": k, "beam": beam, "depth": args.depth, "temperature": args.temperature if k > 1 else 0.0,
+        "answer_candidate_each_depth": answer_candidate,
         "max_step_tokens": args.max_step, "max_steps_shown": args.max_steps, "system_prompt": STEP_SYSTEM, "evaluator": str(args.evaluator),
         "evaluator_layer": evaluator.layer, "served_model": trunk.served_model(),
         "inputs_the_deployed_system_has": "all: the question",
@@ -100,7 +111,7 @@ def arm(spec: str, ps: list[dict], trunk, evaluator: LinearHead, args) -> dict:
 
 def main() -> None:
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    p.add_argument("--arms", default="search:1:1,search:4:1")
+    p.add_argument("--arms", default="trunk,search:4:1")
     p.add_argument("--n", type=int, default=500)
     p.add_argument("--evaluator", default="state/steps/evaluator.npz")
     p.add_argument("--model", default="Qwen/Qwen3.5-2B")

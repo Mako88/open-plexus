@@ -24,8 +24,14 @@ PRM = ROOT / "data" / "prm800k"
 
 STEP_SYSTEM = (
     "Solve the problem one step at a time. Reply with only the next step of the solution: one "
-    "sentence that names a quantity and works out its number. When the steps so far already "
-    "give the final answer, reply with 'Answer: N' where N is the final number, and nothing else."
+    "sentence that names a quantity and works out its number, never a step already taken. When "
+    "the steps so far already give the final answer, reply with 'Answer: N' where N is the final "
+    "number, and nothing else.\n"
+    "Example. Problem: Tom buys 3 pens at 2 dollars each and pays with a 10 dollar note. What is "
+    "his change?\nSteps so far:\n(none yet)\nNext step: The pens cost 3 * 2 = 6 dollars.\n"
+    "Steps so far:\n1. The pens cost 3 * 2 = 6 dollars.\nNext step: His change is 10 - 6 = 4 "
+    "dollars.\nSteps so far:\n1. The pens cost 3 * 2 = 6 dollars.\n2. His change is 10 - 6 = 4 "
+    "dollars.\nNext step: Answer: 4"
 )
 
 
@@ -80,9 +86,21 @@ def steps_text(steps: list[str], last: int | None = None) -> str:
 
 def judge_prompt(problem: str, steps: list[str], candidate: str, last: int | None = None) -> str:
     """What the trunk reads before its state is taken: the problem, the steps so far (the last
-    `last` of them if given), the candidate, and a cue that a judgement follows."""
+    `last` of them if given), the candidate, and a cue that a judgement follows. An answer line
+    is shown as PRM800K writes its final step, "# Answer" and the number on its own line, so
+    the evaluator meets the search's answers in the form it was trained on."""
+    answer = answer_of(candidate)
+    if answer is not None:
+        candidate = f"# Answer\n\n{answer}"
     return (f"Problem: {problem}\nSolution so far:\n{steps_text(steps, last)}Next step: {candidate}\n"
             "Is the next step right:")
+
+
+def clean_step(text: str) -> str:
+    """A proposed step as one line without the list numbering the trunk copies from the steps
+    so far ("4. 4. Multiply ..." was seen), nor the "Next step:" it copies from the turn."""
+    line = re.sub(r"^\s*next step\s*:\s*", "", text.strip().split("\n")[0], flags=re.I)
+    return re.sub(r"^(\s*\d+[.)]\s*)+", "", line).strip()
 
 
 def step_messages(problem: str, steps: list[str]) -> list[dict]:
@@ -121,8 +139,10 @@ def search_many(problems: list[str], propose_many, judge_many, k: int = 4, beam:
     for each; `judge_many([(problem, steps, candidate), ...])` returns the evaluator's score of
     each. At every depth each live path is extended by its candidates, every path is scored by
     mean step score, and the best `beam` are kept, finished paths among them; the search ends
-    when the kept paths are all finished or the depth is spent. Returns the best path a problem.
-    With k=1 and beam=1 the evaluator chooses nothing: that is the control."""
+    when the kept paths are all finished or the depth is spent. A candidate that repeats a step
+    already on its path is dropped: the trunk re-emits its last step when it has nothing to add,
+    and a judge trained on PRM800K rates a repeat as right. Returns the best path a problem.
+    With one candidate a step the evaluator chooses nothing: that is the control."""
     beams: list[list[Path]] = [[Path([], [])] for _ in problems]
     for _ in range(depth):
         asks = [(i, p) for i, b in enumerate(beams) for p in b if not p.done]
@@ -131,9 +151,10 @@ def search_many(problems: list[str], propose_many, judge_many, k: int = 4, beam:
         proposals = propose_many([(problems[i], p.steps) for i, p in asks], k)
         judge_asks, owners = [], []
         for (i, p), cands in zip(asks, proposals):
-            for c in dict.fromkeys(c.strip() for c in cands if c.strip()):
-                judge_asks.append((problems[i], p.steps, c))
-                owners.append((i, p))
+            for c in dict.fromkeys(clean_step(c) for c in cands):
+                if c and c not in p.steps:
+                    judge_asks.append((problems[i], p.steps, c))
+                    owners.append((i, p))
         scores = judge_many(judge_asks) if judge_asks else []
         children: list[list[Path]] = [[] for _ in problems]
         for (i, p), (_, _, c), s in zip(owners, judge_asks, scores):

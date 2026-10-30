@@ -124,15 +124,17 @@ class LocalTrunk:
             out.extend(self.tok.decode(ids, skip_special_tokens=True).strip() for ids in new)
         return out
 
-    def propose(self, prompts: list[list[dict]], k: int, temperature: float, max_new: int) -> list[list[str]]:
+    def propose(self, prompts: list[list[dict]], k: int, temperature: float, max_new: int,
+                prefix: str = "") -> list[list[str]]:
         """k replies to each turn, sampled at `temperature` (greedy when it is 0 or k is 1),
         for a search that wants several candidate next steps; one line each, the first line
-        kept."""
+        kept. `prefix` starts the reply for the trunk ("Answer:" makes it finish), and is part
+        of what comes back."""
         out: list[list[str]] = []
         sample = temperature > 0 and k > 1
         for i in range(0, len(prompts), self.batch):
             texts = [self.tok.apply_chat_template(m, tokenize=False, add_generation_prompt=True,
-                                                  enable_thinking=False)
+                                                  enable_thinking=False) + prefix
                      for m in prompts[i:i + self.batch]]
             enc = self.tok(texts, return_tensors="pt", padding=True).to("cuda")
             with self.torch.no_grad():
@@ -143,7 +145,7 @@ class LocalTrunk:
             new = gen[:, enc["input_ids"].shape[1]:]
             self.tokens_in += int(enc["attention_mask"].sum())
             self.tokens_out += int((new != self.tok.pad_token_id).sum())
-            replies = [self.tok.decode(ids, skip_special_tokens=True).strip().split("\n")[0].strip()
+            replies = [prefix + self.tok.decode(ids, skip_special_tokens=True).split("\n")[0].rstrip()
                        for ids in new]
             per = k if sample else 1
             out.extend(replies[j * per:(j + 1) * per] for j in range(len(texts)))

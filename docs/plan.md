@@ -455,6 +455,18 @@ Each step says what it decides. A step is struck when it is done.
     every question answered; between the step form's 0.364 at 102 and the thinking's 0.85 at
     1,950. Round one, a thousand training problems, four solutions each, is running; its
     reading is the same arm with the trained adapter against 0.736, the early stop on.
+  - Two principles from the talk with John 2026-10-30, for after the loop runs. The system is
+    several learners over a shared state, each credited for the difference its action made to
+    the outcome (counterfactual credit: the step by paths through it, the fetch by the solution
+    with and without it, the stop by the answer when it stopped), the trunk itself trained on
+    the final outcome; the trunk is not made the sole decider, since every decision would then
+    be capped by a 2B's text policy, and a judge with its own representation (a published 1.5B
+    process reward model, or a second small model) is on the table. And the reasoning fork,
+    held until learning works: a clock for the trunk, a loop over its own state driven by a
+    small trained adapter with the outcome as the reward, so it can take a step of thought
+    without writing a token; natural on this trunk, whose eighteen linear-attention layers
+    already carry a state across tokens, and a coin flip against written thought at this size
+    by the published results (Coconut 2024, recurrent-depth transformers 2025).
 
 4. **Writing.** What goes in a row: the raw sentence, or the trunk's own restatement with
    names resolved ("John is in the hallway", not "he went there"), one fact a row. Rows carry

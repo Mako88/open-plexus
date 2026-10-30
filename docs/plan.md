@@ -349,10 +349,12 @@ Each step says what it decides. A step is struck when it is done.
     line with the evaluator choosing, 0.252 at 105, every path finished; the four-way search,
     four sampled steps and the answer line a depth, the evaluator keeping the best, **0.363 at
     538 passes** over 256 problems, ended early as indistinguishable from the control; the
-    chance judge, the same search with random numbers for the evaluator, pending. So the
-    PRM800K-trained evaluator choosing among four of the trunk's steps buys nothing over the
-    trunk's first choice at five times the passes, and the stop folded into it fires too
-    early. The rows say why: it scores a bare restatement of a given fact highest of all
+    chance judge, the same search with random numbers for the evaluator, 0.25 at 380 passes,
+    stopped at 104 problems as 2.7 standard errors below the search. So the evaluator's
+    choices do real work, lifting a random pick from 0.25 to the trunk's own greedy 0.36, and
+    no further: the PRM800K-trained evaluator choosing among four of the trunk's steps buys
+    nothing over the trunk's first choice at five times the passes, and the stop folded into
+    it fires too early. The rows say why: it scores a bare restatement of a given fact highest
     ("Seattle has 20 sheep", 1.21) and accepts an answer line right after one, because
     PRM800K's "reasonable, no progress" steps were labelled good; and a 2B trunk's four
     samples at one step rarely include a step it would not have taken anyway. Against the

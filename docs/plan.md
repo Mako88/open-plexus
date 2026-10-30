@@ -447,7 +447,14 @@ Each step says what it decides. A step is struck when it is done.
     flag. Round one's adapter arm (fork b, filtered steps, the ReST-EM shape) is read on the
     trunk alone against 0.364 and the step-judge search arms are skipped. What stays ours: the
     store as the primary knowledge and the asking, the continuous life on one card, the system
-    supplying its own problems and checks, and the readings.
+    supplying its own problems and checks, and the readings. The GRPO smoke 2026-10-30: 20 to
+    25 seconds an optimiser step of two problems and eight solutions, 8.7 GiB peak, so an epoch
+    of a thousand problems is about three hours here, days not weeks. Its control
+    (`readings/grpo-20261030T111215Z`, `scripts/grpo_reading.py`): the plain trunk's whole
+    greedy solution under training's prompt, GSM8K test, **0.736 at 237 passes a question**,
+    every question answered; between the step form's 0.364 at 102 and the thinking's 0.85 at
+    1,950. Round one, a thousand training problems, four solutions each, is running; its
+    reading is the same arm with the trained adapter against 0.736, the early stop on.
 
 4. **Writing.** What goes in a row: the raw sentence, or the trunk's own restatement with
    names resolved ("John is in the hallway", not "he went there"), one fact a row. Rows carry

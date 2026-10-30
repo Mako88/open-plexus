@@ -124,7 +124,7 @@ class LocalTrunk:
     what the server cannot give."""
 
     def __init__(self, model_id: str = "Qwen/Qwen3.5-2B", batch: int = 8, max_new: int = 8,
-                 dtype: str = "float32"):
+                 dtype: str = "float32", adapter: str | None = None):
         import torch
         from transformers import AutoModelForCausalLM, AutoTokenizer
 
@@ -137,7 +137,12 @@ class LocalTrunk:
         # float32 on this card: a GTX 1080 Ti has no bfloat16 and slow float16, so a half-precision
         # trunk sits beside the server but runs several times slower; the option is for a newer card
         self.dtype = dtype
+        self.adapter = adapter
         self.model = AutoModelForCausalLM.from_pretrained(model_id, dtype=getattr(torch, dtype))
+        if adapter:  # the search's wins trained into the trunk (scripts/trunk_adapter.py), merged so
+            from peft import PeftModel  # a pass costs what the plain trunk's does
+
+            self.model = PeftModel.from_pretrained(self.model, adapter).merge_and_unload()
         self.model = self.model.to("cuda").eval()
         self.batch = batch
         self.max_new = max_new
@@ -145,7 +150,7 @@ class LocalTrunk:
         self.tokens_out = 0
 
     def served_model(self) -> str:
-        return f"{self.model_id} {self.dtype} in process"
+        return f"{self.model_id} {self.dtype} in process" + (f" with adapter {self.adapter}" if self.adapter else "")
 
     def ask_many(self, prompts: list[list[dict]]) -> list[str]:
         out: list[str] = []

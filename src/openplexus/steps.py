@@ -103,10 +103,12 @@ def clean_step(text: str) -> str:
     return re.sub(r"^(\s*\d+[.)]\s*)+", "", line).strip()
 
 
-def step_messages(problem: str, steps: list[str]) -> list[dict]:
-    """The trunk's turn to propose the next step."""
+def step_messages(problem: str, steps: list[str], example: str | None = None) -> list[dict]:
+    """The trunk's turn to propose the next step; with `example`, a solved problem fetched from
+    the store is shown first (`openplexus.fetch`)."""
+    shown = f"A solved problem like this one:\n{example}\n\n" if example else ""
     return [{"role": "system", "content": STEP_SYSTEM},
-            {"role": "user", "content": f"Problem: {problem}\nSteps so far:\n{steps_text(steps)}Next step:"}]
+            {"role": "user", "content": f"{shown}Problem: {problem}\nSteps so far:\n{steps_text(steps)}Next step:"}]
 
 
 def answer_of(step: str) -> str | None:

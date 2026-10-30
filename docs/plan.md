@@ -375,7 +375,11 @@ Each step says what it decides. A step is struck when it is done.
     mechanism itself, untested on the proposer. (e) A trust head beside the evaluator, over the
     same state, predicting whether the evaluator's verdict here will prove right, trained on the
     record of verdicts and outcomes; it chooses when to train, when to search harder and when to
-    ask a tool. John's framing: every decision runs on internal signals, and external signals
+    ask a tool. Read 2026-10-30 on the cached PRM800K states as a linear head over the same
+    state: AUC 0.55 at predicting the evaluator's errors, the trusted half right 0.76 against
+    0.69 for the rest, so the trunk's state does not say when its judge is wrong, and the trust
+    signal has to come from disagreement between judges or the outcome record instead. John's
+    framing: every decision runs on internal signals, and external signals
     exist to correct the internal ones; a signal that stops being corrected drifts.
   - The loop, as talked through with John 2026-10-30. The forks above close one loop: the trunk
     proposes, the evaluator judges, the search finds wins the trunk alone would not, the wins

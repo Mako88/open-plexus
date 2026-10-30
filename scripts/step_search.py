@@ -9,7 +9,10 @@ question: tokens generated, plus one prefill a proposal and one a judgement. Arm
 `search:<k>:<beam>`, with `search:1:1` the stop alone (one greedy step against the answer line,
 the evaluator choosing between them); `trunk` is the control, the trunk's own greedy
 step-by-step with no answer candidate and the evaluator choosing nothing; `random:<k>` draws
-among the candidates by chance in the evaluator's place. Rows are appended to state/ as each chunk of questions finishes, and a
+among the candidates by chance in the evaluator's place. A `:fetch` suffix on any arm shows the trunk the most similar solved
+training problem from the rollout rows before it proposes (`openplexus.fetch`, fork d), and
+`--adapter` loads the trunk with an adapter trained from its wins (fork b); each is read against
+the same arm without it. Rows are appended to state/ as each chunk of questions finishes, and a
 re-run with the same arm skips the questions already read. The deployed system has every input:
 the question.
 
@@ -39,14 +42,19 @@ from openplexus.maths import problems, same_number  # noqa: E402
 from openplexus.steps import STEP_SYSTEM, judge_prompt, search_many, step_messages  # noqa: E402
 
 
-def arm(spec: str, ps: list[dict], trunk, evaluator: LinearHead, args) -> dict:
+def arm(spec: str, ps: list[dict], trunk, evaluator: LinearHead, args, index=None) -> dict:
     parts = spec.split(":")
+    fetch = "fetch" in parts
+    parts = [x for x in parts if x != "fetch"]
     kind = parts[0]
     k = int(parts[1]) if len(parts) > 1 else 1
     beam = int(parts[2]) if len(parts) > 2 else 1
     answer_candidate = kind != "trunk"
+    if fetch and index is None:
+        raise SystemExit(f"{spec} needs --fetch <rollout rows> for the solved problems")
     rng = random.Random(args.seed)
-    part = ROOT / "state" / f"step-search-{spec.replace(':', '-')}.part.jsonl"
+    tag = spec.replace(":", "-") + (f"-{Path(args.adapter).name}" if args.adapter else "")
+    part = ROOT / "state" / f"step-search-{tag}.part.jsonl"
     done = {}
     if part.exists():
         for line in part.read_text(encoding="utf-8").splitlines():
@@ -57,7 +65,8 @@ def arm(spec: str, ps: list[dict], trunk, evaluator: LinearHead, args) -> dict:
     def propose_many(asks, kk):
         counted["prefills"] += len(asks)
         before = trunk.tokens_out
-        turns = [step_messages(p, s) for p, s in asks]
+        examples = index.nearest_many([p for p, _ in asks]) if fetch else [None] * len(asks)
+        turns = [step_messages(p, s, e) for (p, s), e in zip(asks, examples)]
         out = trunk.propose(turns, kk, args.temperature if kk > 1 else 0.0, args.max_step)
         if answer_candidate:
             counted["prefills"] += len(asks)
@@ -103,7 +112,8 @@ def arm(spec: str, ps: list[dict], trunk, evaluator: LinearHead, args) -> dict:
     n = len(rows)
     return {
         "kind": kind, "k": k, "beam": beam, "depth": args.depth, "temperature": args.temperature if k > 1 else 0.0,
-        "answer_candidate_each_depth": answer_candidate,
+        "answer_candidate_each_depth": answer_candidate, "fetch": args.fetch if fetch else None,
+        "adapter": args.adapter,
         "max_step_tokens": args.max_step, "max_steps_shown": args.max_steps, "system_prompt": STEP_SYSTEM, "evaluator": str(args.evaluator),
         "evaluator_layer": evaluator.layer,
         "served_model": trunk.served_model() if trunk else f"{args.model} float32 in process, rows as read",
@@ -133,6 +143,9 @@ def main() -> None:
                    help="a score to be told from: an arm stops once it is --clear standard errors from it")
     p.add_argument("--min-n", type=int, default=100, help="questions read before an arm may stop")
     p.add_argument("--clear", type=float, default=2.5)
+    p.add_argument("--adapter", default=None, help="an adapter dir from trunk_adapter.py, merged into the trunk")
+    p.add_argument("--fetch", default=None,
+                   help="rollout rows whose solved problems a :fetch arm shows the trunk (state/rollouts/train.jsonl)")
     p.add_argument("--as-read", action="store_true",
                    help="write the reading from the rows on disk, searching nothing more: for arms ended early")
     p.add_argument("--note", default="")
@@ -140,16 +153,26 @@ def main() -> None:
 
     ps = problems(args.n)
     evaluator = LinearHead.load(args.evaluator)
+    index = None
+    if args.fetch:
+        from openplexus.embed import MiniLM
+        from openplexus.fetch import SolvedIndex, solved_examples
+
+        rows = [json.loads(line) for line in Path(args.fetch).read_text(encoding="utf-8").splitlines()]
+        embed = MiniLM()
+        index = SolvedIndex(solved_examples(rows), embed)
+        embed.close()
+        print(f"{len(index.examples)} solved problems to fetch from", flush=True)
     if args.as_read:
         trunk = None
     else:
         from openplexus.trunk import LocalTrunk
 
-        trunk = LocalTrunk(args.model, batch=args.parallel)
+        trunk = LocalTrunk(args.model, batch=args.parallel, adapter=args.adapter)
     reading = {"kind": "step-search", "step": 3, "set": "GSM8K test, data/gsm8k/test.jsonl", "n": len(ps),
                "scorer": "the answer line's number, within 1e-6 of the gold", "arms": {}}
     for spec in args.arms.split(","):
-        a = arm(spec, ps, trunk, evaluator, args)
+        a = arm(spec, ps, trunk, evaluator, args, index)
         reading["arms"][spec] = a
         print(f"== {spec}: {a['score']} in {a['seconds']}s, {a['passes_per_question']} passes a question, "
               f"{a['unfinished']} unfinished", flush=True)

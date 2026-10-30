@@ -1,0 +1,178 @@
+{
+ "kind": "step-evaluator-fit",
+ "step": 3,
+ "features": {
+  "path": "state\\features\\rollouts-r1",
+  "model": "Qwen/Qwen3.5-2B float32 in process",
+  "layers": [
+   12,
+   16,
+   20
+  ],
+  "n_rows": 7395,
+  "n_problems": 700,
+  "seed": 0,
+  "prompt": "openplexus.steps.judge_prompt",
+  "max_steps_shown": 6,
+  "labels": "outcome: fraction of rollouts right, +1 at 0.5 or more, -1 below; drawn as many wrong as right",
+  "rollouts": {
+   "set": "GSM8K train, data/gsm8k/train.jsonl",
+   "n_problems": 700,
+   "k": 3,
+   "m": 3,
+   "depth": 5,
+   "rollout_depth": 10,
+   "temperature": 0.7,
+   "max_step_tokens": 64,
+   "served_model": "C:\\Users\\John\\.cache\\huggingface\\hub\\models--bartowski--Qwen_Qwen3.5-2B-GGUF\\snapshots\\7d26695454df6de5fbcce2e58681e62dae06ce43\\Qwen_Qwen3.5-2B-Q8_0.gguf",
+   "label": "fraction of m rollouts from the candidate reaching the gold number; +1 at 0.5 or more",
+   "tokens_out": 768480,
+   "seconds": 14964.7,
+   "sha": "e1783b06",
+   "command": "scripts\\step_rollouts.py rollouts --n 700 --k 3 --m 3 --depth 5 --chunk 16 --parallel 8"
+  },
+  "sizes": {
+   "fit": 3030,
+   "held": 856,
+   "test": 772
+  },
+  "seconds": 519.8,
+  "sha": "a38a9b9a",
+  "command": "scripts\\step_rollouts.py features --out state\\features\\rollouts-r1 --batch 6"
+ },
+ "chosen": {
+  "layer": 16,
+  "lam": 1000.0,
+  "threshold": -0.0584
+ },
+ "sweep": [
+  {
+   "layer": 12,
+   "lam": 1.0,
+   "threshold": 0.0373,
+   "held_balanced_accuracy": 0.637,
+   "held_auc": 0.674
+  },
+  {
+   "layer": 12,
+   "lam": 10.0,
+   "threshold": -0.0571,
+   "held_balanced_accuracy": 0.665,
+   "held_auc": 0.709
+  },
+  {
+   "layer": 12,
+   "lam": 100.0,
+   "threshold": -0.2121,
+   "held_balanced_accuracy": 0.689,
+   "held_auc": 0.741
+  },
+  {
+   "layer": 12,
+   "lam": 1000.0,
+   "threshold": -0.0804,
+   "held_balanced_accuracy": 0.71,
+   "held_auc": 0.774
+  },
+  {
+   "layer": 12,
+   "lam": 10000.0,
+   "threshold": 0.0309,
+   "held_balanced_accuracy": 0.716,
+   "held_auc": 0.782
+  },
+  {
+   "layer": 16,
+   "lam": 1.0,
+   "threshold": 0.1227,
+   "held_balanced_accuracy": 0.641,
+   "held_auc": 0.681
+  },
+  {
+   "layer": 16,
+   "lam": 10.0,
+   "threshold": -0.313,
+   "held_balanced_accuracy": 0.679,
+   "held_auc": 0.722
+  },
+  {
+   "layer": 16,
+   "lam": 100.0,
+   "threshold": -0.1902,
+   "held_balanced_accuracy": 0.711,
+   "held_auc": 0.78
+  },
+  {
+   "layer": 16,
+   "lam": 1000.0,
+   "threshold": -0.0584,
+   "held_balanced_accuracy": 0.741,
+   "held_auc": 0.81
+  },
+  {
+   "layer": 16,
+   "lam": 10000.0,
+   "threshold": 0.1332,
+   "held_balanced_accuracy": 0.723,
+   "held_auc": 0.803
+  },
+  {
+   "layer": 20,
+   "lam": 1.0,
+   "threshold": 0.0945,
+   "held_balanced_accuracy": 0.581,
+   "held_auc": 0.58
+  },
+  {
+   "layer": 20,
+   "lam": 10.0,
+   "threshold": -0.0011,
+   "held_balanced_accuracy": 0.631,
+   "held_auc": 0.656
+  },
+  {
+   "layer": 20,
+   "lam": 100.0,
+   "threshold": -0.0765,
+   "held_balanced_accuracy": 0.69,
+   "held_auc": 0.738
+  },
+  {
+   "layer": 20,
+   "lam": 1000.0,
+   "threshold": 0.0112,
+   "held_balanced_accuracy": 0.725,
+   "held_auc": 0.77
+  },
+  {
+   "layer": 20,
+   "lam": 10000.0,
+   "threshold": -0.073,
+   "held_balanced_accuracy": 0.727,
+   "held_auc": 0.778
+  }
+ ],
+ "test": {
+  "n": 772,
+  "balanced_accuracy": 0.729,
+  "auc": 0.827,
+  "right_candidates_passed": 0.793,
+  "wrong_candidates_failed": 0.666,
+  "neutral_candidates_passed": null
+ },
+ "also_test": {
+  "features": "state/features/steps6",
+  "n": 1500,
+  "balanced_accuracy": 0.574,
+  "auc": 0.59
+ },
+ "chance": {
+  "balanced_accuracy": 0.5,
+  "auc": 0.5
+ },
+ "evaluator_path": "state\\steps-r1\\evaluator.npz",
+ "command": "scripts/step_evaluator.py fit --features state/features/rollouts-r1 --out state/steps-r1 --also-test state/features/steps6 --note round 1: labels from the system's own rollouts, no human label",
+ "sha": "a38a9b9a",
+ "taken_at": "20261030T085449Z",
+ "note": "round 1: labels from the system's own rollouts, no human label"
+}

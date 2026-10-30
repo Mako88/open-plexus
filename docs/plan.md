@@ -364,8 +364,14 @@ Each step says what it decides. A step is struck when it is done.
     labelled by outcome (`scripts/step_rollouts.py`, Math-Shepherd's method): the served trunk
     walks training problems, proposes k steps and an answer line at each, and every candidate
     is labelled by m rollouts to an answer, no human label and no test problem; the evaluator
-    is refitted on them and read on the PRM800K test steps too. Running 2026-10-30 over 700
-    problems. (b) The trunk learns (`scripts/trunk_adapter.py`): a LoRA adapter on its
+    is refitted on them and read on the PRM800K test steps too. Read 2026-10-30
+    (`readings/step-evaluator-fit-20261030T085449Z`): 700 training problems walked, 7,395
+    candidates labelled in four hours, 2,329 right; the forced answer lines 2,566 of them and
+    584 right, so "not yet" is in the labels. The judge fitted on them, layer 16, on 772
+    candidates from problems it never saw: **balanced accuracy 0.729, AUC 0.827**, above the
+    PRM800K judge's 0.727 and 0.79 from fewer labels; on the PRM800K test steps 0.574 and
+    0.59, so a judge learns the distribution it is corrected on and does not carry to
+    competition maths written by humans. (b) The trunk learns (`scripts/trunk_adapter.py`): a LoRA adapter on its
     attention and MLP projections, trained on the step turns the rollouts labelled right,
     merged at load (`LocalTrunk(adapter=)`), the control the same arm without it. Built, not
     run. (c) A learning-progress monitor, the score a problem type over time and search budget

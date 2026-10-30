@@ -373,8 +373,18 @@ Each step says what it decides. A step is struck when it is done.
     0.59, so a judge learns the distribution it is corrected on and does not carry to
     competition maths written by humans. (b) The trunk learns (`scripts/trunk_adapter.py`): a LoRA adapter on its
     attention and MLP projections, trained on the step turns the rollouts labelled right,
-    merged at load (`LocalTrunk(adapter=)`), the control the same arm without it. Built, not
-    run. (c) A learning-progress monitor, the score a problem type over time and search budget
+    merged at load (`LocalTrunk(adapter=)`), the control the same arm without it. Read
+    2026-10-30 (`readings/step-search-20261030T104210Z`): 1,879 turns from 436 problems, the
+    held-out loss 0.359 to 0.264 at its best (step 400 of 700, noisy either side; a first run
+    at the full rate from step one taught the trunk to answer at once, so the rate warms up and
+    the best checkpoint is kept). The trunk with that adapter, its own greedy steps on GSM8K
+    test: **0.307 at 49 passes**, 2.6 standard errors below the plain trunk's 0.364 at 102,
+    stopped at 456 problems. It learnt to be terse: 84 paths answer at the first step (7
+    right) against the plain trunk's 57, since a third of its training turns were answer lines;
+    and it changed a quarter of the outcomes both ways (67 right made wrong, 49 wrong made
+    right), so it learnt, in the wrong direction. The remedy would be at the data, fewer
+    answer-line turns, but the filtered-steps form is not pursued: the pivot below replaces it
+    with the published loop. (c) A learning-progress monitor, the score a problem type over time and search budget
     to the steepest slope; waits for a problem set with types. (d) The store feeding the
     proposer (`openplexus.fetch`, a `:fetch` arm): the system's own solved problems indexed by
     the question, the nearest shown before the trunk proposes, never a question's own solution;

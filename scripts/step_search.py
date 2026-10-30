@@ -161,7 +161,6 @@ def main() -> None:
         rows = [json.loads(line) for line in Path(args.fetch).read_text(encoding="utf-8").splitlines()]
         embed = MiniLM()
         index = SolvedIndex(solved_examples(rows), embed)
-        embed.close()
         print(f"{len(index.examples)} solved problems to fetch from", flush=True)
     if args.as_read:
         trunk = None

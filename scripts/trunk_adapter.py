@@ -74,6 +74,9 @@ def main() -> None:
     p.add_argument("--rank", type=int, default=16)
     p.add_argument("--alpha", type=int, default=32)
     p.add_argument("--lr", type=float, default=1e-4)
+    p.add_argument("--warmup", type=int, default=50,
+                   help="steps over which the learning rate rises to --lr; Adam's first steps are full-sized whatever "
+                        "the gradient, and eight of them at the full rate made the trunk answer at once")
     p.add_argument("--epochs", type=float, default=2.0)
     p.add_argument("--batch", type=int, default=4, help="turns an optimiser step, accumulated")
     p.add_argument("--micro", type=int, default=1,
@@ -171,8 +174,10 @@ def main() -> None:
             x, y, m = batch_of(items[at_micro:at_micro + args.micro])
             part = model(input_ids=x, attention_mask=m, labels=y).loss * (len(x) / len(items))
             part.backward()
-            loss += float(part)
+            loss += float(part.detach())
         torch.nn.utils.clip_grad_norm_(params, 1.0)
+        for group in opt.param_groups:
+            group["lr"] = args.lr * min(1.0, (state["step"] + 1) / max(args.warmup, 1))
         opt.step()
         opt.zero_grad(set_to_none=True)
         state["step"] += 1
@@ -190,7 +195,8 @@ def main() -> None:
     (out / "adapter.json").write_text(json.dumps({
         "model": args.model, "rows": args.rows, "min_fraction": args.min_fraction, "turns": len(data),
         "train": len(train), "held": len(held), "problems": len(indices), "rank": args.rank, "alpha": args.alpha,
-        "targets": TARGETS, "lr": args.lr, "epochs": args.epochs, "batch": args.batch, "micro": args.micro,
+        "targets": TARGETS, "lr": args.lr, "warmup": args.warmup, "epochs": args.epochs, "batch": args.batch,
+        "micro": args.micro,
         "steps": total_steps,
         "log": state["log"], "seconds": round(time.perf_counter() - started, 1), "sha": sha(),
         "command": " ".join(sys.argv),

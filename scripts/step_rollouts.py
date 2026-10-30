@@ -119,6 +119,10 @@ def rollouts(args) -> None:
         right = sum(r["label"] > 0 for r in rows)
         print(f"{n_done}/{len(todo)} problems, {len(rows)} candidates this chunk, {right} labelled right, "
               f"{trunk.tokens_out} tokens out, {time.perf_counter() - started:.0f}s", flush=True)
+        about(args, trunk, ps, started)  # after every chunk, so a run ended early still describes itself
+
+
+def about(args, trunk, ps, started) -> None:
     (ROWS.parent / "rollouts.json").write_text(json.dumps({
         "set": "GSM8K train, data/gsm8k/train.jsonl", "n_problems": len(ps), "k": args.k, "m": args.m,
         "depth": args.depth, "rollout_depth": args.rollout_depth, "temperature": args.temperature,
@@ -187,7 +191,7 @@ def main() -> None:
     r.add_argument("--depth", type=int, default=6, help="steps of the walk")
     r.add_argument("--rollout-depth", type=int, default=10)
     r.add_argument("--temperature", type=float, default=0.7)
-    r.add_argument("--max-step", type=int, default=48)
+    r.add_argument("--max-step", type=int, default=64, help="tokens a step may take; 48 cut long sentences")
     r.add_argument("--chunk", type=int, default=16, help="problems walked in lockstep")
     r.add_argument("--parallel", type=int, default=8, help="requests in flight at the server")
     r.add_argument("--seed", type=int, default=0)

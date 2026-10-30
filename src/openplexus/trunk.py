@@ -80,7 +80,7 @@ class ServedTrunk:
             from transformers import AutoTokenizer
 
             self._tok = AutoTokenizer.from_pretrained(model_id)
-        base = self.url.rsplit("/", 2)[0] + "/completion"
+        base = self.url.rsplit("/", 3)[0] + "/completion"  # at the server root, not under /v1
 
         def one(job):
             text, j = job
@@ -104,7 +104,7 @@ class ServedTrunk:
         for m in prompts:
             text = self._tok.apply_chat_template(m, tokenize=False, add_generation_prompt=True,
                                                  enable_thinking=False) + prefix
-            jobs.extend((text, j) for j in range(k))
+            jobs.extend((text, len(jobs) + j) for j in range(k))  # a seed a request, so repeats of one prompt differ
         with ThreadPoolExecutor(max_workers=self.parallel) as pool:
             replies = list(pool.map(one, jobs))
         return [replies[i * k:(i + 1) * k] for i in range(len(prompts))]

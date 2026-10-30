@@ -340,6 +340,20 @@ Each step says what it decides. A step is struck when it is done.
     So the frozen trunk's state carries a real but middling signal about whether a maths step
     is right; whether that signal, applied k times a step, beats the trunk's own thought is
     the search reading next.
+  - Forks held for after the search reading, agreed with John 2026-10-30, in the order to try
+    them. (a) Label steps by outcome: after a search, every step is marked by whether the paths
+    through it reached the right answer, and the evaluator is refitted on those labels, so the
+    judge learns from the system's own experience and PRM800K falls away (Math-Shepherd's
+    method). (b) The adapter on the trunk trained from the search's wins, the agreed fallback,
+    which this card can train: frozen weights 8 GB, the adapter and its gradients a few hundred
+    MB, checkpoints every few minutes. (c) A learning-progress monitor: the score a problem
+    type over time, with search budget spent where the slope is steepest. (d) The store feeding
+    the proposer: a solved similar problem or a fact fetched into the step prompt, the plexus
+    mechanism itself, untested on the proposer. (e) A trust head beside the evaluator, over the
+    same state, predicting whether the evaluator's verdict here will prove right, trained on the
+    record of verdicts and outcomes; it chooses when to train, when to search harder and when to
+    ask a tool. John's framing: every decision runs on internal signals, and external signals
+    exist to correct the internal ones; a signal that stops being corrected drifts.
 
 4. **Writing.** What goes in a row: the raw sentence, or the trunk's own restatement with
    names resolved ("John is in the hallway", not "he went there"), one fact a row. Rows carry

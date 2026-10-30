@@ -75,7 +75,9 @@ def main() -> None:
     p.add_argument("--alpha", type=int, default=32)
     p.add_argument("--lr", type=float, default=1e-4)
     p.add_argument("--epochs", type=float, default=2.0)
-    p.add_argument("--batch", type=int, default=4)
+    p.add_argument("--batch", type=int, default=4, help="turns an optimiser step, accumulated")
+    p.add_argument("--micro", type=int, default=1,
+                   help="turns a forward pass; the logits over the vocabulary are gigabytes a turn, so one")
     p.add_argument("--max-tokens", type=int, default=640, help="a turn longer than this is dropped")
     p.add_argument("--checkpoint-minutes", type=float, default=4.0)
     p.add_argument("--eval-every", type=int, default=50, help="optimiser steps between held-out losses")
@@ -136,8 +138,8 @@ def main() -> None:
         model.eval()
         total, count = 0.0, 0
         with torch.no_grad():
-            for at in range(0, len(held), args.batch):
-                x, y, m = batch_of(held[at:at + args.batch])
+            for at in range(0, len(held), args.micro):
+                x, y, m = batch_of(held[at:at + args.micro])
                 total += float(model(input_ids=x, attention_mask=m, labels=y).loss) * len(x)
                 count += len(x)
         model.train()
@@ -164,18 +166,21 @@ def main() -> None:
         if not items:
             state["seen"] += len(train) - at
             continue
-        x, y, m = batch_of(items)
-        loss = model(input_ids=x, attention_mask=m, labels=y).loss
-        loss.backward()
+        loss = 0.0
+        for at_micro in range(0, len(items), args.micro):  # the step's gradient accumulated a few turns at a time
+            x, y, m = batch_of(items[at_micro:at_micro + args.micro])
+            part = model(input_ids=x, attention_mask=m, labels=y).loss * (len(x) / len(items))
+            part.backward()
+            loss += float(part)
         torch.nn.utils.clip_grad_norm_(params, 1.0)
         opt.step()
         opt.zero_grad(set_to_none=True)
         state["step"] += 1
         state["seen"] += len(items)
         if state["step"] % 10 == 0:
-            print(f"step {state['step']}/{total_steps} loss {float(loss):.4f}", flush=True)
+            print(f"step {state['step']}/{total_steps} loss {loss:.4f}", flush=True)
         if state["step"] % args.eval_every == 0 or state["step"] == total_steps:
-            state["log"].append({"step": state["step"], "train_loss": round(float(loss), 4),
+            state["log"].append({"step": state["step"], "train_loss": round(loss, 4),
                                  "held_loss": round(held_loss(), 4)})
             print(f"step {state['step']} held loss {state['log'][-1]['held_loss']}", flush=True)
         if time.perf_counter() - last_save > args.checkpoint_minutes * 60 or state["step"] == total_steps:
@@ -185,7 +190,8 @@ def main() -> None:
     (out / "adapter.json").write_text(json.dumps({
         "model": args.model, "rows": args.rows, "min_fraction": args.min_fraction, "turns": len(data),
         "train": len(train), "held": len(held), "problems": len(indices), "rank": args.rank, "alpha": args.alpha,
-        "targets": TARGETS, "lr": args.lr, "epochs": args.epochs, "batch": args.batch, "steps": total_steps,
+        "targets": TARGETS, "lr": args.lr, "epochs": args.epochs, "batch": args.batch, "micro": args.micro,
+        "steps": total_steps,
         "log": state["log"], "seconds": round(time.perf_counter() - started, 1), "sha": sha(),
         "command": " ".join(sys.argv),
     }, indent=1), encoding="utf-8")

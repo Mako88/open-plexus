@@ -1,0 +1,124 @@
+"""The off-the-shelf loop: TRL's GRPO on the trunk, the key as the reward (the R1 recipe).
+
+The trunk samples several whole solutions to a GSM8K training problem; each is rewarded by
+whether its answer line matches the gold number; the group's rewards are normalised and the
+trunk's adapter is pushed toward the solutions that scored. No step judge and no search: this is
+the published recipe for a small model learning to reason from checkable outcomes, run here to
+read what it does on this card before anything of ours is built on it. The trunk's non-thinking
+solution by default (a few hundred tokens); `--mode think` samples its thinking, ten times the
+tokens. LoRA on the same projections as `trunk_adapter.py`; fp32, since the card has no bf16;
+checkpoints every `--save-steps` and resumes from the last.
+
+    .venv/Scripts/python scripts/grpo.py --n 2 --max-steps 2 --out state/grpo/smoke     # memory and seconds a step
+    .venv/Scripts/python scripts/grpo.py --n 1000 --out state/grpo/round1
+
+Writes <out>/checkpoint-*/ (the adapter and trainer state) and <out>/grpo.json.
+"""
+
+from __future__ import annotations
+
+import argparse
+import json
+import re
+import subprocess
+import sys
+import time
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(ROOT / "src"))
+
+from openplexus.maths import number_in, problems, same_number  # noqa: E402
+
+TARGETS = ["q_proj", "k_proj", "v_proj", "o_proj", "in_proj_qkv", "out_proj", "gate_proj", "up_proj", "down_proj"]
+SYSTEM = ("Solve the problem step by step, briefly. End with a last line of the form 'Answer: N' "
+          "where N is the final number, and nothing after it.")
+
+
+def sha() -> str:
+    return subprocess.run(["git", "rev-parse", "--short", "HEAD"], capture_output=True, text=True,
+                          cwd=ROOT).stdout.strip()
+
+
+def answer_in(text: str) -> str | None:
+    """The number on the completion's answer line, else the last number in it."""
+    m = re.findall(r"answer\s*:?\**\s*([^\n]+)", text, re.I)
+    return number_in(m[-1]) if m else number_in(text)
+
+
+def correct(completions, answer, **kwargs) -> list[float]:
+    """1.0 where the completion's answer is the gold number."""
+    texts = [c[0]["content"] if isinstance(c, list) else c for c in completions]
+    return [1.0 if same_number(answer_in(t), a) else 0.0 for t, a in zip(texts, answer)]
+
+
+def answer_line(completions, **kwargs) -> list[float]:
+    """0.1 where the completion ends with an answer line, so the form is learnt even where the
+    number is wrong."""
+    texts = [c[0]["content"] if isinstance(c, list) else c for c in completions]
+    return [0.1 if re.search(r"answer\s*:\s*[^\n]+\s*$", t.strip(), re.I) else 0.0 for t in texts]
+
+
+def main() -> None:
+    p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    p.add_argument("--out", default="state/grpo/round1")
+    p.add_argument("--model", default="Qwen/Qwen3.5-2B")
+    p.add_argument("--n", type=int, default=1000, help="training problems")
+    p.add_argument("--mode", choices=["plain", "think"], default="plain")
+    p.add_argument("--generations", type=int, default=4, help="solutions sampled a problem")
+    p.add_argument("--prompts-per-step", type=int, default=2, help="problems an optimiser step")
+    p.add_argument("--max-completion", type=int, default=None, help="tokens a solution; 400 plain, 1536 think")
+    p.add_argument("--lr", type=float, default=2e-5)
+    p.add_argument("--epochs", type=float, default=1.0)
+    p.add_argument("--max-steps", type=int, default=-1)
+    p.add_argument("--save-steps", type=int, default=20)
+    p.add_argument("--rank", type=int, default=16)
+    p.add_argument("--seed", type=int, default=0)
+    args = p.parse_args()
+
+    import torch
+    from datasets import Dataset
+    from peft import LoraConfig
+    from trl import GRPOConfig, GRPOTrainer
+
+    out = Path(args.out)
+    out.mkdir(parents=True, exist_ok=True)
+    ps = problems(args.n, split="train")
+    data = Dataset.from_list([{"prompt": [{"role": "system", "content": SYSTEM},
+                                          {"role": "user", "content": x["question"]}],
+                               "answer": x["answer"]} for x in ps])
+    max_completion = args.max_completion or (1536 if args.mode == "think" else 400)
+    config = GRPOConfig(
+        output_dir=str(out), seed=args.seed, learning_rate=args.lr, num_train_epochs=args.epochs,
+        max_steps=args.max_steps, per_device_train_batch_size=args.generations,
+        gradient_accumulation_steps=args.prompts_per_step, num_generations=args.generations,
+        max_completion_length=max_completion, temperature=1.0, beta=0.0,
+        gradient_checkpointing=True, gradient_checkpointing_kwargs={"use_reentrant": False},
+        logging_steps=1, save_steps=args.save_steps, save_total_limit=2, report_to="none",
+        chat_template_kwargs={"enable_thinking": args.mode == "think"}, mask_truncated_completions=True,
+        model_init_kwargs={"dtype": torch.float32}, log_completions=False, bf16=False, fp16=False,
+        torch_empty_cache_steps=1,
+    )
+    peft = LoraConfig(r=args.rank, lora_alpha=2 * args.rank, lora_dropout=0.0, target_modules=TARGETS,
+                      task_type="CAUSAL_LM")
+    trainer = GRPOTrainer(model=args.model, reward_funcs=[correct, answer_line], args=config,
+                          train_dataset=data, peft_config=peft)
+    last = sorted(out.glob("checkpoint-*"), key=lambda d: int(d.name.split("-")[1]))
+    started = time.perf_counter()
+    trainer.train(resume_from_checkpoint=str(last[-1]) if last else None)
+    trainer.save_model(str(out / "adapter"))
+    log = [dict(e) for e in trainer.state.log_history]
+    (out / "grpo.json").write_text(json.dumps({
+        "model": args.model, "mode": args.mode, "n": len(ps), "generations": args.generations,
+        "prompts_per_step": args.prompts_per_step, "max_completion": max_completion, "lr": args.lr,
+        "epochs": args.epochs, "max_steps": args.max_steps, "rank": args.rank, "system": SYSTEM,
+        "rewards": ["correct: 1.0 where the answer line is the gold number",
+                    "answer_line: 0.1 where the completion ends with an answer line"],
+        "log": log, "seconds": round(time.perf_counter() - started, 1),
+        "peak_gib": round(torch.cuda.max_memory_allocated() / 2**30, 2), "sha": sha(), "command": " ".join(sys.argv),
+    }, indent=1), encoding="utf-8")
+    print("wrote", out / "grpo.json", f"peak {torch.cuda.max_memory_allocated() / 2**30:.2f} GiB")
+
+
+if __name__ == "__main__":
+    main()

@@ -378,7 +378,12 @@ Each step says what it decides. A step is struck when it is done.
     to the steepest slope; waits for a problem set with types. (d) The store feeding the
     proposer (`openplexus.fetch`, a `:fetch` arm): the system's own solved problems indexed by
     the question, the nearest shown before the trunk proposes, never a question's own solution;
-    the plexus mechanism read on the proposer for the first time. Built, not run. (e) A trust
+    the plexus mechanism read on the proposer for the first time. Built, not run. Its second
+    form, John 2026-10-30: key on the thinking, not the question; at every step fetch the solved
+    situations most like the steps so far (by an embedding of the recent steps, or the trunk's
+    state after reading them) and show what the next step was there, every fetched step one
+    that outcome marked good; the rollout rows are already those pairs. Read against the same
+    search without it, since a trunk fed its own past steps can set in its ways. (e) A trust
     signal for the judge: as a linear head over the trunk's state it reads AUC 0.55 at
     predicting the evaluator's errors (the trusted half right 0.76 against 0.69), so the state
     does not say when its judge is wrong; the signal has to come from disagreement between

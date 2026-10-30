@@ -76,7 +76,7 @@ def arm(spec: str, ps: list[dict], trunk, evaluator: LinearHead, args) -> dict:
         return evaluator.query(x)[:, 0].tolist()
 
     started = time.perf_counter()
-    todo = [p for p in ps if p["question"] not in done]
+    todo = [] if args.as_read else [p for p in ps if p["question"] not in done]
     for at in range(0, len(todo), args.parallel):
         chunk = todo[at:at + args.parallel]
         counted = {"tokens_out": 0, "prefills": 0}
@@ -105,7 +105,8 @@ def arm(spec: str, ps: list[dict], trunk, evaluator: LinearHead, args) -> dict:
         "kind": kind, "k": k, "beam": beam, "depth": args.depth, "temperature": args.temperature if k > 1 else 0.0,
         "answer_candidate_each_depth": answer_candidate,
         "max_step_tokens": args.max_step, "max_steps_shown": args.max_steps, "system_prompt": STEP_SYSTEM, "evaluator": str(args.evaluator),
-        "evaluator_layer": evaluator.layer, "served_model": trunk.served_model(),
+        "evaluator_layer": evaluator.layer,
+        "served_model": trunk.served_model() if trunk else f"{args.model} float32 in process, rows as read",
         "inputs_the_deployed_system_has": "all: the question",
         "score": round(sum(r["correct"] for r in rows) / n, 3), "n": n,
         "unfinished": sum(not r["finished"] for r in rows),
@@ -132,14 +133,19 @@ def main() -> None:
                    help="a score to be told from: an arm stops once it is --clear standard errors from it")
     p.add_argument("--min-n", type=int, default=100, help="questions read before an arm may stop")
     p.add_argument("--clear", type=float, default=2.5)
+    p.add_argument("--as-read", action="store_true",
+                   help="write the reading from the rows on disk, searching nothing more: for arms ended early")
     p.add_argument("--note", default="")
     args = p.parse_args()
 
-    from openplexus.trunk import LocalTrunk
-
     ps = problems(args.n)
     evaluator = LinearHead.load(args.evaluator)
-    trunk = LocalTrunk(args.model, batch=args.parallel)
+    if args.as_read:
+        trunk = None
+    else:
+        from openplexus.trunk import LocalTrunk
+
+        trunk = LocalTrunk(args.model, batch=args.parallel)
     reading = {"kind": "step-search", "step": 3, "set": "GSM8K test, data/gsm8k/test.jsonl", "n": len(ps),
                "scorer": "the answer line's number, within 1e-6 of the gold", "arms": {}}
     for spec in args.arms.split(","):

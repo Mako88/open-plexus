@@ -251,11 +251,8 @@ Each step says what it decides. A step is struck when it is done.
    passes. Counting and arithmetic go to a tool: an aggregation over rows for the first, a Python
    call the trunk writes for the second, read on bAbI task 7 and on GSM8K. Decides whether a
    small evaluator with search beats the trunk's own chain of thought at matched forward passes.
-   This is the step the frontier claim lives or dies on. It fails if search with the trained
-   evaluator is no better than chain of thought at the same budget on a problem the 12B with
-   thinking gets right; that would mean the evaluator, not the search, is the wall, and the next
-   question is whether a bigger label set or a LoRA under the head moves it. Training here is in
-   daytime bursts with checkpoints, as everything is.
+   This is the step the frontier claim lives or dies on; its refutation line is in the
+   decision bullet below. Training here is in daytime bursts with checkpoints, as everything is.
    - Path finding (`readings/path-*`, `scripts/path_reading.py`), bAbI task 19, five rooms placed
      relative to each other, the answer two moves in order, chance one in sixteen, 500 test
      stories. The step evaluator reads the trunk's state over the story, the question, the moves
@@ -344,8 +341,26 @@ Each step says what it decides. A step is struck when it is done.
     test candidates from solutions it never saw: **balanced accuracy 0.727, AUC 0.79**, chance
     0.5; 0.70 of right steps pass and 0.755 of wrong steps fail. Layers 12 to 20 read alike.
     So the frozen trunk's state carries a real but middling signal about whether a maths step
-    is right; whether that signal, applied k times a step, beats the trunk's own thought is
-    the search reading next.
+    is right.
+  - The search (`readings/step-search-*`, `scripts/step_search.py`), GSM8K test, 2026-10-30,
+    the trunk in process proposing one-line steps: the control, the trunk's own greedy steps
+    with no judge, **0.364 at 102 passes**, 103 of 500 never reaching an answer line (it loops
+    on a step it cannot get past); the stop alone, one greedy step against the forced answer
+    line with the evaluator choosing, 0.252 at 105, every path finished; the four-way search,
+    four sampled steps and the answer line a depth, the evaluator keeping the best, **0.363 at
+    538 passes** over 256 problems, ended early as indistinguishable from the control; the
+    chance judge, the same search with random numbers for the evaluator, pending. So the
+    PRM800K-trained evaluator choosing among four of the trunk's steps buys nothing over the
+    trunk's first choice at five times the passes, and the stop folded into it fires too
+    early. The rows say why: it scores a bare restatement of a given fact highest of all
+    ("Seattle has 20 sheep", 1.21) and accepts an answer line right after one, because
+    PRM800K's "reasonable, no progress" steps were labelled good; and a 2B trunk's four
+    samples at one step rarely include a step it would not have taken anyway. Against the
+    chain of thought's 0.85 at 1,950 passes the search form as built is far short. By the
+    refutation line the labels are the first thing not yet tried (fork a, built, unsmoked) and
+    the trunk learning the second (fork b); the evaluator-and-search form is not struck, since
+    the evaluator read here is the one trained on another distribution's labels, but the
+    loop's first round starts from the trunk's own steps as the proposer, not from this search.
   - Forks held for after the search reading, agreed with John 2026-10-30, in the order to try
     them. (a) Label steps by outcome: after a search, every step is marked by whether the paths
     through it reached the right answer, and the evaluator is refitted on those labels, so the

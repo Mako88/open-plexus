@@ -387,7 +387,20 @@ Each step says what it decides. A step is struck when it is done.
     standard a fair input since the deployed system does not carry it, with the loop then run
     to go past where the teacher left it. Not novel in any piece; possibly in the whole, a
     continuously running system on one card where the store is the knowledge, the trunk
-    learns, and the system supplies its own problems and checks.
+    learns, and the system supplies its own problems and checks. John 2026-10-30: start from
+    the best trunk that fits, a distilled open-weights reasoner if one beats Qwen3.5-2B on the
+    chain-of-thought arm (one afternoon's reading; the in-process fp32 path caps the trunk
+    near 2B on this card). The known failures of this loop and the plan's answer to each,
+    with the two not yet answered marked: the self-judge drifts (labels anchored to outcomes,
+    fork a; the judge refitted on fresh outcomes every round so the trunk cannot overfit a
+    fixed judge; checks manufactured where there is no key); the trunk learns to please the
+    judge (the same, plus the trust head, fork e); the search ceiling on hard problems (the
+    trunk learns each round so the ceiling rises, fork b, and the store and tools inject
+    steps the trunk would not write, fork d; whether that is enough is the bet, not
+    answered); forgetting as the adapter trains on (replay from the store, step 7, adapters a
+    domain routed by the trunk's state, John's idea, and a fixed held-out set of every
+    earlier task re-read each round, the regression check; not yet built); running out of
+    problems (generators with keys; not yet built).
 
 4. **Writing.** What goes in a row: the raw sentence, or the trunk's own restatement with
    names resolved ("John is in the hallway", not "he went there"), one fact a row. Rows carry

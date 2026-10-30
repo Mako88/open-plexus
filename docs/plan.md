@@ -421,6 +421,23 @@ Each step says what it decides. A step is struck when it is done.
     (fp32 in process caps it near 2B; Qwen3.5-2B is one; a comparison is an afternoon's
     reading). Not novel in any piece; possibly in the whole: one card, the store as the
     knowledge, the trunk a learner, the system supplying its own problems and checks.
+  - Decided with John 2026-10-30, after the search reading: the quickest bare-bones prototype
+    from off-the-shelf parts, maths kept as the definite domain until the loop is shown to
+    work, and the core bet (the store feeding the proposer, the trunk learning when and what
+    to ask) read as soon as the loop runs. Four parts in five of the mechanisms were already
+    borrowed; two we wrote have better published forms. The judge: a published process reward
+    model of 1.5B would beat the 0.73 linear head on maths steps, and is fair by the standard
+    since the deployed system carries it; the head stays as the reading of what the frozen
+    state holds. The loop: TRL's GRPO, the R1 recipe, the trunk sampling whole solutions and
+    trained on the key directly, no step judge and no search, since the step judge recovered
+    the baseline and no more and the R1 paper found step judges added little
+    (`scripts/grpo.py`). First its smoke measures seconds a step and memory on this card in
+    fp32, which decides whether the recipe is days or weeks here; the trunk's non-thinking
+    solution first, since it is a tenth the tokens of its thinking, the thinking mode behind a
+    flag. Round one's adapter arm (fork b, filtered steps, the ReST-EM shape) is read on the
+    trunk alone against 0.364 and the step-judge search arms are skipped. What stays ours: the
+    store as the primary knowledge and the asking, the continuous life on one card, the system
+    supplying its own problems and checks, and the readings.
 
 4. **Writing.** What goes in a row: the raw sentence, or the trunk's own restatement with
    names resolved ("John is in the hallway", not "he went there"), one fact a row. Rows carry

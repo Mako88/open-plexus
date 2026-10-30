@@ -11,6 +11,7 @@ dependencies = [
     "safetensors",
     "peft>=0.21.2",
     "pytest",
+    "trl>=1.17.0",
 ]
 
 [build-system]

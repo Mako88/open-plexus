@@ -23,6 +23,11 @@ that produced them and in a reading under `readings/`, never in the doc.
   never saw, and a thinking mode left on have each produced a wrong reading in this project's
   past. Check the system prompt, the sampling settings and the thinking switch in the reading
   itself, not in your head.
+- **Size a run to its question.** Before a run, name the comparison it must settle and the
+  smallest n at which the expected gap is about 2.5 standard errors; run the arm whose result
+  changes the next step first; stop an arm once it is clearly above or below its reference
+  (`--reference` in the search script). Smoke on 8, read from 100, and 500 only when two arms
+  are close.
 - **A reading is a JSON file under `readings/`** with the command, the git SHA and the model
   that produced it, committed with the change it measures. Every reading carries a floor (the
   model given nothing) and a ceiling (the model given the whole relevant text) beside the arm.

@@ -10,7 +10,8 @@ reasons by one chain of tokens with no backtracking, a huge evaluator doing a we
 The design here inverts both. Knowledge lives in a store on disk and is learnt by appending.
 Reasoning is a small trained evaluator and search in ordinary code, the way AlphaGo beat
 players no network without search could touch, and the way a small model with search over
-its steps matched one fourteen times larger on maths (Snell et al., 2024). Arithmetic and
+its steps matched one fourteen times larger on maths (Snell et al., 2024; on the easy and
+middling problems, not the hard ones, which is the ceiling to beat). Arithmetic and
 counting go to a tool, as they do at the frontier. The frontier claim rests on both
 inversions holding, and the plan reads each on its own.
 
@@ -23,8 +24,12 @@ after a fact has been seen on the order of a thousand times in varied forms (All
 *Physics of Language Models 3.3*). That is why the models are huge and why they cannot learn a
 fact without a training run. Keep the three apart:
 
-- **The trunk.** A small pretrained language model, frozen. It reads and writes English and
-  does what thinking a small model can. Taken off the shelf; nothing here trains it.
+- **The trunk.** A small pretrained language model, taken off the shelf. It reads and
+  writes English and does what thinking a small model can. Frozen through step 3's first
+  reading; from then a learner too (decided with John 2026-10-30): an adapter on it trained
+  from the search's own wins, since every head over a frozen state can only re-weight what the
+  trunk already represents, and a system that improves its own judgement needs a trunk whose
+  representation can sharpen.
 - **The store.** A table on disk. Each row is something the system read or was told. Learning
   is appending a row. It is never retrained and never forgets.
 - **The glue.** The reasoning core, and the part we design. Small heads over the trunk's
@@ -37,7 +42,8 @@ fact without a training run. Keep the three apart:
 
 The trunk is the language organ, the glue is the judgement and the search is the thinking,
 so the system is as clever as the glue's judgement multiplied by the search, not as clever
-as the trunk's one pass. What learns for life is the store's contents and the glue. The bet
+as the trunk's one pass. What learns for life is the store's contents, the glue, and the
+trunk's adapter. The bet
 is in two halves. Knowledge: a small trunk reading a store approaches the same trunk with
 the relevant text placed in front of it (the ceiling) on questions whose answer needs two
 rows put together. Reasoning: a trained evaluator with search beats the same trunk's chain
@@ -354,6 +360,34 @@ Each step says what it decides. A step is struck when it is done.
     record of verdicts and outcomes; it chooses when to train, when to search harder and when to
     ask a tool. John's framing: every decision runs on internal signals, and external signals
     exist to correct the internal ones; a signal that stops being corrected drifts.
+  - The loop, as talked through with John 2026-10-30. The forks above close one loop: the trunk
+    proposes, the evaluator judges, the search finds wins the trunk alone would not, the wins
+    retrain the evaluator and the trunk, and the next round searches from a better trunk. Its
+    first reading is small: train one round on the maths loop and ask whether round two's
+    search beats round one's on held-out problems. Nothing below is built before that number
+    moves. Three pieces are missing from the loop and each resolves to the same move, the
+    system making its own signal where none is handed to it: a supply of problems (generators
+    with keys: DeepMind's mathematics dataset, procedural games, the trunk writing variants of
+    a solved problem with Python computing the key; test sets never trained on; the world
+    last); a verifier without a key (the evaluator is the values, and values are only as good
+    as what last corrected them, so the mechanism is manufacturing a check: write the tests,
+    re-derive by a second route, call a tool, ask the world; two cheap judges, and a third
+    opinion only where they disagree; a value that does not count cost is a loop); and asking
+    the store (finding a passage is solved engineering and fits this box, Wikipedia's text and
+    a passage index of some 15 GB answered in milliseconds on the CPU; what is not solved is
+    knowing when to ask and what for, which is the trunk learning to query, trained by whether
+    the fetched thing changed the outcome). Neighbours in the literature, to be checked before
+    any is leant on: STaR, ReST and Math-Shepherd are the small versions of this loop and the
+    o-series and DeepSeek-R1 the large; Absolute Zero (2025) is the problem supply; Self-
+    Rewarding Language Models (2024) is values-as-key, and drifted after a few rounds; Voyager
+    is the store as a skill library. Two warnings: Snell et al. find the search ceiling of a
+    small trunk below the frontier on hard problems, and the R1 paper reports that running
+    this loop on small models did worse than distilling a large model's reasoning into them.
+    So a frontier teacher at training time is on the table for the adapter, by John's
+    standard a fair input since the deployed system does not carry it, with the loop then run
+    to go past where the teacher left it. Not novel in any piece; possibly in the whole, a
+    continuously running system on one card where the store is the knowledge, the trunk
+    learns, and the system supplies its own problems and checks.
 
 4. **Writing.** What goes in a row: the raw sentence, or the trunk's own restatement with
    names resolved ("John is in the hallway", not "he went there"), one fact a row. Rows carry
@@ -377,7 +411,8 @@ Each step says what it decides. A step is struck when it is done.
    it) is trained by replay from the store, in daytime bursts with checkpoints. Reading: a
    fact that has been consolidated is answerable with the store switched off. Decides whether
    knowledge can move from rows into weights without a training run, and at what cost in
-   forgetting. The trunk stays frozen until this step.
+   forgetting. The adapter trained on the search's wins (step 3, fork b) comes before this
+   and is skill; this step is knowledge moving into weights.
 
 Where the glue makes a choice (which row to follow, whether to retrieve again, whether a
 sentence is worth writing, whether a row supersedes an older one), it is a typed decision from

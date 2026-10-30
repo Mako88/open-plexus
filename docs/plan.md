@@ -243,16 +243,11 @@ Each step says what it decides. A step is struck when it is done.
    by nothing yet.
 
 3. **The evaluator and search.** A second head over the trunk's hidden state: given a candidate
-   step, is it good. Its first form, a linear head judging the walker's candidates with bAbI's
-   supporting lines as labels, is read under step 2; then labels from step-labelled maths
-   (PRM800K, 800k human labels on steps of MATH solutions) and bAbI's path finding (task 19),
-   which is planning in miniature. The gradient-trained evaluator has to beat the linear one.
-   Search in code: beam over hops first, then a tree with backtracking, budgeted in forward
-   passes. Counting and arithmetic go to a tool: an aggregation over rows for the first, a Python
-   call the trunk writes for the second, read on bAbI task 7 and on GSM8K. Decides whether a
-   small evaluator with search beats the trunk's own chain of thought at matched forward passes.
-   This is the step the frontier claim lives or dies on; its refutation line is in the
-   decision bullet below. Training here is in daytime bursts with checkpoints, as everything is.
+   step, is it good; search in ordinary code, budgeted in forward passes; counting and
+   arithmetic to a tool. Decides whether a small evaluator with search beats the trunk's own
+   chain of thought at matched forward passes. This is the step the frontier claim lives or
+   dies on; its refutation line is in the decision bullet below. Training here is in daytime
+   bursts with checkpoints, as everything is.
    - Path finding (`readings/path-*`, `scripts/path_reading.py`), bAbI task 19, five rooms placed
      relative to each other, the answer two moves in order, chance one in sixteen, 500 test
      stories. The step evaluator reads the trunk's state over the story, the question, the moves
@@ -363,67 +358,58 @@ Each step says what it decides. A step is struck when it is done.
     the trunk learning the second (fork b); the evaluator-and-search form is not struck, since
     the evaluator read here is the one trained on another distribution's labels, but the
     loop's first round starts from the trunk's own steps as the proposer, not from this search.
-  - Forks held for after the search reading, agreed with John 2026-10-30, in the order to try
-    them. (a) Label steps by outcome: after a search, every step is marked by whether the paths
-    through it reached the right answer, and the evaluator is refitted on those labels, so the
-    judge learns from the system's own experience and PRM800K falls away (Math-Shepherd's
-    method). (b) The adapter on the trunk trained from the search's wins, the agreed fallback,
-    which this card can train: frozen weights 8 GB, the adapter and its gradients a few hundred
-    MB, checkpoints every few minutes. (c) A learning-progress monitor: the score a problem
-    type over time, with search budget spent where the slope is steepest. (d) The store feeding
-    the proposer: a solved similar problem or a fact fetched into the step prompt, the plexus
-    mechanism itself, untested on the proposer. (e) A trust head beside the evaluator, over the
-    same state, predicting whether the evaluator's verdict here will prove right, trained on the
-    record of verdicts and outcomes; it chooses when to train, when to search harder and when to
-    ask a tool. Read 2026-10-30 on the cached PRM800K states as a linear head over the same
-    state: AUC 0.55 at predicting the evaluator's errors, the trusted half right 0.76 against
-    0.69 for the rest, so the trunk's state does not say when its judge is wrong, and the trust
-    signal has to come from disagreement between judges or the outcome record instead. John's
-    framing: every decision runs on internal signals, and external signals
-    exist to correct the internal ones; a signal that stops being corrected drifts.
-  - The loop, as talked through with John 2026-10-30. The forks above close one loop: the trunk
-    proposes, the evaluator judges, the search finds wins the trunk alone would not, the wins
-    retrain the evaluator and the trunk, and the next round searches from a better trunk. Its
-    first reading is small: train one round on the maths loop and ask whether round two's
-    search beats round one's on held-out problems. Nothing below is built before that number
-    moves. Three pieces are missing from the loop and each resolves to the same move, the
-    system making its own signal where none is handed to it: a supply of problems (generators
-    with keys: DeepMind's mathematics dataset, procedural games, the trunk writing variants of
-    a solved problem with Python computing the key; test sets never trained on; the world
-    last); a verifier without a key (the evaluator is the values, and values are only as good
-    as what last corrected them, so the mechanism is manufacturing a check: write the tests,
-    re-derive by a second route, call a tool, ask the world; two cheap judges, and a third
-    opinion only where they disagree; a value that does not count cost is a loop); and asking
-    the store (finding a passage is solved engineering and fits this box, Wikipedia's text and
-    a passage index of some 15 GB answered in milliseconds on the CPU; what is not solved is
-    knowing when to ask and what for, which is the trunk learning to query, trained by whether
-    the fetched thing changed the outcome). Neighbours in the literature, to be checked before
-    any is leant on: STaR, ReST and Math-Shepherd are the small versions of this loop and the
-    o-series and DeepSeek-R1 the large; Absolute Zero (2025) is the problem supply; Self-
-    Rewarding Language Models (2024) is values-as-key, and drifted after a few rounds; Voyager
-    is the store as a skill library. Two warnings: Snell et al. find the search ceiling of a
-    small trunk below the frontier on hard problems, and the R1 paper reports that running
-    this loop on small models did worse than distilling a large model's reasoning into them.
-    So a frontier teacher at training time is on the table for the adapter, by John's
-    standard a fair input since the deployed system does not carry it, with the loop then run
-    to go past where the teacher left it. Not novel in any piece; possibly in the whole, a
-    continuously running system on one card where the store is the knowledge, the trunk
-    learns, and the system supplies its own problems and checks. John 2026-10-30: start from
-    the best trunk that fits, a distilled open-weights reasoner if one beats Qwen3.5-2B on the
-    chain-of-thought arm (one afternoon's reading; the in-process fp32 path caps the trunk
-    near 2B on this card). The known failures of this loop and the plan's answer to each,
-    with the two not yet answered marked: the self-judge drifts (labels anchored to outcomes,
-    fork a; the judge refitted on fresh outcomes every round so the trunk cannot overfit a
-    fixed judge; checks manufactured where there is no key); the trunk learns to please the
-    judge (the same, plus the trust head, fork e); the search ceiling on hard problems (the
-    trunk learns each round so the ceiling rises, fork b, and the store and tools inject
-    steps the trunk would not write, fork d; whether that is enough is the bet, not
-    answered); forgetting as the adapter trains on (replay from the store, step 7, adapters a
-    domain routed by the trunk's state, John's idea, and a fixed held-out set of every
-    earlier task re-read each round, the regression check; not yet built); running out of
-    problems (generators with keys; not yet built). The round is run by scripts/loop.py: rollouts,
-    features, fit, adapter, search, each a script of its own behind flags (--no-adapter, --fetch),
-    a stage whose output exists skipped, the server started and stopped around the rollouts.
+  - Forks after the search reading, agreed with John 2026-10-30, in order; the round that runs
+    them is `scripts/loop.py` (rollouts, features, fit, adapter, search, each a script behind
+    a flag, a stage already done skipped, the server up only for the rollouts). (a) Steps
+    labelled by outcome (`scripts/step_rollouts.py`, Math-Shepherd's method): the served trunk
+    walks training problems, proposes k steps and an answer line at each, and every candidate
+    is labelled by m rollouts to an answer, no human label and no test problem; the evaluator
+    is refitted on them and read on the PRM800K test steps too. Running 2026-10-30 over 700
+    problems. (b) The trunk learns (`scripts/trunk_adapter.py`): a LoRA adapter on its
+    attention and MLP projections, trained on the step turns the rollouts labelled right,
+    merged at load (`LocalTrunk(adapter=)`), the control the same arm without it. Built, not
+    run. (c) A learning-progress monitor, the score a problem type over time and search budget
+    to the steepest slope; waits for a problem set with types. (d) The store feeding the
+    proposer (`openplexus.fetch`, a `:fetch` arm): the system's own solved problems indexed by
+    the question, the nearest shown before the trunk proposes, never a question's own solution;
+    the plexus mechanism read on the proposer for the first time. Built, not run. (e) A trust
+    signal for the judge: as a linear head over the trunk's state it reads AUC 0.55 at
+    predicting the evaluator's errors (the trusted half right 0.76 against 0.69), so the state
+    does not say when its judge is wrong; the signal has to come from disagreement between
+    judges fitted on different rounds, or from the outcome record. Not built.
+  - The loop, as talked through 2026-10-30: propose, judge, search, retrain the judge and the
+    trunk on the wins, search again from a better trunk. Its first reading is small and comes
+    before anything below is built: train one round and ask whether round two's search beats
+    round one's on held-out problems. John's framing: every decision runs on internal signals;
+    external signals exist to correct them, a signal that stops being corrected drifts, and
+    the system should feel the absence of correction as uncertainty, not freedom. Three pieces
+    are missing, and each resolves to the system making its own signal where none is handed to
+    it: a supply of problems (generators with keys, the trunk writing variants of solved
+    problems with Python computing the key, the world last; test sets never trained on); a
+    verifier without a key (the evaluator is the values, and values are only as good as what
+    last corrected them, so the mechanism is manufacturing a check: write the tests, re-derive
+    by a second route, call a tool, ask the world; two cheap judges and a third opinion only
+    where they disagree; a value that does not count cost is a loop); and asking the store
+    (finding a passage is solved and fits this box, Wikipedia's text and a passage index of
+    some 15 GB answered on the CPU; knowing when to ask and what for is the trunk learning to
+    query, trained by whether the fetch changed the outcome). The known failures of this loop
+    and the answer to each: the self-judge drifts (outcome labels, the judge refitted every
+    round, manufactured checks); the trunk learns to please the judge (the same, plus the
+    trust signal); the search ceiling of a small trunk sits below the frontier on hard
+    problems (Snell et al., 2024; the trunk learns each round and the store and tools inject
+    steps it would not write; whether that is enough is the bet, unanswered); forgetting as
+    the adapter trains on (replay from the store, step 7; adapters a domain routed by the
+    trunk's state; a fixed held-out set of every earlier task re-read each round; not built);
+    running out of problems (generators; not built). Neighbours, to be checked before any is
+    leant on: STaR, ReST and Math-Shepherd are this loop small and the o-series and DeepSeek-R1
+    large; Absolute Zero (2025) is the problem supply; Self-Rewarding Language Models (2024)
+    is values-as-key and drifted after a few rounds; Voyager is the store as a skill library;
+    RETRO is the store as knowledge. The R1 paper found this loop on small models lost to
+    distilling a large model's reasoning into them, so by John's standard a frontier teacher at
+    training time is fair, and the trunk should start as the best distilled reasoner that fits
+    (fp32 in process caps it near 2B; Qwen3.5-2B is one; a comparison is an afternoon's
+    reading). Not novel in any piece; possibly in the whole: one card, the store as the
+    knowledge, the trunk a learner, the system supplying its own problems and checks.
 
 4. **Writing.** What goes in a row: the raw sentence, or the trunk's own restatement with
    names resolved ("John is in the hallway", not "he went there"), one fact a row. Rows carry

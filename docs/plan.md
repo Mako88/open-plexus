@@ -468,7 +468,17 @@ Each step says what it decides. A step is struck when it is done.
     small trained adapter with the outcome as the reward, so it can take a step of thought
     without writing a token; natural on this trunk, whose eighteen linear-attention layers
     already carry a state across tokens, and a coin flip against written thought at this size
-    by the published results (Coconut 2024, recurrent-depth transformers 2025).
+    by the published results (Coconut 2024, recurrent-depth transformers 2025). Its grown form,
+    John 2026-10-30: two models, a thinker that moves through an internal state and never
+    writes, and a speaker that renders the state to words when the thinker chooses, so thinking
+    cost comes apart from token cost and speech is an action (Meta's Large Concept Model 2024
+    is this shape; Dreamer in world models; the brain's language network is quiet during
+    non-verbal reasoning). The bottleneck is supervision: a model that never writes has no
+    words to learn from, only its own future states, rewards through the speaker, or a text
+    model's states; the LCM matched same-size LLMs on summarisation and lagged elsewhere. So
+    the first form here is the latent loop above, one trunk wearing both hats, its own output
+    head the speaker; the split comes if the loop reasons better a pass than words do. A
+    thinker that does not speak cannot be read without its speaker, so the speaker stays cheap.
   - From the same talk, the tests the design is held to. A brain is also many organs; what
     makes it one learner is that every part learns from shared signals and they co-adapt, so
     the test of this design is not how few parts it has but whether its joints learn: the

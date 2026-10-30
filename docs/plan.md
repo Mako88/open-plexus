@@ -528,7 +528,15 @@ Each step says what it decides. A step is struck when it is done.
    fact that has been consolidated is answerable with the store switched off. Decides whether
    knowledge can move from rows into weights without a training run, and at what cost in
    forgetting. The adapter trained on the search's wins (step 3, fork b) comes before this
-   and is skill; this step is knowledge moving into weights.
+   and is skill; this step is knowledge moving into weights. Its principled form, from the talk
+   with John 2026-10-30: the drive is compression (Schmidhuber's compression progress;
+   DreamCoder, 2021, which names recurring patterns across its own solutions as new primitives
+   and solves harder problems with the names, wake and sleep). Periodically the system reads
+   its solved paths, finds step patterns that recur, coins a name or a tool for each, writes
+   it to the store and uses it after; the measure is passes, since a real abstraction reaches
+   the same answers in fewer steps. The blocks stay as text even if the thinking goes latent:
+   language compounded because its blocks were shareable and composable, and a concept that
+   stays private cannot be stored, taught or built on.
 
 Where the glue makes a choice (which row to follow, whether to retrieve again, whether a
 sentence is worth writing, whether a row supersedes an older one), it is a typed decision from

@@ -359,7 +359,7 @@ Each step says what it decides. A step is struck when it is done.
     PRM800K's "reasonable, no progress" steps were labelled good; and a 2B trunk's four
     samples at one step rarely include a step it would not have taken anyway. Against the
     chain of thought's 0.85 at 1,950 passes the search form as built is far short. By the
-    refutation line the labels are the first thing not yet tried (fork a, built, unsmoked) and
+    refutation line the labels are the first thing not yet tried (fork a, rollouts running 2026-10-30) and
     the trunk learning the second (fork b); the evaluator-and-search form is not struck, since
     the evaluator read here is the one trained on another distribution's labels, but the
     loop's first round starts from the trunk's own steps as the proposer, not from this search.

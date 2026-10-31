@@ -8,7 +8,10 @@ read what it does on this card before anything of ours is built on it. The trunk
 solution by default (a few hundred tokens); `--mode think` samples its thinking, ten times the
 tokens. LoRA on the same projections as `trunk_adapter.py`; fp32, since the card has no bf16;
 checkpoints every `--save-steps` and resumes from the last. A later round starts from the round
-before's adapter (`--init-adapter`) on the next training problems (`--skip`).
+before's adapter (`--init-adapter`) on the next training problems (`--skip`), or on problems the
+system chose for itself (`--from-rows`: the reading rows of its own greedy pass over training
+problems, every one it got wrong and as many it got right, since a group whose four samples all
+score alike teaches nothing and the easy problems are mostly such groups).
 
     .venv/Scripts/python scripts/grpo.py --n 2 --max-steps 2 --out state/grpo/smoke     # memory and seconds a step
     .venv/Scripts/python scripts/grpo.py --n 1000 --out state/grpo/round1
@@ -42,6 +45,22 @@ def sha() -> str:
                           cwd=ROOT).stdout.strip()
 
 
+def select_rows(rows: list[dict], wrong_share: float = 0.5, seed: int = 0) -> list[dict]:
+    """Training problems from the system's own reading rows: every problem it got wrong, and
+    right ones to make the wrong ones `wrong_share` of the whole, drawn at random, in a shuffled
+    order."""
+    import random
+
+    rng = random.Random(seed)
+    wrong = [r for r in rows if not r["correct"]]
+    right = [r for r in rows if r["correct"]]
+    rng.shuffle(right)
+    n_right = min(len(right), int(round(len(wrong) * (1 - wrong_share) / max(wrong_share, 1e-9))))
+    chosen = wrong + right[:n_right]
+    rng.shuffle(chosen)
+    return [{"question": r["question"], "answer": r["answer"]} for r in chosen]
+
+
 def answer_in(text: str) -> str | None:
     """The number on the completion's answer line, else the last number in it."""
     m = re.findall(r"answer\s*:?\**\s*([^\n]+)", text, re.I)
@@ -68,6 +87,8 @@ def main() -> None:
     p.add_argument("--n", type=int, default=1000, help="training problems")
     p.add_argument("--skip", type=int, default=0, help="training problems passed over first")
     p.add_argument("--init-adapter", default=None, help="the adapter to go on training, else a fresh one")
+    p.add_argument("--from-rows", default=None, help="reading rows to choose the problems from, instead of --n/--skip")
+    p.add_argument("--wrong-share", type=float, default=0.5, help="share of chosen problems the pass got wrong")
     p.add_argument("--mode", choices=["plain", "think"], default="plain")
     p.add_argument("--generations", type=int, default=4, help="solutions sampled a problem")
     p.add_argument("--prompts-per-step", type=int, default=2, help="problems an optimiser step")
@@ -87,7 +108,12 @@ def main() -> None:
 
     out = Path(args.out)
     out.mkdir(parents=True, exist_ok=True)
-    ps = problems(args.n, split="train", skip=args.skip)
+    if args.from_rows:
+        rows = [json.loads(line) for line in Path(args.from_rows).read_text(encoding="utf-8").splitlines()]
+        ps = select_rows(rows, args.wrong_share, args.seed)
+        print(f"{len(ps)} problems chosen from {len(rows)} rows, {sum(not r['correct'] for r in rows)} wrong", flush=True)
+    else:
+        ps = problems(args.n, split="train", skip=args.skip)
     data = Dataset.from_list([{"prompt": [{"role": "system", "content": SYSTEM},
                                           {"role": "user", "content": x["question"]}],
                                "answer": x["answer"]} for x in ps])
@@ -125,6 +151,7 @@ def main() -> None:
     log = [dict(e) for e in trainer.state.log_history]
     (out / "grpo.json").write_text(json.dumps({
         "model": args.model, "mode": args.mode, "n": len(ps), "skip": args.skip, "init_adapter": args.init_adapter,
+        "from_rows": args.from_rows, "wrong_share": args.wrong_share if args.from_rows else None,
         "generations": args.generations,
         "prompts_per_step": args.prompts_per_step, "max_completion": max_completion, "lr": args.lr,
         "epochs": args.epochs, "max_steps": args.max_steps, "rank": args.rank, "system": SYSTEM,

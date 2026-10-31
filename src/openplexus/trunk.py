@@ -11,6 +11,7 @@ import os
 import time
 import urllib.request
 from concurrent.futures import ThreadPoolExecutor
+from pathlib import Path
 
 SYSTEM = (
     "You are given a short story and a question about it. Answer using only the story. "
@@ -20,8 +21,9 @@ SYSTEM = (
 
 class ServedTrunk:
     def __init__(self, model: str = "trunk", url: str | None = None, max_new: int = 8,
-                 parallel: int = 8, think: bool = False):
+                 parallel: int = 8, think: bool = False, lora: list[dict] | None = None):
         self.model = model
+        self.lora = lora  # per-request adapter scales, [{"id": 0, "scale": 1.0}, ...]; None leaves the server's
         self.url = (url or os.environ.get("LOCAL_SERVER", "http://127.0.0.1:8093")) \
             + "/v1/chat/completions"
         self.max_new = max_new
@@ -32,16 +34,38 @@ class ServedTrunk:
         self.thoughts: dict[int, str] = {}  # id(messages) -> the reasoning the server returned
 
     def served_model(self) -> str:
-        """What the server says it is serving, for the reading's record."""
-        with urllib.request.urlopen(self.url.rsplit("/", 2)[0] + "/models", timeout=10) as r:
-            return json.load(r)["data"][0]["id"]
+        """What the server says it is serving, for the reading's record: the model, and the
+        adapters it has loaded with the scales this client asks for."""
+        root = self.url.rsplit("/", 2)[0]
+        with urllib.request.urlopen(root + "/models", timeout=10) as r:
+            model = json.load(r)["data"][0]["id"]
+        return model + self.adapters_note()
+
+    def adapters(self) -> list[dict]:
+        """The adapters the server has loaded, [{"id", "path", "scale"}], [] where it has none."""
+        try:
+            with urllib.request.urlopen(self.url.rsplit("/", 3)[0] + "/lora-adapters", timeout=10) as r:
+                return json.load(r)
+        except Exception:  # noqa: BLE001
+            return []
+
+    def adapters_note(self) -> str:
+        loaded = self.adapters()
+        if not loaded:
+            return ""
+        scales = {x["id"]: x["scale"] for x in (self.lora or [])}
+        return " with adapters " + ", ".join(
+            f"{Path(a['path']).name} at {scales.get(a['id'], 0.0)}" for a in loaded)
 
     def ask(self, messages: list[dict]) -> str:
-        body = json.dumps({
+        request = {
             "model": self.model, "messages": messages, "max_tokens": self.max_new,
             "temperature": 0, "seed": 0,
             "chat_template_kwargs": {"enable_thinking": self.think},
-        }).encode()
+        }
+        if self.lora is not None:
+            request["lora"] = self.lora
+        body = json.dumps(request).encode()
         req = urllib.request.Request(self.url, body, {"Content-Type": "application/json"})
         for attempt in range(5):
             try:

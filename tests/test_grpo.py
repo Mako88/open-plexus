@@ -9,7 +9,7 @@ sys.path.insert(0, str(ROOT / "src"))
 sys.path.insert(0, str(ROOT / "scripts"))
 
 from grpo import answer_in, answer_line, correct, select_rows  # noqa: E402
-from grpo_reading import arm_tag, ask_text, paired  # noqa: E402
+from grpo_reading import arm_tag, ask_text, lora_scales, paired  # noqa: E402
 
 
 def test_the_answer_line_is_read_and_the_last_number_stands_in():
@@ -58,3 +58,17 @@ def test_the_chosen_problems_are_every_wrong_one_and_as_many_right():
     assert select_rows(rows, wrong_share=0.25, seed=0).__len__() == 12
     assert select_rows(rows, wrong_share=1.0)[0]["question"].startswith("w")
     assert set(chosen[0]) == {"question", "answer"}
+
+
+def test_each_served_arm_asks_for_its_own_adapter_only():
+    import argparse
+    import pytest
+    loaded = [{"id": 0, "path": "state/gguf/round1-lora.gguf", "scale": 0.0},
+              {"id": 1, "path": "state/gguf/round2-lora.gguf", "scale": 0.0}]
+    assert lora_scales("state/grpo/round2/adapter", loaded) == [{"id": 0, "scale": 0.0}, {"id": 1, "scale": 1.0}]
+    assert lora_scales(None, loaded) == [{"id": 0, "scale": 0.0}, {"id": 1, "scale": 0.0}]
+    with pytest.raises(SystemExit):
+        lora_scales("state/grpo/round3/adapter", loaded)
+    served = argparse.Namespace(split="test", skip=0, served="http://127.0.0.1:8093")
+    assert arm_tag("base", served) == "base-served"
+    assert arm_tag("state/grpo/round2/adapter", served) == "round2-served"

@@ -4,7 +4,12 @@ tokens of the solution plus one prefill. Arms are adapter paths, or `base` for t
 `:fetch` suffix shows the trunk the most similar solved problem from `--fetch <rows>` before the
 question (`openplexus.fetch`, fork d), the control the same arm without it. `--split train
 --skip N` reads training problems instead, whose right rows are the solved problems a later
-`--fetch` draws on: the system's own solutions, no human's.
+`--fetch` draws on: the system's own solutions, no human's. `--served` reads on llama-server
+instead of fp32 in process, several times faster: the server is launched with every adapter as
+a GGUF LoRA file (`convert_lora_to_gguf.py`, `state/llama-server-readings.bat`) unapplied, and
+each arm asks for its own adapter's scale in the request, `base` for none; rows from the two
+engines are kept apart (a `-served` tag), and the base is re-read on the server before any
+adapter is compared with it there.
 An arm is compared with `--against` (other arms' tags, `base` by default, the first the one that
 stops it) on the same questions, by the count of problems made right and made wrong, and stops
 once that paired gap is `--clear` standard errors from zero after `--min-n` questions; the
@@ -65,7 +70,20 @@ def arm_tag(spec: str, args) -> str:
         tag += "-fetch"
     if args.split != "test" or args.skip:
         tag += f"-{args.split}" + (f"-skip{args.skip}" if args.skip else "")
+    if getattr(args, "served", None):
+        tag += "-served"
     return tag
+
+
+def lora_scales(adapter: str | None, loaded: list[dict]) -> list[dict]:
+    """The per-request adapter scales for an arm on the server: the arm's adapter at 1 and every
+    other loaded adapter at 0, by the adapter's round name in the GGUF file's name; `base` has
+    them all at 0. An adapter the server has not loaded is an error, not a silent base."""
+    want = None if adapter is None else Path(adapter).parent.name
+    if want is not None and not any(Path(a["path"]).stem.startswith(want) for a in loaded):
+        raise SystemExit(f"the server has no adapter for {want}: loaded {[a['path'] for a in loaded]}")
+    return [{"id": a["id"], "scale": 1.0 if want and Path(a["path"]).stem.startswith(want) else 0.0}
+            for a in loaded]
 
 
 def ask_text(question: str, example: str | None) -> str:
@@ -84,10 +102,17 @@ def arm(spec: str, ps: list[dict], args, index=None) -> dict:
     tag = arm_tag(spec, args)
     part = ROOT / "state" / f"grpo-reading-{tag}.part.jsonl"
     done = part_rows(tag)
-    others = {o: part_rows(o) for o in args.against.split(",") if o and o != tag}
+    suffix = "-served" if args.served else ""
+    others = {o + suffix: part_rows(o + suffix) for o in args.against.split(",") if o and o + suffix != tag}
     others = {o: rows for o, rows in others.items() if rows}
     other = next(iter(others.values()), {})
-    trunk = LocalTrunk(args.model, batch=args.batch, max_new=args.max_completion, adapter=adapter)
+    if args.served:
+        from openplexus.trunk import ServedTrunk
+
+        trunk = ServedTrunk(url=args.served, max_new=args.max_completion, parallel=args.batch)
+        trunk.lora = lora_scales(adapter, trunk.adapters())
+    else:
+        trunk = LocalTrunk(args.model, batch=args.batch, max_new=args.max_completion, adapter=adapter)
     started = time.perf_counter()
     todo = [p for p in ps if p["question"] not in done]
     for at in range(0, len(todo), args.batch):
@@ -124,11 +149,13 @@ def arm(spec: str, ps: list[dict], args, index=None) -> dict:
                 print(f"{tag} stopped at {len(done)}: {score:.3f} is {abs(score - args.reference) / se:.1f} "
                       f"standard errors from {args.reference}", flush=True)
                 break
-    trunk.close()
+    if hasattr(trunk, "close"):
+        trunk.close()
     rows = [done[p["question"]] for p in ps if p["question"] in done]
     n = len(rows)
     return {
-        "adapter": adapter, "fetch": args.fetch if fetch else None,
+        "adapter": adapter, "engine": "llama-server Q8" if args.served else "fp32 in process",
+        "fetch": args.fetch if fetch else None,
         "solved_problems_to_fetch_from": len(index.examples) if fetch else None,
         "served_model": trunk.served_model(), "system_prompt": SYSTEM, "greedy": True,
         "max_completion": args.max_completion, "inputs_the_deployed_system_has": "all: the question",
@@ -147,6 +174,7 @@ def main() -> None:
     p.add_argument("--split", default="test", help="test for a reading; train to make solved problems")
     p.add_argument("--skip", type=int, default=0)
     p.add_argument("--fetch", default=None, help="reading rows whose right solutions a :fetch arm shows the trunk")
+    p.add_argument("--served", default=None, help="llama-server's URL to read on, e.g. http://127.0.0.1:8093")
     p.add_argument("--model", default="Qwen/Qwen3.5-2B")
     p.add_argument("--batch", type=int, default=8)
     p.add_argument("--max-completion", type=int, default=400)

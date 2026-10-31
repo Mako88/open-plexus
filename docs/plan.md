@@ -341,9 +341,23 @@ Each step says what it decides. A step is struck when it is done.
    a trunk with a fixed-size state (a state-space model, or a Titans-style module) is the
    alternative. Decides how state persists.
 
-6. **Scale and speed.** A real knowledge store (a Wikipedia subset), the trunk quantised to
-   int8 or 4-bit, and the budget read honestly: tokens per second, VRAM, disk. Decides whether
-   this reads as frontier knowledge on an 11 GB card, and what is left.
+6. **The store at knowledge, and the asking as a learned action.** Pulled forward 2026-10-31
+   (John, after fork (d) read that on GSM8K the store has nothing to give): the core bet is read
+   where the knowledge a question needs is absent from the trunk and present in the store.
+   HotpotQA (`data/hotpotqa`, 90k training and 7.4k validation questions, each answered from
+   two Wikipedia paragraphs together, a short answer as the key): first the distractor form,
+   the ten paragraphs of a question (two supporting, eight distractors) as the store's rows
+   and the question's episode, bAbI's shape with real text; then the full form, the Wikipedia
+   abstracts (5.2M, about 1.5 GB) as one store, the plan's scale reading. Lines: the floor is
+   the trunk with no paragraphs, the ceiling the trunk with the two supporting paragraphs in
+   front of it, the whole-episode ceiling all ten. The arm is the asking: the trunk's own
+   query to the store as an action inside the GRPO loop (`<search>...</search>`, the store
+   answering with the nearest rows, the trunk continuing; Search-R1, 2025, is this shape),
+   rewarded by the key, so the trunk learns when to ask and what for; the control is the same
+   trunk shown the top rows by the question with no action. Every reading here also carries a
+   frontier reference (John, 2026-10-31): a clean-context frontier agent on the same
+   questions, as the target and as the check that a set is hard. The trunk quantised and the
+   budget read honestly (tokens per second, VRAM, disk) come with the full form.
 
 7. **Consolidation: the trunk learns slowly, by replay.** Complementary learning systems
    (McClelland, McNaughton and O'Reilly, 1995): the hippocampus learns in one shot and the

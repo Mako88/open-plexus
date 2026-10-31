@@ -258,7 +258,15 @@ Each step says what it decides. A step is struck when it is done.
      240 tokens (with it, 110 by step twenty), so the bonus did it. It is off from here
      (`--format-reward`, 0.1 in rounds one and two), and round three reruns without it from
      round two's adapter on the same set. Rounds continue while each widens the gap; the
-     recipe's ceiling at this size is the round that does not. The R1 paper found this loop on small models lost to distilling a large model's reasoning
+     recipe's ceiling at this size is the round that does not. A fork from John 2026-10-31,
+     held until the pieces below are functional: the learner decoupled from the actor. The
+     trunk answers with the current adapter while the learner trains in the background on what
+     it wrote and swaps the adapter in every few steps; a gradient a few steps stale is a valid
+     direction (asynchronous SGD; the loop's ratio clip already absorbs a little off-policy),
+     and a system that lives and learns continuously has this shape anyway. On one card the
+     payoff is not overlap (generation and training both saturate it) but the actor on the Q8
+     server, several times faster than fp32 PyTorch here, loading the adapter as a file without
+     a merge: a round in one or two hours instead of three or four. The R1 paper found this loop on small models lost to distilling a large model's reasoning
      into them, so a frontier teacher at training time is fair by the standard, and the trunk
      should start as the best distilled reasoner that fits fp32 in process (Qwen3.5-2B is one;
      a comparison is an afternoon's reading).

@@ -27,6 +27,13 @@ PYTHON_SYSTEM = (
 )
 
 
+def rows_of(path) -> list[dict]:
+    """The JSON rows of a .jsonl file, split on newlines only: a reply can hold a Unicode line
+    separator, which `str.splitlines` would cut a row at."""
+    text = Path(path).read_text(encoding="utf-8")
+    return [json.loads(line) for line in text.split("\n") if line.strip()]
+
+
 def problems(n: int | None = None, split: str = "test", skip: int = 0) -> list[dict]:
     """The problems of a split, each {"question", "answer"} with the answer as the gold number,
     the first `skip` passed over. Readings are on "test"; "train" (7,473 problems, the same

@@ -35,17 +35,12 @@ sys.path.insert(0, str(ROOT / "src"))
 sys.path.insert(0, str(ROOT / "scripts"))
 
 from grpo import SYSTEM, answer_in  # noqa: E402
-from openplexus.maths import problems, same_number  # noqa: E402
+from openplexus.maths import problems, rows_of, same_number  # noqa: E402
 
 
 def part_rows(tag: str) -> dict:
     part = ROOT / "state" / f"grpo-reading-{tag}.part.jsonl"
-    done = {}
-    if part.exists():
-        for line in part.read_text(encoding="utf-8").splitlines():
-            r = json.loads(line)
-            done[r["question"]] = r
-    return done
+    return {r["question"]: r for r in rows_of(part)} if part.exists() else {}
 
 
 def paired(rows: dict, other: dict, ps: list[dict]) -> dict | None:
@@ -170,7 +165,7 @@ def main() -> None:
         from openplexus.embed import MiniLM
         from openplexus.fetch import SolvedIndex, solved_solutions
 
-        rows = [json.loads(line) for line in Path(args.fetch).read_text(encoding="utf-8").splitlines()]
+        rows = rows_of(args.fetch)
         index = SolvedIndex(solved_solutions(rows), MiniLM())
         print(f"{len(index.examples)} solved problems to fetch from", flush=True)
     for spec in args.arms.split(","):

@@ -33,7 +33,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "src"))
 
-from openplexus.maths import number_in, problems, same_number  # noqa: E402
+from openplexus.maths import number_in, problems, rows_of, same_number  # noqa: E402
 
 TARGETS = ["q_proj", "k_proj", "v_proj", "o_proj", "in_proj_qkv", "out_proj", "gate_proj", "up_proj", "down_proj"]
 SYSTEM = ("Solve the problem step by step, briefly. End with a last line of the form 'Answer: N' "
@@ -109,7 +109,7 @@ def main() -> None:
     out = Path(args.out)
     out.mkdir(parents=True, exist_ok=True)
     if args.from_rows:
-        rows = [json.loads(line) for line in Path(args.from_rows).read_text(encoding="utf-8").splitlines()]
+        rows = rows_of(args.from_rows)
         ps = select_rows(rows, args.wrong_share, args.seed)
         print(f"{len(ps)} problems chosen from {len(rows)} rows, {sum(not r['correct'] for r in rows)} wrong", flush=True)
     else:

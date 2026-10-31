@@ -1,0 +1,191 @@
+"""Step 6's lines on HotpotQA (`openplexus.hotpot`), the distractor form: the trunk answers a
+question with the paragraphs an arm puts in front of it. Arms: `floor` (no paragraphs, what the
+trunk knows), `gold` (the two supporting paragraphs, the ceiling), `episode` (all ten, the
+whole-episode ceiling), `top:K` (the K paragraphs nearest the question by MiniLM, the store with
+no learnt asking, the control for the asking arm). Each arm is compared paired with `--against`
+on the same questions by exact match, and stops once clear. Rows are appended to state/ and a
+re-run skips the questions read. Short answers, so the Q8 server is the engine (`--served`,
+default); `--adapter` names a GGUF LoRA the server has loaded to apply.
+
+    .venv/Scripts/python scripts/hotpot_reading.py --arms floor,gold,episode,top:2 --n 200
+
+Writes readings/hotpot-*.json.
+"""
+
+from __future__ import annotations
+
+import argparse
+import json
+import subprocess
+import sys
+import time
+from datetime import datetime, timezone
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(ROOT / "src"))
+sys.path.insert(0, str(ROOT / "scripts"))
+
+from grpo_reading import paired  # noqa: E402
+from openplexus.hotpot import answer_of, exact, f1, paragraph_text, questions  # noqa: E402
+from openplexus.maths import rows_of  # noqa: E402
+
+SYSTEM = ("Answer the question. Use the passages where they are given; they may contain the facts needed. "
+          "Think briefly, then end with a last line of the form 'Answer: X' where X is the short answer "
+          "(a name, a number, a date, or yes or no), and nothing after it.")
+
+
+def ask_text(q: dict, paragraphs: list[dict]) -> str:
+    if not paragraphs:
+        return q["question"]
+    passages = "\n\n".join(paragraph_text(p) for p in paragraphs)
+    return f"Passages:\n\n{passages}\n\nQuestion: {q['question']}"
+
+
+def chosen(spec: str, q: dict, index=None) -> list[dict]:
+    if spec == "floor":
+        return []
+    if spec == "gold":
+        return [p for p in q["paragraphs"] if p["supporting"]]
+    if spec == "episode":
+        return q["paragraphs"]
+    if spec.startswith("top:"):
+        k = int(spec.split(":")[1])
+        return index(q, k)
+    raise SystemExit(f"unknown arm {spec}")
+
+
+def tag_of(spec: str, args) -> str:
+    tag = spec.replace(":", "")
+    if args.adapter:
+        tag += "-" + Path(args.adapter).stem.replace("-lora", "")
+    return tag
+
+
+def part_rows(tag: str) -> dict:
+    part = ROOT / "state" / f"hotpot-{tag}.part.jsonl"
+    return {r["id"]: r for r in rows_of(part)} if part.exists() else {}
+
+
+def arm(spec: str, qs: list[dict], args, trunk, index) -> dict:
+    tag = tag_of(spec, args)
+    part = ROOT / "state" / f"hotpot-{tag}.part.jsonl"
+    done = part_rows(tag)
+    others = {o: part_rows(tag_of(o, args)) for o in args.against.split(",") if o and o != spec}
+    others = {o: rows for o, rows in others.items() if rows}
+    other = next(iter(others.values()), {})
+    started = time.perf_counter()
+    todo = [q for q in qs if q["id"] not in done]
+    key = lambda rows, q: rows.get(q["id"])  # noqa: E731
+    for at in range(0, len(todo), args.batch):
+        chunk = todo[at:at + args.batch]
+        before_out = trunk.tokens_out
+        turns = [[{"role": "system", "content": SYSTEM}, {"role": "user", "content": ask_text(q, chosen(spec, q, index))}]
+                 for q in chunk]
+        replies = trunk.ask_many(turns)
+        tokens_out = trunk.tokens_out - before_out
+        with open(part, "a", encoding="utf-8") as f:
+            for q, reply, turn in zip(chunk, replies, turns):
+                said = answer_of(reply)
+                shown = chosen(spec, q, index)
+                row = {"id": q["id"], "question": q["question"], "answer": q["answer"], "type": q["type"],
+                       "level": q["level"], "said": said, "correct": exact(said, q["answer"]),
+                       "f1": round(f1(said, q["answer"]), 3), "reply": reply,
+                       "shown": [p["title"] for p in shown],
+                       "gold_shown": sum(p["supporting"] for p in shown),
+                       "passes": round(tokens_out / len(chunk) + 1, 1)}
+                done[q["id"]] = row
+                f.write(json.dumps(row, ensure_ascii=False) + "\n")
+        n = len(done)
+        score = sum(done[q["id"]]["correct"] for q in qs if q["id"] in done) / n
+        print(f"{tag} {n}/{len(qs)} running {score:.3f}", flush=True)
+        if n >= args.min_n and other:
+            pr = paired({r["question"]: r for r in done.values()},
+                        {r["question"]: r for r in other.values()}, qs)
+            if pr and pr["n"] >= args.min_n and abs(pr["standard_errors"]) >= args.clear:
+                print(f"{tag} stopped at {n}: {pr['made_right']} made right and {pr['made_wrong']} made wrong "
+                      f"against {next(iter(others))}, {pr['standard_errors']} standard errors", flush=True)
+                break
+    rows = [done[q["id"]] for q in qs if q["id"] in done]
+    n = len(rows)
+    by_type = {}
+    for t in ("bridge", "comparison"):
+        sub = [r for r in rows if r["type"] == t]
+        if sub:
+            by_type[t] = round(sum(r["correct"] for r in sub) / len(sub), 3)
+    return {
+        "paragraphs": spec, "served_model": trunk.served_model(), "system_prompt": SYSTEM,
+        "inputs_the_deployed_system_has": {"floor": "the question", "gold": "NOT: the supporting paragraphs are the key's choice",
+                                           "episode": "the question's ten paragraphs, the store's rows",
+                                           }.get(spec, "the question and the store"),
+        "exact": round(sum(r["correct"] for r in rows) / n, 3), "f1": round(sum(r["f1"] for r in rows) / n, 3),
+        "by_type": by_type, "n": n, "stopped_early": n < len(qs), "unanswered": sum(r["said"] is None for r in rows),
+        "gold_shown_mean": round(sum(r["gold_shown"] for r in rows) / n, 2),
+        "passes_per_question": round(sum(r["passes"] for r in rows) / n, 1),
+        "paired": {o: paired({r["question"]: r for r in rows}, {r["question"]: r for r in rows_o.values()}, qs)
+                   for o, rows_o in others.items()},
+        "seconds": round(time.perf_counter() - started, 1), "rows": rows,
+    }
+
+
+def main() -> None:
+    p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    p.add_argument("--arms", default="floor,gold,episode,top:2")
+    p.add_argument("--n", type=int, default=200)
+    p.add_argument("--skip", type=int, default=0)
+    p.add_argument("--split", default="validation")
+    p.add_argument("--batch", type=int, default=8)
+    p.add_argument("--max-new", type=int, default=160)
+    p.add_argument("--served", default="http://127.0.0.1:8093")
+    p.add_argument("--adapter", default=None, help="a GGUF LoRA file the server has loaded, applied at 1")
+    p.add_argument("--against", default="floor")
+    p.add_argument("--min-n", type=int, default=100)
+    p.add_argument("--clear", type=float, default=2.5)
+    p.add_argument("--note", default="")
+    args = p.parse_args()
+    from openplexus.trunk import ServedTrunk
+
+    qs = questions(args.n, split=args.split, skip=args.skip)
+    trunk = ServedTrunk(url=args.served, max_new=args.max_new, parallel=args.batch)
+    loaded = trunk.adapters()
+    if args.adapter:
+        want = Path(args.adapter).name
+        if not any(Path(a["path"]).name == want for a in loaded):
+            raise SystemExit(f"the server has not loaded {want}: {[a['path'] for a in loaded]}")
+    trunk.lora = [{"id": a["id"], "scale": 1.0 if args.adapter and Path(a["path"]).name == Path(args.adapter).name else 0.0}
+                  for a in loaded]
+    index = None
+    if any(s.startswith("top:") for s in args.arms.split(",")):
+        import numpy as np
+        from openplexus.embed import MiniLM
+
+        embed = MiniLM()
+
+        def index(q, k):
+            keys = np.asarray(embed([paragraph_text(p) for p in q["paragraphs"]]), dtype=np.float32)
+            keys /= np.maximum(np.linalg.norm(keys, axis=1, keepdims=True), 1e-12)
+            query = np.asarray(embed([q["question"]]), dtype=np.float32)[0]
+            query /= max(float(np.linalg.norm(query)), 1e-12)
+            order = np.argsort(-(keys @ query))[:k]
+            return [q["paragraphs"][int(j)] for j in order]
+    reading = {"kind": "hotpot-reading", "set": f"HotpotQA distractor {args.split}, data/hotpotqa/{args.split}.jsonl",
+               "skip": args.skip, "n": len(qs), "scorer": "exact match and token F1 on the normalised answer, HotpotQA's own",
+               "adapter": args.adapter, "arms": {}}
+    for spec in args.arms.split(","):
+        a = arm(spec, qs, args, trunk, index)
+        reading["arms"][spec] = a
+        print(f"== {spec}: exact {a['exact']} f1 {a['f1']} on {a['n']} at {a['passes_per_question']} passes, "
+              f"{a['unanswered']} unanswered, by type {a['by_type']}, {a['seconds']}s", flush=True)
+    reading.update({
+        "command": "scripts/hotpot_reading.py " + " ".join(sys.argv[1:]),
+        "sha": subprocess.run(["git", "rev-parse", "--short", "HEAD"], capture_output=True, text=True,
+                              cwd=ROOT).stdout.strip(),
+        "taken_at": datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ"), "note": args.note,
+    })
+    out = ROOT / "readings" / f"hotpot-{reading['taken_at']}.json"
+    out.write_text(json.dumps(reading, indent=1, ensure_ascii=False), encoding="utf-8")
+    print(f"wrote {out}")
+
+
+if __name__ == "__main__":
+    main()

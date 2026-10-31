@@ -73,6 +73,37 @@ def correct(completions, answer, **kwargs) -> list[float]:
     return [1.0 if same_number(answer_in(t), a) else 0.0 for t, a in zip(texts, answer)]
 
 
+GROUP = 4  # solutions sampled a problem, set from --generations; the agreement reward needs the group
+
+
+def majority_of(answers: list[str | None]) -> str | None:
+    """The answer most of a group gave, by number; None where none answered."""
+    said = [a for a in answers if a is not None]
+    groups: list[list[str]] = []
+    for a in said:
+        for g in groups:
+            if same_number(a, g[0]):
+                g.append(a)
+                break
+        else:
+            groups.append([a])
+    return max(groups, key=len)[0] if groups else None
+
+
+def agreement(completions, **kwargs) -> list[float]:
+    """1.0 where the completion's answer is the majority answer of its group of GROUP solutions
+    to the same problem: the key-less reward (TTRL, 2025), the system's own agreement standing
+    in for the gold number. Completions arrive grouped, GROUP consecutive to a problem."""
+    texts = [c[0]["content"] if isinstance(c, list) else c for c in completions]
+    answers = [answer_in(t) for t in texts]
+    out = []
+    for at in range(0, len(answers), GROUP):
+        group = answers[at:at + GROUP]
+        best = majority_of(group)
+        out.extend(1.0 if best is not None and a is not None and same_number(a, best) else 0.0 for a in group)
+    return out
+
+
 def answer_line(completions, **kwargs) -> list[float]:
     """0.1 where the completion ends with an answer line, so the form is learnt even where the
     number is wrong. On a set of problems the trunk mostly gets wrong this is the only reward
@@ -95,6 +126,8 @@ def main() -> None:
     p.add_argument("--generations", type=int, default=4, help="solutions sampled a problem")
     p.add_argument("--prompts-per-step", type=int, default=2, help="problems an optimiser step")
     p.add_argument("--format-reward", type=float, default=0.0, help="the answer-line bonus, 0.1 in rounds one and two; 0 since")
+    p.add_argument("--reward", choices=["key", "agreement"], default="key",
+                   help="key: the gold number; agreement: the group's majority answer, no key in the loop")
     p.add_argument("--micro", type=int, default=None,
                    help="solutions a forward pass; the generations by default, 2 when the card is shared by day")
     p.add_argument("--max-completion", type=int, default=None, help="tokens a solution; 400 plain, 1536 think")
@@ -134,7 +167,8 @@ def main() -> None:
         max_completion_length=max_completion, temperature=1.0, beta=0.0,
         gradient_checkpointing=True, gradient_checkpointing_kwargs={"use_reentrant": False},
         logging_steps=1, save_steps=args.save_steps, save_total_limit=2, report_to="none",
-        reward_weights=[1.0, args.format_reward / 0.1] if args.format_reward else [1.0],
+        reward_weights=([1.0, 0.0] if args.reward == "agreement" else [1.0])
+        + ([args.format_reward / 0.1] if args.format_reward else []),
         chat_template_kwargs={"enable_thinking": args.mode == "think"}, mask_truncated_completions=True,
         log_completions=False, bf16=False, fp16=False,
         torch_empty_cache_steps=1,
@@ -152,7 +186,10 @@ def main() -> None:
 
         model = PeftModel.from_pretrained(model, args.init_adapter, is_trainable=True)
         peft = None
-    rewards = [correct] + ([answer_line] if args.format_reward else [])
+    global GROUP
+    GROUP = args.generations
+    # the key's reward is always computed and logged; with --reward agreement its weight is 0
+    rewards = ([agreement, correct] if args.reward == "agreement" else [correct]) + ([answer_line] if args.format_reward else [])
     trainer = GRPOTrainer(model=model, processing_class=tok, reward_funcs=rewards, args=config,
                           train_dataset=data, peft_config=peft)
     last = sorted(out.glob("checkpoint-*"), key=lambda d: int(d.name.split("-")[1]))
@@ -166,7 +203,9 @@ def main() -> None:
         "generations": args.generations,
         "prompts_per_step": args.prompts_per_step, "max_completion": max_completion, "lr": args.lr,
         "epochs": args.epochs, "max_steps": args.max_steps, "rank": args.rank, "system": SYSTEM,
-        "rewards": ["correct: 1.0 where the answer line is the gold number"]
+        "reward": args.reward,
+        "rewards": (["agreement: 1.0 where the answer is the group's majority answer (the key logged at weight 0)"]
+                    if args.reward == "agreement" else []) + ["correct: 1.0 where the answer line is the gold number"]
                    + ([f"answer_line: {args.format_reward} where the completion ends with an answer line"]
                       if args.format_reward else []),
         "log": log, "seconds": round(time.perf_counter() - started, 1),

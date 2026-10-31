@@ -8,7 +8,8 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "src"))
 sys.path.insert(0, str(ROOT / "scripts"))
 
-from grpo import answer_in, answer_line, correct, select_rows  # noqa: E402
+import grpo  # noqa: E402
+from grpo import agreement, answer_in, answer_line, correct, select_rows  # noqa: E402
 from grpo_reading import agreement_curve, arm_tag, ask_text, lora_scales, majority, paired  # noqa: E402
 
 
@@ -90,3 +91,11 @@ def test_the_majority_answer_and_its_agreement():
                      {"agreement_at_least": 0.5, "n": 3, "accuracy": 0.667}]
     import argparse
     assert arm_tag("state/grpo/round2/adapter:vote4", argparse.Namespace(split="test", skip=0)) == "round2-vote4"
+
+
+def test_the_agreement_reward_is_the_group_majority_with_no_key():
+    grpo.GROUP = 4
+    done = ["Answer: 7", "so 7.0", "Answer: 8", "nothing here",           # group one: 7 wins
+            "Answer: 3", "Answer: 4", "Answer: 4", "Answer: 3"]           # group two: a tie, the first group counted
+    assert agreement(done) == [1.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0]
+    assert agreement(["nothing", "nothing", "nothing", "nothing"]) == [0.0] * 4

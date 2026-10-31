@@ -270,10 +270,14 @@ Each step says what it decides. A step is struck when it is done.
      trunk answers with the current adapter while the learner trains in the background on what
      it wrote and swaps the adapter in every few steps; a gradient a few steps stale is a valid
      direction (asynchronous SGD; the loop's ratio clip already absorbs a little off-policy),
-     and a system that lives and learns continuously has this shape anyway. On one card the
-     payoff is not overlap (generation and training both saturate it) but the actor on the Q8
-     server, several times faster than fp32 PyTorch here, loading the adapter as a file without
-     a merge: a round in one or two hours instead of three or four. The R1 paper found this loop on small models lost to distilling a large model's reasoning
+     and a system that lives and learns continuously has this shape anyway. Its speed premise
+     was read and refuted the same day: the Q8 server with the adapter as a GGUF LoRA file
+     (`--served`, built) reads the same as fp32 in process on the base (320 shared questions,
+     12 made right and 9 made wrong, 0.7 standard errors) and is slower on 240-token solutions,
+     nine questions a minute against forty, since fp32 PyTorch batches eight sequences and the
+     server's slots do not scale on this card; the "several times faster" below dates from
+     one-word bAbI answers. So on one card the fork has no payoff at all until a second device
+     holds the actor; held. The R1 paper found this loop on small models lost to distilling a large model's reasoning
      into them, so a frontier teacher at training time is fair by the standard, and the trunk
      should start as the best distilled reasoner that fits fp32 in process (Qwen3.5-2B is one;
      a comparison is an afternoon's reading).
@@ -291,8 +295,13 @@ Each step says what it decides. A step is struck when it is done.
      were. So a fetch that helps has to be keyed on the method, not the words of the question:
      John's form, keyed on the thinking (the solved situations most like the steps so far,
      shown with what the next step was there), or the solution's shape as the key, and the
-     asker has to learn when not to fetch, which the first form never could. That is the
-     next form to build, read the same way. Then the asking as the trunk's learned action,
+     asker has to learn when not to fetch, which the first form never could. The second form
+     (`:fetch2`, built 2026-10-31): the trunk solves once, the arithmetic shape of its own
+     solution (equation lines, numbers as N, names dropped, `openplexus.fetch.shape`) fetches
+     the solved problem whose solution has the nearest shape, and the trunk solves again with it
+     shown, at twice the passes; a probe showed the shape key finding a download with a
+     restart for a download with a restart where the question key found a file by its size.
+     Read against the same adapter without it. Then the asking as the trunk's learned action,
      credited by whether the fetch changed the outcome: the core bet. A published process reward model (Skywork-PRM 1.5B, Qwen2.5-Math-PRM 7B) as a judge
      arm, and agreement across samples as the first key-less signal, since it costs only
      passes. (c) A learning-progress monitor, budget to the steepest slope, once there are
@@ -396,12 +405,12 @@ credit signal might not cost it much. It runs in minutes and never touches the t
 - Models live in the Hugging Face cache (`~/.cache/huggingface/hub`). Qwen3.5-0.8B, 2B and 4B
   are there as safetensors for in-process use and as Q8 GGUFs; Gemma 4 12B at 4-bit is in
   `D:\Downloads`. llama.cpp is built at `D:\tools\llama.cpp-src\build\bin\Release`.
-  Inference-only readings go through llama-server (`local:` in `ceiling.py`; launch:
+  Short-answer readings go through llama-server (`local:` in `ceiling.py`; launch:
   `llama-server -m <Qwen_Qwen3.5-2B-Q8_0.gguf> --port 8093 --jinja --reasoning-budget 0
-  -ngl 99 -np 8 -c 32768`), which is
-  several times faster on this card than fp32 PyTorch, whose Qwen3.5 linear-attention
-  layers run on fallback kernels here. PyTorch is for anything that needs hidden states or
-  gradients.
+  -ngl 99 -np 8 -c 32768`), which was several times faster than fp32 PyTorch on one-word
+  answers; on 240-token solutions fp32 PyTorch batching eight is faster (forty questions a
+  minute against nine, 2026-10-31), and the two engines read alike. PyTorch is for anything
+  that needs hidden states or gradients, and for the GRPO readings.
 - Decoding on this card is bandwidth-bound, so serve with eight parallel streams and batch
   the questions; four streams and a 2,048-token thinking budget was 300 questions in two and
   a half hours.

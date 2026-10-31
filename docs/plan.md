@@ -254,10 +254,11 @@ Each step says what it decides. A step is struck when it is done.
      shrank from 250 tokens to 100 within twenty training steps and stayed there: on a set the
      trunk mostly gets wrong, most groups score alike on the key and the 0.1 answer-line bonus
      is the only reward with a spread, so it pulled toward short completions that end in the
-     form. The bonus is now a flag (`--format-reward 0`); the control that settles whether the
-     bonus or the hard set shrank the solutions is thirty steps on the same set without it.
-     Rounds continue while each widens the gap; the recipe's ceiling at this size is the round
-     that does not, and round three is not that round until the control reads. The R1 paper found this loop on small models lost to distilling a large model's reasoning
+     form. The control, thirty steps on the same set without the bonus: the solutions hold at
+     240 tokens (with it, 110 by step twenty), so the bonus did it. It is off from here
+     (`--format-reward`, 0.1 in rounds one and two), and round three reruns without it from
+     round two's adapter on the same set. Rounds continue while each widens the gap; the
+     recipe's ceiling at this size is the round that does not. The R1 paper found this loop on small models lost to distilling a large model's reasoning
      into them, so a frontier teacher at training time is fair by the standard, and the trunk
      should start as the best distilled reasoner that fits fp32 in process (Qwen3.5-2B is one;
      a comparison is an afternoon's reading).

@@ -94,7 +94,7 @@ def main() -> None:
     p.add_argument("--mode", choices=["plain", "think"], default="plain")
     p.add_argument("--generations", type=int, default=4, help="solutions sampled a problem")
     p.add_argument("--prompts-per-step", type=int, default=2, help="problems an optimiser step")
-    p.add_argument("--format-reward", type=float, default=0.1, help="the answer-line bonus; 0 drops it")
+    p.add_argument("--format-reward", type=float, default=0.0, help="the answer-line bonus, 0.1 in rounds one and two; 0 since")
     p.add_argument("--micro", type=int, default=None,
                    help="solutions a forward pass; the generations by default, 2 when the card is shared by day")
     p.add_argument("--max-completion", type=int, default=None, help="tokens a solution; 400 plain, 1536 think")

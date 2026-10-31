@@ -217,120 +217,81 @@ Each step says what it decides. A step is struck when it is done.
      judge is wrong; trust has to come from disagreement between judges or the outcome record.
      `scripts/loop.py` (rollouts, features, fit, adapter, search, each behind a flag) stays
      for the step form should it be revived.
-   - The loop that runs now (`scripts/grpo.py`, `scripts/grpo_reading.py`), decided with John
-     2026-10-30: TRL's GRPO on the trunk's non-thinking whole solutions, four a problem, the
-     key as the reward plus 0.1 for an answer line, LoRA r16 on the attention and MLP
-     projections, fp32, a checkpoint every twenty steps, the thinking mode behind a flag. The
-     smoke: 20 to 25 s an optimiser step of two problems and eight solutions, 8.7 GiB peak, so
-     a thousand problems is about three hours here. The control
-     (`readings/grpo-20261030T111215Z`): the plain trunk's greedy whole solution under
-     training's prompt, GSM8K test, **0.736 at 237 passes**, every question answered, between
-     the step form's 0.364 at 102 and the thinking's 0.85 at 1,950. **Round one**
-     (`readings/grpo-20261031T042520Z`, `state/grpo/round1`): a thousand training problems,
-     500 optimiser steps in 2.8 hours of card time across two pauses for Ember, peak 10.1 GiB.
-     The sampled training accuracy rose from 0.59 in the first fifty steps to 0.75 by step 200
-     and held; solutions cut at the 400-token cap fell from 0.29 to 0.07 as it learnt to
-     finish. Its adapter, greedy on the same 500 test problems: **0.774 at 246 passes**
-     against 0.736 at 237, 50 problems made right and 31 made wrong, a paired gap of 0.038 at
-     2.1 standard errors. So the trunk learns to reason from its own checkable outcomes on
-     this card, modestly, in one round: the loop runs. Two lessons. The early stop against the
-     unpaired reference fired at 232 problems reading 0.802, on a prefix the control also
-     found easier (0.754), so an arm read against a control on the same questions is stopped
-     by the paired count of flips, not the unpaired gap. And the gain is at the same cost, not
-     cheaper: the loop made the trunk right more often, not briefer. **Round two**
-     (`readings/grpo-20261031T093424Z`, `state/grpo/round2`), the same adapter trained on over
-     the next thousand training problems (`--skip 1000 --init-adapter`), 4.7 hours, peak 10.4
-     GiB: **0.804 at 227 passes**, against round one 49 made right and 34 made wrong (a gap of
-     0.030 at 1.6 standard errors) and against the base 63 and 29 (**0.068 at 3.5**). So the gap
-     widens round on round, and this round the solutions also got shorter (227 passes against
-     246); the training accuracy reached 0.83 in its last blocks, and in six groups of ten all
-     four samples scored alike and taught nothing, so round three wants harder problems or more
-     samples a group. Round three (`--from-rows`, running 2026-10-31) takes the system's own
-     choice of problems: round two's greedy pass over the next thousand training problems got
-     797 right (`state/grpo-solved-round2-skip2000.json`), and the round trains on the 203 it got
-     wrong and 203 it got right, 203 steps. Read (`readings/grpo-20261031T151441Z`): **0.768
-     at 107 passes**, half the cost and the gain gone, 14 made right and 31 made wrong against
-     round two (stopped at 284, 2.5 standard errors), 31 and 25 against the base. The solutions
-     shrank from 250 tokens to 100 within twenty training steps and stayed there: on a set the
-     trunk mostly gets wrong, most groups score alike on the key and the 0.1 answer-line bonus
-     is the only reward with a spread, so it pulled toward short completions that end in the
-     form. The control, thirty steps on the same set without the bonus: the solutions hold at
-     240 tokens (with it, 110 by step twenty), so the bonus did it. It is off from here
-     (`--format-reward`, 0.1 in rounds one and two). Round three rerun without it from round
-     two's adapter on the same set (`readings/grpo-20261031T191349Z`): the solutions held at
-     250 tokens and it reads **0.806 at 241 passes**, 36 made right and 35 made wrong against
-     round two, 53 and 18 against the base (0.07 at 4.2 standard errors). So round three is the
-     round that does not widen the gap: three rounds of this recipe on GSM8K lift the trunk
-     from 0.736 to about 0.805 and stop there, a third of the way to its own thinking's 0.85 at
-     an eighth of the passes. The loop is left here as the learner, its adapter carried
-     forward, and the work moves to the pieces not yet functional, in the order below; a round
-     is run again when a piece changes what the trunk is trained on (harder problems, the
-     thinking mode, a key-less judge), not to push this number. A fork from John 2026-10-31,
-     held until the pieces below are functional: the learner decoupled from the actor. The
-     trunk answers with the current adapter while the learner trains in the background on what
-     it wrote and swaps the adapter in every few steps; a gradient a few steps stale is a valid
-     direction (asynchronous SGD; the loop's ratio clip already absorbs a little off-policy),
-     and a system that lives and learns continuously has this shape anyway. Its speed premise
-     was read and refuted the same day: the Q8 server with the adapter as a GGUF LoRA file
-     (`--served`, built) reads the same as fp32 in process on the base (320 shared questions,
-     12 made right and 9 made wrong, 0.7 standard errors) and is slower on 240-token solutions,
-     nine questions a minute against forty, since fp32 PyTorch batches eight sequences and the
-     server's slots do not scale on this card; the "several times faster" below dates from
-     one-word bAbI answers. So on one card the fork has no payoff at all until a second device
-     holds the actor; held. The R1 paper found this loop on small models lost to distilling a large model's reasoning
-     into them, so a frontier teacher at training time is fair by the standard, and the trunk
-     should start as the best distilled reasoner that fits fp32 in process (Qwen3.5-2B is one;
-     a comparison is an afternoon's reading).
-   - Next, in order. (d) The store feeding the thinking (`openplexus.fetch`, the `:fetch` arm
-     of `grpo_reading.py`). Its first form read 2026-10-31 (`readings/grpo-20261031T110513Z`,
-     the fetch arm): the system's own solved problems, round two's 1,606 right whole solutions
-     on its 2,000 training problems, indexed by MiniLM on the question, the nearest shown
-     before the test question, never a question's own; against the same adapter without it, on
-     the first 112 questions **5 made right and 17 made wrong**, 0.679 against 0.786, stopped
-     at 2.6 standard errors. Not copying: no wrong answer was the example's, and the replies
-     are the same length; the trunk misreads its own problem's quantities with a neighbour in
-     front of it (150% of the wrong base, a third of the wrong total). The nearest question is
-     a topical neighbour (a house, chickens, a profit), not an analogue in method, and a
-     topical neighbour is a distractor to a 2B trunk, as step 1 found the rows about the milk
-     were. So a fetch that helps has to be keyed on the method, not the words of the question:
-     John's form, keyed on the thinking (the solved situations most like the steps so far,
-     shown with what the next step was there), or the solution's shape as the key, and the
-     asker has to learn when not to fetch, which the first form never could. The second form
-     (`:fetch2`, built 2026-10-31): the trunk solves once, the arithmetic shape of its own
-     solution (equation lines, numbers as N, names dropped, `openplexus.fetch.shape`) fetches
-     the solved problem whose solution has the nearest shape, and the trunk solves again with it
-     shown, at twice the passes; a probe showed the shape key finding a download with a
-     restart for a download with a restart where the question key found a file by its size.
-     Read 2026-10-31 against the same adapter without it (`readings/grpo-20261031T194227Z`): **11
-     made right and 26 made wrong** on 192 questions, 0.724 against 0.802, stopped at 2.5
-     standard errors, at twice the passes. The first pass was right on 154 of the 192, exactly
-     as the plain arm; the second pass, with a method analogue in front of it, re-derived 26 of
-     those wrongly (a different decomposition, not the example's answer, not its numbers) and
-     fixed 11. So both forms read the same way: any solved example shown to this trunk perturbs
-     about a fifth of its solutions in both directions, net loss, because on GSM8K the store
-     holds nothing the trunk lacks and a 2B cannot ignore what it is shown. A gate that fetches
-     only where it helps would have to pick the 11 from the 26 from the state before solving,
-     and fork (e) read that the state does not carry that. The conclusion, for John: the store's
-     claim cannot be read on GSM8K at all; it has to be read where the knowledge needed is
-     absent from the trunk and present in the store (the bAbI readings were that, at the
-     ceiling; a knowledge-bearing problem set is the next one), and the asking as a learned
-     action is built there, not here. Until then the loop runs without the store on maths. A published process reward model (Skywork-PRM 1.5B, Qwen2.5-Math-PRM 7B) as a judge
-     arm. Agreement across samples, the first key-less signal, read 2026-10-31
-     (`readings/grpo-20261031T201814Z`, the `:vote4` arm of `grpo_reading.py`): four solutions
-     sampled at 0.7 from round two's adapter, the majority answer. The majority is the greedy
-     answer (10 made right, 9 made wrong on 206 questions) at four times the passes, so voting
-     buys no accuracy, as the plan said ensembles would not; but **agreement sorts the
-     questions**: all four agree on 132 of 206 and the answer is right on 95.5% of those, while
-     on the 74 where they split it is right on 54% (greedy 57%). So with no key in the loop the
-     system can tell which of its answers to trust, two in three of them at 95%, and which to
-     spend more on. That is the key-less judge's first functional form, off the shelf
-     (self-consistency 2022; TTRL 2025 trains on the majority as the label). Its next reading
-     is the loop itself without the key: a round rewarded by agreement with the group's
-     majority instead of the gold number, on maths where the key can still score the result
-     offline, read against the key-trained round. (c) A learning-progress monitor, budget to the steepest slope, once there are
-     problem types. Problem supply: generators with keys, the trunk writing variants of solved
-     problems with Python computing the key (Absolute Zero, 2025), test sets never trained on.
-     A fixed held-out set of every earlier task re-read each round, for forgetting.
+   - The loop (`scripts/grpo.py`, `scripts/grpo_reading.py`), decided with John 2026-10-30:
+     TRL's GRPO on the trunk's non-thinking whole solutions, four a problem, the gold number as
+     the reward, LoRA r16 on the attention and MLP projections, fp32, a checkpoint every twenty
+     steps, about 35 s an optimiser step of two problems (`--micro 2` by day, when John's apps
+     hold 1 to 2 GB of the card and a 10 GiB peak thrashes). Readings are the adapter's greedy
+     whole solution on the first 500 GSM8K test problems, paired against the other arms on the
+     same questions and stopped at 2.5 standard errors of the flip count (the unpaired early
+     stop over-read round one at 232 problems on an easy prefix). The control
+     (`readings/grpo-20261030T111215Z`): the plain trunk **0.736 at 237 passes**, between the
+     step form's 0.364 and the thinking's 0.85 at 1,950. **Round one** (`grpo-20261031T042520Z`),
+     a thousand training problems: **0.774 at 246**, 50 made right and 31 made wrong against
+     the base, 2.1 standard errors; the trunk learns to reason from its own checkable outcomes
+     on this card. **Round two** (`grpo-20261031T093424Z`), the same adapter on the next
+     thousand: **0.804 at 227**, 49 and 34 against round one, 63 and 29 against the base (3.5);
+     the gap widens and the solutions shorten. In six groups of ten all four samples scored
+     alike and taught nothing, so **round three** took the system's own choice of problems: of
+     the next thousand, the 203 round two's greedy pass got wrong and 203 it got right. Its
+     first run (`grpo-20261031T151441Z`) read 0.768 at 107 passes, 14 and 31 against round two:
+     the solutions shrank from 250 tokens to 100 in twenty steps, because on a mostly-wrong set
+     the 0.1 answer-line bonus was the only reward with a spread inside most groups; thirty
+     steps on the same set without the bonus held 240 tokens, so the bonus is off
+     (`--format-reward`, 0.1 in rounds one and two). Rerun without it
+     (`grpo-20261031T191349Z`): **0.806 at 241**, 36 and 35 against round two, 53 and 18
+     against the base (4.2). So three rounds lift the trunk from 0.736 to about 0.805 and stop,
+     a third of the way to its own thinking at an eighth of the passes: the recipe's ceiling at
+     this size on this set. The loop stays as the learner, its adapter carried forward; a round
+     runs again when a piece changes what the trunk is trained on, not to push the number. The
+     R1 paper found this loop on small models lost to distilling a large model's reasoning into
+     them, so a frontier teacher at training time is fair, and the trunk should start as the
+     best distilled reasoner that fits fp32 in process; swapped only on a reading that shows a
+     piece failing for want of the trunk, never to lift a number (John, 2026-10-31). Held, from
+     John the same day: the learner decoupled from the actor, the trunk answering with the
+     current adapter while the learner trains behind it and swaps the adapter in (a gradient a
+     few steps stale is a valid direction; the ratio clip absorbs it; a system that lives has
+     this shape). Its speed premise failed: the Q8 server with the adapter as a GGUF LoRA file
+     (`--served`, built) reads as fp32 in process does (320 shared questions, 12 made right, 9
+     made wrong) and is slower on 240-token solutions, nine questions a minute against forty, so
+     the fork has no payoff on one card.
+   - The store on maths, fork (d), read and refuted 2026-10-31. First form
+     (`grpo-20261031T110513Z`): round two's 1,606 right training solutions indexed by MiniLM on
+     the question, the nearest shown before the test question, never a question's own; against
+     the same adapter without it **5 made right and 17 made wrong** on 112 (0.679 against
+     0.786). Not copying, the same length: the trunk misreads its own problem's quantities with
+     a topical neighbour (a house, chickens, a profit) in front of it, as step 1 found the rows
+     about the milk. Second form (`:fetch2`, `openplexus.fetch.shape`, `grpo-20261031T194227Z`),
+     keyed on the method: the trunk solves, the arithmetic shape of its own solution (equation
+     lines, numbers as N, names dropped) fetches the solved problem with the nearest shape, and
+     it solves again with that shown, at twice the passes: **11 made right and 26 made wrong**
+     on 192 (0.724 against 0.802). The first pass was right on 154 of 192, exactly the plain arm;
+     the example re-derived 26 of those wrongly, with its own decomposition, not the example's
+     numbers. So any solved example shown to this trunk perturbs a fifth of its solutions both
+     ways, net loss: on GSM8K the store holds nothing the trunk lacks, and a 2B cannot ignore
+     what it is shown; a gate that fetches only where it helps would have to pick the 11 from
+     the 26 before solving, and fork (e) read that the state does not carry that. For John: the
+     store's claim cannot be read on GSM8K; it has to be read where the knowledge needed is
+     absent from the trunk and present in the store, and the asking as a learned action is
+     built there (the recommendation put to him: a Wikipedia subset in the store with questions
+     answered from it, the asking an action inside the same loop, the published search-as-action
+     shape). Until then the loop runs without the store on maths.
+   - The key-less judge. Agreement across samples first, since it costs only passes
+     (`grpo-20261031T201814Z`, the `:vote4` arm): four solutions sampled at 0.7 from round
+     two's adapter, the majority answer. The majority is the greedy answer (10 made right, 9
+     made wrong on 206) at four times the passes, so voting buys no accuracy, as the plan said
+     ensembles would not; but **agreement sorts the questions**: all four agree on 132 of 206
+     and are right on 95.5% of those, and split on 74 where the answer is right on 54% (greedy
+     57%). With no key the system can tell which two in three of its answers to trust and which
+     to spend more on (self-consistency 2022; TTRL 2025 trains on the majority as the label).
+     Next, running: the loop without the key, round two's adapter trained on round three's set
+     with agreement with the group's majority as the reward (`--reward agreement`, the key
+     logged at weight zero), read against round three's key-trained 0.806. Then a published
+     process reward model (Skywork-PRM 1.5B, Qwen2.5-Math-PRM 7B) as a judge arm. (c) A
+     learning-progress monitor, budget to the steepest slope, once there are problem types.
+     Problem supply: generators with keys, the trunk writing variants of solved problems with
+     Python computing the key (Absolute Zero, 2025), test sets never trained on. A fixed
+     held-out set of every earlier task re-read each round, for forgetting.
    - What the design is held to, from the talks with John 2026-10-30. Every decision runs on
      internal signals; external signals correct them, a signal no longer corrected drifts, and
      the absence of correction should read as uncertainty, not freedom. The system is several

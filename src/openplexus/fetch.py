@@ -1,11 +1,13 @@
-"""Step 3 on maths, fork (d): the store feeding the proposer.
+"""Step 3 on maths, fork (d): the store feeding the thinking.
 
-The system's own solved problems, each a question with the steps that reached its gold number,
-indexed by an embedding of the question; before the trunk proposes a step, the most similar
-solved problem is fetched and shown in its turn. The examples come from the rollout rows
-(`step_rollouts.py`): a problem is solved where an answer line reached the gold number, and its
-steps are the walk's steps so far. No human writes a row. The plexus mechanism itself, read for
-the first time on the proposer: does a fetched analogue change what the trunk writes next.
+The system's own solved problems, each a question with the solution that reached its gold
+number, indexed by an embedding of the question; before the trunk solves, the most similar
+solved problem is fetched and shown. The examples are the system's own: the rollout rows of the
+step form (`step_rollouts.py`, a problem solved where an answer line reached the gold number,
+its steps the walk's), or the whole solutions the trunk wrote on training problems
+(`grpo_reading.py --split train`, a row solved where its answer was right). No human writes a
+row. The plexus mechanism itself, read on the proposer: does a fetched analogue change what the
+trunk writes next.
 """
 
 from __future__ import annotations
@@ -28,7 +30,19 @@ def solved_examples(rows: list[dict]) -> list[dict]:
     return [x for x in best.values() if x["steps"]]
 
 
+def solved_solutions(rows: list[dict]) -> list[dict]:
+    """From reading rows (`grpo_reading.py`), one {"question", "solution", "answer"} a problem
+    whose whole solution was right."""
+    best: dict[str, dict] = {}
+    for r in rows:
+        if r.get("correct") and r.get("reply") and r["question"] not in best:
+            best[r["question"]] = {"question": r["question"], "solution": r["reply"].strip(), "answer": r["answer"]}
+    return list(best.values())
+
+
 def example_text(ex: dict) -> str:
+    if "solution" in ex:
+        return f"Problem: {ex['question']}\nSolution:\n{ex['solution']}"
     steps = "".join(f"{i + 1}. {s}\n" for i, s in enumerate(ex["steps"]))
     return f"Problem: {ex['question']}\nSteps:\n{steps}{len(ex['steps']) + 1}. Answer: {ex['answer']}"
 

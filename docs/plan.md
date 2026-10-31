@@ -245,9 +245,10 @@ Each step says what it decides. A step is struck when it is done.
      into them, so a frontier teacher at training time is fair by the standard, and the trunk
      should start as the best distilled reasoner that fits fp32 in process (Qwen3.5-2B is one;
      a comparison is an afternoon's reading).
-   - Next, once round one reads, in order. (d) The store feeding the thinking
-     (`openplexus.fetch`, built, not run): the system's own solved problems indexed, first by
-     the question (the nearest solved problem shown before the trunk solves, never a question's
+   - Next, in order. (d) The store feeding the thinking (`openplexus.fetch`, the `:fetch` arm
+     of `grpo_reading.py`, built, not run): the system's own solved problems (its right whole
+     solutions on the training problems, `--split train`) indexed by MiniLM, first by the
+     question (the nearest solved problem shown before the trunk solves, never a question's
      own), then John's form keyed on the thinking: at each step fetch the solved situations
      most like the steps so far and show what the next step was there; read against the same
      arm without it, since a trunk fed its own past can set in its ways. Then the asking as

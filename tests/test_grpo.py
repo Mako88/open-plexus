@@ -9,7 +9,7 @@ sys.path.insert(0, str(ROOT / "src"))
 sys.path.insert(0, str(ROOT / "scripts"))
 
 from grpo import answer_in, answer_line, correct  # noqa: E402
-from grpo_reading import paired  # noqa: E402
+from grpo_reading import arm_tag, ask_text, paired  # noqa: E402
 
 
 def test_the_answer_line_is_read_and_the_last_number_stands_in():
@@ -36,3 +36,15 @@ def test_the_paired_gap_counts_flips_on_shared_questions_only():
     assert (pr["n"], pr["made_right"], pr["made_wrong"]) == (3, 1, 1)
     assert pr["gap"] == 0 and pr["standard_errors"] == 0
     assert paired(mine, {}, ps) is None
+
+
+def test_arm_tags_and_the_fetched_ask():
+    import argparse
+    test = argparse.Namespace(split="test", skip=0)
+    train = argparse.Namespace(split="train", skip=1000)
+    assert arm_tag("base", test) == "base"
+    assert arm_tag("state/grpo/round1/adapter", test) == "round1"
+    assert arm_tag("state/grpo/round1/adapter:fetch", test) == "round1-fetch"
+    assert arm_tag("state/grpo/round1/adapter", train) == "round1-train-skip1000"
+    assert ask_text("Q", None) == "Q"
+    assert ask_text("Q", "Problem: P\nSolution:\nS").endswith("Now solve this one.\n\nQ")

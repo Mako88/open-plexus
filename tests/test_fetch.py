@@ -9,7 +9,7 @@ import numpy as np
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "src"))
 
-from openplexus.fetch import SolvedIndex, example_text, solved_examples  # noqa: E402
+from openplexus.fetch import SolvedIndex, example_text, solved_examples, solved_solutions  # noqa: E402
 from openplexus.steps import step_messages  # noqa: E402
 
 ROWS = [
@@ -43,3 +43,12 @@ def test_the_nearest_solved_problem_is_fetched_but_never_the_question_itself():
     turn = step_messages("Di has 6 apples.", [], got[0])
     assert turn[1]["content"].startswith("A solved problem like this one:\nProblem: Ann has")
     assert turn[1]["content"].endswith("Problem: Di has 6 apples.\nSteps so far:\n(none yet)\nNext step:")
+
+
+def test_whole_solutions_are_solved_where_right_and_shown_as_one():
+    rows = [{"question": "Q1", "answer": "5", "reply": "2 + 3 = 5.\nAnswer: 5\n", "correct": True},
+            {"question": "Q2", "answer": "6", "reply": "Answer: 7", "correct": False},
+            {"question": "Q1", "answer": "5", "reply": "again", "correct": True}]
+    got = solved_solutions(rows)
+    assert [x["question"] for x in got] == ["Q1"]
+    assert example_text(got[0]) == "Problem: Q1\nSolution:\n2 + 3 = 5.\nAnswer: 5"

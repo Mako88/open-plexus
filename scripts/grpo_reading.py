@@ -1,6 +1,10 @@
 """The GRPO policy read on GSM8K test: the trunk's whole solution, greedy, with and without the
 adapter the loop trained (`grpo.py`), the same system prompt as training. Passes a question: the
-tokens of the solution plus one prefill. Arms are adapter paths, or `base` for the plain trunk.
+tokens of the solution plus one prefill. Arms are adapter paths, or `base` for the plain trunk; a
+`:fetch` suffix shows the trunk the most similar solved problem from `--fetch <rows>` before the
+question (`openplexus.fetch`, fork d), the control the same arm without it. `--split train
+--skip N` reads training problems instead, whose right rows are the solved problems a later
+`--fetch` draws on: the system's own solutions, no human's.
 An arm is compared with `--against` (other arms' tags, `base` by default, the first the one that
 stops it) on the same questions, by the count of problems made right and made wrong, and stops
 once that paired gap is `--clear` standard errors from zero after `--min-n` questions; the
@@ -9,7 +13,9 @@ prefix the control also found easy. Rows
 are appended to state/ and a re-run skips the questions read.
 
     .venv/Scripts/python scripts/grpo_reading.py --arms base --n 500
-    .venv/Scripts/python scripts/grpo_reading.py --arms state/grpo/round1/adapter --n 500 --reference <base>
+    .venv/Scripts/python scripts/grpo_reading.py --arms state/grpo/round1/adapter --n 500 --against base
+    .venv/Scripts/python scripts/grpo_reading.py --arms state/grpo/round1/adapter --split train --n 1000
+    .venv/Scripts/python scripts/grpo_reading.py --arms state/grpo/round1/adapter:fetch --fetch state/grpo-reading-round1-train.part.jsonl --against round1
 
 Writes readings/grpo-*.json. Needs the card.
 """
@@ -57,11 +63,30 @@ def paired(rows: dict, other: dict, ps: list[dict]) -> dict | None:
             "standard_errors": round((fixed - broke) / len(both) / se, 1)}
 
 
-def arm(spec: str, ps: list[dict], args) -> dict:
+def arm_tag(spec: str, args) -> str:
+    base = spec.split(":")[0]
+    tag = "base" if base == "base" else Path(base).parent.name
+    if spec.endswith(":fetch"):
+        tag += "-fetch"
+    if args.split != "test" or args.skip:
+        tag += f"-{args.split}" + (f"-skip{args.skip}" if args.skip else "")
+    return tag
+
+
+def ask_text(question: str, example: str | None) -> str:
+    if example is None:
+        return question
+    return f"A solved problem like this one:\n\n{example}\n\nNow solve this one.\n\n{question}"
+
+
+def arm(spec: str, ps: list[dict], args, index=None) -> dict:
     from openplexus.trunk import LocalTrunk
 
-    adapter = None if spec == "base" else spec
-    tag = "base" if adapter is None else Path(adapter).parent.name
+    fetch = spec.endswith(":fetch")
+    if fetch and index is None:
+        raise SystemExit(f"{spec} needs --fetch <reading rows> for the solved problems")
+    adapter = None if spec.split(":")[0] == "base" else spec.split(":")[0]
+    tag = arm_tag(spec, args)
     part = ROOT / "state" / f"grpo-reading-{tag}.part.jsonl"
     done = part_rows(tag)
     others = {o: part_rows(o) for o in args.against.split(",") if o and o != tag}
@@ -73,15 +98,19 @@ def arm(spec: str, ps: list[dict], args) -> dict:
     for at in range(0, len(todo), args.batch):
         chunk = todo[at:at + args.batch]
         before_out, before_in = trunk.tokens_out, trunk.tokens_in
-        replies = trunk.ask_many([[{"role": "system", "content": SYSTEM}, {"role": "user", "content": p["question"]}]
-                                  for p in chunk])
+        examples = index.nearest_many([p["question"] for p in chunk]) if fetch else [None] * len(chunk)
+        replies = trunk.ask_many([[{"role": "system", "content": SYSTEM},
+                                   {"role": "user", "content": ask_text(p["question"], ex)}]
+                                  for p, ex in zip(chunk, examples)])
         tokens_out = trunk.tokens_out - before_out
         with open(part, "a", encoding="utf-8") as f:
-            for p, reply in zip(chunk, replies):
+            for p, reply, ex in zip(chunk, replies, examples):
                 said = answer_in(reply)
                 row = {"question": p["question"], "answer": p["answer"], "said": said,
                        "correct": same_number(said, p["answer"]), "reply": reply,
                        "passes": round(tokens_out / len(chunk) + 1, 1)}
+                if fetch:
+                    row["example"] = ex
                 done[p["question"]] = row
                 f.write(json.dumps(row, ensure_ascii=False) + "\n")
         score = sum(done[p["question"]]["correct"] for p in ps[:len(done)]) / len(done)
@@ -104,7 +133,9 @@ def arm(spec: str, ps: list[dict], args) -> dict:
     rows = [done[p["question"]] for p in ps if p["question"] in done]
     n = len(rows)
     return {
-        "adapter": adapter, "served_model": trunk.served_model(), "system_prompt": SYSTEM, "greedy": True,
+        "adapter": adapter, "fetch": args.fetch if fetch else None,
+        "solved_problems_to_fetch_from": len(index.examples) if fetch else None,
+        "served_model": trunk.served_model(), "system_prompt": SYSTEM, "greedy": True,
         "max_completion": args.max_completion, "inputs_the_deployed_system_has": "all: the question",
         "score": round(sum(r["correct"] for r in rows) / n, 3), "n": n, "stopped_early": n < len(ps),
         "reference": args.reference, "paired": {o: paired(done, rows, ps) for o, rows in others.items()},
@@ -118,6 +149,9 @@ def main() -> None:
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument("--arms", default="base")
     p.add_argument("--n", type=int, default=500)
+    p.add_argument("--split", default="test", help="test for a reading; train to make solved problems")
+    p.add_argument("--skip", type=int, default=0)
+    p.add_argument("--fetch", default=None, help="reading rows whose right solutions a :fetch arm shows the trunk")
     p.add_argument("--model", default="Qwen/Qwen3.5-2B")
     p.add_argument("--batch", type=int, default=8)
     p.add_argument("--max-completion", type=int, default=400)
@@ -127,11 +161,20 @@ def main() -> None:
     p.add_argument("--clear", type=float, default=2.5)
     p.add_argument("--note", default="")
     args = p.parse_args()
-    ps = problems(args.n)
-    reading = {"kind": "grpo-reading", "set": "GSM8K test, data/gsm8k/test.jsonl", "n": len(ps),
-               "scorer": "the answer line's number, else the last number, within 1e-6 of the gold", "arms": {}}
+    ps = problems(args.n, split=args.split, skip=args.skip)
+    reading = {"kind": "grpo-reading", "set": f"GSM8K {args.split}, data/gsm8k/{args.split}.jsonl", "skip": args.skip,
+               "n": len(ps), "scorer": "the answer line's number, else the last number, within 1e-6 of the gold",
+               "arms": {}}
+    index = None
+    if args.fetch:
+        from openplexus.embed import MiniLM
+        from openplexus.fetch import SolvedIndex, solved_solutions
+
+        rows = [json.loads(line) for line in Path(args.fetch).read_text(encoding="utf-8").splitlines()]
+        index = SolvedIndex(solved_solutions(rows), MiniLM())
+        print(f"{len(index.examples)} solved problems to fetch from", flush=True)
     for spec in args.arms.split(","):
-        a = arm(spec, ps, args)
+        a = arm(spec, ps, args, index)
         reading["arms"][spec] = a
         print(f"== {spec}: {a['score']} on {a['n']} at {a['passes_per_question']} passes a question, "
               f"{a['unanswered']} unanswered, {a['seconds']}s", flush=True)

@@ -284,9 +284,21 @@ Each step says what it decides. A step is struck when it is done.
      and are right on 95.5% of those, and split on 74 where the answer is right on 54% (greedy
      57%). With no key the system can tell which two in three of its answers to trust and which
      to spend more on (self-consistency 2022; TTRL 2025 trains on the majority as the label).
-     Next, running: the loop without the key, round two's adapter trained on round three's set
-     with agreement with the group's majority as the reward (`--reward agreement`, the key
-     logged at weight zero), read against round three's key-trained 0.806. Then a published
+     The loop without the key, read 2026-10-31 (`readings/grpo-20261031T225403Z`,
+     `state/grpo/round3-agree`): round two's adapter trained on round three's set with
+     agreement with the group's majority as the reward (`--reward agreement`, the key logged at
+     weight zero), 203 steps. In training the agreement rose from 0.78 to 0.85 and the logged
+     key accuracy with it, 0.66 to 0.72, for 150 steps; in the last fifty the solutions
+     shortened from 230 tokens to 135 and the key accuracy fell to 0.60 while agreement held,
+     the policy sharpening on itself. On test **0.763 at 136 passes**, 15 made right and 32 made
+     wrong against the key-trained round three (0.839 on the same 224 questions), 15 and 25
+     against its own starting point, 28 and 24 against the base. So agreement is a judge here
+     and not yet a reward: it sorts the answers at 95% against 54%, but a round that chases it
+     plainly drifts to terse consensus and loses to the key, the collapse TTRL reports and
+     Self-Rewarding Language Models met after a few rounds. The piece's next form, when it is
+     needed (a set with no key): reward only the groups that agree unanimously and leave the
+     rest unscored, the judge refreshed each round; until then the key trains and agreement
+     judges. Then a published
      process reward model (Skywork-PRM 1.5B, Qwen2.5-Math-PRM 7B) as a judge arm. (c) A
      learning-progress monitor, budget to the steepest slope, once there are problem types.
      Problem supply: generators with keys, the trunk writing variants of solved problems with

@@ -301,8 +301,20 @@ Each step says what it decides. A step is struck when it is done.
      the solved problem whose solution has the nearest shape, and the trunk solves again with it
      shown, at twice the passes; a probe showed the shape key finding a download with a
      restart for a download with a restart where the question key found a file by its size.
-     Read against the same adapter without it. Then the asking as the trunk's learned action,
-     credited by whether the fetch changed the outcome: the core bet. A published process reward model (Skywork-PRM 1.5B, Qwen2.5-Math-PRM 7B) as a judge
+     Read 2026-10-31 against the same adapter without it (`readings/grpo-20261031T194227Z`): **11
+     made right and 26 made wrong** on 192 questions, 0.724 against 0.802, stopped at 2.5
+     standard errors, at twice the passes. The first pass was right on 154 of the 192, exactly
+     as the plain arm; the second pass, with a method analogue in front of it, re-derived 26 of
+     those wrongly (a different decomposition, not the example's answer, not its numbers) and
+     fixed 11. So both forms read the same way: any solved example shown to this trunk perturbs
+     about a fifth of its solutions in both directions, net loss, because on GSM8K the store
+     holds nothing the trunk lacks and a 2B cannot ignore what it is shown. A gate that fetches
+     only where it helps would have to pick the 11 from the 26 from the state before solving,
+     and fork (e) read that the state does not carry that. The conclusion, for John: the store's
+     claim cannot be read on GSM8K at all; it has to be read where the knowledge needed is
+     absent from the trunk and present in the store (the bAbI readings were that, at the
+     ceiling; a knowledge-bearing problem set is the next one), and the asking as a learned
+     action is built there, not here. Until then the loop runs without the store on maths. A published process reward model (Skywork-PRM 1.5B, Qwen2.5-Math-PRM 7B) as a judge
      arm, and agreement across samples as the first key-less signal, since it costs only
      passes. (c) A learning-progress monitor, budget to the steepest slope, once there are
      problem types. Problem supply: generators with keys, the trunk writing variants of solved

@@ -92,6 +92,8 @@ def main() -> None:
     p.add_argument("--mode", choices=["plain", "think"], default="plain")
     p.add_argument("--generations", type=int, default=4, help="solutions sampled a problem")
     p.add_argument("--prompts-per-step", type=int, default=2, help="problems an optimiser step")
+    p.add_argument("--micro", type=int, default=None,
+                   help="solutions a forward pass; the generations by default, 2 when the card is shared by day")
     p.add_argument("--max-completion", type=int, default=None, help="tokens a solution; 400 plain, 1536 think")
     p.add_argument("--lr", type=float, default=2e-5)
     p.add_argument("--epochs", type=float, default=1.0)
@@ -118,10 +120,14 @@ def main() -> None:
                                           {"role": "user", "content": x["question"]}],
                                "answer": x["answer"]} for x in ps])
     max_completion = args.max_completion or (1536 if args.mode == "think" else 400)
+    micro = args.micro or args.generations
+    per_step = args.generations * args.prompts_per_step
+    if per_step % micro:
+        raise SystemExit(f"--micro {micro} must divide the {per_step} solutions of a step")
     config = GRPOConfig(
         output_dir=str(out), seed=args.seed, learning_rate=args.lr, num_train_epochs=args.epochs,
-        max_steps=args.max_steps, per_device_train_batch_size=args.generations,
-        gradient_accumulation_steps=args.prompts_per_step, num_generations=args.generations,
+        max_steps=args.max_steps, per_device_train_batch_size=micro,
+        gradient_accumulation_steps=per_step // micro, num_generations=args.generations,
         max_completion_length=max_completion, temperature=1.0, beta=0.0,
         gradient_checkpointing=True, gradient_checkpointing_kwargs={"use_reentrant": False},
         logging_steps=1, save_steps=args.save_steps, save_total_limit=2, report_to="none",
@@ -151,7 +157,7 @@ def main() -> None:
     log = [dict(e) for e in trainer.state.log_history]
     (out / "grpo.json").write_text(json.dumps({
         "model": args.model, "mode": args.mode, "n": len(ps), "skip": args.skip, "init_adapter": args.init_adapter,
-        "from_rows": args.from_rows, "wrong_share": args.wrong_share if args.from_rows else None,
+        "from_rows": args.from_rows, "wrong_share": args.wrong_share if args.from_rows else None, "micro": micro,
         "generations": args.generations,
         "prompts_per_step": args.prompts_per_step, "max_completion": max_completion, "lr": args.lr,
         "epochs": args.epochs, "max_steps": args.max_steps, "rank": args.rank, "system": SYSTEM,

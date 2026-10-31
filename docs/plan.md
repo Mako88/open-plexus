@@ -251,7 +251,7 @@ Each step says what it decides. A step is struck when it is done.
      should start as the best distilled reasoner that fits fp32 in process (Qwen3.5-2B is one;
      a comparison is an afternoon's reading).
    - Next, in order. (d) The store feeding the thinking (`openplexus.fetch`, the `:fetch` arm
-     of `grpo_reading.py`). Its first form read 2026-10-31 (`readings/grpo-20261031T1*`,
+     of `grpo_reading.py`). Its first form read 2026-10-31 (`readings/grpo-20261031T110513Z`,
      the fetch arm): the system's own solved problems, round two's 1,606 right whole solutions
      on its 2,000 training problems, indexed by MiniLM on the question, the nearest shown
      before the test question, never a question's own; against the same adapter without it, on

@@ -225,10 +225,23 @@ Each step says what it decides. A step is struck when it is done.
      a thousand problems is about three hours here. The control
      (`readings/grpo-20261030T111215Z`): the plain trunk's greedy whole solution under
      training's prompt, GSM8K test, **0.736 at 237 passes**, every question answered, between
-     the step form's 0.364 at 102 and the thinking's 0.85 at 1,950. Round one, a thousand
-     problems, is running (resumed 2026-10-30 from step 20 after the card was Ember's for the
-     evening); its reading is the same arm with the adapter against 0.736, the early stop on.
-     The R1 paper found this loop on small models lost to distilling a large model's reasoning
+     the step form's 0.364 at 102 and the thinking's 0.85 at 1,950. **Round one**
+     (`readings/grpo-20261031T042520Z`, `state/grpo/round1`): a thousand training problems,
+     500 optimiser steps in 2.8 hours of card time across two pauses for Ember, peak 10.1 GiB.
+     The sampled training accuracy rose from 0.59 in the first fifty steps to 0.75 by step 200
+     and held; solutions cut at the 400-token cap fell from 0.29 to 0.07 as it learnt to
+     finish. Its adapter, greedy on the same 500 test problems: **0.774 at 246 passes**
+     against 0.736 at 237, 50 problems made right and 31 made wrong, a paired gap of 0.038 at
+     2.1 standard errors. So the trunk learns to reason from its own checkable outcomes on
+     this card, modestly, in one round: the loop runs. Two lessons. The early stop against the
+     unpaired reference fired at 232 problems reading 0.802, on a prefix the control also
+     found easier (0.754), so an arm read against a control on the same questions is stopped
+     by the paired count of flips, not the unpaired gap. And the gain is at the same cost, not
+     cheaper: the loop made the trunk right more often, not briefer. Round two goes on from
+     this adapter over the next thousand training problems (`--skip 1000 --init-adapter`), read
+     against both 0.736 and 0.774; the loop's claim is that the gap widens round on round, and
+     a second round that does not widen it is the ceiling of this recipe at this size. The R1
+     paper found this loop on small models lost to distilling a large model's reasoning
      into them, so a frontier teacher at training time is fair by the standard, and the trunk
      should start as the best distilled reasoner that fits fp32 in process (Qwen3.5-2B is one;
      a comparison is an afternoon's reading).

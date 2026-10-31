@@ -356,8 +356,16 @@ Each step says what it decides. A step is struck when it is done.
    rewarded by the key, so the trunk learns when to ask and what for; the control is the same
    trunk shown the top rows by the question with no action. Every reading here also carries a
    frontier reference (John, 2026-10-31): a clean-context frontier agent on the same
-   questions, as the target and as the check that a set is hard. The trunk quantised and the
-   budget read honestly (tokens per second, VRAM, disk) come with the full form.
+   questions, as the target and as the check that a set is hard. Built 2026-10-31
+   (`openplexus.hotpot`, `scripts/hotpot_reading.py` for the lines on the served trunk,
+   `scripts/ask.py` for the arm: TRL's GRPO with a store environment a rollout whose `search`
+   method is the trunk's tool, the key as the reward). The frontier reference
+   (`readings/frontier-hotpot-20261031T210036Z`): Opus 5.5 with the ten paragraphs, exact
+   match **0.79**, F1 0.886 on the first 100 validation questions, the misses mostly wording
+   (a fuller name, a date with the day), so F1 is the fairer line here; on GSM8K the same
+   agent scored 100 of the first 100 (`readings/frontier-gsm8k-20261031T205453Z`) against our
+   0.82, so GSM8K is a solved set at the frontier and HotpotQA is not. The trunk quantised and
+   the budget read honestly (tokens per second, VRAM, disk) come with the full form.
 
 7. **Consolidation: the trunk learns slowly, by replay.** Complementary learning systems
    (McClelland, McNaughton and O'Reilly, 1995): the hippocampus learns in one shot and the

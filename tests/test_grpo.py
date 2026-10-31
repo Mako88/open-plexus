@@ -72,3 +72,9 @@ def test_each_served_arm_asks_for_its_own_adapter_only():
     served = argparse.Namespace(split="test", skip=0, served="http://127.0.0.1:8093")
     assert arm_tag("base", served) == "base-served"
     assert arm_tag("state/grpo/round2/adapter", served) == "round2-served"
+
+
+def test_the_second_fetch_form_has_its_own_tag():
+    import argparse
+    test = argparse.Namespace(split="test", skip=0)
+    assert arm_tag("state/grpo/round2/adapter:fetch2", test) == "round2-fetch2"

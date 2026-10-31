@@ -12,6 +12,8 @@ trunk writes next.
 
 from __future__ import annotations
 
+import re
+
 import numpy as np
 
 from openplexus.maths import same_number
@@ -40,6 +42,19 @@ def solved_solutions(rows: list[dict]) -> list[dict]:
     return list(best.values())
 
 
+def shape(solution: str) -> str:
+    """The arithmetic shape of a solution, the key of the second fetch form: its equation lines
+    with every number replaced by N and capitalised names dropped, so two solutions that do the
+    same operations in the same order are near whatever they are about. The first form keyed on
+    the question's words and fetched topical neighbours, which distracted the trunk."""
+    lines = [line for line in solution.split("\n") if "=" in line]
+    s = " ; ".join(lines) if lines else solution
+    s = re.sub(r"\$?\d[\d,]*\.?\d*%?", "N", s)
+    s = re.sub(r"\b[A-Z][a-z]+\b", "", s)
+    s = re.sub(r"[*_#]", "", s)
+    return re.sub(r"\s+", " ", s).strip()[:600]
+
+
 def example_text(ex: dict) -> str:
     if "solution" in ex:
         return f"Problem: {ex['question']}\nSolution:\n{ex['solution']}"
@@ -48,24 +63,30 @@ def example_text(ex: dict) -> str:
 
 
 class SolvedIndex:
-    """Solved problems under an embedder of their questions; `nearest(question)` is the most
-    similar one's text, never the same question (a test question that leaked into the store
-    would otherwise be answered by its own solution)."""
+    """Solved problems under an embedder of a key of each, the question by default or any
+    function of the example (`key=lambda ex: shape(ex["solution"])` for the second form);
+    `nearest_many(queries, questions)` is the most similar one's text for each query, never
+    the example of the same question (a test question that leaked into the store would
+    otherwise be answered by its own solution)."""
 
-    def __init__(self, examples: list[dict], embed):
+    def __init__(self, examples: list[dict], embed, key=None):
         self.examples = examples
         self.embed = embed
-        self.keys = self._normalise(embed([x["question"] for x in examples])) if examples else np.zeros((0, 1))
+        self.key = key or (lambda ex: ex["question"])
+        self.keys = self._normalise(embed([self.key(x) for x in examples])) if examples else np.zeros((0, 1))
 
     @staticmethod
     def _normalise(x) -> np.ndarray:
         x = np.asarray(x, dtype=np.float32)
         return x / np.maximum(np.linalg.norm(x, axis=1, keepdims=True), 1e-12)
 
-    def nearest_many(self, questions: list[str]) -> list[str | None]:
+    def nearest_many(self, queries: list[str], questions: list[str] | None = None) -> list[str | None]:
+        """The nearest example's text for each query; `questions` are the queries' own
+        questions where the query is not the question itself, so none fetches its own."""
         if not self.examples:
-            return [None] * len(questions)
-        q = self._normalise(self.embed(questions))
+            return [None] * len(queries)
+        questions = questions or queries
+        q = self._normalise(self.embed(queries))
         scores = q @ self.keys.T
         out = []
         for i, question in enumerate(questions):

@@ -52,3 +52,20 @@ def test_whole_solutions_are_solved_where_right_and_shown_as_one():
     got = solved_solutions(rows)
     assert [x["question"] for x in got] == ["Q1"]
     assert example_text(got[0]) == "Problem: Q1\nSolution:\n2 + 3 = 5.\nAnswer: 5"
+
+
+def test_the_shape_keeps_the_operations_and_drops_the_numbers_and_names():
+    from openplexus.fetch import shape
+    s = shape("Janet has 16 eggs.\n1. 16 - 3 = 13 eggs left.\n2. 13 * $2 = $26.\nAnswer: 26")
+    assert s == "N N - N = N eggs left. ; N N N = N"
+    assert shape("no equations here") == "no equations here"
+
+
+def test_an_index_keyed_on_the_shape_never_fetches_its_own_question():
+    from openplexus.fetch import shape
+    examples = [{"question": "Q1", "solution": "2 * 3 = 6\nAnswer: 6", "answer": "6"},
+                {"question": "Q2", "solution": "4 + 1 = 5\nAnswer: 5", "answer": "5"}]
+    index = SolvedIndex(examples, lambda texts: np.array([[1.0, 0.0] if "N N = N" in t else [0.0, 1.0] for t in texts]),
+                        key=lambda ex: shape(ex["solution"]))
+    got = index.nearest_many([shape("7 * 8 = 56\nAnswer: 56")], questions=["Q1"])
+    assert got == ["Problem: Q2\nSolution:\n4 + 1 = 5\nAnswer: 5"]

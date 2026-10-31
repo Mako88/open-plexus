@@ -2,7 +2,10 @@
 adapter the loop trained (`grpo.py`), the same system prompt as training. Passes a question: the
 tokens of the solution plus one prefill. Arms are adapter paths, or `base` for the plain trunk; a
 `:fetch` suffix shows the trunk the most similar solved problem from `--fetch <rows>` before the
-question (`openplexus.fetch`, fork d), the control the same arm without it. `--split train
+question (`openplexus.fetch`, fork d), the control the same arm without it; `:fetch2` is the
+second form, keyed on the method: the trunk solves once, the arithmetic shape of its own
+solution fetches the solved problem whose solution has the nearest shape, and the trunk solves
+again with that shown, at twice the passes. `--split train
 --skip N` reads training problems instead, whose right rows are the solved problems a later
 `--fetch` draws on: the system's own solutions, no human's. `--served` reads on llama-server
 instead of fp32 in process, several times faster: the server is launched with every adapter as
@@ -68,6 +71,8 @@ def arm_tag(spec: str, args) -> str:
     tag = "base" if base == "base" else Path(base).parent.name
     if spec.endswith(":fetch"):
         tag += "-fetch"
+    if spec.endswith(":fetch2"):
+        tag += "-fetch2"
     if args.split != "test" or args.skip:
         tag += f"-{args.split}" + (f"-skip{args.skip}" if args.skip else "")
     if getattr(args, "served", None):
@@ -95,9 +100,14 @@ def ask_text(question: str, example: str | None) -> str:
 def arm(spec: str, ps: list[dict], args, index=None) -> dict:
     from openplexus.trunk import LocalTrunk
 
-    fetch = spec.endswith(":fetch")
+    fetch = spec.endswith(":fetch") or spec.endswith(":fetch2")
+    by_shape = spec.endswith(":fetch2")
     if fetch and index is None:
         raise SystemExit(f"{spec} needs --fetch <reading rows> for the solved problems")
+    if by_shape:
+        from openplexus.fetch import SolvedIndex, shape
+
+        index = SolvedIndex(index.examples, index.embed, key=lambda ex: shape(ex["solution"]))
     adapter = None if spec.split(":")[0] == "base" else spec.split(":")[0]
     tag = arm_tag(spec, args)
     part = ROOT / "state" / f"grpo-reading-{tag}.part.jsonl"
@@ -118,7 +128,15 @@ def arm(spec: str, ps: list[dict], args, index=None) -> dict:
     for at in range(0, len(todo), args.batch):
         chunk = todo[at:at + args.batch]
         before_out, before_in = trunk.tokens_out, trunk.tokens_in
-        examples = index.nearest_many([p["question"] for p in chunk]) if fetch else [None] * len(chunk)
+        first = None
+        if by_shape:
+            first = trunk.ask_many([[{"role": "system", "content": SYSTEM}, {"role": "user", "content": p["question"]}]
+                                    for p in chunk])
+            examples = index.nearest_many([shape(r) for r in first], questions=[p["question"] for p in chunk])
+        elif fetch:
+            examples = index.nearest_many([p["question"] for p in chunk])
+        else:
+            examples = [None] * len(chunk)
         replies = trunk.ask_many([[{"role": "system", "content": SYSTEM},
                                    {"role": "user", "content": ask_text(p["question"], ex)}]
                                   for p, ex in zip(chunk, examples)])
@@ -131,6 +149,8 @@ def arm(spec: str, ps: list[dict], args, index=None) -> dict:
                        "passes": round(tokens_out / len(chunk) + 1, 1)}
                 if fetch:
                     row["example"] = ex
+                if first is not None:
+                    row["first_reply"] = first[chunk.index(p)]
                 done[p["question"]] = row
                 f.write(json.dumps(row, ensure_ascii=False) + "\n")
         score = sum(done[p["question"]]["correct"] for p in ps[:len(done)]) / len(done)

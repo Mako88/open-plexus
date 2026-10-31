@@ -251,14 +251,22 @@ Each step says what it decides. A step is struck when it is done.
      should start as the best distilled reasoner that fits fp32 in process (Qwen3.5-2B is one;
      a comparison is an afternoon's reading).
    - Next, in order. (d) The store feeding the thinking (`openplexus.fetch`, the `:fetch` arm
-     of `grpo_reading.py`, built, not run): the system's own solved problems (its right whole
-     solutions on the training problems, `--split train`) indexed by MiniLM, first by the
-     question (the nearest solved problem shown before the trunk solves, never a question's
-     own), then John's form keyed on the thinking: at each step fetch the solved situations
-     most like the steps so far and show what the next step was there; read against the same
-     arm without it, since a trunk fed its own past can set in its ways. Then the asking as
-     the trunk's learned action, credited by whether the fetch changed the outcome: the core
-     bet. A published process reward model (Skywork-PRM 1.5B, Qwen2.5-Math-PRM 7B) as a judge
+     of `grpo_reading.py`). Its first form read 2026-10-31 (`readings/grpo-20261031T1*`,
+     the fetch arm): the system's own solved problems, round two's 1,606 right whole solutions
+     on its 2,000 training problems, indexed by MiniLM on the question, the nearest shown
+     before the test question, never a question's own; against the same adapter without it, on
+     the first 112 questions **5 made right and 17 made wrong**, 0.679 against 0.786, stopped
+     at 2.6 standard errors. Not copying: no wrong answer was the example's, and the replies
+     are the same length; the trunk misreads its own problem's quantities with a neighbour in
+     front of it (150% of the wrong base, a third of the wrong total). The nearest question is
+     a topical neighbour (a house, chickens, a profit), not an analogue in method, and a
+     topical neighbour is a distractor to a 2B trunk, as step 1 found the rows about the milk
+     were. So a fetch that helps has to be keyed on the method, not the words of the question:
+     John's form, keyed on the thinking (the solved situations most like the steps so far,
+     shown with what the next step was there), or the solution's shape as the key, and the
+     asker has to learn when not to fetch, which the first form never could. That is the
+     next form to build, read the same way. Then the asking as the trunk's learned action,
+     credited by whether the fetch changed the outcome: the core bet. A published process reward model (Skywork-PRM 1.5B, Qwen2.5-Math-PRM 7B) as a judge
      arm, and agreement across samples as the first key-less signal, since it costs only
      passes. (c) A learning-progress monitor, budget to the steepest slope, once there are
      problem types. Problem supply: generators with keys, the trunk writing variants of solved

@@ -7,10 +7,12 @@ the published recipe for a small model learning to reason from checkable outcome
 read what it does on this card before anything of ours is built on it. The trunk's non-thinking
 solution by default (a few hundred tokens); `--mode think` samples its thinking, ten times the
 tokens. LoRA on the same projections as `trunk_adapter.py`; fp32, since the card has no bf16;
-checkpoints every `--save-steps` and resumes from the last.
+checkpoints every `--save-steps` and resumes from the last. A later round starts from the round
+before's adapter (`--init-adapter`) on the next training problems (`--skip`).
 
     .venv/Scripts/python scripts/grpo.py --n 2 --max-steps 2 --out state/grpo/smoke     # memory and seconds a step
     .venv/Scripts/python scripts/grpo.py --n 1000 --out state/grpo/round1
+    .venv/Scripts/python scripts/grpo.py --n 1000 --skip 1000 --init-adapter state/grpo/round1/adapter --out state/grpo/round2
 
 Writes <out>/checkpoint-*/ (the adapter and trainer state) and <out>/grpo.json.
 """
@@ -64,6 +66,8 @@ def main() -> None:
     p.add_argument("--out", default="state/grpo/round1")
     p.add_argument("--model", default="Qwen/Qwen3.5-2B")
     p.add_argument("--n", type=int, default=1000, help="training problems")
+    p.add_argument("--skip", type=int, default=0, help="training problems passed over first")
+    p.add_argument("--init-adapter", default=None, help="the adapter to go on training, else a fresh one")
     p.add_argument("--mode", choices=["plain", "think"], default="plain")
     p.add_argument("--generations", type=int, default=4, help="solutions sampled a problem")
     p.add_argument("--prompts-per-step", type=int, default=2, help="problems an optimiser step")
@@ -83,7 +87,7 @@ def main() -> None:
 
     out = Path(args.out)
     out.mkdir(parents=True, exist_ok=True)
-    ps = problems(args.n, split="train")
+    ps = problems(args.n, split="train", skip=args.skip)
     data = Dataset.from_list([{"prompt": [{"role": "system", "content": SYSTEM},
                                           {"role": "user", "content": x["question"]}],
                                "answer": x["answer"]} for x in ps])
@@ -107,6 +111,11 @@ def main() -> None:
     # vision processor, which needs image libraries this project does not carry
     model = AutoModelForCausalLM.from_pretrained(args.model, dtype=torch.float32)
     tok = AutoTokenizer.from_pretrained(args.model)
+    if args.init_adapter:
+        from peft import PeftModel
+
+        model = PeftModel.from_pretrained(model, args.init_adapter, is_trainable=True)
+        peft = None
     trainer = GRPOTrainer(model=model, processing_class=tok, reward_funcs=[correct, answer_line], args=config,
                           train_dataset=data, peft_config=peft)
     last = sorted(out.glob("checkpoint-*"), key=lambda d: int(d.name.split("-")[1]))
@@ -115,7 +124,8 @@ def main() -> None:
     trainer.save_model(str(out / "adapter"))
     log = [dict(e) for e in trainer.state.log_history]
     (out / "grpo.json").write_text(json.dumps({
-        "model": args.model, "mode": args.mode, "n": len(ps), "generations": args.generations,
+        "model": args.model, "mode": args.mode, "n": len(ps), "skip": args.skip, "init_adapter": args.init_adapter,
+        "generations": args.generations,
         "prompts_per_step": args.prompts_per_step, "max_completion": max_completion, "lr": args.lr,
         "epochs": args.epochs, "max_steps": args.max_steps, "rank": args.rank, "system": SYSTEM,
         "rewards": ["correct: 1.0 where the answer line is the gold number",

@@ -27,14 +27,17 @@ PYTHON_SYSTEM = (
 )
 
 
-def problems(n: int | None = None, split: str = "test") -> list[dict]:
-    """The problems of a split, each {"question", "answer"} with the answer as the gold number.
-    Readings are on "test"; "train" (7,473 problems, the same source) is for the system's own
-    rollouts, so nothing it learns from is a problem it is read on."""
+def problems(n: int | None = None, split: str = "test", skip: int = 0) -> list[dict]:
+    """The problems of a split, each {"question", "answer"} with the answer as the gold number,
+    the first `skip` passed over. Readings are on "test"; "train" (7,473 problems, the same
+    source) is for the system's own rollouts, so nothing it learns from is a problem it is read
+    on, and a round of training takes the next problems after the round before."""
     out = []
     with open(ROOT / "data" / "gsm8k" / f"{split}.jsonl", encoding="utf-8") as f:
         for i, line in enumerate(f):
-            if n is not None and i >= n:
+            if i < skip:
+                continue
+            if n is not None and i >= skip + n:
                 break
             r = json.loads(line)
             out.append({"question": r["question"], "answer": gold_number(r["answer"]),

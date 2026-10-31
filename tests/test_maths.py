@@ -30,3 +30,10 @@ def test_a_program_runs_and_a_hanging_one_is_cut_off():
     assert run_program("print('the answer is 7.0')") == "7"
     assert run_program("while True: pass", timeout=1.0) is None
     assert run_program("raise ValueError") is None
+
+
+def test_a_round_takes_the_problems_after_the_round_before():
+    first, second = problems(3, split="train"), problems(3, split="train", skip=3)
+    assert len(first) == len(second) == 3
+    assert {p["question"] for p in first}.isdisjoint({p["question"] for p in second})
+    assert problems(6, split="train")[3:] == second

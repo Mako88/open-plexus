@@ -376,8 +376,19 @@ Each step says what it decides. A step is struck when it is done.
    match **0.79**, F1 0.886 on the first 100 validation questions, the misses mostly wording
    (a fuller name, a date with the day), so F1 is the fairer line here; on GSM8K the same
    agent scored 100 of the first 100 (`readings/frontier-gsm8k-20261031T205453Z`) against our
-   0.82, so GSM8K is a solved set at the frontier and HotpotQA is not. The trunk quantised and
-   the budget read honestly (tokens per second, VRAM, disk) come with the full form.
+   0.82, so GSM8K is a solved set at the frontier and HotpotQA is not. The lines, read
+   2026-10-31 on the served Q8 trunk, no adapter (`readings/hotpot-20261031T232647Z`, exact
+   match, the first 200 validation questions, the arms stopped at 104 as clear of the floor):
+   floor **0.15** (F1 0.206; bridge questions 0.06, comparison 0.59, which are mostly yes or
+   no); gold, the two supporting paragraphs, **0.635** (F1 0.745); episode, all ten, 0.538, the
+   eight distractors costing a tenth as bAbI's whole story did; top-2 by MiniLM on the question,
+   the store with no asking, **0.365** (F1 0.438). The top-2 arm shows exactly what the asking
+   has to earn: it found both supporting paragraphs for 31 of 104 questions and the trunk then
+   scored 0.71, above gold; one of the two for 65, scoring 0.22; the second hop is not in the
+   question's words, it is in the first paragraph. So the store has 0.15 to 0.64 to give here,
+   the question alone recovers 0.37 of it, and the asking is read on the rest. The trunk
+   quantised and the budget read honestly (tokens per second, VRAM, disk) come with the full
+   form.
 
 7. **Consolidation: the trunk learns slowly, by replay.** Complementary learning systems
    (McClelland, McNaughton and O'Reilly, 1995): the hippocampus learns in one shot and the

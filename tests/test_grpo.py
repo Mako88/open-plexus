@@ -9,7 +9,7 @@ sys.path.insert(0, str(ROOT / "src"))
 sys.path.insert(0, str(ROOT / "scripts"))
 
 from grpo import answer_in, answer_line, correct, select_rows  # noqa: E402
-from grpo_reading import arm_tag, ask_text, lora_scales, paired  # noqa: E402
+from grpo_reading import agreement_curve, arm_tag, ask_text, lora_scales, majority, paired  # noqa: E402
 
 
 def test_the_answer_line_is_read_and_the_last_number_stands_in():
@@ -78,3 +78,15 @@ def test_the_second_fetch_form_has_its_own_tag():
     import argparse
     test = argparse.Namespace(split="test", skip=0)
     assert arm_tag("state/grpo/round2/adapter:fetch2", test) == "round2-fetch2"
+
+
+def test_the_majority_answer_and_its_agreement():
+    assert majority(["7", "7.0", "8", None]) == ("7", 0.5)
+    assert majority([None, None]) == (None, 0.0)
+    assert majority(["1250", "1250.0", "1250.00"]) == ("1250", 1.0)
+    curve = agreement_curve([{"agreement": 1.0, "correct": True}, {"agreement": 0.5, "correct": False},
+                             {"agreement": 1.0, "correct": True}])
+    assert curve == [{"agreement_at_least": 1.0, "n": 2, "accuracy": 1.0},
+                     {"agreement_at_least": 0.5, "n": 3, "accuracy": 0.667}]
+    import argparse
+    assert arm_tag("state/grpo/round2/adapter:vote4", argparse.Namespace(split="test", skip=0)) == "round2-vote4"

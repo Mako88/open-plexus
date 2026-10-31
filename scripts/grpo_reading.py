@@ -5,7 +5,11 @@ tokens of the solution plus one prefill. Arms are adapter paths, or `base` for t
 question (`openplexus.fetch`, fork d), the control the same arm without it; `:fetch2` is the
 second form, keyed on the method: the trunk solves once, the arithmetic shape of its own
 solution fetches the solved problem whose solution has the nearest shape, and the trunk solves
-again with that shown, at twice the passes. `--split train
+again with that shown, at twice the passes. A `:voteK` suffix samples K solutions at
+`--temperature` and answers with the majority (self-consistency), at K times the passes; each
+row carries the K answers and the agreement, the share that voted with the majority, which is
+the first key-less signal the plan names: read as the accuracy of the majority answer at each
+level of agreement, with no key in the loop. `--split train
 --skip N` reads training problems instead, whose right rows are the solved problems a later
 `--fetch` draws on: the system's own solutions, no human's. `--served` reads on llama-server
 instead of fp32 in process, several times faster: the server is launched with every adapter as
@@ -32,6 +36,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import subprocess
 import sys
 import time
@@ -73,6 +78,9 @@ def arm_tag(spec: str, args) -> str:
         tag += "-fetch"
     if spec.endswith(":fetch2"):
         tag += "-fetch2"
+    m = re.search(r":vote(\d+)$", spec)
+    if m:
+        tag += f"-vote{m.group(1)}"
     if args.split != "test" or args.skip:
         tag += f"-{args.split}" + (f"-skip{args.skip}" if args.skip else "")
     if getattr(args, "served", None):
@@ -91,10 +99,40 @@ def lora_scales(adapter: str | None, loaded: list[dict]) -> list[dict]:
             for a in loaded]
 
 
+def majority(answers: list[str | None]) -> tuple[str | None, float]:
+    """The answer most of the samples gave, by number, and the share that gave it; None where
+    no sample answered."""
+    said = [a for a in answers if a is not None]
+    if not said:
+        return None, 0.0
+    groups: list[list[str]] = []
+    for a in said:
+        for g in groups:
+            if same_number(a, g[0]):
+                g.append(a)
+                break
+        else:
+            groups.append([a])
+    best = max(groups, key=len)
+    return best[0], len(best) / len(answers)
+
+
 def ask_text(question: str, example: str | None) -> str:
     if example is None:
         return question
     return f"A solved problem like this one:\n\n{example}\n\nNow solve this one.\n\n{question}"
+
+
+def agreement_curve(rows: list[dict]) -> list[dict]:
+    """The majority answer's accuracy at each level of agreement, and how many questions
+    reached it: the key-less signal read without a key."""
+    levels = sorted({r["agreement"] for r in rows}, reverse=True)
+    out = []
+    for lv in levels:
+        at = [r for r in rows if r["agreement"] >= lv]
+        out.append({"agreement_at_least": lv, "n": len(at),
+                    "accuracy": round(sum(r["correct"] for r in at) / len(at), 3)})
+    return out
 
 
 def arm(spec: str, ps: list[dict], args, index=None) -> dict:
@@ -102,6 +140,10 @@ def arm(spec: str, ps: list[dict], args, index=None) -> dict:
 
     fetch = spec.endswith(":fetch") or spec.endswith(":fetch2")
     by_shape = spec.endswith(":fetch2")
+    vote = re.search(r":vote(\d+)$", spec)
+    votes = int(vote.group(1)) if vote else 0
+    if votes and args.served:
+        raise SystemExit("voting arms read in process")
     if fetch and index is None:
         raise SystemExit(f"{spec} needs --fetch <reading rows> for the solved problems")
     if by_shape:
@@ -137,16 +179,26 @@ def arm(spec: str, ps: list[dict], args, index=None) -> dict:
             examples = index.nearest_many([p["question"] for p in chunk])
         else:
             examples = [None] * len(chunk)
-        replies = trunk.ask_many([[{"role": "system", "content": SYSTEM},
-                                   {"role": "user", "content": ask_text(p["question"], ex)}]
-                                  for p, ex in zip(chunk, examples)])
+        turns = [[{"role": "system", "content": SYSTEM}, {"role": "user", "content": ask_text(p["question"], ex)}]
+                 for p, ex in zip(chunk, examples)]
+        samples = None
+        if votes:
+            samples = trunk.propose(turns, votes, args.temperature, args.max_completion, whole=True)
+            replies = [s[0] for s in samples]
+        else:
+            replies = trunk.ask_many(turns)
         tokens_out = trunk.tokens_out - before_out
         with open(part, "a", encoding="utf-8") as f:
             for p, reply, ex in zip(chunk, replies, examples):
                 said = answer_in(reply)
                 row = {"question": p["question"], "answer": p["answer"], "said": said,
                        "correct": same_number(said, p["answer"]), "reply": reply,
-                       "passes": round(tokens_out / len(chunk) + 1, 1)}
+                       "passes": round(tokens_out / len(chunk) + max(votes, 1), 1)}
+                if samples is not None:
+                    answers = [answer_in(s) for s in samples[chunk.index(p)]]
+                    said, agreement = majority(answers)
+                    row.update({"said": said, "correct": same_number(said, p["answer"]), "answers": answers,
+                                "agreement": round(agreement, 3), "samples": samples[chunk.index(p)]})
                 if fetch:
                     row["example"] = ex
                 if first is not None:
@@ -175,6 +227,8 @@ def arm(spec: str, ps: list[dict], args, index=None) -> dict:
     n = len(rows)
     return {
         "adapter": adapter, "engine": "llama-server Q8" if args.served else "fp32 in process",
+        "votes": votes or None, "temperature": args.temperature if votes else None,
+        "agreement_curve": agreement_curve(rows) if votes else None,
         "fetch": args.fetch if fetch else None,
         "solved_problems_to_fetch_from": len(index.examples) if fetch else None,
         "served_model": trunk.served_model(), "system_prompt": SYSTEM, "greedy": True,
@@ -195,6 +249,7 @@ def main() -> None:
     p.add_argument("--skip", type=int, default=0)
     p.add_argument("--fetch", default=None, help="reading rows whose right solutions a :fetch arm shows the trunk")
     p.add_argument("--served", default=None, help="llama-server's URL to read on, e.g. http://127.0.0.1:8093")
+    p.add_argument("--temperature", type=float, default=0.7, help="for :voteK arms")
     p.add_argument("--model", default="Qwen/Qwen3.5-2B")
     p.add_argument("--batch", type=int, default=8)
     p.add_argument("--max-completion", type=int, default=400)

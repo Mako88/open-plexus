@@ -194,11 +194,12 @@ class LocalTrunk:
         return out
 
     def propose(self, prompts: list[list[dict]], k: int, temperature: float, max_new: int,
-                prefix: str = "") -> list[list[str]]:
+                prefix: str = "", whole: bool = False) -> list[list[str]]:
         """k replies to each turn, sampled at `temperature` (greedy when it is 0 or k is 1),
         for a search that wants several candidate next steps; one line each, the first line
-        kept. `prefix` starts the reply for the trunk ("Answer:" makes it finish), and is part
-        of what comes back."""
+        kept, or the whole reply with `whole` (several solutions to vote among). `prefix`
+        starts the reply for the trunk ("Answer:" makes it finish), and is part of what comes
+        back."""
         out: list[list[str]] = []
         sample = temperature > 0 and k > 1
         for i in range(0, len(prompts), self.batch):
@@ -214,8 +215,8 @@ class LocalTrunk:
             new = gen[:, enc["input_ids"].shape[1]:]
             self.tokens_in += int(enc["attention_mask"].sum())
             self.tokens_out += int((new != self.tok.pad_token_id).sum())
-            replies = [prefix + self.tok.decode(ids, skip_special_tokens=True).split("\n")[0].rstrip()
-                       for ids in new]
+            replies = [prefix + (text.strip() if whole else text.split("\n")[0].rstrip())
+                       for text in (self.tok.decode(ids, skip_special_tokens=True) for ids in new)]
             per = k if sample else 1
             out.extend(replies[j * per:(j + 1) * per] for j in range(len(texts)))
         return out

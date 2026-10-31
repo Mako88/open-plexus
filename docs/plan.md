@@ -248,8 +248,16 @@ Each step says what it decides. A step is struck when it is done.
      samples a group. Round three (`--from-rows`, running 2026-10-31) takes the system's own
      choice of problems: round two's greedy pass over the next thousand training problems got
      797 right (`state/grpo-solved-round2-skip2000.json`), and the round trains on the 203 it got
-     wrong and 203 it got right, 203 steps. Rounds continue while each widens the gap; the
-     recipe's ceiling at this size is the round that does not. The R1 paper found this loop on small models lost to distilling a large model's reasoning
+     wrong and 203 it got right, 203 steps. Read (`readings/grpo-20261031T151441Z`): **0.768
+     at 107 passes**, half the cost and the gain gone, 14 made right and 31 made wrong against
+     round two (stopped at 284, 2.5 standard errors), 31 and 25 against the base. The solutions
+     shrank from 250 tokens to 100 within twenty training steps and stayed there: on a set the
+     trunk mostly gets wrong, most groups score alike on the key and the 0.1 answer-line bonus
+     is the only reward with a spread, so it pulled toward short completions that end in the
+     form. The bonus is now a flag (`--format-reward 0`); the control that settles whether the
+     bonus or the hard set shrank the solutions is thirty steps on the same set without it.
+     Rounds continue while each widens the gap; the recipe's ceiling at this size is the round
+     that does not, and round three is not that round until the control reads. The R1 paper found this loop on small models lost to distilling a large model's reasoning
      into them, so a frontier teacher at training time is fair by the standard, and the trunk
      should start as the best distilled reasoner that fits fp32 in process (Qwen3.5-2B is one;
      a comparison is an afternoon's reading).

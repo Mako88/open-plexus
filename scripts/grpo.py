@@ -75,7 +75,9 @@ def correct(completions, answer, **kwargs) -> list[float]:
 
 def answer_line(completions, **kwargs) -> list[float]:
     """0.1 where the completion ends with an answer line, so the form is learnt even where the
-    number is wrong."""
+    number is wrong. On a set of problems the trunk mostly gets wrong this is the only reward
+    with a spread inside a group, and it pulls toward short completions that end in the form
+    (round three, 2026-10-31); `--format-reward 0` drops it once the form is learnt."""
     texts = [c[0]["content"] if isinstance(c, list) else c for c in completions]
     return [0.1 if re.search(r"answer\s*:\s*[^\n]+\s*$", t.strip(), re.I) else 0.0 for t in texts]
 
@@ -92,6 +94,7 @@ def main() -> None:
     p.add_argument("--mode", choices=["plain", "think"], default="plain")
     p.add_argument("--generations", type=int, default=4, help="solutions sampled a problem")
     p.add_argument("--prompts-per-step", type=int, default=2, help="problems an optimiser step")
+    p.add_argument("--format-reward", type=float, default=0.1, help="the answer-line bonus; 0 drops it")
     p.add_argument("--micro", type=int, default=None,
                    help="solutions a forward pass; the generations by default, 2 when the card is shared by day")
     p.add_argument("--max-completion", type=int, default=None, help="tokens a solution; 400 plain, 1536 think")
@@ -131,6 +134,7 @@ def main() -> None:
         max_completion_length=max_completion, temperature=1.0, beta=0.0,
         gradient_checkpointing=True, gradient_checkpointing_kwargs={"use_reentrant": False},
         logging_steps=1, save_steps=args.save_steps, save_total_limit=2, report_to="none",
+        reward_weights=[1.0, args.format_reward / 0.1] if args.format_reward else [1.0],
         chat_template_kwargs={"enable_thinking": args.mode == "think"}, mask_truncated_completions=True,
         log_completions=False, bf16=False, fp16=False,
         torch_empty_cache_steps=1,
@@ -148,7 +152,8 @@ def main() -> None:
 
         model = PeftModel.from_pretrained(model, args.init_adapter, is_trainable=True)
         peft = None
-    trainer = GRPOTrainer(model=model, processing_class=tok, reward_funcs=[correct, answer_line], args=config,
+    rewards = [correct] + ([answer_line] if args.format_reward else [])
+    trainer = GRPOTrainer(model=model, processing_class=tok, reward_funcs=rewards, args=config,
                           train_dataset=data, peft_config=peft)
     last = sorted(out.glob("checkpoint-*"), key=lambda d: int(d.name.split("-")[1]))
     started = time.perf_counter()
@@ -161,8 +166,9 @@ def main() -> None:
         "generations": args.generations,
         "prompts_per_step": args.prompts_per_step, "max_completion": max_completion, "lr": args.lr,
         "epochs": args.epochs, "max_steps": args.max_steps, "rank": args.rank, "system": SYSTEM,
-        "rewards": ["correct: 1.0 where the answer line is the gold number",
-                    "answer_line: 0.1 where the completion ends with an answer line"],
+        "rewards": ["correct: 1.0 where the answer line is the gold number"]
+                   + ([f"answer_line: {args.format_reward} where the completion ends with an answer line"]
+                      if args.format_reward else []),
         "log": log, "seconds": round(time.perf_counter() - started, 1),
         "peak_gib": round(torch.cuda.max_memory_allocated() / 2**30, 2), "sha": sha(), "command": " ".join(sys.argv),
     }, indent=1), encoding="utf-8")

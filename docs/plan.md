@@ -315,8 +315,19 @@ Each step says what it decides. A step is struck when it is done.
      absent from the trunk and present in the store (the bAbI readings were that, at the
      ceiling; a knowledge-bearing problem set is the next one), and the asking as a learned
      action is built there, not here. Until then the loop runs without the store on maths. A published process reward model (Skywork-PRM 1.5B, Qwen2.5-Math-PRM 7B) as a judge
-     arm, and agreement across samples as the first key-less signal, since it costs only
-     passes. (c) A learning-progress monitor, budget to the steepest slope, once there are
+     arm. Agreement across samples, the first key-less signal, read 2026-10-31
+     (`readings/grpo-20261031T201814Z`, the `:vote4` arm of `grpo_reading.py`): four solutions
+     sampled at 0.7 from round two's adapter, the majority answer. The majority is the greedy
+     answer (10 made right, 9 made wrong on 206 questions) at four times the passes, so voting
+     buys no accuracy, as the plan said ensembles would not; but **agreement sorts the
+     questions**: all four agree on 132 of 206 and the answer is right on 95.5% of those, while
+     on the 74 where they split it is right on 54% (greedy 57%). So with no key in the loop the
+     system can tell which of its answers to trust, two in three of them at 95%, and which to
+     spend more on. That is the key-less judge's first functional form, off the shelf
+     (self-consistency 2022; TTRL 2025 trains on the majority as the label). Its next reading
+     is the loop itself without the key: a round rewarded by agreement with the group's
+     majority instead of the gold number, on maths where the key can still score the result
+     offline, read against the key-trained round. (c) A learning-progress monitor, budget to the steepest slope, once there are
      problem types. Problem supply: generators with keys, the trunk writing variants of solved
      problems with Python computing the key (Absolute Zero, 2025), test sets never trained on.
      A fixed held-out set of every earlier task re-read each round, for forgetting.

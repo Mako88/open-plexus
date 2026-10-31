@@ -237,11 +237,16 @@ Each step says what it decides. A step is struck when it is done.
      unpaired reference fired at 232 problems reading 0.802, on a prefix the control also
      found easier (0.754), so an arm read against a control on the same questions is stopped
      by the paired count of flips, not the unpaired gap. And the gain is at the same cost, not
-     cheaper: the loop made the trunk right more often, not briefer. Round two goes on from
-     this adapter over the next thousand training problems (`--skip 1000 --init-adapter`), read
-     against both 0.736 and 0.774; the loop's claim is that the gap widens round on round, and
-     a second round that does not widen it is the ceiling of this recipe at this size. The R1
-     paper found this loop on small models lost to distilling a large model's reasoning
+     cheaper: the loop made the trunk right more often, not briefer. **Round two**
+     (`readings/grpo-20261031T093424Z`, `state/grpo/round2`), the same adapter trained on over
+     the next thousand training problems (`--skip 1000 --init-adapter`), 4.7 hours, peak 10.4
+     GiB: **0.804 at 227 passes**, against round one 49 made right and 34 made wrong (a gap of
+     0.030 at 1.6 standard errors) and against the base 63 and 29 (**0.068 at 3.5**). So the gap
+     widens round on round, and this round the solutions also got shorter (227 passes against
+     246); the training accuracy reached 0.83 in its last blocks, and in six groups of ten all
+     four samples scored alike and taught nothing, so round three wants harder problems or more
+     samples a group. Rounds continue while each widens the gap; the recipe's ceiling at this
+     size is the round that does not. The R1 paper found this loop on small models lost to distilling a large model's reasoning
      into them, so a frontier teacher at training time is fair by the standard, and the trunk
      should start as the best distilled reasoner that fits fp32 in process (Qwen3.5-2B is one;
      a comparison is an afternoon's reading).

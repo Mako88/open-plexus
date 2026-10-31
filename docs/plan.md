@@ -256,9 +256,16 @@ Each step says what it decides. A step is struck when it is done.
      is the only reward with a spread, so it pulled toward short completions that end in the
      form. The control, thirty steps on the same set without the bonus: the solutions hold at
      240 tokens (with it, 110 by step twenty), so the bonus did it. It is off from here
-     (`--format-reward`, 0.1 in rounds one and two), and round three reruns without it from
-     round two's adapter on the same set. Rounds continue while each widens the gap; the
-     recipe's ceiling at this size is the round that does not. A fork from John 2026-10-31,
+     (`--format-reward`, 0.1 in rounds one and two). Round three rerun without it from round
+     two's adapter on the same set (`readings/grpo-20261031T191349Z`): the solutions held at
+     250 tokens and it reads **0.806 at 241 passes**, 36 made right and 35 made wrong against
+     round two, 53 and 18 against the base (0.07 at 4.2 standard errors). So round three is the
+     round that does not widen the gap: three rounds of this recipe on GSM8K lift the trunk
+     from 0.736 to about 0.805 and stop there, a third of the way to its own thinking's 0.85 at
+     an eighth of the passes. The loop is left here as the learner, its adapter carried
+     forward, and the work moves to the pieces not yet functional, in the order below; a round
+     is run again when a piece changes what the trunk is trained on (harder problems, the
+     thinking mode, a key-less judge), not to push this number. A fork from John 2026-10-31,
      held until the pieces below are functional: the learner decoupled from the actor. The
      trunk answers with the current adapter while the learner trains in the background on what
      it wrote and swaps the adapter in every few steps; a gradient a few steps stale is a valid

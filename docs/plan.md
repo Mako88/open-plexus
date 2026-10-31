@@ -245,8 +245,11 @@ Each step says what it decides. A step is struck when it is done.
      widens round on round, and this round the solutions also got shorter (227 passes against
      246); the training accuracy reached 0.83 in its last blocks, and in six groups of ten all
      four samples scored alike and taught nothing, so round three wants harder problems or more
-     samples a group. Rounds continue while each widens the gap; the recipe's ceiling at this
-     size is the round that does not. The R1 paper found this loop on small models lost to distilling a large model's reasoning
+     samples a group. Round three (`--from-rows`, running 2026-10-31) takes the system's own
+     choice of problems: round two's greedy pass over the next thousand training problems got
+     797 right (`state/grpo-solved-round2-skip2000.json`), and the round trains on the 203 it got
+     wrong and 203 it got right, 203 steps. Rounds continue while each widens the gap; the
+     recipe's ceiling at this size is the round that does not. The R1 paper found this loop on small models lost to distilling a large model's reasoning
      into them, so a frontier teacher at training time is fair by the standard, and the trunk
      should start as the best distilled reasoner that fits fp32 in process (Qwen3.5-2B is one;
      a comparison is an afternoon's reading).

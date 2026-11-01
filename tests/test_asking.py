@@ -31,9 +31,17 @@ def test_two_searches_then_an_answer():
     assert seen == [2, 4, 6]
 
 
-def test_a_trunk_that_never_asks_and_one_that_only_asks():
+def test_a_trunk_that_never_asks_and_one_that_asks_until_the_cap():
     assert solve(lambda m, t: {"content": "Answer: no"}, "s", "q", lambda q: "", max_turns=4)["searches"] == []
-    only = solve(lambda m, t: {"content": "", "tool_calls": [{"function": {"name": "search", "arguments": "{\"query\": \"x\"}"}}]},
-                 "s", "q", lambda q: "p", max_turns=3)
-    assert only["turns"] == 3 and only["searches"] == ["x", "x"] and only["reply"] == ""
+    offered = []
+
+    def asks_while_it_can(messages, tools):
+        offered.append(tools is not None)
+        if tools is None:  # the last turn offers no tool, so the trunk answers with what it has
+            return {"content": "Answer: p"}
+        return {"content": "", "tool_calls": [{"function": {"name": "search", "arguments": "{\\"query\\": \\"x\\"}"}}]}
+
+    only = solve(asks_while_it_can, "s", "q", lambda q: "p", max_turns=3)
+    assert only["turns"] == 3 and only["searches"] == ["x", "x"] and only["reply"] == "Answer: p"
+    assert offered == [True, True, False]
     assert query_of({"function": {"arguments": "not json"}}) == "not json"

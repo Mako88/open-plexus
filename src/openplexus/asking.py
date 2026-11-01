@@ -45,11 +45,12 @@ def solve(chat, system: str, question: str, search, max_turns: int = 4) -> dict:
     searches: list[str] = []
     reply = ""
     for turn in range(max_turns):
-        msg = chat(messages, [SEARCH_TOOL])
+        # the last turn is offered no tool: a trunk still searching at the cap answers with what it has
+        msg = chat(messages, [SEARCH_TOOL] if turn < max_turns - 1 else None)
         calls = msg.get("tool_calls") or []
         messages.append({"role": "assistant", "content": msg.get("content") or "", "tool_calls": calls} if calls
                         else {"role": "assistant", "content": msg.get("content") or ""})
-        if not calls or turn == max_turns - 1:
+        if not calls:
             reply = (msg.get("content") or "").strip()
             break
         for call in calls:

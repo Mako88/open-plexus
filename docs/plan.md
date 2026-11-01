@@ -374,7 +374,10 @@ Each step says what it decides. A step is struck when it is done.
    method is the trunk's tool, the key as the reward). The frontier reference
    (`readings/frontier-hotpot-20261031T210036Z`): Opus 5.5 with the ten paragraphs, exact
    match **0.79**, F1 0.886 on the first 100 validation questions, the misses mostly wording
-   (a fuller name, a date with the day), so F1 is the fairer line here; on GSM8K the same
+   (a fuller name, a date with the day), so F1 is the fairer line here; and from memory alone,
+   no paragraphs (`frontier-hotpot-memory-20261101T003417Z`), **0.79**, F1 0.882, the same. So
+   the frontier's score on this set is its weights, the passages add nothing, and the store's
+   claim here is exactly that a 2B with a store stands where a frontier model stands on memory; on GSM8K the same
    agent scored 100 of the first 100 (`readings/frontier-gsm8k-20261031T205453Z`) against our
    0.82, so GSM8K is a solved set at the frontier and HotpotQA is not. The lines, read
    2026-10-31 on the served Q8 trunk, no adapter (`readings/hotpot-20261031T232647Z`, exact

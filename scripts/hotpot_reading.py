@@ -98,7 +98,13 @@ def arm(spec: str, qs: list[dict], args, trunk, index) -> dict:
             def one(q):
                 store = Store()
                 store.reset(paragraphs=[{"text": paragraph_text(p), "supporting": p["supporting"]} for p in q["paragraphs"]])
-                out = solve(trunk.chat, ASK_SYSTEM, q["question"], store.search, max_turns=args.max_turns)
+                try:
+                    out = solve(trunk.chat, ASK_SYSTEM, q["question"], store.search, max_turns=args.max_turns)
+                except Exception as e:  # noqa: BLE001
+                    # a turn the server refused (a tool call it could not parse): the question
+                    # counts as unanswered, with the refusal on the row, and the arm goes on
+                    out = {"reply": "", "searches": list(store.searches), "turns": 1 + len(store.searches),
+                           "messages": [], "failed": str(e)[:200]}
                 out["shown"] = [q["paragraphs"][j]["title"] for j in store.shown]
                 out["gold_shown"] = sum(q["paragraphs"][j]["supporting"] for j in store.shown)
                 return out
@@ -125,6 +131,8 @@ def arm(spec: str, qs: list[dict], args, trunk, index) -> dict:
                 if a:
                     row["searches"] = a["searches"]
                     row["turns"] = a["turns"]
+                    if a.get("failed"):
+                        row["failed"] = a["failed"]
                 done[q["id"]] = row
                 f.write(json.dumps(row, ensure_ascii=False) + "\n")
         n = len(done)
@@ -154,6 +162,7 @@ def arm(spec: str, qs: list[dict], args, trunk, index) -> dict:
         "gold_shown_mean": round(sum(r["gold_shown"] for r in rows) / n, 2),
         "searches_mean": round(sum(len(r.get("searches", [])) for r in rows) / n, 2) if spec == "ask" else None,
         "never_asked": sum(not r.get("searches") for r in rows) if spec == "ask" else None,
+        "failed_turns": sum(bool(r.get("failed")) for r in rows) if spec == "ask" else None,
         "passes_per_question": round(sum(r["passes"] for r in rows) / n, 1),
         "paired": {o: paired({r["question"]: r for r in rows}, {r["question"]: r for r in rows_o.values()}, qs)
                    for o, rows_o in others.items()},

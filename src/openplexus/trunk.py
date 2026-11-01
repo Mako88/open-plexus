@@ -9,6 +9,7 @@ from __future__ import annotations
 import json
 import os
 import time
+import urllib.error
 import urllib.request
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
@@ -103,6 +104,11 @@ class ServedTrunk:
                 with urllib.request.urlopen(req, timeout=1800) as resp:
                     reply = json.loads(resp.read())
                 break
+            except urllib.error.HTTPError as e:
+                # the server's own refusal (a tool call it could not parse, 2026-11-01) is final:
+                # it would refuse the same request again, so it is not retried
+                body = e.read().decode("utf-8", "replace")[:300]
+                raise RuntimeError(f"server {e.code}: {body}") from None
             except Exception:  # noqa: BLE001
                 if attempt == 4:
                     raise

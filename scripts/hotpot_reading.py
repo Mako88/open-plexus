@@ -5,8 +5,10 @@ whole-episode ceiling), `top:K` (the K paragraphs nearest the question by MiniLM
 no learnt asking, the control for the asking arm), `ask` (the trunk given the search tool over
 the ten, asking as it chooses, up to `--max-turns`; with `--adapter` the trained asker);
 `recall:K` (automatic recall: the paragraph nearest the question, then the one nearest the text
-of the paragraph just recalled, K in all, shown with no action; John's memory-like form). Each arm is compared paired with `--against`
-on the same questions by exact match, and stops once clear. Rows are appended to state/ and a
+of the paragraph just recalled, K in all, shown with no action; John's memory-like form). Each
+arm is compared paired with `--against` on the same questions by exact match, and stops once
+clear of the first named; an entry is an arm read plain (`ask`, `top:2`) or a part file's tag
+(`ask-ask-round2`, a trained asker's reading). Rows are appended to state/ and a
 re-run skips the questions read. Short answers, so the Q8 server is the engine (`--served`,
 default); `--adapter` names a GGUF LoRA the server has loaded to apply.
 
@@ -76,13 +78,19 @@ def part_rows(tag: str) -> dict:
     return {r["id"]: r for r in rows_of(part)} if part.exists() else {}
 
 
+def other_rows(name: str, plain) -> dict:
+    """The rows of a comparison arm, named by a part tag (`ask-ask-round2`) or by its spec read
+    without this arm's adapter (`ask`, `top:2`)."""
+    return part_rows(name) or part_rows(tag_of(name, plain))
+
+
 def arm(spec: str, qs: list[dict], args, trunk, index) -> dict:
     tag = tag_of(spec, args)
     part = ROOT / "state" / f"hotpot-{tag}.part.jsonl"
     done = part_rows(tag)
     # the arms compared with are read without this arm's adapter: the plain tags
     plain = type(args)(**{**vars(args), "adapter": None})
-    others = {o: part_rows(tag_of(o, plain)) for o in args.against.split(",") if o and o != spec}
+    others = {o: other_rows(o, plain) for o in args.against.split(",") if o and o != spec and o != tag}
     others = {o: rows for o, rows in others.items() if rows}
     other = next(iter(others.values()), {})
     started = time.perf_counter()

@@ -44,3 +44,20 @@ def test_recall_follows_the_cue_from_the_first_paragraph_to_the_second():
     # the question's words reach the film; the film's text names Burton, which cues the director
     assert recall(paragraphs, "Who directed the film Ed Wood?", embed, k=2) == [2, 1]
     assert recall(paragraphs, "Who directed the film Ed Wood?", embed, k=5) == [2, 1, 0]
+
+
+def test_a_comparison_arm_is_a_part_tag_first_and_a_plain_spec_otherwise(tmp_path, monkeypatch):
+    import argparse
+    import json
+    sys.path.insert(0, str(ROOT / "scripts"))
+    import hotpot_reading as hr
+    (tmp_path / "state").mkdir()
+    for tag, ids in (("ask", ["a", "b"]), ("ask-ask-round2", ["a"]), ("top2", ["a", "b", "c"])):
+        (tmp_path / "state" / f"hotpot-{tag}.part.jsonl").write_text(
+            "".join(json.dumps({"id": i}) + "\n" for i in ids), encoding="utf-8")
+    monkeypatch.setattr(hr, "ROOT", tmp_path)
+    plain = argparse.Namespace(adapter=None)
+    assert set(hr.other_rows("ask-ask-round2", plain)) == {"a"}  # a trained asker's reading, by its tag
+    assert set(hr.other_rows("ask", plain)) == {"a", "b"}  # the plain arm, whatever adapter this arm has
+    assert set(hr.other_rows("top:2", plain)) == {"a", "b", "c"}  # a spec, resolved to its tag
+    assert hr.other_rows("never-read", plain) == {}

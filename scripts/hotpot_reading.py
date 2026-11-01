@@ -3,7 +3,9 @@ question with the paragraphs an arm puts in front of it. Arms: `floor` (no parag
 trunk knows), `gold` (the two supporting paragraphs, the ceiling), `episode` (all ten, the
 whole-episode ceiling), `top:K` (the K paragraphs nearest the question by MiniLM, the store with
 no learnt asking, the control for the asking arm), `ask` (the trunk given the search tool over
-the ten, asking as it chooses, up to `--max-turns`; with `--adapter` the trained asker). Each arm is compared paired with `--against`
+the ten, asking as it chooses, up to `--max-turns`; with `--adapter` the trained asker);
+`recall:K` (automatic recall: the paragraph nearest the question, then the one nearest the text
+of the paragraph just recalled, K in all, shown with no action; John's memory-like form). Each arm is compared paired with `--against`
 on the same questions by exact match, and stops once clear. Rows are appended to state/ and a
 re-run skips the questions read. Short answers, so the Q8 server is the engine (`--served`,
 default); `--adapter` names a GGUF LoRA the server has loaded to apply.
@@ -31,7 +33,7 @@ from ask import SYSTEM as ASK_SYSTEM  # noqa: E402
 from ask import Store, embedder  # noqa: E402
 from grpo_reading import paired  # noqa: E402
 from openplexus.asking import solve  # noqa: E402
-from openplexus.hotpot import answer_of, exact, f1, paragraph_text, questions  # noqa: E402
+from openplexus.hotpot import answer_of, exact, f1, paragraph_text, questions, recall  # noqa: E402
 from openplexus.maths import rows_of  # noqa: E402
 
 SYSTEM = ("Answer the question. Use the passages where they are given; they may contain the facts needed. "
@@ -56,6 +58,9 @@ def chosen(spec: str, q: dict, index=None) -> list[dict]:
     if spec.startswith("top:"):
         k = int(spec.split(":")[1])
         return index(q, k)
+    if spec.startswith("recall:"):
+        k = int(spec.split(":")[1])
+        return [q["paragraphs"][j] for j in recall([paragraph_text(p) for p in q["paragraphs"]], q["question"], index.embed, k)]
     raise SystemExit(f"unknown arm {spec}")
 
 
@@ -184,7 +189,7 @@ def main() -> None:
     trunk.lora = [{"id": a["id"], "scale": 1.0 if args.adapter and Path(a["path"]).name == Path(args.adapter).name else 0.0}
                   for a in loaded]
     index = None
-    if any(s.startswith("top:") for s in args.arms.split(",")):
+    if any(s.startswith("top:") or s.startswith("recall:") for s in args.arms.split(",")):
         import numpy as np
         from openplexus.embed import MiniLM
 
@@ -197,6 +202,8 @@ def main() -> None:
             query /= max(float(np.linalg.norm(query)), 1e-12)
             order = np.argsort(-(keys @ query))[:k]
             return [q["paragraphs"][int(j)] for j in order]
+
+        index.embed = embed
     reading = {"kind": "hotpot-reading", "set": f"HotpotQA distractor {args.split}, data/hotpotqa/{args.split}.jsonl",
                "skip": args.skip, "n": len(qs), "scorer": "exact match and token F1 on the normalised answer, HotpotQA's own",
                "adapter": args.adapter, "arms": {}}

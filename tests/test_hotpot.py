@@ -30,3 +30,17 @@ def test_the_answer_is_the_last_answer_line_else_the_last_line():
     assert answer_of("**Answer:** Chief of Protocol.") == "Chief of Protocol"
     assert answer_of("I think\nArthur's Magazine") == "Arthur's Magazine"
     assert answer_of("   ") is None
+
+
+def test_recall_follows_the_cue_from_the_first_paragraph_to_the_second():
+    import numpy as np
+    from openplexus.hotpot import recall
+    # a question about a film's director; the film paragraph names the director, whose own paragraph answers
+    def embed(texts):  # a text points toward each thing it mentions: films, Burton, towns
+        return np.array([[float("film" in t), float("direct" in t or "Burton" in t), float("town" in t)]
+                         for t in texts], dtype=np.float32)
+
+    paragraphs = ["Woodson: a town in Arkansas.", "Tim Burton: an American director.", "Ed Wood: a 1994 film by Burton."]
+    # the question's words reach the film; the film's text names Burton, which cues the director
+    assert recall(paragraphs, "Who directed the film Ed Wood?", embed, k=2) == [2, 1]
+    assert recall(paragraphs, "Who directed the film Ed Wood?", embed, k=5) == [2, 1, 0]

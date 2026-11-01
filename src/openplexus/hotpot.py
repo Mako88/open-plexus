@@ -68,6 +68,27 @@ def f1(said: str | None, gold: str) -> float:
     return 2 * precision * recall / (precision + recall)
 
 
+def recall(paragraphs: list[str], question: str, embed, k: int = 2) -> list[int]:
+    """Automatic recall, as memory does, nothing asked for (John's form, 2026-10-31): the first
+    paragraph is the one nearest the question, and each next is the one nearest the text of the
+    paragraph just recalled, so the first paragraph cues the second (the bridge entity is named
+    in it, not in the question). Returns the indices in the order recalled, none twice."""
+    import numpy as np
+
+    keys = np.asarray(embed(paragraphs), dtype=np.float32)
+    keys /= np.maximum(np.linalg.norm(keys, axis=1, keepdims=True), 1e-12)
+    out: list[int] = []
+    cue = question
+    for _ in range(min(k, len(paragraphs))):
+        q = np.asarray(embed([cue]), dtype=np.float32)[0]
+        q /= max(float(np.linalg.norm(q)), 1e-12)
+        order = np.argsort(-(keys @ q))
+        pick = next(int(j) for j in order if int(j) not in out)
+        out.append(pick)
+        cue = paragraphs[pick]
+    return out
+
+
 def answer_of(reply: str) -> str | None:
     """The answer in the trunk's reply: the text after the last "Answer:" line, else the reply's
     last line; None where there is nothing."""

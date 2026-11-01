@@ -394,8 +394,18 @@ Each step says what it decides. A step is struck when it is done.
    the top-2 line is its first version, keyed on the question; the second is keyed on the state
    as the trunk reads, the first paragraph's text cueing the next fetch (what the GSM8K `fetch`
    and `fetch2` arms were, which lost there because nothing was missing). Both read against
-   each other and against top-2. The key-less learner stays a live line, not a key-only loop:
-   its second form, only unanimous groups scored, runs next on maths. The trunk
+   each other and against top-2. The untrained asker, read 2026-10-31
+   (`readings/hotpot-20261101T005207Z`, the `ask` arm, the plain trunk given the search tool,
+   four turns at most): it asks every time, 2.5 searches a question, and **finds both supporting
+   paragraphs for 140 of 200** against top-2's 31 of 104, so asking retrieves what the
+   question's words cannot; but it scores **0.235** exact (F1 0.328), 11 made right and 25 made
+   wrong against top-2, because 59 questions end at the turn cap with no answer and the rest
+   answer in a sentence the exact match rejects; with both paragraphs found it scores 0.30
+   against gold's 0.635 at the same inputs. So the asker already asks well and answers badly,
+   which is what the reward trains: the form and the stop. Asking round one (`scripts/ask.py`,
+   120 training questions, 60 steps, running) is read against this and against top-2. The
+   key-less learner stays a live line, not a key-only loop: its second form, only unanimous
+   groups scored, runs next on maths. The trunk
    quantised and the budget read honestly (tokens per second, VRAM, disk) come with the full
    form.
 

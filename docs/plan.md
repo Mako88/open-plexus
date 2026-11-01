@@ -306,7 +306,17 @@ Each step says what it decides. A step is struck when it is done.
      questions exactly as round two had (0 made right, 0 made wrong), a clean null and a check
      of the reading machinery. The form that has a gradient and still scores only confident
      groups is `--agree-min 0.75`: where three of four agree, the three are rewarded and the
-     dissenter is not, and split groups stay unscored; it runs next. Then a published
+     dissenter is not, and split groups stay unscored. Read 2026-11-01
+     (`readings/grpo-20261101T114404Z`, `state/grpo/round3-confident`, 203 steps on round
+     three's set from round two's adapter; a gradient on a third of the steps, the solutions
+     steady at 220 to 260 tokens): **0.812 at 237 passes** on 500, against the key-trained
+     round three 38 made right and 35 made wrong (0.4 standard errors), against its own start 35
+     and 31, against the plain-agreement round 28 and 15, against the base 64 and 26. So with
+     no key in the loop, scored only where three of four agree, the trunk neither drifts nor
+     gains: it holds exactly where the key-trained round stands, which on this set is the
+     recipe's ceiling for both. The key-less loop in this form is as good as the key here, and
+     the test that separates them is a set where the trunk is not yet at its ceiling, which the
+     asking is. Then a published
      process reward model (Skywork-PRM 1.5B, Qwen2.5-Math-PRM 7B) as a judge arm. (c) A
      learning-progress monitor, budget to the steepest slope, once there are problem types.
      Problem supply: generators with keys, the trunk writing variants of solved problems with

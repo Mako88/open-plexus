@@ -354,76 +354,62 @@ Each step says what it decides. A step is struck when it is done.
    alternative. Decides how state persists.
 
 6. **The store at knowledge, and the asking as a learned action.** Pulled forward 2026-10-31
-   (John, after fork (d) read that on GSM8K the store has nothing to give): the core bet is read
-   where the knowledge a question needs is absent from the trunk and present in the store.
-   HotpotQA (`data/hotpotqa`, 90k training and 7.4k validation questions, each answered from
-   two Wikipedia paragraphs together, a short answer as the key): first the distractor form,
-   the ten paragraphs of a question (two supporting, eight distractors) as the store's rows
-   and the question's episode, bAbI's shape with real text; then the full form, the Wikipedia
-   abstracts (5.2M, about 1.5 GB) as one store, the plan's scale reading. Lines: the floor is
-   the trunk with no paragraphs, the ceiling the trunk with the two supporting paragraphs in
-   front of it, the whole-episode ceiling all ten. The arm is the asking: the trunk's own
-   query to the store as an action inside the GRPO loop (`<search>...</search>`, the store
-   answering with the nearest rows, the trunk continuing; Search-R1, 2025, is this shape),
-   rewarded by the key, so the trunk learns when to ask and what for; the control is the same
-   trunk shown the top rows by the question with no action. Every reading here also carries a
-   frontier reference (John, 2026-10-31): a clean-context frontier agent on the same
-   questions, as the target and as the check that a set is hard. Built 2026-10-31
-   (`openplexus.hotpot`, `scripts/hotpot_reading.py` for the lines on the served trunk,
-   `scripts/ask.py` for the arm: TRL's GRPO with a store environment a rollout whose `search`
-   method is the trunk's tool, the key as the reward). The frontier reference
-   (`readings/frontier-hotpot-20261031T210036Z`): Opus 5.5 with the ten paragraphs, exact
-   match **0.79**, F1 0.886 on the first 100 validation questions, the misses mostly wording
-   (a fuller name, a date with the day), so F1 is the fairer line here; and from memory alone,
-   no paragraphs (`frontier-hotpot-memory-20261101T003417Z`), **0.79**, F1 0.882, the same. So
-   the frontier's score on this set is its weights, the passages add nothing, and the store's
-   claim here is exactly that a 2B with a store stands where a frontier model stands on memory; on GSM8K the same
-   agent scored 100 of the first 100 (`readings/frontier-gsm8k-20261031T205453Z`) against our
-   0.82, so GSM8K is a solved set at the frontier and HotpotQA is not. The lines, read
-   2026-10-31 on the served Q8 trunk, no adapter (`readings/hotpot-20261031T232647Z`, exact
-   match, the first 200 validation questions, the arms stopped at 104 as clear of the floor):
-   floor **0.15** (F1 0.206; bridge questions 0.06, comparison 0.59, which are mostly yes or
-   no); gold, the two supporting paragraphs, **0.635** (F1 0.745); episode, all ten, 0.538, the
-   eight distractors costing a tenth as bAbI's whole story did; top-2 by MiniLM on the question,
-   the store with no asking, **0.365** (F1 0.438). The top-2 arm shows exactly what the asking
-   has to earn: it found both supporting paragraphs for 31 of 104 questions and the trunk then
-   scored 0.71, above gold; one of the two for 65, scoring 0.22; the second hop is not in the
-   question's words, it is in the first paragraph. So the store has 0.15 to 0.64 to give here,
-   the question alone recovers 0.37 of it, and the asking is read on the rest. Beside the
-   asking, John's other form (2026-10-31): automatic recall, as memory does, nothing asked for:
-   the top-2 line is its first version, keyed on the question; the second is keyed on the state
-   as the trunk reads, the first paragraph's text cueing the next fetch (what the GSM8K `fetch`
-   and `fetch2` arms were, which lost there because nothing was missing). Both read against
-   each other and against top-2. The untrained asker, read 2026-10-31
-   (`readings/hotpot-20261101T005207Z`, the `ask` arm, the plain trunk given the search tool,
-   four turns at most): it asks every time, 2.5 searches a question, and **finds both supporting
-   paragraphs for 140 of 200** against top-2's 31 of 104, so asking retrieves what the
-   question's words cannot; but it scores **0.235** exact (F1 0.328), 11 made right and 25 made
-   wrong against top-2, because 59 questions end at the turn cap with no answer and the rest
-   answer in a sentence the exact match rejects; with both paragraphs found it scores 0.30
-   against gold's 0.635 at the same inputs. So the asker already asks well and answers badly,
-   which is what the reward trains: the form and the stop. Re-read with the loop offering no
-   tool on its last turn (`hotpot-20261101T033048Z`), the untrained asker scores 0.33 (F1 0.44),
-   level with top-2. **Asking round one** (`scripts/ask.py`, `state/ask/round1`: 120 training
-   questions, 60 steps, 2.5 hours on the shared card, the key the only reward): the trained
-   asker (`hotpot-20261101T033732Z`) scores **0.465** exact, F1 0.568, on the same 200
-   questions, **35 made right and 8 made wrong against the untrained asker** (4.1 standard
-   errors), 23 and 9 against top-2 (2.5), 7 and 21 against gold, 8 and 12 against episode. It
-   asks a little less (2.2 searches a question against 2.5), finds both paragraphs slightly
-   less often (122 against 140 of 200) and answers far better when it has them (0.61 against
-   0.41), with no question left unanswered. So the first reading of the core bet is positive:
-   the trunk learnt, from the key alone, to ask the store and answer from what it found, and
-   the store with a learnt asker beats the store without one; comparison questions reached
-   0.735. The gap left is to gold (0.635) and then to the frontier (0.79): the asking as the
-   learnt action is now the piece to grow, with rounds, more questions, and the server as the
-   actor since the tool loop is what makes a round slow. The regression check
-   (`readings/grpo-20261101T040321Z`): the asking adapter read on GSM8K scores 0.734 at 246
-   passes against the plain trunk's 0.736, 17 made right and 18 made wrong, so sixty steps of
-   learning to ask on HotpotQA cost the maths nothing. Round two (240 questions, from round
-   one's adapter) runs overnight 2026-11-01. The key-less learner stays a live line, not a key-only loop: its second form, only unanimous
-   groups scored, runs next on maths. The trunk
-   quantised and the budget read honestly (tokens per second, VRAM, disk) come with the full
-   form.
+   with John after fork (d) read that on GSM8K the store has nothing to give: the core bet is
+   read where the knowledge a question needs is absent from the trunk and present in the
+   store. HotpotQA (`data/hotpotqa`, 90k training and 7.4k validation questions, each answered
+   from two Wikipedia paragraphs together, a short answer as the key; `openplexus.hotpot`, the
+   benchmark's exact match and F1): first the distractor form, a question's ten paragraphs (two
+   supporting, eight distractors) as the store's rows for that episode, bAbI's shape with real
+   text; then the full form, the Wikipedia abstracts (5.2M, about 1.5 GB) as one store, the
+   plan's scale reading, where the trunk is quantised and the budget read honestly. Every
+   reading carries a frontier reference (John): a clean-context frontier agent on the same
+   questions, as the target and as the check that a set is hard.
+   - The frontier (`readings/frontier-hotpot-20261031T210036Z`, `-memory-20261101T003417Z`,
+     `frontier-gsm8k-20261031T205453Z`): Opus 5.5 on the first 100 validation questions, exact
+     match **0.79**, F1 0.886 with the ten paragraphs, and **0.79**, F1 0.882 from memory alone,
+     so its score on this set is its weights and the passages add nothing: the store's claim is
+     exactly that a 2B with a store stands where a frontier model stands on memory. The misses
+     are wording (a fuller name, a date with the day), so F1 is the fairer line. On GSM8K the
+     same agent scored 100 of 100 against our 0.82: GSM8K is solved at the frontier, HotpotQA
+     is not.
+   - The lines (`hotpot-20261031T232647Z`, the served Q8 trunk, no adapter, exact match on the
+     first 200 validation questions, the arms stopped at 104 as clear of the floor): floor
+     **0.15** (F1 0.206; bridge questions 0.06, comparison 0.59, mostly yes or no); gold, the
+     two supporting paragraphs handed over, **0.635** (F1 0.745); episode, all ten, 0.538, the
+     distractors costing a tenth as bAbI's whole story did; top-2 by MiniLM on the question,
+     the store with no asking, **0.365** (F1 0.438). Top-2 found both supporting paragraphs for
+     31 of 104 and the trunk then scored 0.71, above gold; one of the two for 65, scoring 0.22:
+     the second hop is not in the question's words, it is in the first paragraph.
+   - The asking (`scripts/ask.py`): TRL's GRPO with a store environment a rollout whose
+     `search(query)` method is the trunk's one tool, the paragraph nearest the query by MiniLM,
+     the key the only reward, nothing telling it when to ask (Search-R1, 2025). Read on the
+     served trunk with the adapter as a GGUF LoRA (`hotpot_reading.py --arms ask`, the loop in
+     `openplexus.asking`, four turns, no tool offered on the last so it always answers). The
+     untrained asker (`hotpot-20261101T033048Z`): asks every time, 2.5 searches a question,
+     finds both paragraphs for 140 of 200 where the question's words find 31 of 104, and scores
+     **0.33** (F1 0.44), level with top-2, answering badly from what it found (0.41 with both in
+     hand against gold's 0.635). **Asking round one** (`state/ask/round1`: 120 training
+     questions, 60 steps, 2.5 hours on the shared card, a step 94 to 470 s since every tool
+     turn re-reads the conversation): the trained asker (`hotpot-20261101T033732Z`) scores
+     **0.465** exact, F1 0.568, **35 made right and 8 made wrong against the untrained asker**
+     (4.1 standard errors), 23 and 9 against top-2, 7 and 21 against gold; it asks a little less
+     (2.2 searches), finds both paragraphs about as often (122 of 200) and answers far better
+     with them (0.61 against 0.41); comparison questions 0.735. The first reading of the core
+     bet is positive: from the key alone the trunk learnt to ask the store and answer from what
+     it found, and the store with a learnt asker beats the store without one. The regression
+     check (`grpo-20261101T040321Z`): the asking adapter on GSM8K 0.734 against the plain
+     trunk's 0.736, 17 and 18, so learning to ask cost the maths nothing. Round two (240 more
+     questions from round one's adapter) ran overnight 2026-11-01; its reading is against round
+     one, the untrained asker and top-2. The gap left is to gold (0.635) and the frontier
+     (0.79); the asking is the piece to grow: rounds, more questions, and the server as the
+     actor, since the tool loop is what makes a round slow.
+   - Beside the asking, John's other form: automatic recall, as memory does, nothing asked
+     for. Top-2 is its first version, keyed on the question; the second (`--arms recall:K`,
+     `openplexus.hotpot.recall`, built 2026-11-01) is keyed on the state as the trunk reads,
+     the paragraph nearest the question first and then the one nearest that paragraph's text,
+     the first cueing the second. Read against top-2 and the asker. The key-less learner stays
+     a live line, not a key-only loop: its second form, only unanimous groups scored, runs on
+     maths overnight 2026-11-01.
 
 7. **Consolidation: the trunk learns slowly, by replay.** Complementary learning systems
    (McClelland, McNaughton and O'Reilly, 1995): the hippocampus learns in one shot and the

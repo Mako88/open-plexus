@@ -386,7 +386,13 @@ Each step says what it decides. A step is struck when it is done.
    has to earn: it found both supporting paragraphs for 31 of 104 questions and the trunk then
    scored 0.71, above gold; one of the two for 65, scoring 0.22; the second hop is not in the
    question's words, it is in the first paragraph. So the store has 0.15 to 0.64 to give here,
-   the question alone recovers 0.37 of it, and the asking is read on the rest. The trunk
+   the question alone recovers 0.37 of it, and the asking is read on the rest. Beside the
+   asking, John's other form (2026-10-31): automatic recall, as memory does, nothing asked for:
+   the top-2 line is its first version, keyed on the question; the second is keyed on the state
+   as the trunk reads, the first paragraph's text cueing the next fetch (what the GSM8K `fetch`
+   and `fetch2` arms were, which lost there because nothing was missing). Both read against
+   each other and against top-2. The key-less learner stays a live line, not a key-only loop:
+   its second form, only unanimous groups scored, runs next on maths. The trunk
    quantised and the budget read honestly (tokens per second, VRAM, disk) come with the full
    form.
 

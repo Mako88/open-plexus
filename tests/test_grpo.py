@@ -99,3 +99,12 @@ def test_the_agreement_reward_is_the_group_majority_with_no_key():
             "Answer: 3", "Answer: 4", "Answer: 4", "Answer: 3"]           # group two: a tie, the first group counted
     assert agreement(done) == [1.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0]
     assert agreement(["nothing", "nothing", "nothing", "nothing"]) == [0.0] * 4
+
+
+def test_a_group_below_the_agreement_floor_is_not_scored():
+    grpo.GROUP, grpo.AGREE_MIN = 4, 1.0
+    try:
+        assert agreement(["Answer: 7", "Answer: 7", "Answer: 7", "Answer: 7"]) == [1.0] * 4
+        assert agreement(["Answer: 7", "Answer: 7", "Answer: 7", "Answer: 8"]) == [0.0] * 4
+    finally:
+        grpo.AGREE_MIN = 0.0

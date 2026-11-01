@@ -74,6 +74,7 @@ def correct(completions, answer, **kwargs) -> list[float]:
 
 
 GROUP = 4  # solutions sampled a problem, set from --generations; the agreement reward needs the group
+AGREE_MIN = 0.0  # the share of a group that must agree before the group is scored at all (--agree-min)
 
 
 def majority_of(answers: list[str | None]) -> str | None:
@@ -100,7 +101,13 @@ def agreement(completions, **kwargs) -> list[float]:
     for at in range(0, len(answers), GROUP):
         group = answers[at:at + GROUP]
         best = majority_of(group)
-        out.extend(1.0 if best is not None and a is not None and same_number(a, best) else 0.0 for a in group)
+        agree = [best is not None and a is not None and same_number(a, best) for a in group]
+        if sum(agree) / len(group) < AGREE_MIN:
+            # the second form: a group that does not agree enough is not scored, so the loop
+            # learns only from the answers the system is sure of, not from a split vote
+            out.extend(0.0 for _ in group)
+            continue
+        out.extend(1.0 if a else 0.0 for a in agree)
     return out
 
 
@@ -128,6 +135,8 @@ def main() -> None:
     p.add_argument("--format-reward", type=float, default=0.0, help="the answer-line bonus, 0.1 in rounds one and two; 0 since")
     p.add_argument("--reward", choices=["key", "agreement"], default="key",
                    help="key: the gold number; agreement: the group's majority answer, no key in the loop")
+    p.add_argument("--agree-min", type=float, default=0.0,
+                   help="with --reward agreement, the share of a group that must agree for it to be scored; 1.0 is unanimous only")
     p.add_argument("--micro", type=int, default=None,
                    help="solutions a forward pass; the generations by default, 2 when the card is shared by day")
     p.add_argument("--max-completion", type=int, default=None, help="tokens a solution; 400 plain, 1536 think")
@@ -186,8 +195,9 @@ def main() -> None:
 
         model = PeftModel.from_pretrained(model, args.init_adapter, is_trainable=True)
         peft = None
-    global GROUP
+    global GROUP, AGREE_MIN
     GROUP = args.generations
+    AGREE_MIN = args.agree_min
     # the key's reward is always computed and logged; with --reward agreement its weight is 0
     rewards = ([agreement, correct] if args.reward == "agreement" else [correct]) + ([answer_line] if args.format_reward else [])
     trainer = GRPOTrainer(model=model, processing_class=tok, reward_funcs=rewards, args=config,
@@ -203,7 +213,7 @@ def main() -> None:
         "generations": args.generations,
         "prompts_per_step": args.prompts_per_step, "max_completion": max_completion, "lr": args.lr,
         "epochs": args.epochs, "max_steps": args.max_steps, "rank": args.rank, "system": SYSTEM,
-        "reward": args.reward,
+        "reward": args.reward, "agree_min": args.agree_min if args.reward == "agreement" else None,
         "rewards": (["agreement: 1.0 where the answer is the group's majority answer (the key logged at weight 0)"]
                     if args.reward == "agreement" else []) + ["correct: 1.0 where the answer line is the gold number"]
                    + ([f"answer_line: {args.format_reward} where the completion ends with an answer line"]

@@ -416,7 +416,11 @@ Each step says what it decides. A step is struck when it is done.
    the store with a learnt asker beats the store without one; comparison questions reached
    0.735. The gap left is to gold (0.635) and then to the frontier (0.79): the asking as the
    learnt action is now the piece to grow, with rounds, more questions, and the server as the
-   actor since the tool loop is what makes a round slow. The key-less learner stays a live line, not a key-only loop: its second form, only unanimous
+   actor since the tool loop is what makes a round slow. The regression check
+   (`readings/grpo-20261101T040321Z`): the asking adapter read on GSM8K scores 0.734 at 246
+   passes against the plain trunk's 0.736, 17 made right and 18 made wrong, so sixty steps of
+   learning to ask on HotpotQA cost the maths nothing. Round two (240 questions, from round
+   one's adapter) runs overnight 2026-11-01. The key-less learner stays a live line, not a key-only loop: its second form, only unanimous
    groups scored, runs next on maths. The trunk
    quantised and the budget read honestly (tokens per second, VRAM, disk) come with the full
    form.

@@ -298,7 +298,15 @@ Each step says what it decides. A step is struck when it is done.
      Self-Rewarding Language Models met after a few rounds. The piece's next form, when it is
      needed (a set with no key): reward only the groups that agree unanimously and leave the
      rest unscored, the judge refreshed each round; until then the key trains and agreement
-     judges. Then a published
+     judges. That second form as stated was a mistake, read 2026-11-01
+     (`readings/grpo-20261101T091555Z`, `--agree-min 1.0`, 203 steps on round three's set):
+     a group that agrees unanimously gets 1.0 on every member and a group that does not gets
+     0.0 on every member, so no group has any spread and GRPO has no gradient; the gradient
+     norm was 0.0 on all 203 steps and the adapter answered every one of the 500 test
+     questions exactly as round two had (0 made right, 0 made wrong), a clean null and a check
+     of the reading machinery. The form that has a gradient and still scores only confident
+     groups is `--agree-min 0.75`: where three of four agree, the three are rewarded and the
+     dissenter is not, and split groups stay unscored; it runs next. Then a published
      process reward model (Skywork-PRM 1.5B, Qwen2.5-Math-PRM 7B) as a judge arm. (c) A
      learning-progress monitor, budget to the steepest slope, once there are problem types.
      Problem supply: generators with keys, the trunk writing variants of solved problems with

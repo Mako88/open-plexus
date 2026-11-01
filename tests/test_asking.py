@@ -39,7 +39,7 @@ def test_a_trunk_that_never_asks_and_one_that_asks_until_the_cap():
         offered.append(tools is not None)
         if tools is None:  # the last turn offers no tool, so the trunk answers with what it has
             return {"content": "Answer: p"}
-        return {"content": "", "tool_calls": [{"function": {"name": "search", "arguments": "{\\"query\\": \\"x\\"}"}}]}
+        return {"content": "", "tool_calls": [{"function": {"name": "search", "arguments": {"query": "x"}}}]}
 
     only = solve(asks_while_it_can, "s", "q", lambda q: "p", max_turns=3)
     assert only["turns"] == 3 and only["searches"] == ["x", "x"] and only["reply"] == "Answer: p"

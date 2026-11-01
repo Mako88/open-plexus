@@ -2,7 +2,8 @@
 question with the paragraphs an arm puts in front of it. Arms: `floor` (no paragraphs, what the
 trunk knows), `gold` (the two supporting paragraphs, the ceiling), `episode` (all ten, the
 whole-episode ceiling), `top:K` (the K paragraphs nearest the question by MiniLM, the store with
-no learnt asking, the control for the asking arm). Each arm is compared paired with `--against`
+no learnt asking, the control for the asking arm), `ask` (the trunk given the search tool over
+the ten, asking as it chooses, up to `--max-turns`; with `--adapter` the trained asker). Each arm is compared paired with `--against`
 on the same questions by exact match, and stops once clear. Rows are appended to state/ and a
 re-run skips the questions read. Short answers, so the Q8 server is the engine (`--served`,
 default); `--adapter` names a GGUF LoRA the server has loaded to apply.
@@ -26,7 +27,10 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "src"))
 sys.path.insert(0, str(ROOT / "scripts"))
 
+from ask import SYSTEM as ASK_SYSTEM  # noqa: E402
+from ask import Store  # noqa: E402
 from grpo_reading import paired  # noqa: E402
+from openplexus.asking import solve  # noqa: E402
 from openplexus.hotpot import answer_of, exact, f1, paragraph_text, questions  # noqa: E402
 from openplexus.maths import rows_of  # noqa: E402
 
@@ -43,7 +47,7 @@ def ask_text(q: dict, paragraphs: list[dict]) -> str:
 
 
 def chosen(spec: str, q: dict, index=None) -> list[dict]:
-    if spec == "floor":
+    if spec in ("floor", "ask"):
         return []
     if spec == "gold":
         return [p for p in q["paragraphs"] if p["supporting"]]
@@ -80,20 +84,38 @@ def arm(spec: str, qs: list[dict], args, trunk, index) -> dict:
     for at in range(0, len(todo), args.batch):
         chunk = todo[at:at + args.batch]
         before_out = trunk.tokens_out
-        turns = [[{"role": "system", "content": SYSTEM}, {"role": "user", "content": ask_text(q, chosen(spec, q, index))}]
-                 for q in chunk]
-        replies = trunk.ask_many(turns)
+        asked: list[dict | None] = [None] * len(chunk)
+        if spec == "ask":
+            def one(q):
+                store = Store()
+                store.reset(paragraphs=[{"text": paragraph_text(p), "supporting": p["supporting"]} for p in q["paragraphs"]])
+                out = solve(trunk.chat, ASK_SYSTEM, q["question"], store.search, max_turns=args.max_turns)
+                out["shown"] = [q["paragraphs"][j]["title"] for j in store.shown]
+                out["gold_shown"] = sum(q["paragraphs"][j]["supporting"] for j in store.shown)
+                return out
+
+            from concurrent.futures import ThreadPoolExecutor
+            with ThreadPoolExecutor(max_workers=args.batch) as pool:
+                asked = list(pool.map(one, chunk))
+            replies = [a["reply"] for a in asked]
+        else:
+            turns = [[{"role": "system", "content": SYSTEM}, {"role": "user", "content": ask_text(q, chosen(spec, q, index))}]
+                     for q in chunk]
+            replies = trunk.ask_many(turns)
         tokens_out = trunk.tokens_out - before_out
         with open(part, "a", encoding="utf-8") as f:
-            for q, reply, turn in zip(chunk, replies, turns):
+            for q, reply, a in zip(chunk, replies, asked):
                 said = answer_of(reply)
                 shown = chosen(spec, q, index)
                 row = {"id": q["id"], "question": q["question"], "answer": q["answer"], "type": q["type"],
                        "level": q["level"], "said": said, "correct": exact(said, q["answer"]),
                        "f1": round(f1(said, q["answer"]), 3), "reply": reply,
-                       "shown": [p["title"] for p in shown],
-                       "gold_shown": sum(p["supporting"] for p in shown),
-                       "passes": round(tokens_out / len(chunk) + 1, 1)}
+                       "shown": a["shown"] if a else [p["title"] for p in shown],
+                       "gold_shown": a["gold_shown"] if a else sum(p["supporting"] for p in shown),
+                       "passes": round(tokens_out / len(chunk) + (a["turns"] if a else 1), 1)}
+                if a:
+                    row["searches"] = a["searches"]
+                    row["turns"] = a["turns"]
                 done[q["id"]] = row
                 f.write(json.dumps(row, ensure_ascii=False) + "\n")
         n = len(done)
@@ -121,6 +143,8 @@ def arm(spec: str, qs: list[dict], args, trunk, index) -> dict:
         "exact": round(sum(r["correct"] for r in rows) / n, 3), "f1": round(sum(r["f1"] for r in rows) / n, 3),
         "by_type": by_type, "n": n, "stopped_early": n < len(qs), "unanswered": sum(r["said"] is None for r in rows),
         "gold_shown_mean": round(sum(r["gold_shown"] for r in rows) / n, 2),
+        "searches_mean": round(sum(len(r.get("searches", [])) for r in rows) / n, 2) if spec == "ask" else None,
+        "never_asked": sum(not r.get("searches") for r in rows) if spec == "ask" else None,
         "passes_per_question": round(sum(r["passes"] for r in rows) / n, 1),
         "paired": {o: paired({r["question"]: r for r in rows}, {r["question"]: r for r in rows_o.values()}, qs)
                    for o, rows_o in others.items()},
@@ -136,6 +160,7 @@ def main() -> None:
     p.add_argument("--split", default="validation")
     p.add_argument("--batch", type=int, default=8)
     p.add_argument("--max-new", type=int, default=160)
+    p.add_argument("--max-turns", type=int, default=4, help="assistant turns an `ask` arm may take")
     p.add_argument("--served", default="http://127.0.0.1:8093")
     p.add_argument("--adapter", default=None, help="a GGUF LoRA file the server has loaded, applied at 1")
     p.add_argument("--against", default="floor")

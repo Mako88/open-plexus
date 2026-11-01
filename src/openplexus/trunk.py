@@ -88,6 +88,30 @@ class ServedTrunk:
         with ThreadPoolExecutor(max_workers=self.parallel) as pool:
             return list(pool.map(self.ask, prompts))
 
+    def chat(self, messages: list[dict], tools: list[dict] | None = None) -> dict:
+        """One assistant turn with tools offered: the message as the server returns it, with
+        `content` and any `tool_calls`, for `openplexus.asking.solve`. Greedy, thinking off."""
+        request = {"model": self.model, "messages": messages, "max_tokens": self.max_new, "temperature": 0, "seed": 0,
+                   "chat_template_kwargs": {"enable_thinking": self.think}}
+        if tools:
+            request["tools"] = tools
+        if self.lora is not None:
+            request["lora"] = self.lora
+        req = urllib.request.Request(self.url, json.dumps(request).encode(), {"Content-Type": "application/json"})
+        for attempt in range(5):
+            try:
+                with urllib.request.urlopen(req, timeout=1800) as resp:
+                    reply = json.loads(resp.read())
+                break
+            except Exception:  # noqa: BLE001
+                if attempt == 4:
+                    raise
+                time.sleep(2 ** attempt)
+        u = reply.get("usage", {})
+        self.tokens_in += int(u.get("prompt_tokens", 0))
+        self.tokens_out += int(u.get("completion_tokens", 0))
+        return reply["choices"][0]["message"]
+
     def thought_of(self, messages: list[dict]) -> str | None:
         """The reasoning the server returned for a thinking turn already asked, for the
         reading's rows: a stop over the thinking stream is read first on recorded thoughts."""

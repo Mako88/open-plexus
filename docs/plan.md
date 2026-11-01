@@ -402,9 +402,21 @@ Each step says what it decides. A step is struck when it is done.
    wrong against top-2, because 59 questions end at the turn cap with no answer and the rest
    answer in a sentence the exact match rejects; with both paragraphs found it scores 0.30
    against gold's 0.635 at the same inputs. So the asker already asks well and answers badly,
-   which is what the reward trains: the form and the stop. Asking round one (`scripts/ask.py`,
-   120 training questions, 60 steps, running) is read against this and against top-2. The
-   key-less learner stays a live line, not a key-only loop: its second form, only unanimous
+   which is what the reward trains: the form and the stop. Re-read with the loop offering no
+   tool on its last turn (`hotpot-20261101T033048Z`), the untrained asker scores 0.33 (F1 0.44),
+   level with top-2. **Asking round one** (`scripts/ask.py`, `state/ask/round1`: 120 training
+   questions, 60 steps, 2.5 hours on the shared card, the key the only reward): the trained
+   asker (`hotpot-20261101T033732Z`) scores **0.465** exact, F1 0.568, on the same 200
+   questions, **35 made right and 8 made wrong against the untrained asker** (4.1 standard
+   errors), 23 and 9 against top-2 (2.5), 7 and 21 against gold, 8 and 12 against episode. It
+   asks a little less (2.2 searches a question against 2.5), finds both paragraphs slightly
+   less often (122 against 140 of 200) and answers far better when it has them (0.61 against
+   0.41), with no question left unanswered. So the first reading of the core bet is positive:
+   the trunk learnt, from the key alone, to ask the store and answer from what it found, and
+   the store with a learnt asker beats the store without one; comparison questions reached
+   0.735. The gap left is to gold (0.635) and then to the frontier (0.79): the asking as the
+   learnt action is now the piece to grow, with rounds, more questions, and the server as the
+   actor since the tool loop is what makes a round slow. The key-less learner stays a live line, not a key-only loop: its second form, only unanimous
    groups scored, runs next on maths. The trunk
    quantised and the budget read honestly (tokens per second, VRAM, disk) come with the full
    form.

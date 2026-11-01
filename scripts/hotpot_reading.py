@@ -75,7 +75,9 @@ def arm(spec: str, qs: list[dict], args, trunk, index) -> dict:
     tag = tag_of(spec, args)
     part = ROOT / "state" / f"hotpot-{tag}.part.jsonl"
     done = part_rows(tag)
-    others = {o: part_rows(tag_of(o, args)) for o in args.against.split(",") if o and o != spec}
+    # the arms compared with are read without this arm's adapter: the plain tags
+    plain = type(args)(**{**vars(args), "adapter": None})
+    others = {o: part_rows(tag_of(o, plain)) for o in args.against.split(",") if o and o != spec}
     others = {o: rows for o, rows in others.items() if rows}
     other = next(iter(others.values()), {})
     started = time.perf_counter()

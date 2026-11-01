@@ -74,6 +74,8 @@ def paired(rows: dict, other: dict, ps: list[dict]) -> dict | None:
 def arm_tag(spec: str, args) -> str:
     base = spec.split(":")[0]
     tag = "base" if base == "base" else Path(base).parent.name
+    if getattr(args, "tag", None) and base != "base":
+        tag = args.tag  # an adapter from another loop whose folder name would collide (state/ask/round1)
     if spec.endswith(":fetch"):
         tag += "-fetch"
     if spec.endswith(":fetch2"):
@@ -250,6 +252,7 @@ def main() -> None:
     p.add_argument("--fetch", default=None, help="reading rows whose right solutions a :fetch arm shows the trunk")
     p.add_argument("--served", default=None, help="llama-server's URL to read on, e.g. http://127.0.0.1:8093")
     p.add_argument("--temperature", type=float, default=0.7, help="for :voteK arms")
+    p.add_argument("--tag", default=None, help="the rows' tag for an adapter arm, where its folder name would collide")
     p.add_argument("--model", default="Qwen/Qwen3.5-2B")
     p.add_argument("--batch", type=int, default=8)
     p.add_argument("--max-completion", type=int, default=400)

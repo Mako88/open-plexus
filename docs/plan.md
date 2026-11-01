@@ -406,18 +406,31 @@ Each step says what it decides. A step is struck when it is done.
      bet is positive: from the key alone the trunk learnt to ask the store and answer from what
      it found, and the store with a learnt asker beats the store without one. The regression
      check (`grpo-20261101T040321Z`): the asking adapter on GSM8K 0.734 against the plain
-     trunk's 0.736, 17 and 18, so learning to ask cost the maths nothing. Round two (240 more
-     questions from round one's adapter) ran overnight 2026-11-01; its reading is against round
-     one, the untrained asker and top-2. The gap left is to gold (0.635) and the frontier
-     (0.79); the asking is the piece to grow: rounds, more questions, and the server as the
-     actor, since the tool loop is what makes a round slow.
+     trunk's 0.736, 17 and 18, so learning to ask cost the maths nothing. **Asking round two**
+     (`state/ask/round2`, 240 more questions from round one's adapter, 120 steps, 51 minutes on
+     the free card; read 2026-11-01, `hotpot-20261101T091902Z`): **0.548** exact, F1 0.633 on 104
+     questions, stopped as clear of top-2 (25 made right, 6 made wrong, 3.4 standard errors);
+     against round one 11 and 6 (0.048, 1.2), against the untrained asker 30 and 5, against
+     gold 6 and 15 (0.635 there). The gap to gold has closed from 0.135 to 0.087 in one more
+     round, with 1.9 searches a question. One lesson: the trained asker sometimes emits a tool
+     call whose arguments are not JSON and the server refuses the turn; the reading now counts
+     that question as unanswered (one of 104) rather than dying. The asking is the piece to
+     grow: rounds, more questions, and the server as the actor, since the tool loop is what
+     makes a round slow.
    - Beside the asking, John's other form: automatic recall, as memory does, nothing asked
      for. Top-2 is its first version, keyed on the question; the second (`--arms recall:K`,
      `openplexus.hotpot.recall`, built 2026-11-01) is keyed on the state as the trunk reads,
      the paragraph nearest the question first and then the one nearest that paragraph's text,
-     the first cueing the second. Read against top-2 and the asker. The key-less learner stays
-     a live line, not a key-only loop: its second form, only unanimous groups scored, runs on
-     maths overnight 2026-11-01.
+     the first cueing the second. Read 2026-11-01 (`hotpot-20261101T092214Z`, `recall:2`): **0.365**
+     exact, F1 0.425 on 200, the same as top-2 to the question (8 made right, 8 made wrong on
+     the shared 104); it found both supporting paragraphs for 56 of 200 where top-2 found 31 of
+     104, no better, since the paragraph's text cues its topical neighbours as the question's
+     words do; against the round-two asker 6 and 25. So automatic recall by similarity, keyed
+     on the question or on what was just read, does not find the second hop on this trunk's
+     embedder, and the asking does: the deliberate form wins here. Recall keyed on the trunk's
+     own state while it reads, rather than on the text, is the form left to try, and it is held
+     until the asking plateaus. The key-less learner stays a live line, not a key-only loop:
+     the confident-group form runs on maths 2026-11-01.
 
 7. **Consolidation: the trunk learns slowly, by replay.** Complementary learning systems
    (McClelland, McNaughton and O'Reilly, 1995): the hippocampus learns in one shot and the

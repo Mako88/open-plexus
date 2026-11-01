@@ -415,8 +415,14 @@ Each step says what it decides. A step is struck when it is done.
      round, with 1.9 searches a question. One lesson: the trained asker sometimes emits a tool
      call whose arguments are not JSON and the server refuses the turn; the reading now counts
      that question as unanswered (one of 104) rather than dying. The asking is the piece to
-     grow: rounds, more questions, and the server as the actor, since the tool loop is what
-     makes a round slow.
+     grow: rounds and more questions. The server as the actor was costed 2026-11-01 and does not
+     pay on this card: the trainer's own path already runs the eight rollouts' tool turns
+     batched, and the cost is each turn re-reading the grown conversation in fp32; the server
+     would spare that with its cache but decodes at about 70 tokens a second across its slots
+     against fp32 PyTorch's 176 batched, so a step would come out no faster, and the trainer's
+     contract for a custom rollout treats the samples as on-policy anyway (`rollout_func`,
+     `env_mask`, the sampler's logprobs unused without vLLM). The levers that remain are fewer
+     and shorter turns; held unless a round's speed becomes the bottleneck.
    - Beside the asking, John's other form: automatic recall, as memory does, nothing asked
      for. Top-2 is its first version, keyed on the question; the second (`--arms recall:K`,
      `openplexus.hotpot.recall`, built 2026-11-01) is keyed on the state as the trunk reads,

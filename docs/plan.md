@@ -322,44 +322,33 @@ Each step says what it decides. A step is struck when it is done.
      Problem supply: generators with keys, the trunk writing variants of solved problems with
      Python computing the key (Absolute Zero, 2025), test sets never trained on. A fixed
      held-out set of every earlier task re-read each round, for forgetting.
-   - What the design is held to, from the talks with John 2026-10-30. Every decision runs on
-     internal signals; external signals correct them, a signal no longer corrected drifts, and
-     the absence of correction should read as uncertainty, not freedom. The system is several
-     learners over a shared state, each credited for the difference its action made (the step
-     by paths through it, the fetch by the solution with and without it, the stop by the
-     answer when it stopped), the trunk trained on the final outcome and not made the sole
-     decider, since every choice would then be capped by a 2B's text policy. The test is not
-     how few parts there are but whether the joints learn: how many samples, when to stop,
-     when to fetch, when to compute are where learning stops today, and each is to become a
-     learner. A verifier without a key is a manufactured check: tests written, a second route,
-     a tool, the world; two cheap judges and a third where they disagree; a value that does
-     not count cost is a loop. Off the shelf first for key-less judging: process reward
-     models, agreement, preference reward models (Skywork-Reward, ArmoRM), generative judges
-     (Prometheus 2, CriticGPT), written principles; judges are gamed and have tastes (length,
-     position, their own writing), so several trained differently, disagreement as
-     uncertainty, refreshed every round. Ensembles of small models buy checking and
-     calibration (Mixture-of-Agents, 2024), not reasoning capacity. Neighbours: STaR, ReST
-     and Math-Shepherd are this loop small, the o-series and R1 large; Self-Rewarding Language
-     Models (values as the key) drifted after a few rounds; Voyager is the store as skills,
-     RETRO as knowledge. Not novel in any piece; possibly in the whole: one card, the store as
-     the knowledge, the trunk a learner, the system supplying its own problems and checks.
-     Order: learning before reasoning, since a reasoner that does not learn is a search over a
-     fixed trunk, which is what the step form read as.
+   - What the design is held to (John, 2026-10-30). Decisions run on internal signals;
+     external signals correct them, an uncorrected signal drifts, and missing correction should
+     read as uncertainty. The system is several learners over a shared state, each credited for
+     the difference its action made (counterfactual credit: the step by paths through it, the
+     fetch by the solution with and without it, the stop by the answer when it stopped), the
+     trunk trained on the outcome and never the sole decider. The test is not how few parts
+     but whether the joints learn: how many samples, when to stop, when to fetch, when to
+     compute are each to become a learner. A verifier without a key is a manufactured check
+     (tests written, a second route, a tool, the world; two cheap judges and a third where they
+     disagree; a value that ignores cost is a loop). Key-less judging off the shelf first:
+     process reward models, agreement, preference models (Skywork-Reward, ArmoRM), generative
+     judges (Prometheus 2, CriticGPT), written principles; judges are gamed and have tastes, so
+     several trained differently, disagreement as uncertainty, refreshed every round. Ensembles
+     buy checking, not reasoning (Mixture-of-Agents 2024). Neighbours: STaR, ReST, Math-Shepherd
+     small, the o-series and R1 large; Self-Rewarding LMs drifted after a few rounds; Voyager
+     the store as skills, RETRO as knowledge. Not novel in any piece, possibly in the whole.
+     Learning before reasoning: a reasoner that does not learn is a search over a fixed trunk.
    - The reasoning fork, held until learning works: a latent loop, the trunk stepping its own
-     state under a small trained adapter with the outcome as the reward, a thought without a
-     token; natural on a trunk whose eighteen linear-attention layers carry a state, and a
-     coin flip against written thought at this size (Coconut 2024, recurrent-depth
-     transformers 2025). Its grown form, John's: a thinker that moves through an internal
-     state and never writes, and a speaker that renders it when the thinker chooses, so
-     thinking cost comes apart from token cost and speech is an action (Large Concept Model
-     2024; Dreamer). The bottleneck is supervision: a model that never writes has only its own
-     future states and rewards through the speaker to learn from, so the one-trunk latent loop
-     comes first and the split if it reasons better a pass than words do; the speaker stays
-     cheap, since a thinker that does not speak cannot be read. The three inefficiencies of
-     word-stream reasoning and their answers: every thought through a token (the latent loop),
-     no backing up (search in code, a backtrack as a rewarded action), no sense of how long to
-     think (the stop and budget learnt from outcome, as R1's models learnt to think longer only
-     where it paid).
+     state under a small adapter rewarded by the outcome, a thought without a token (natural on
+     eighteen linear-attention layers; a coin flip against written thought at this size,
+     Coconut 2024, recurrent-depth transformers 2025). Its grown form, John's: a thinker that
+     never writes and a speaker that renders when the thinker chooses, so thinking cost comes
+     apart from token cost (Large Concept Model 2024, Dreamer); supervision is the bottleneck,
+     so the one-trunk loop first, the split if it reasons better a pass, the speaker kept
+     cheap. The three inefficiencies of word-stream reasoning and their answers: a token a
+     thought (the latent loop), no backing up (search in code, a backtrack as a rewarded
+     action), no sense of how long to think (the stop and budget learnt from outcome).
 
 4. **Writing.** What goes in a row: the raw sentence, or the trunk's own restatement with
    names resolved ("John is in the hallway", not "he went there"), one fact a row. Rows carry

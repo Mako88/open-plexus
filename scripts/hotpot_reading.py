@@ -28,7 +28,7 @@ sys.path.insert(0, str(ROOT / "src"))
 sys.path.insert(0, str(ROOT / "scripts"))
 
 from ask import SYSTEM as ASK_SYSTEM  # noqa: E402
-from ask import Store  # noqa: E402
+from ask import Store, embedder  # noqa: E402
 from grpo_reading import paired  # noqa: E402
 from openplexus.asking import solve  # noqa: E402
 from openplexus.hotpot import answer_of, exact, f1, paragraph_text, questions  # noqa: E402
@@ -86,6 +86,8 @@ def arm(spec: str, qs: list[dict], args, trunk, index) -> dict:
         before_out = trunk.tokens_out
         asked: list[dict | None] = [None] * len(chunk)
         if spec == "ask":
+            embedder()  # once, before the threads: a first import inside several threads at once fails
+
             def one(q):
                 store = Store()
                 store.reset(paragraphs=[{"text": paragraph_text(p), "supporting": p["supporting"]} for p in q["paragraphs"]])

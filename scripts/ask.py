@@ -152,6 +152,7 @@ def main() -> None:
         chat_template_kwargs={"enable_thinking": False}, mask_truncated_completions=True,
         log_completions=False, bf16=False, fp16=False, torch_empty_cache_steps=1,
     )
+    embedder()  # loaded once here: a first import of transformers inside several threads at once fails
     model = AutoModelForCausalLM.from_pretrained(args.model, dtype=torch.float32)
     tok = AutoTokenizer.from_pretrained(args.model)
     peft = LoraConfig(r=args.rank, lora_alpha=2 * args.rank, lora_dropout=0.0, target_modules=TARGETS,

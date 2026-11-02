@@ -70,6 +70,9 @@ def test_the_store_finds_the_nearest_abstract_and_the_tool_never_repeats_one(tmp
     second = tool.search("the film Ed Wood")
     assert first.startswith("Ed Wood (film): ") and second != first
     assert tool.titles()[0] == "Ed Wood (film)" and tool.searches == ["the film Ed Wood"] * 2
+    # another sense: a function of queries, k and rows to skip, here one that always says row 6 then 0
+    other = WikiSearch(store, Words(), nearest=lambda queries, k, exclude: [[i for i in (6, 0) if i not in exclude][:k] for _ in queries])
+    assert other.search("anything") == "Alabama: a state" and other.search("anything") == "Anarchism: a political philosophy"
 
 
 def test_an_unfinished_store_refuses_to_open(tmp_path):

@@ -128,11 +128,14 @@ class WikiStore:
 
 class WikiSearch:
     """The asker's tool over the whole store: the nearest abstract to the query not shown before.
-    Built per question, so `shown` and `searches` are that question's."""
+    Built per question, so `shown` and `searches` are that question's. `nearest(queries, k,
+    exclude)` is the sense, the store's own dense keys unless another is given (the lexical index,
+    or a fusion of the two, `openplexus.lexical`)."""
 
-    def __init__(self, store: WikiStore, embed):
+    def __init__(self, store: WikiStore, embed, nearest=None):
         self.store = store
         self.embed = embed
+        self.nearest = nearest or (lambda queries, k, exclude: store.nearest(embed(queries), k, exclude))
         self.searches: list[str] = []
         self.shown: list[int] = []
 
@@ -146,8 +149,7 @@ class WikiSearch:
             The most relevant passage, with its title first.
         """
         self.searches.append(query)
-        q = np.asarray(self.embed([query]), dtype=np.float32)
-        pick = self.store.nearest(q, 1, exclude=set(self.shown))[0]
+        pick = self.nearest([query], 1, set(self.shown))[0]
         i = pick[0] if pick else 0
         self.shown.append(i)
         return self.store.text(i)

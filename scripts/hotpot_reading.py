@@ -8,7 +8,8 @@ the ten, asking as it chooses, up to `--max-turns`; with `--adapter` the trained
 of the paragraph just recalled, K in all, shown with no action; John's memory-like form);
 `wiki:top:K` and `wiki:ask`, the same two over the full-form store, every Wikipedia abstract
 (`--wiki`, built by `wiki_build.py`), where the supporting paragraphs are two rows in 5.2 million
-and `gold_shown` counts them by title. Each
+and `gold_shown` counts them by title; `--sense dense|lexical|hybrid` is how that store is
+searched (MiniLM keys, BM25 from `--bm25`, or their rank fusion), named in the tag unless dense. Each
 arm is compared paired with `--against` on the same questions by exact match, and stops once
 clear of the first named; an entry is an arm read plain (`ask`, `top:2`) or a part file's tag
 (`ask-ask-round2`, a trained asker's reading). Rows are appended to state/ and a
@@ -40,6 +41,7 @@ from grpo_reading import paired  # noqa: E402
 from openplexus.asking import solve  # noqa: E402
 from openplexus.hotpot import answer_of, exact, f1, paragraph_text, questions, recall  # noqa: E402
 from openplexus.maths import rows_of  # noqa: E402
+from openplexus.lexical import LexicalIndex, fused  # noqa: E402
 from openplexus.wiki import WikiSearch, WikiStore  # noqa: E402
 
 ASKING = ("ask", "wiki:ask")
@@ -66,12 +68,28 @@ def as_paragraph(store: WikiStore, i: int, gold: set[str]) -> dict:
     return {"title": title, "sentences": [text], "supporting": title in gold}
 
 
+def sense_of(sense: str, store: WikiStore, embed, bm25: str):
+    """The full-form store's search as a function of queries, k and rows to skip."""
+    dense = lambda queries, k, exclude: store.nearest(embed(queries), k, exclude)  # noqa: E731
+    if sense == "dense":
+        return dense
+    lexical = LexicalIndex(bm25)
+    if sense == "lexical":
+        return lexical.nearest
+    deep = 20
+
+    def hybrid(queries, k, exclude):
+        return [fused([d, x], k) for d, x in zip(dense(queries, deep, exclude), lexical.nearest(queries, deep, exclude))]
+
+    return hybrid
+
+
 def chosen(spec: str, q: dict, index=None) -> list[dict]:
     if spec == "floor" or spec in ASKING:
         return []
     if spec.startswith("wiki:top:"):
         k = int(spec.split(":")[2])
-        picks = index.wiki.nearest(index.embed([q["question"]]), k)[0]
+        picks = index.nearest([q["question"]], k, set())[0]
         return [as_paragraph(index.wiki, i, gold_titles(q)) for i in picks]
     if spec == "gold":
         return [p for p in q["paragraphs"] if p["supporting"]]
@@ -88,6 +106,8 @@ def chosen(spec: str, q: dict, index=None) -> list[dict]:
 
 def tag_of(spec: str, args) -> str:
     tag = spec.replace(":", "")
+    if spec.startswith("wiki:") and getattr(args, "sense", "dense") != "dense":
+        tag += "-" + args.sense
     if args.adapter:
         tag += "-" + Path(args.adapter).stem.replace("-lora", "")
     return tag
@@ -126,7 +146,7 @@ def arm(spec: str, qs: list[dict], args, trunk, index) -> dict:
 
             def one(q):
                 if spec == "wiki:ask":
-                    tool = WikiSearch(index.wiki, index.embed)
+                    tool = WikiSearch(index.wiki, index.embed, index.nearest)
                     titles = tool.titles
                 else:
                     tool = Store()
@@ -198,6 +218,7 @@ def arm(spec: str, qs: list[dict], args, trunk, index) -> dict:
         "never_asked": sum(not r.get("searches") for r in rows) if spec in ASKING else None,
         "failed_turns": sum(bool(r.get("failed")) for r in rows) if spec in ASKING else None,
         "store_rows": index.wiki.n if spec.startswith("wiki:") else 10,
+        "sense": args.sense if spec.startswith("wiki:") else "the ten paragraphs by MiniLM",
         "passes_per_question": round(sum(r["passes"] for r in rows) / n, 1),
         "paired": {o: paired({r["question"]: r for r in rows}, {r["question"]: r for r in rows_o.values()}, qs)
                    for o, rows_o in others.items()},
@@ -217,6 +238,8 @@ def main() -> None:
     p.add_argument("--served", default="http://127.0.0.1:8093")
     p.add_argument("--adapter", default=None, help="a GGUF LoRA file the server has loaded, applied at 1")
     p.add_argument("--wiki", default=str(ROOT / "data" / "wiki-abstracts" / "minilm"), help="the full-form store")
+    p.add_argument("--bm25", default=str(ROOT / "data" / "wiki-abstracts" / "bm25"), help="its lexical index")
+    p.add_argument("--sense", default="dense", choices=["dense", "lexical", "hybrid"], help="how the full-form store is searched")
     p.add_argument("--against", default="floor")
     p.add_argument("--min-n", type=int, default=100)
     p.add_argument("--clear", type=float, default=2.5)
@@ -251,7 +274,8 @@ def main() -> None:
         index.embed = embed
         if any(s.startswith("wiki:") for s in args.arms.split(",")):
             index.wiki = WikiStore(args.wiki)
-            print(f"the full-form store: {index.wiki.n} abstracts on {index.wiki.device}", flush=True)
+            index.nearest = sense_of(args.sense, index.wiki, embed, args.bm25)
+            print(f"the full-form store: {index.wiki.n} abstracts on {index.wiki.device}, searched {args.sense}", flush=True)
     reading = {"kind": "hotpot-reading", "set": f"HotpotQA distractor {args.split}, data/hotpotqa/{args.split}.jsonl",
                "skip": args.skip, "n": len(qs), "scorer": "exact match and token F1 on the normalised answer, HotpotQA's own",
                "adapter": args.adapter, "arms": {}}

@@ -84,7 +84,8 @@ def test_the_full_form_arms_read_store_rows_as_paragraphs_and_count_gold_by_titl
     sys.path.insert(0, str(ROOT / "scripts"))
     import hotpot_reading as hr
     build(corpus(tmp_path), tmp_path / "store", Words(), shard=3)
-    index = types.SimpleNamespace(wiki=WikiStore(tmp_path / "store", device="cpu", chunk=4), embed=Words())
+    wiki = WikiStore(tmp_path / "store", device="cpu", chunk=4)
+    index = types.SimpleNamespace(wiki=wiki, embed=Words(), nearest=hr.sense_of("dense", wiki, Words(), bm25=None))
     q = {"question": "who directed the film Ed Wood",
          "paragraphs": [{"title": "Ed Wood (film)", "supporting": True}, {"title": "Tim Burton", "supporting": True},
                         {"title": "Albedo", "supporting": False}]}
@@ -95,3 +96,6 @@ def test_the_full_form_arms_read_store_rows_as_paragraphs_and_count_gold_by_titl
     assert hr.chosen("wiki:ask", q, index) == [] and hr.chosen("floor", q, index) == []
     assert hr.tag_of("wiki:top:2", types.SimpleNamespace(adapter=None)) == "wikitop2"
     assert hr.tag_of("wiki:ask", types.SimpleNamespace(adapter="state/gguf/ask-round2-lora.gguf")) == "wikiask-ask-round2"
+    assert hr.tag_of("wiki:ask", types.SimpleNamespace(adapter="state/gguf/ask-round2-lora.gguf", sense="lexical")) == "wikiask-lexical-ask-round2"
+    assert hr.tag_of("wiki:top:2", types.SimpleNamespace(adapter=None, sense="hybrid")) == "wikitop2-hybrid"
+    assert hr.tag_of("ask", types.SimpleNamespace(adapter=None, sense="lexical")) == "ask"  # the ten-paragraph store has one sense

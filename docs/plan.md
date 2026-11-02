@@ -356,9 +356,20 @@ Each step says what it decides. A step is struck when it is done.
    whether the trunk should write its own rows.
 
 5. **Continual state.** The conversation's working state saved to disk and reloaded, so a
-   restart continues mid-conversation: the KV cache of the prefix first. If its growth bites,
-   a trunk with a fixed-size state (a state-space model, or a Titans-style module) is the
-   alternative. Decides how state persists.
+   restart continues mid-conversation. First form built and read 2026-11-02 (`openplexus.state`,
+   `state_reading.py`, `state-20261102T135706Z`): the served trunk's slot state (attention KV
+   and the recurrent layers' state) saved to a file and restored after a restart. Eight
+   conversations of a 7,300-token prefix and four turns: the restored turn reads 32 new tokens
+   and answers in 0.5 s with the unbroken conversation's reply and the same first-token
+   log-probability to the last digit on all eight; the cold restart re-reads 7,300 tokens in
+   9.9 s (same replies, log-probabilities off by 0.02). Save 0.4 s, restore 0.3 s, 15 KB a
+   token (110 MB a conversation; 480 MB at the 32k context). The finding on the way: the chat
+   template drops the empty thinking block from every past assistant turn, so a history it
+   renders never matches the saved tokens and the state is silently re-read; the transcript is
+   rendered by our code on the raw completion endpoint instead. Left: the state of the asking
+   (its shown rows and the store) is on disk already, so continuity of the whole system is
+   wired when the system runs continuously (after step 6); if the file's growth bites, a trunk
+   with a fixed-size state (a state-space model, or a Titans-style module) is the alternative.
 
 6. **The store at knowledge, and the asking as a learned action.** Pulled forward 2026-10-31
    with John after fork (d) read that on GSM8K the store has nothing to give: the core bet is

@@ -1,0 +1,899 @@
+{
+ "kind": "state-reading",
+ "set": "HotpotQA distractor validation paragraphs as the story, its questions as the turns",
+ "system_prompt": "You are given passages and then questions about them. Answer each question from the passages in a few words, nothing else.",
+ "thinking": false,
+ "ctx": 16384,
+ "turns": 4,
+ "summary": {
+  "n": 8,
+  "restored_same_reply": 1.0,
+  "cold_same_reply": 1.0,
+  "restored_logprob_gap_mean": 0.0,
+  "cold_logprob_gap_mean": 0.0221,
+  "saved_tokens_mean": 7265.12,
+  "file_mb_mean": 109.7,
+  "bytes_per_token": 15097,
+  "save_s_mean": 0.37,
+  "restore_s_mean": 0.27,
+  "server_restart_s_mean": 5.88,
+  "prompt_n_mean": {
+   "unbroken": 32.25,
+   "restored": 32.25,
+   "cold": 7297.38
+  },
+  "prompt_ms_mean": {
+   "unbroken": 226.03,
+   "restored": 228.6,
+   "cold": 9621.59
+  },
+  "seconds_mean": {
+   "unbroken": 0.5,
+   "restored": 0.49,
+   "cold": 9.91
+  }
+ },
+ "rows": [
+  {
+   "conversation": 0,
+   "ids": [
+    "5a8b57f25542995d1e6f1371",
+    "5a8c7595554299585d9e36b6",
+    "5a85ea095542994775f606a8",
+    "5adbf0a255429947ff17385a",
+    "5a8e3ea95542995a26add48d"
+   ],
+   "turns": [
+    {
+     "question": "Were Scott Derrickson and Ed Wood of the same nationality?",
+     "answer": "yes",
+     "said": "No",
+     "prompt_n": 6383
+    },
+    {
+     "question": "What government position was held by the woman who portrayed Corliss Archer in the film Kiss and Tell?",
+     "answer": "Chief of Protocol",
+     "said": "United States ambassador to Ghana and Czechoslovakia.",
+     "prompt_n": 35
+    },
+    {
+     "question": "What science fantasy young adult series, told in first person, has a set of companion books narrating the stories of enslaved worlds and alien species?",
+     "answer": "Animorphs",
+     "said": "Animorphs.",
+     "prompt_n": 43
+    },
+    {
+     "question": "Are the Laleli Mosque and Esma Sultan Mansion located in the same neighborhood?",
+     "answer": "no",
+     "said": "No.",
+     "prompt_n": 31
+    }
+   ],
+   "final": {
+    "question": "The director of the romantic comedy \"Big Stone Gap\" is based in what New York city?",
+    "answer": "Greenwich Village, New York City"
+   },
+   "saved_tokens": 6510,
+   "restored_tokens": 6510,
+   "file_bytes": 100379272,
+   "save_s": 0.44,
+   "restore_s": 0.29,
+   "server_restart_s": 6.5,
+   "unbroken": {
+    "content": "New York City.",
+    "prompt_n": 33,
+    "prompt_ms": 225.9,
+    "predicted_n": 5,
+    "stop": "eos",
+    "seconds": 0.38,
+    "first_token": "New",
+    "first_logprob": -0.6600425839424133,
+    "first_top": {
+     "New": -0.66,
+     "Bro": -1.8688,
+     "Big": -2.3081,
+     "Virginia": -3.3439,
+     "None": -3.9334
+    }
+   },
+   "restored": {
+    "content": "New York City.",
+    "prompt_n": 33,
+    "prompt_ms": 251.8,
+    "predicted_n": 5,
+    "stop": "eos",
+    "seconds": 0.42,
+    "first_token": "New",
+    "first_logprob": -0.6600425839424133,
+    "first_top": {
+     "New": -0.66,
+     "Bro": -1.8688,
+     "Big": -2.3081,
+     "Virginia": -3.3439,
+     "None": -3.9334
+    }
+   },
+   "cold": {
+    "content": "New York City.",
+    "prompt_n": 6543,
+    "prompt_ms": 8511.0,
+    "predicted_n": 5,
+    "stop": "eos",
+    "seconds": 8.69,
+    "first_token": "New",
+    "first_logprob": -0.6530023813247681,
+    "first_top": {
+     "New": -0.653,
+     "Bro": -1.9125,
+     "Big": -2.3182,
+     "Virginia": -3.2919,
+     "None": -4.0586
+    }
+   },
+   "restored_vs_unbroken": {
+    "same_reply": true,
+    "same_first_token": true,
+    "logprob_gap": 0.0
+   },
+   "cold_vs_unbroken": {
+    "same_reply": true,
+    "same_first_token": true,
+    "logprob_gap": 0.007
+   }
+  },
+  {
+   "conversation": 1,
+   "ids": [
+    "5abd94525542992ac4f382d2",
+    "5a85b2d95542997b5ce40028",
+    "5a87ab905542996e4f3088c1",
+    "5a7bbb64554299042af8f7cc",
+    "5a8db19d5542994ba4e3dd00"
+   ],
+   "turns": [
+    {
+     "question": "2014 S/S is the debut album of a South Korean boy group that was formed by who?",
+     "answer": "YG Entertainment",
+     "said": "YG Entertainment",
+     "prompt_n": 8872
+    },
+    {
+     "question": "Who was known by his stage name Aladin and helped organizations improve their performance as a consultant?",
+     "answer": "Eenasul Fateh",
+     "said": "Eenasul Fateh",
+     "prompt_n": 33
+    },
+    {
+     "question": "The arena where the Lewiston Maineiacs played their home games can seat how many people?",
+     "answer": "3,677 seated",
+     "said": "4,000",
+     "prompt_n": 33
+    },
+    {
+     "question": "Who is older, Annie Morton or Terry Richardson?",
+     "answer": "Terry Richardson",
+     "said": "Annie Morton is older.",
+     "prompt_n": 24
+    }
+   ],
+   "final": {
+    "question": "Are Local H and For Against both from the United States?",
+    "answer": "yes"
+   },
+   "saved_tokens": 8980,
+   "restored_tokens": 8980,
+   "file_bytes": 130799792,
+   "save_s": 0.46,
+   "restore_s": 0.35,
+   "server_restart_s": 6.5,
+   "unbroken": {
+    "content": "No, Local H is from the United States, but For Against is from Nebraska, which is in the United States.",
+    "prompt_n": 26,
+    "prompt_ms": 234.9,
+    "predicted_n": 24,
+    "stop": "limit",
+    "seconds": 0.9,
+    "first_token": "No",
+    "first_logprob": -0.48156869411468506,
+    "first_top": {
+     "No": -0.4816,
+     "Yes": -1.2215,
+     "Local": -2.8045,
+     "Both": -4.2109,
+     "For": -5.4007
+    }
+   },
+   "restored": {
+    "content": "No, Local H is from the United States, but For Against is from Nebraska, which is in the United States.",
+    "prompt_n": 26,
+    "prompt_ms": 234.8,
+    "predicted_n": 24,
+    "stop": "limit",
+    "seconds": 0.86,
+    "first_token": "No",
+    "first_logprob": -0.48156869411468506,
+    "first_top": {
+     "No": -0.4816,
+     "Yes": -1.2215,
+     "Local": -2.8045,
+     "Both": -4.2109,
+     "For": -5.4007
+    }
+   },
+   "cold": {
+    "content": "No, Local H is from the United States, but For Against is from Nebraska, which is in the United States.",
+    "prompt_n": 9006,
+    "prompt_ms": 12564.9,
+    "predicted_n": 24,
+    "stop": "limit",
+    "seconds": 13.25,
+    "first_token": "No",
+    "first_logprob": -0.49588969349861145,
+    "first_top": {
+     "No": -0.4959,
+     "Yes": -1.1776,
+     "Local": -2.8868,
+     "Both": -4.1421,
+     "For": -5.4572
+    }
+   },
+   "restored_vs_unbroken": {
+    "same_reply": true,
+    "same_first_token": true,
+    "logprob_gap": 0.0
+   },
+   "cold_vs_unbroken": {
+    "same_reply": true,
+    "same_first_token": true,
+    "logprob_gap": 0.0143
+   }
+  },
+  {
+   "conversation": 2,
+   "ids": [
+    "5a7166395542994082a3e814",
+    "5a877e5d5542993e715abf7d",
+    "5ab3b0bf5542992ade7c6e39",
+    "5ab56e32554299637185c594",
+    "5ab6d09255429954757d337d"
+   ],
+   "turns": [
+    {
+     "question": "What is the name of the fight song of the university whose main campus is in Lawrence, Kansas and whose branch campuses are in the Kansas City metropolitan area?",
+     "answer": "Kansas Song",
+     "said": "Kansas Song",
+     "prompt_n": 8145
+    },
+    {
+     "question": "What screenwriter with credits for \"Evolution\" co-wrote a film starring Nicolas Cage and Téa Leoni?",
+     "answer": "David Weissman",
+     "said": "David Weissman",
+     "prompt_n": 38
+    },
+    {
+     "question": "What year did Guns N Roses perform a promo for a movie starring Arnold Schwarzenegger as a former New York Police detective?",
+     "answer": "1999",
+     "said": "1999",
+     "prompt_n": 39
+    },
+    {
+     "question": "Are Random House Tower and 888 7th Avenue both used for real estate?",
+     "answer": "no",
+     "said": "Yes",
+     "prompt_n": 33
+    }
+   ],
+   "final": {
+    "question": "The football manager who recruited David Beckham managed Manchester United during what timeframe?",
+    "answer": "from 1986 to 2013"
+   },
+   "saved_tokens": 8265,
+   "restored_tokens": 8265,
+   "file_bytes": 121993852,
+   "save_s": 0.45,
+   "restore_s": 0.35,
+   "server_restart_s": 6.5,
+   "unbroken": {
+    "content": "1945 to 1969",
+    "prompt_n": 28,
+    "prompt_ms": 232.4,
+    "predicted_n": 11,
+    "stop": "eos",
+    "seconds": 0.57,
+    "first_token": "1",
+    "first_logprob": -0.09346357733011246,
+    "first_top": {
+     "1": -0.0935,
+     "Between": -2.8582,
+     "From": -5.0976,
+     "Sir": -5.0981,
+     "2": -5.188
+    }
+   },
+   "restored": {
+    "content": "1945 to 1969",
+    "prompt_n": 28,
+    "prompt_ms": 250.4,
+    "predicted_n": 11,
+    "stop": "eos",
+    "seconds": 0.59,
+    "first_token": "1",
+    "first_logprob": -0.09346357733011246,
+    "first_top": {
+     "1": -0.0935,
+     "Between": -2.8582,
+     "From": -5.0976,
+     "Sir": -5.0981,
+     "2": -5.188
+    }
+   },
+   "cold": {
+    "content": "1945 to 1969",
+    "prompt_n": 8293,
+    "prompt_ms": 11242.7,
+    "predicted_n": 11,
+    "stop": "eos",
+    "seconds": 11.58,
+    "first_token": "1",
+    "first_logprob": -0.09746359288692474,
+    "first_top": {
+     "1": -0.0975,
+     "Between": -2.8309,
+     "Sir": -4.989,
+     "From": -4.9999,
+     "2": -5.1245
+    }
+   },
+   "restored_vs_unbroken": {
+    "same_reply": true,
+    "same_first_token": true,
+    "logprob_gap": 0.0
+   },
+   "cold_vs_unbroken": {
+    "same_reply": true,
+    "same_first_token": true,
+    "logprob_gap": 0.004
+   }
+  },
+  {
+   "conversation": 3,
+   "ids": [
+    "5a75e05c55429976ec32bc5f",
+    "5ab3e45655429976abd1bcd4",
+    "5ab29c24554299449642c932",
+    "5ae0d4c9554299603e418468",
+    "5a8133725542995ce29dcbdb"
+   ],
+   "turns": [
+    {
+     "question": "Brown State Fishing Lake is in a country that has a population of how many inhabitants ?",
+     "answer": "9,984",
+     "said": "9,984",
+     "prompt_n": 6963
+    },
+    {
+     "question": "The Vermont Catamounts men's soccer team currently competes in a conference that was formerly known as what from 1988 to 1996?",
+     "answer": "the North Atlantic Conference",
+     "said": "North Atlantic Conference",
+     "prompt_n": 48
+    },
+    {
+     "question": "Are Giuseppe Verdi and Ambroise Thomas both Opera composers ?",
+     "answer": "yes",
+     "said": "Yes",
+     "prompt_n": 26
+    },
+    {
+     "question": "Roger O. Egeberg was Assistant Secretary for Health and Scientific Affairs during the administration of a president that served during what years?",
+     "answer": "1969 until 1974",
+     "said": "1969 to 1974",
+     "prompt_n": 40
+    }
+   ],
+   "final": {
+    "question": "Which writer was from England, Henry Roth or Robert Erskine Childers?",
+    "answer": "Robert Erskine Childers DSC"
+   },
+   "saved_tokens": 7096,
+   "restored_tokens": 7096,
+   "file_bytes": 107596448,
+   "save_s": 0.41,
+   "restore_s": 0.29,
+   "server_restart_s": 6.5,
+   "unbroken": {
+    "content": "Robert Erskine Childers",
+    "prompt_n": 30,
+    "prompt_ms": 239.4,
+    "predicted_n": 7,
+    "stop": "eos",
+    "seconds": 0.45,
+    "first_token": "Robert",
+    "first_logprob": -0.1286827027797699,
+    "first_top": {
+     "Robert": -0.1287,
+     "Henry": -2.8885,
+     "Er": -3.7426,
+     "Neither": -4.9269,
+     "Both": -5.2734
+    }
+   },
+   "restored": {
+    "content": "Robert Erskine Childers",
+    "prompt_n": 30,
+    "prompt_ms": 233.7,
+    "predicted_n": 7,
+    "stop": "eos",
+    "seconds": 0.45,
+    "first_token": "Robert",
+    "first_logprob": -0.1286827027797699,
+    "first_top": {
+     "Robert": -0.1287,
+     "Henry": -2.8885,
+     "Er": -3.7426,
+     "Neither": -4.9269,
+     "Both": -5.2734
+    }
+   },
+   "cold": {
+    "content": "Robert Erskine Childers",
+    "prompt_n": 7126,
+    "prompt_ms": 9381.5,
+    "predicted_n": 7,
+    "stop": "eos",
+    "seconds": 9.61,
+    "first_token": "Robert",
+    "first_logprob": -0.14388716220855713,
+    "first_top": {
+     "Robert": -0.1439,
+     "Henry": -2.7248,
+     "Er": -3.6446,
+     "Neither": -5.0124,
+     "Both": -5.1898
+    }
+   },
+   "restored_vs_unbroken": {
+    "same_reply": true,
+    "same_first_token": true,
+    "logprob_gap": 0.0
+   },
+   "cold_vs_unbroken": {
+    "same_reply": true,
+    "same_first_token": true,
+    "logprob_gap": 0.0152
+   }
+  },
+  {
+   "conversation": 4,
+   "ids": [
+    "5ae7a8175542993210983ed8",
+    "5ae6050f55429929b0807a5e",
+    "5adddccd5542997dc7907069",
+    "5ae2070a5542994d89d5b313",
+    "5ae22b8d554299234fd0440f"
+   ],
+   "turns": [
+    {
+     "question": "Which other Mexican Formula One race car driver has held the podium besides the Force India driver born in 1990?",
+     "answer": "Pedro Rodríguez",
+     "said": "Pedro Rodríguez",
+     "prompt_n": 6862
+    },
+    {
+     "question": "This singer of A Rather Blustery Day also voiced what hedgehog?",
+     "answer": "Sonic",
+     "said": "Tigger",
+     "prompt_n": 29
+    },
+    {
+     "question": "Aside from the Apple Remote, what other device can control the program Apple Remote was originally designed to interact with?",
+     "answer": "keyboard function keys",
+     "said": "Keyboard function keys.",
+     "prompt_n": 36
+    },
+    {
+     "question": "Which performance act has a higher instrument to person ratio, Badly Drawn Boy or Wolf Alice? ",
+     "answer": "Badly Drawn Boy",
+     "said": "Badly Drawn Boy.",
+     "prompt_n": 35
+    }
+   ],
+   "final": {
+    "question": "What was the father of Kasper Schmeichel voted to be by the IFFHS in 1992?",
+    "answer": "World's Best Goalkeeper"
+   },
+   "saved_tokens": 6977,
+   "restored_tokens": 6977,
+   "file_bytes": 106130844,
+   "save_s": 0.41,
+   "restore_s": 0.23,
+   "server_restart_s": 6.5,
+   "unbroken": {
+    "content": "Peter Schmeichel.",
+    "prompt_n": 39,
+    "prompt_ms": 264.6,
+    "predicted_n": 6,
+    "stop": "eos",
+    "seconds": 0.49,
+    "first_token": "Peter",
+    "first_logprob": -0.2963203191757202,
+    "first_top": {
+     "Peter": -0.2963,
+     "Man": -3.6329,
+     "None": -3.8728,
+     "K": -3.8782,
+     "No": -4.2223
+    }
+   },
+   "restored": {
+    "content": "Peter Schmeichel.",
+    "prompt_n": 39,
+    "prompt_ms": 200.3,
+    "predicted_n": 6,
+    "stop": "eos",
+    "seconds": 0.36,
+    "first_token": "Peter",
+    "first_logprob": -0.2963203191757202,
+    "first_top": {
+     "Peter": -0.2963,
+     "Man": -3.6329,
+     "None": -3.8728,
+     "K": -3.8782,
+     "No": -4.2223
+    }
+   },
+   "cold": {
+    "content": "Peter Schmeichel.",
+    "prompt_n": 7016,
+    "prompt_ms": 9004.9,
+    "predicted_n": 6,
+    "stop": "eos",
+    "seconds": 9.16,
+    "first_token": "Peter",
+    "first_logprob": -0.2667354643344879,
+    "first_top": {
+     "Peter": -0.2667,
+     "Man": -3.6947,
+     "None": -3.9365,
+     "K": -3.9702,
+     "No": -4.3329
+    }
+   },
+   "restored_vs_unbroken": {
+    "same_reply": true,
+    "same_first_token": true,
+    "logprob_gap": 0.0
+   },
+   "cold_vs_unbroken": {
+    "same_reply": true,
+    "same_first_token": true,
+    "logprob_gap": 0.0296
+   }
+  },
+  {
+   "conversation": 5,
+   "ids": [
+    "5a722b8655429971e9dc9329",
+    "5adf37a95542995ec70e8f97",
+    "5abd259d55429924427fcf1a",
+    "5a828c8355429966c78a6a50",
+    "5a8a3e745542996c9b8d5e70"
+   ],
+   "turns": [
+    {
+     "question": "Who was the writer of These Boots Are Made for Walkin' and who died in 2007?",
+     "answer": "Barton Lee Hazlewood",
+     "said": "Lee Hazlewood",
+     "prompt_n": 5816
+    },
+    {
+     "question": "The 2011–12 VCU Rams men's basketball team, led by third year head coach Shaka Smart, represented Virginia Commonwealth University which was founded in what year?",
+     "answer": "1838",
+     "said": "1838",
+     "prompt_n": 52
+    },
+    {
+     "question": "Are both Dictyosperma, and Huernia described as a genus?",
+     "answer": "yes",
+     "said": "Yes",
+     "prompt_n": 31
+    },
+    {
+     "question": "Kaiser Ventures corporation was founded by an American industrialist who became known as the father of modern American shipbuilding?",
+     "answer": "Henry J. Kaiser",
+     "said": "Yes",
+     "prompt_n": 37
+    }
+   ],
+   "final": {
+    "question": "What is the name for the adventure in \"Tunnels and Trolls\", a game designed by Ken St. Andre?",
+    "answer": "Arena of Khazan"
+   },
+   "saved_tokens": 5946,
+   "restored_tokens": 5946,
+   "file_bytes": 93433048,
+   "save_s": 0.23,
+   "restore_s": 0.2,
+   "server_restart_s": 5.5,
+   "unbroken": {
+    "content": "Crusaders of Khazan",
+    "prompt_n": 39,
+    "prompt_ms": 187.4,
+    "predicted_n": 7,
+    "stop": "eos",
+    "seconds": 0.37,
+    "first_token": "Cr",
+    "first_logprob": -1.382371425628662,
+    "first_top": {
+     "Cr": -1.3824,
+     "Arena": -1.5044,
+     "T": -1.9157,
+     "C": -2.0911,
+     "None": -3.4065
+    }
+   },
+   "restored": {
+    "content": "Crusaders of Khazan",
+    "prompt_n": 39,
+    "prompt_ms": 197.6,
+    "predicted_n": 7,
+    "stop": "eos",
+    "seconds": 0.37,
+    "first_token": "Cr",
+    "first_logprob": -1.382371425628662,
+    "first_top": {
+     "Cr": -1.3824,
+     "Arena": -1.5044,
+     "T": -1.9157,
+     "C": -2.0911,
+     "None": -3.4065
+    }
+   },
+   "cold": {
+    "content": "Crusaders of Khazan",
+    "prompt_n": 5985,
+    "prompt_ms": 7817.3,
+    "predicted_n": 7,
+    "stop": "eos",
+    "seconds": 8.05,
+    "first_token": "Cr",
+    "first_logprob": -1.4498815536499023,
+    "first_top": {
+     "Cr": -1.4499,
+     "Arena": -1.6081,
+     "T": -1.7133,
+     "C": -2.0869,
+     "None": -3.3343
+    }
+   },
+   "restored_vs_unbroken": {
+    "same_reply": true,
+    "same_first_token": true,
+    "logprob_gap": 0.0
+   },
+   "cold_vs_unbroken": {
+    "same_reply": true,
+    "same_first_token": true,
+    "logprob_gap": 0.0675
+   }
+  },
+  {
+   "conversation": 6,
+   "ids": [
+    "5ac23ff0554299636651994d",
+    "5ae4a3265542995ad6573de5",
+    "5ae0361155429925eb1afc2c",
+    "5abc0a5d5542993f40c73c64",
+    "5a7cc50e554299452d57ba3e"
+   ],
+   "turns": [
+    {
+     "question": "When was Poison's album \"Shut Up, Make Love\" released?",
+     "answer": "2000",
+     "said": "2000",
+     "prompt_n": 7046
+    },
+    {
+     "question": "Hayden is a singer-songwriter from Canada, but where does Buck-Tick hail from?",
+     "answer": "Fujioka, Gunma",
+     "said": "Gunma, Japan",
+     "prompt_n": 33
+    },
+    {
+     "question": "Which  French ace pilot and adventurer fly L'Oiseau Blanc",
+     "answer": "Charles Eugène",
+     "said": "Charles Nungesser and François Coli.",
+     "prompt_n": 26
+    },
+    {
+     "question": "Are Freakonomics and In the Realm of the Hackers both American documentaries?",
+     "answer": "no",
+     "said": "No, Freakonomics is American, but In the Realm of the Hackers is Australian.",
+     "prompt_n": 30
+    }
+   ],
+   "final": {
+    "question": "Which band, Letters to Cleo or Screaming Trees, had more members?",
+    "answer": "Letters to Cleo"
+   },
+   "saved_tokens": 7171,
+   "restored_tokens": 7171,
+   "file_bytes": 108520148,
+   "save_s": 0.28,
+   "restore_s": 0.23,
+   "server_restart_s": 4.5,
+   "unbroken": {
+    "content": "Letters to Cleo had more members.",
+    "prompt_n": 30,
+    "prompt_ms": 211.8,
+    "predicted_n": 9,
+    "stop": "eos",
+    "seconds": 0.45,
+    "first_token": "Letters",
+    "first_logprob": -0.6072080135345459,
+    "first_top": {
+     "Letters": -0.6072,
+     "S": -1.253,
+     "Both": -2.4572,
+     "Sc": -4.1317,
+     "Neither": -4.2327
+    }
+   },
+   "restored": {
+    "content": "Letters to Cleo had more members.",
+    "prompt_n": 30,
+    "prompt_ms": 227.5,
+    "predicted_n": 9,
+    "stop": "eos",
+    "seconds": 0.46,
+    "first_token": "Letters",
+    "first_logprob": -0.6072080135345459,
+    "first_top": {
+     "Letters": -0.6072,
+     "S": -1.253,
+     "Both": -2.4572,
+     "Sc": -4.1317,
+     "Neither": -4.2327
+    }
+   },
+   "cold": {
+    "content": "Letters to Cleo had more members.",
+    "prompt_n": 7201,
+    "prompt_ms": 9185.4,
+    "predicted_n": 9,
+    "stop": "eos",
+    "seconds": 9.43,
+    "first_token": "Letters",
+    "first_logprob": -0.5689132809638977,
+    "first_top": {
+     "Letters": -0.5689,
+     "S": -1.3177,
+     "Both": -2.4937,
+     "Sc": -4.1008,
+     "Neither": -4.2699
+    }
+   },
+   "restored_vs_unbroken": {
+    "same_reply": true,
+    "same_first_token": true,
+    "logprob_gap": 0.0
+   },
+   "cold_vs_unbroken": {
+    "same_reply": true,
+    "same_first_token": true,
+    "logprob_gap": 0.0383
+   }
+  },
+  {
+   "conversation": 7,
+   "ids": [
+    "5abf63f15542997ec76fd3ea",
+    "5a8ef2a75542995a26add583",
+    "5a80721b554299485f5985ef",
+    "5ab51dae5542991779162d82",
+    "5a7571135542992d0ec05f98"
+   ],
+   "turns": [
+    {
+     "question": "Alexander Kerensky was defeated and destroyed by the Bolsheviks in the course of a civil war that ended when ?",
+     "answer": "October 1922",
+     "said": "1923",
+     "prompt_n": 7042
+    },
+    {
+     "question": "Seven Brief Lessons on Physics was written by an Italian physicist that has worked in France since what year?",
+     "answer": "2000",
+     "said": "2000",
+     "prompt_n": 34
+    },
+    {
+     "question": "The Livesey Hal War Memorial commemorates the fallen of which war, that had over 60 million casualties?",
+     "answer": "World War II",
+     "said": "World War II",
+     "prompt_n": 37
+    },
+    {
+     "question": "Are both Elko Regional Airport and Gerald R. Ford International Airport located in Michigan?",
+     "answer": "no",
+     "said": "No, Elko Regional Airport is in Nevada, and Gerald R. Ford International Airport is in Michigan.",
+     "prompt_n": 31
+    }
+   ],
+   "final": {
+    "question": "Ralph Hefferline was a psychology professor at a university that is located in what city?",
+    "answer": "New York City"
+   },
+   "saved_tokens": 7176,
+   "restored_tokens": 7176,
+   "file_bytes": 108581728,
+   "save_s": 0.28,
+   "restore_s": 0.23,
+   "server_restart_s": 4.5,
+   "unbroken": {
+    "content": "Columbia City, New York.",
+    "prompt_n": 33,
+    "prompt_ms": 211.8,
+    "predicted_n": 8,
+    "stop": "eos",
+    "seconds": 0.41,
+    "first_token": "C",
+    "first_logprob": -0.7568305730819702,
+    "first_top": {
+     "C": -0.7568,
+     "New": -1.3753,
+     "R": -3.1153,
+     "Philadelphia": -3.6329,
+     "Ann": -3.8347
+    }
+   },
+   "restored": {
+    "content": "Columbia City, New York.",
+    "prompt_n": 33,
+    "prompt_ms": 232.7,
+    "predicted_n": 8,
+    "stop": "eos",
+    "seconds": 0.44,
+    "first_token": "C",
+    "first_logprob": -0.7568305730819702,
+    "first_top": {
+     "C": -0.7568,
+     "New": -1.3753,
+     "R": -3.1153,
+     "Philadelphia": -3.6329,
+     "Ann": -3.8347
+    }
+   },
+   "cold": {
+    "content": "Columbia City, New York.",
+    "prompt_n": 7209,
+    "prompt_ms": 9265.0,
+    "predicted_n": 8,
+    "stop": "eos",
+    "seconds": 9.48,
+    "first_token": "C",
+    "first_logprob": -0.7555384635925293,
+    "first_top": {
+     "C": -0.7555,
+     "New": -1.3256,
+     "R": -3.261,
+     "Philadelphia": -3.718,
+     "Ann": -3.8861
+    }
+   },
+   "restored_vs_unbroken": {
+    "same_reply": true,
+    "same_first_token": true,
+    "logprob_gap": 0.0
+   },
+   "cold_vs_unbroken": {
+    "same_reply": true,
+    "same_first_token": true,
+    "logprob_gap": 0.0013
+   }
+  }
+ ],
+ "command": "scripts/state_reading.py --n 8 --turns 4 --note step 5's first form: the served trunk's slot state saved and restored across a restart; ceiling the unbroken conversation, floor the cold restart re-reading the prefix",
+ "sha": "737fe17b",
+ "model": "C:\\Users\\John\\.cache\\huggingface\\hub\\models--bartowski--Qwen_Qwen3.5-2B-GGUF\\snapshots\\7d26695454df6de5fbcce2e58681e62dae06ce43\\Qwen_Qwen3.5-2B-Q8_0.gguf",
+ "taken_at": "20261102T135706Z",
+ "note": "step 5's first form: the served trunk's slot state saved and restored across a restart; ceiling the unbroken conversation, floor the cold restart re-reading the prefix"
+}

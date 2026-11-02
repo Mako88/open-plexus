@@ -531,9 +531,19 @@ Each step says what it decides. A step is struck when it is done.
      against plain BM25, both articles found for 71 of 200 against 66; two rows a search
      (`-201652Z`) 0.385, 11 and 12, both found for 70. More finding did not become more
      answering, and the asker given both articles scores 0.66, so the full-store asker sits at
-     0.39 against a reachable 0.64 with the finding at a third of questions. Next: recall keyed
-     on the trunk's state for the described hop, and before it the reading end (the ceiling
-     with thinking on), since that is the other half of the gap.
+     0.39 against a reachable 0.64 with the finding at a third of questions.
+   - The reading end, read 2026-11-02 with the trunk's thinking on (`--think`): given the two
+     supporting paragraphs with no budget (`hotpot-20261102T205625Z`) the trunk thinks past
+     4,096 tokens on half the questions and never answers, 0.356 on 104; with the server's
+     thinking budget at 2,048 tokens (`-215031Z` against `-213113Z`, 200 questions) it scores
+     **0.655**, F1 0.771, against 0.61 with thinking off, 18 made right and 9 made wrong (1.7
+     standard errors), at 1,520 passes a question against 47. So test-time depth buys the 2B
+     trunk about 0.04 of the reading gap to the frontier's 0.79, for thirty times the compute,
+     and only when something ends the thinking for it. The asker with thinking on
+     (`-212850Z`) leaves 46 of 104 unanswered: the forced close and the tool turns do not
+     compose, not read further. Next in the step: recall keyed on the trunk's state for the
+     described hop (`wiki_walker.py`), then GRPO on the answering from given paragraphs, the
+     reading end trained the way step 3 trained maths.
 
 7. **Consolidation: the trunk learns slowly, by replay.** Complementary learning systems
    (McClelland, McNaughton and O'Reilly, 1995): the hippocampus learns in one shot and the

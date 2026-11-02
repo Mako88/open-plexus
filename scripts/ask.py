@@ -98,6 +98,7 @@ class WikiEnv(WikiSearch):
 
     texts: WikiTexts | None = None
     lexical: LexicalIndex | None = None
+    titles = None  # TRL offers every public function of the environment to the trunk as a tool: search alone is the tool
 
     @classmethod
     def open(cls, store: str, bm25: str) -> None:

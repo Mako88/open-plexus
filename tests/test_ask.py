@@ -52,6 +52,10 @@ def test_the_wiki_environment_searches_the_whole_store_by_bm25_and_resets_per_ro
     env.reset()
     assert env.shown == [] and env.search("Tim Burton").startswith("Tim Burton: ")  # shown again after a reset
     assert ask.WikiEnv().shown == []  # each rollout its own
+    # TRL offers every public function of the class as a tool, and a tool needs a docstring: search is the one
+    import inspect
+    public = [n for n, _ in inspect.getmembers(ask.WikiEnv, predicate=inspect.isfunction) if not n.startswith("_")]
+    assert public == ["reset", "search"], public
 
 
 def test_the_final_answer_is_the_last_assistant_turn_and_is_scored_by_exact_match():

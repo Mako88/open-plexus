@@ -22,7 +22,10 @@ the top-k by the question, then for each further hop re-queries with the stored 
 best row not yet followed and adds its top-k, so the trunk sees up to k*depth rows;
 `hops-random:<embedder>:<k>:<depth>` follows a random row of the episode instead, which is
 the hop with its choice disabled, and `store:<embedder>:<k*depth>` is the same number of rows
-with no hop at all. `walker:<k>:<depth>` is the trained hop: the query at each hop is the
+with no hop at all. Step 4's writer, rows restated by the trunk with their pronouns resolved,
+was an arm of this reading and lost to the sentence as heard (2026-11-02,
+`store-minilm-20261102T145539Z` against `-143602Z`); it is deleted, and the plan's step 4
+names the commit to revive it from. `walker:<k>:<depth>` is the trained hop: the query at each hop is the
 walker's map of the trunk's hidden state after reading the question and the rows followed so
 far (`walker_fit.py`), which needs `--trunk local`, the trunk in PyTorch. Rows always stand
 in the story in the order they were heard. `select:<k>:<depth>` adds the evaluator

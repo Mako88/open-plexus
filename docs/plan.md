@@ -450,6 +450,34 @@ Each step says what it decides. A step is struck when it is done.
      form held the key's level on maths (step 3), and its next reading is on a set that is still
      climbing, which the asking on the distractor form is not.
 
+   - The full form, read 2026-11-01 (`openplexus.wiki`, `scripts/wiki_build.py`): every abstract
+     HotpotQA was built over, 5,233,329 of them (BeIR's copy of the 2017 dump, 976 MB parquet in
+     `data/wiki-abstracts/`, since Stanford's host is unreachable from here), keyed by MiniLM as
+     the ten paragraphs are, 4 GB of float16 keys built in 71 minutes on the card, shard by shard
+     with a progress file so a build paused for a game resumes; searched on the card (3.8 GB) by
+     a chunked float32 matmul, five queries in three seconds. The arms `wiki:top:K` and `wiki:ask`
+     are the distractor form's over this store, gold counted by title, each paired with its twin
+     on the same questions (`hotpot-20261102T052927Z`, `-053148Z`): top-2 over Wikipedia **0.20**
+     (F1 0.251; 6 made right and 18 made wrong against top-2 on the ten, 0.365), both supporting
+     articles found for 12 of 200 and one for 114; the untrained asker over Wikipedia 0.205 (2.7
+     searches, both found for 29 of 112); **round two's asker over Wikipedia 0.321**, F1 0.406, 15
+     made right and 2 made wrong against the untrained asker (3.2 standard errors), 18 and 10
+     against top-2 over Wikipedia, **2 and 28 against itself on the ten-paragraph store** (0.554
+     there), level with top-2 on the ten (15 and 19). With both articles in hand it scores 0.62
+     (gold is 0.635), with one 0.38, with none 0.03: the loss at scale is in the finding, not the
+     answering. So the learnt asking transfers to a store it never saw (its gain over the
+     untrained asker holds), and the store's sense is what fails at scale: a 384-d sentence key
+     over 5.2 million abstracts finds a supporting article on fewer than half the searches,
+     where on the ten it found one on most. Floor 0.15, frontier 0.79; the gap to close is 0.47.
+   - Next in the step: the first hop is a name in the question found among 5.2 million titles,
+     where a sentence key is weak and a lexical index is strong, and the multi-hop retrieval line
+     (MDR 2020, IRCoT 2023) retrieves iteratively from a lexical or trained-dense first hop, which
+     is the asking with a better sense. Build a lexical index beside the dense one (on disk,
+     off the card), read it first with no trunk as recall of the supporting titles at k over the
+     200 questions against MiniLM's (the cheapest comparison that decides it), then as the
+     asker's search tool if it finds more; then asking rounds on the full store, which need the
+     store searched off the card since the trainer fills it, and the lexical index gives that.
+
 7. **Consolidation: the trunk learns slowly, by replay.** Complementary learning systems
    (McClelland, McNaughton and O'Reilly, 1995): the hippocampus learns in one shot and the
    cortex learns slowly by replaying what the hippocampus holds, which is what stops the slow

@@ -194,7 +194,7 @@ def arm(spec: str, qs: list[dict], args, trunk, index) -> dict:
         "exact": round(sum(r["correct"] for r in rows) / n, 3), "f1": round(sum(r["f1"] for r in rows) / n, 3),
         "by_type": by_type, "n": n, "stopped_early": n < len(qs), "unanswered": sum(r["said"] is None for r in rows),
         "gold_shown_mean": round(sum(r["gold_shown"] for r in rows) / n, 2),
-        "searches_mean": round(sum(len(r.get("searches", [])) for r in rows) / n, 2) if spec == "ask" else None,
+        "searches_mean": round(sum(len(r.get("searches", [])) for r in rows) / n, 2) if spec in ASKING else None,
         "never_asked": sum(not r.get("searches") for r in rows) if spec in ASKING else None,
         "failed_turns": sum(bool(r.get("failed")) for r in rows) if spec in ASKING else None,
         "store_rows": index.wiki.n if spec.startswith("wiki:") else 10,

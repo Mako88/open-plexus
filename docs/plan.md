@@ -383,167 +383,68 @@ Each step says what it decides. A step is struck when it is done.
 6. **The store at knowledge, and the asking as a learned action.** Pulled forward 2026-10-31
    with John after fork (d) read that on GSM8K the store has nothing to give: the core bet is
    read where the knowledge a question needs is absent from the trunk and present in the
-   store. HotpotQA (`data/hotpotqa`, 90k training and 7.4k validation questions, each answered
-   from two Wikipedia paragraphs together, a short answer as the key; `openplexus.hotpot`, the
-   benchmark's exact match and F1): first the distractor form, a question's ten paragraphs (two
-   supporting, eight distractors) as the store's rows for that episode, bAbI's shape with real
-   text; then the full form, the Wikipedia abstracts (5.2M, about 1.5 GB) as one store, the
-   plan's scale reading, where the trunk is quantised and the budget read honestly. Every
-   reading carries a frontier reference (John): a clean-context frontier agent on the same
-   questions, as the target and as the check that a set is hard.
-   - The frontier (`readings/frontier-hotpot-20261031T210036Z`, `-memory-20261101T003417Z`,
-     `frontier-gsm8k-20261031T205453Z`): Opus 5.5 on the first 100 validation questions, exact
-     match **0.79**, F1 0.886 with the ten paragraphs, and **0.79**, F1 0.882 from memory alone,
-     so its score on this set is its weights and the passages add nothing: the store's claim is
-     exactly that a 2B with a store stands where a frontier model stands on memory. The misses
-     are wording (a fuller name, a date with the day), so F1 is the fairer line. On GSM8K the
-     same agent scored 100 of 100 against our 0.82: GSM8K is solved at the frontier, HotpotQA
-     is not.
-   - The lines (`hotpot-20261031T232647Z`, the served Q8 trunk, no adapter, exact match on the
-     first 200 validation questions, the arms stopped at 104 as clear of the floor): floor
-     **0.15** (F1 0.206; bridge questions 0.06, comparison 0.59, mostly yes or no); gold, the
-     two supporting paragraphs handed over, **0.635** (F1 0.745); episode, all ten, 0.538, the
-     distractors costing a tenth as bAbI's whole story did; top-2 by MiniLM on the question,
-     the store with no asking, **0.365** (F1 0.438). Top-2 found both supporting paragraphs for
-     31 of 104 and the trunk then scored 0.71, above gold; one of the two for 65, scoring 0.22:
-     the second hop is not in the question's words, it is in the first paragraph.
-   - The asking (`scripts/ask.py`): TRL's GRPO with a store environment a rollout whose
-     `search(query)` method is the trunk's one tool, the paragraph nearest the query by MiniLM,
-     the key the only reward, nothing telling it when to ask (Search-R1, 2025). Read on the
-     served trunk with the adapter as a GGUF LoRA (`hotpot_reading.py --arms ask`, the loop in
-     `openplexus.asking`, four turns, no tool offered on the last so it always answers). The
-     untrained asker (`hotpot-20261101T033048Z`): asks every time, 2.5 searches a question,
-     finds both paragraphs for 140 of 200 where the question's words find 31 of 104, and scores
-     **0.33** (F1 0.44), level with top-2, answering badly from what it found (0.41 with both in
-     hand against gold's 0.635). **Asking round one** (`state/ask/round1`: 120 training
-     questions, 60 steps, 2.5 hours on the shared card, a step 94 to 470 s since every tool
-     turn re-reads the conversation): the trained asker (`hotpot-20261101T033732Z`) scores
-     **0.465** exact, F1 0.568, **35 made right and 8 made wrong against the untrained asker**
-     (4.1 standard errors), 23 and 9 against top-2, 7 and 21 against gold; it asks a little less
-     (2.2 searches), finds both paragraphs about as often (122 of 200) and answers far better
-     with them (0.61 against 0.41); comparison questions 0.735. The first reading of the core
-     bet is positive: from the key alone the trunk learnt to ask the store and answer from what
-     it found, and the store with a learnt asker beats the store without one. The regression
-     check (`grpo-20261101T040321Z`): the asking adapter on GSM8K 0.734 against the plain
-     trunk's 0.736, 17 and 18, so learning to ask cost the maths nothing. **Asking rounds two and three**
-     (`state/ask/round2`, 240 more questions from round one's adapter, 120 steps, 51 minutes;
-     `state/ask/round3`, 480 more from round two's, 240 steps, 3.9 hours on a card shared by day;
-     both read on the first 200 validation questions, `hotpot-20261102T034219Z` and `-034225Z`):
-     round two **0.54** exact, F1 0.628, 24 made right and 9 made wrong against round one (2.6
-     standard errors), 54 and 12 against the untrained asker; round three **0.53**, F1 0.609,
-     **13 and 15 against round two**, 18 and 5 against round one, 47 and 7 against the untrained
-     asker, 26 and 5 against top-2. So the rounds stop here, as the loop's rule says: round three
-     did not widen the gap. The asking is functional, 0.33 to 0.54 from the key alone, and the
-     gap left is to gold (0.635) and the frontier (0.79). Where it sits: the asker searches
-     twice a question and brings both supporting paragraphs for about half the questions (1.49
-     of 2 on average, as rounds one and two did), and with both in hand it answers near gold
-     (0.61 in round one); the second hop is what is still missed, not the answering. Two costs
-     of the loop as run, for the next time a round is worth its card time: 61% of round three's
-     groups were unanimous (`frac_reward_zero_std`), so 90 of 230 steps had no gradient (two
-     questions a step, four tries each; larger groups or DAPO's resampling of unanimous
-     questions buy signal at time per step); and a round beside a game makes no step at all, so
-     it pauses for any game and resumes from its checkpoint (`--save-steps 20`). A tool call
-     whose arguments are not JSON is refused by the server; the reading counts that question as
-     unanswered rather than dying. The server as the actor was costed 2026-11-01 and does not
-     pay on this card: the trainer's own path already runs the eight rollouts' tool turns
-     batched, and the cost is each turn re-reading the grown conversation in fp32; the server
-     would spare that with its cache but decodes at about 70 tokens a second across its slots
-     against fp32 PyTorch's 176 batched, so a step would come out no faster, and the trainer's
-     contract for a custom rollout treats the samples as on-policy anyway (`rollout_func`,
-     `env_mask`, the sampler's logprobs unused without vLLM). The levers that remain are fewer
-     and shorter turns; held unless a round's speed becomes the bottleneck.
-   - Beside the asking, John's other form: automatic recall, as memory does, nothing asked
-     for. Top-2 is its first version, keyed on the question; the second (`--arms recall:K`,
-     `openplexus.hotpot.recall`, built 2026-11-01) is keyed on the state as the trunk reads,
-     the paragraph nearest the question first and then the one nearest that paragraph's text,
-     the first cueing the second. Read 2026-11-01 (`hotpot-20261101T092214Z`, `recall:2`): **0.365**
-     exact, F1 0.425 on 200, the same as top-2 to the question (8 made right, 8 made wrong on
-     the shared 104); it found both supporting paragraphs for 56 of 200 where top-2 found 31 of
-     104, no better, since the paragraph's text cues its topical neighbours as the question's
-     words do; against the round-two asker 6 and 25. So automatic recall by similarity, keyed
-     on the question or on what was just read, does not find the second hop on this trunk's
-     embedder, and the asking does: the deliberate form wins here. Recall keyed on the trunk's
-     own state while it reads, rather than on the text, is the form left to try; the asking has
-     plateaued (round three, 2026-11-01), so it is no longer held, and it comes after the full
-     form below, since it needs the trunk in process and the full form is the scale reading the
-     step is for. The key-less learner stays a live line, not a key-only loop; its confident
-     form held the key's level on maths (step 3), and its next reading is on a set that is still
-     climbing, which the asking on the distractor form is not.
-
-   - The full form, read 2026-11-01 (`openplexus.wiki`, `scripts/wiki_build.py`): every abstract
-     HotpotQA was built over, 5,233,329 of them (BeIR's copy of the 2017 dump, 976 MB parquet in
-     `data/wiki-abstracts/`, since Stanford's host is unreachable from here), keyed by MiniLM as
-     the ten paragraphs are, 4 GB of float16 keys built in 71 minutes on the card, shard by shard
-     with a progress file so a build paused for a game resumes; searched on the card (3.8 GB) by
-     a chunked float32 matmul, five queries in three seconds. The arms `wiki:top:K` and `wiki:ask`
-     are the distractor form's over this store, gold counted by title, each paired with its twin
-     on the same questions (`hotpot-20261102T052927Z`, `-053148Z`): top-2 over Wikipedia **0.20**
-     (F1 0.251; 6 made right and 18 made wrong against top-2 on the ten, 0.365), both supporting
-     articles found for 12 of 200 and one for 114; the untrained asker over Wikipedia 0.205 (2.7
-     searches, both found for 29 of 112); **round two's asker over Wikipedia 0.321**, F1 0.406, 15
-     made right and 2 made wrong against the untrained asker (3.2 standard errors), 18 and 10
-     against top-2 over Wikipedia, **2 and 28 against itself on the ten-paragraph store** (0.554
-     there), level with top-2 on the ten (15 and 19). With both articles in hand it scores 0.62
-     (gold is 0.635), with one 0.38, with none 0.03: the loss at scale is in the finding, not the
-     answering. So the learnt asking transfers to a store it never saw (its gain over the
-     untrained asker holds), and the store's sense is what fails at scale: a 384-d sentence key
-     over 5.2 million abstracts finds a supporting article on fewer than half the searches,
-     where on the ten it found one on most. Floor 0.15, frontier 0.79; the gap to close is 0.47.
-   - Next in the step: the first hop is a name in the question found among 5.2 million titles,
-     where a sentence key is weak and a lexical index is strong, and the multi-hop retrieval line
-     (MDR 2020, IRCoT 2023) retrieves iteratively from a lexical or trained-dense first hop, which
-     is the asking with a better sense. Built and read 2026-11-01 (`openplexus.lexical`, BM25
-     over title and text by tantivy, two minutes to build, 655 MB on disk, nothing on the card;
-     `wiki-recall-20261102T054041Z`, 200 questions, every gold pair in the store, no trunk): the
-     first hop from the question alone, a supporting article in the top two, MiniLM **0.63**,
-     BM25 **0.755**, their rank fusion 0.775 (both articles there: 0.055, 0.14, 0.10); the
-     second hop with one supporting abstract appended to the question, the other article in the
-     top two, 0.235, 0.335, 0.307 (in the top ten: 0.385, 0.568, 0.578). So the lexical sense
-     finds more at both hops on this store, and the asker's queries are names ("Scott Derrickson
-     nationality"), the shape a title index answers where a sentence key returned "Bryan
-     Smithson". The asker's search with each sense (`--sense`, read 2026-11-02,
-     `hotpot-20261102T055343Z`, `-060233Z`, `-130522Z`, 200 questions): by BM25 the plain
-     trunk with the two nearest abstracts 0.26 (0.20 by MiniLM), the untrained asker 0.255
-     (0.205), and **round two's asker 0.39**, F1 0.471, 16 made right and 7 made wrong against
-     itself by MiniLM (1.9 standard errors), 34 and 7 against the untrained asker by BM25, 34 and
-     8 against top-2 by BM25, level with top-2 on the ten paragraphs (19 and 17), 4 and 34
-     against itself on the ten (0.54). It brings both articles for 66 of 200 (dense: 24 of 112)
-     and scores 0.65 with both, 0.36 with one, 0.09 with none, so the finding is still where
-     the loss is: by BM25 the gold article is found on about half the searches. The untrained
-     asker gains nothing from the better sense (0.255 against top-2's 0.26 by BM25) where the
-     trained one gains 0.13: the asking is what turns a sense into a store. The rank fusion of
-     the two senses, which won title recall at the first hop, loses as the asker's tool: 0.365,
-     15 made right and 20 made wrong against BM25 alone, both articles for 60 of 200 against 66,
-     so it is deleted (revive from `385e358d`, `fused` in `openplexus.lexical`) and BM25 is the
-     default sense. The asking round on the full store (`ask.py --store wiki`, 480 questions
-     from round two's adapter, 240 steps in 3.7 hours, half the groups uniform, training
-     accuracy 0.33 in the first half and 0.39 in the second; read 2026-11-02,
-     `hotpot-20261102T194748Z`) scores **0.395**, 17 made right and 16 made wrong against
-     round two on the same store, both articles found for 64 of 200 against 66: training
-     against the store it searches moves nothing, so rounds stop here too. Where the finding
-     fails (181 missing supporting articles on 200 questions): for 38 the title's words were
-     in a query and BM25 ranked another article first ("Ed Wood nationality" gave "Ed Wood
-     filmography", "Androscoggin Bank Colisée seating capacity" gave "Seating capacity"); for
-     143 no query named the title, the asker describing what it wanted ("science fantasy
-     young adult series, first person, companion books") where a word index cannot follow.
-     Both cheap fixes read level and are deleted (revive from `aa7ab186`): a title named in the
-     query ranked first (`hotpot-20261102T200801Z`) 0.375, 14 made right and 17 made wrong
-     against plain BM25, both articles found for 71 of 200 against 66; two rows a search
-     (`-201652Z`) 0.385, 11 and 12, both found for 70. More finding did not become more
-     answering, and the asker given both articles scores 0.66, so the full-store asker sits at
-     0.39 against a reachable 0.64 with the finding at a third of questions.
-   - The reading end, read 2026-11-02 with the trunk's thinking on (`--think`): given the two
-     supporting paragraphs with no budget (`hotpot-20261102T205625Z`) the trunk thinks past
-     4,096 tokens on half the questions and never answers, 0.356 on 104; with the server's
-     thinking budget at 2,048 tokens (`-215031Z` against `-213113Z`, 200 questions) it scores
-     **0.655**, F1 0.771, against 0.61 with thinking off, 18 made right and 9 made wrong (1.7
-     standard errors), at 1,520 passes a question against 47. So test-time depth buys the 2B
-     trunk about 0.04 of the reading gap to the frontier's 0.79, for thirty times the compute,
-     and only when something ends the thinking for it. The asker with thinking on
-     (`-212850Z`) leaves 46 of 104 unanswered: the forced close and the tool turns do not
-     compose, not read further. Next in the step: recall keyed on the trunk's state for the
-     described hop (`wiki_walker.py`), then GRPO on the answering from given paragraphs, the
-     reading end trained the way step 3 trained maths.
+   store. HotpotQA (`data/hotpotqa`, `openplexus.hotpot`, the benchmark's exact match and F1):
+   the distractor form first, a question's ten paragraphs (two supporting) as that episode's
+   store; then the full form, every Wikipedia abstract (5.2M) as one store, the plan's scale
+   reading. Every reading carries a frontier reference (John). Readings are on the first 200
+   validation questions, paired on shared questions, the served Q8 trunk, thinking off unless
+   said. In order of being read:
+   - **The frontier** (`frontier-hotpot-20261031T210036Z`, `-memory-20261101T003417Z`): Opus 5.5
+     exact **0.79**, F1 0.886 with the paragraphs and **0.79** from memory alone, so its score
+     is its weights and the set flatters memory; F1 is the fairer line. On GSM8K it scored 100
+     of 100 against our 0.82 (`frontier-gsm8k-20261031T205453Z`).
+   - **The lines** (`hotpot-20261031T232647Z`, `-213113Z`): floor **0.15**; gold, the two
+     supporting paragraphs handed over, **0.61** on 200 (0.635 on the first 104); all ten
+     0.538; top-2 by MiniLM on the question, the store with no asking, **0.365**. The second
+     hop is not in the question's words.
+   - **The asking** (`scripts/ask.py`, TRL's GRPO, a store environment a rollout, `search(query)`
+     the trunk's one tool, the key the only reward, Search-R1's shape; read by
+     `hotpot_reading.py --arms ask` through `openplexus.asking`). Untrained 0.33, level with
+     top-2; round one (120 questions) **0.465**, 35 made right and 8 made wrong against untrained;
+     round two (240 more) **0.54**, 24 and 9 against round one; round three (480 more) 0.53, 13
+     and 15 against round two, so the rounds stopped (`hotpot-20261101T033048Z`, `-033732Z`,
+     `hotpot-20261102T034219Z`, `-034225Z`). The asking cost GSM8K nothing
+     (`grpo-20261101T040321Z`, 0.734 against 0.736). It brings both paragraphs for about half
+     the questions and with both in hand answers near gold; the second hop is what is missed.
+     Costs for the next round worth its card time: 61% of groups unanimous, so 90 of 230 steps
+     had no gradient (larger groups or DAPO's resampling, held); a round beside a game makes no
+     step, so it pauses for any game and resumes from its checkpoint; the server as the actor
+     was costed and does not pay here. Automatic recall keyed on the text just read
+     (`--arms recall:K`, `hotpot-20261101T092214Z`) 0.365, level with top-2: similarity to the
+     text cues topical neighbours, not the second hop; the deliberate form wins.
+   - **The full form** (`openplexus.wiki`, `wiki_build.py`: BeIR's copy of the 2017 abstracts,
+     MiniLM keys 4 GB float16 built in 71 minutes, searched on the card by chunked matmul;
+     `openplexus.lexical`, BM25 by tantivy, 655 MB, nothing on the card; `--sense`). Title
+     recall with no trunk (`wiki-recall-20261102T054041Z`): first hop any@2 MiniLM 0.63, BM25
+     0.755; second hop, the other article from the question with one abstract appended, 0.235
+     and 0.335. The asker's queries are names, the shape a title index answers. Over Wikipedia
+     by MiniLM (`hotpot-20261102T052927Z`, `-053148Z`): top-2 0.20, round two's asker 0.321;
+     by BM25 (`-055343Z`, `-060233Z`): top-2 0.26, untrained asker 0.255, **round two's asker
+     0.39**, 16 and 7 against itself by MiniLM, 34 and 7 against the untrained asker. The
+     untrained asker gains nothing from the better sense; the asking is what turns a sense into
+     a store. The learnt asking transfers to a store it never saw, and the loss at scale is in
+     the finding: both articles found for 66 of 200, and with both in hand the asker scores
+     0.65, with one 0.36, with none 0.09, so 0.64 is reachable from 0.39 by finding alone.
+   - **What did not move the full-store asker**, each deleted with its revival commit: rank
+     fusion of the two senses 0.365 (`-130522Z`, revive `385e358d`); a title named in the
+     query ranked first 0.375 and two rows a search 0.385 (`-200801Z`, `-201652Z`, revive
+     `aa7ab186`); an asking round trained against the full store itself (`ask.py --store wiki`,
+     480 questions, 240 steps, 3.7 hours) **0.395**, 17 and 16 against round two
+     (`-194748Z`). Of 181 supporting articles missed: 38 were named in a query and BM25 ranked
+     another article first; 143 were described, not named ("science fantasy young adult series,
+     companion books"), where a word index cannot follow.
+   - **The reading end** with thinking on (`--think`, the server's `--reasoning-budget`): with no
+     budget the 2B thinks past 4,096 tokens on half the questions and never answers
+     (`-205625Z`); budgeted at 2,048 tokens, gold **0.655**, F1 0.771, against 0.61, 18 and 9
+     (1.7 standard errors), at 1,520 passes a question against 47 (`-215031Z`). Test-time depth
+     buys about 0.04 of the reading gap for thirty times the compute, only when something ends
+     the thinking. The asker with thinking leaves half unanswered (`-212850Z`): the forced close
+     and the tool turns do not compose; not read further.
+   - **Next in the step:** recall keyed on the trunk's state for the described hop
+     (`wiki_walker.py`: the trunk's hidden state after the question and the first abstract,
+     mapped by a ridge-fitted head into MiniLM's key space, read teacher-forced on the second
+     hop against the two text senses); then GRPO on the answering from given paragraphs, the
+     reading end trained as step 3 trained maths. The key-less learner stays a live line.
 
 7. **Consolidation: the trunk learns slowly, by replay.** Complementary learning systems
    (McClelland, McNaughton and O'Reilly, 1995): the hippocampus learns in one shot and the

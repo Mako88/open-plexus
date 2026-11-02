@@ -515,9 +515,20 @@ Each step says what it decides. A step is struck when it is done.
      the two senses, which won title recall at the first hop, loses as the asker's tool: 0.365,
      15 made right and 20 made wrong against BM25 alone, both articles for 60 of 200 against 66,
      so it is deleted (revive from `385e358d`, `fused` in `openplexus.lexical`) and BM25 is the
-     default sense. Next: asking rounds on the full store searched by BM25, which the trainer
-     can afford since BM25 needs none of the card; the asker learns its queries against the
-     store it will search (`ask.py --store wiki`).
+     default sense. The asking round on the full store (`ask.py --store wiki`, 480 questions
+     from round two's adapter, 240 steps in 3.7 hours, half the groups uniform, training
+     accuracy 0.33 in the first half and 0.39 in the second; read 2026-11-02,
+     `hotpot-20261102T194748Z`) scores **0.395**, 17 made right and 16 made wrong against
+     round two on the same store, both articles found for 64 of 200 against 66: training
+     against the store it searches moves nothing, so rounds stop here too. Where the finding
+     fails (181 missing supporting articles on 200 questions): for 38 the title's words were
+     in a query and BM25 ranked another article first ("Ed Wood nationality" gave "Ed Wood
+     filmography", "Androscoggin Bank Colisée seating capacity" gave "Seating capacity"); for
+     143 no query named the title, the asker describing what it wanted ("science fantasy
+     young adult series, first person, companion books") where a word index cannot follow.
+     Next, cheap on a free card (a reading is six minutes): a title named in the query is
+     found first (the sense, no tuning), and two rows a search instead of one; then recall
+     keyed on the trunk's state for the described hop.
 
 7. **Consolidation: the trunk learns slowly, by replay.** Complementary learning systems
    (McClelland, McNaughton and O'Reilly, 1995): the hippocampus learns in one shot and the

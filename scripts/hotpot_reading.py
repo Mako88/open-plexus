@@ -90,7 +90,8 @@ def arm(spec: str, qs: list[dict], args, trunk, index) -> dict:
     done = part_rows(tag)
     # the arms compared with are read without this arm's adapter: the plain tags
     plain = type(args)(**{**vars(args), "adapter": None})
-    others = {o: other_rows(o, plain) for o in args.against.split(",") if o and o != spec and o != tag}
+    # a trained asker is compared with the plain asker too, so only the arm's own rows are left out
+    others = {o: other_rows(o, plain) for o in args.against.split(",") if o and o != tag and tag_of(o, plain) != tag}
     others = {o: rows for o, rows in others.items() if rows}
     other = next(iter(others.values()), {})
     started = time.perf_counter()

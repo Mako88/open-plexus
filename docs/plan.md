@@ -405,16 +405,26 @@ Each step says what it decides. A step is struck when it is done.
      bet is positive: from the key alone the trunk learnt to ask the store and answer from what
      it found, and the store with a learnt asker beats the store without one. The regression
      check (`grpo-20261101T040321Z`): the asking adapter on GSM8K 0.734 against the plain
-     trunk's 0.736, 17 and 18, so learning to ask cost the maths nothing. **Asking round two**
-     (`state/ask/round2`, 240 more questions from round one's adapter, 120 steps, 51 minutes on
-     the free card; read 2026-11-01, `hotpot-20261101T091902Z`): **0.548** exact, F1 0.633 on 104
-     questions, stopped as clear of top-2 (25 made right, 6 made wrong, 3.4 standard errors);
-     against round one 11 and 6 (0.048, 1.2), against the untrained asker 30 and 5, against
-     gold 6 and 15 (0.635 there). The gap to gold has closed from 0.135 to 0.087 in one more
-     round, with 1.9 searches a question. One lesson: the trained asker sometimes emits a tool
-     call whose arguments are not JSON and the server refuses the turn; the reading now counts
-     that question as unanswered (one of 104) rather than dying. The asking is the piece to
-     grow: rounds and more questions. The server as the actor was costed 2026-11-01 and does not
+     trunk's 0.736, 17 and 18, so learning to ask cost the maths nothing. **Asking rounds two and three**
+     (`state/ask/round2`, 240 more questions from round one's adapter, 120 steps, 51 minutes;
+     `state/ask/round3`, 480 more from round two's, 240 steps, 3.9 hours on a card shared by day;
+     both read on the first 200 validation questions, `hotpot-20261102T034219Z` and `-034225Z`):
+     round two **0.54** exact, F1 0.628, 24 made right and 9 made wrong against round one (2.6
+     standard errors), 54 and 12 against the untrained asker; round three **0.53**, F1 0.609,
+     **13 and 15 against round two**, 18 and 5 against round one, 47 and 7 against the untrained
+     asker, 26 and 5 against top-2. So the rounds stop here, as the loop's rule says: round three
+     did not widen the gap. The asking is functional, 0.33 to 0.54 from the key alone, and the
+     gap left is to gold (0.635) and the frontier (0.79). Where it sits: the asker searches
+     twice a question and brings both supporting paragraphs for about half the questions (1.49
+     of 2 on average, as rounds one and two did), and with both in hand it answers near gold
+     (0.61 in round one); the second hop is what is still missed, not the answering. Two costs
+     of the loop as run, for the next time a round is worth its card time: 61% of round three's
+     groups were unanimous (`frac_reward_zero_std`), so 90 of 230 steps had no gradient (two
+     questions a step, four tries each; larger groups or DAPO's resampling of unanimous
+     questions buy signal at time per step); and a round beside a game makes no step at all, so
+     it pauses for any game and resumes from its checkpoint (`--save-steps 20`). A tool call
+     whose arguments are not JSON is refused by the server; the reading counts that question as
+     unanswered rather than dying. The server as the actor was costed 2026-11-01 and does not
      pay on this card: the trainer's own path already runs the eight rollouts' tool turns
      batched, and the cost is each turn re-reading the grown conversation in fp32; the server
      would spare that with its cache but decodes at about 70 tokens a second across its slots
@@ -433,9 +443,12 @@ Each step says what it decides. A step is struck when it is done.
      words do; against the round-two asker 6 and 25. So automatic recall by similarity, keyed
      on the question or on what was just read, does not find the second hop on this trunk's
      embedder, and the asking does: the deliberate form wins here. Recall keyed on the trunk's
-     own state while it reads, rather than on the text, is the form left to try, and it is held
-     until the asking plateaus. The key-less learner stays a live line, not a key-only loop:
-     the confident-group form runs on maths 2026-11-01.
+     own state while it reads, rather than on the text, is the form left to try; the asking has
+     plateaued (round three, 2026-11-01), so it is no longer held, and it comes after the full
+     form below, since it needs the trunk in process and the full form is the scale reading the
+     step is for. The key-less learner stays a live line, not a key-only loop; its confident
+     form held the key's level on maths (step 3), and its next reading is on a set that is still
+     climbing, which the asking on the distractor form is not.
 
 7. **Consolidation: the trunk learns slowly, by replay.** Complementary learning systems
    (McClelland, McNaughton and O'Reilly, 1995): the hippocampus learns in one shot and the

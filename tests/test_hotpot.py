@@ -61,3 +61,17 @@ def test_a_comparison_arm_is_a_part_tag_first_and_a_plain_spec_otherwise(tmp_pat
     assert set(hr.other_rows("ask", plain)) == {"a", "b"}  # the plain arm, whatever adapter this arm has
     assert set(hr.other_rows("top:2", plain)) == {"a", "b", "c"}  # a spec, resolved to its tag
     assert hr.other_rows("never-read", plain) == {}
+
+
+def test_a_trained_asker_is_compared_with_the_plain_asker_but_not_with_itself():
+    import argparse
+    sys.path.insert(0, str(ROOT / "scripts"))
+    import hotpot_reading as hr
+    plain = argparse.Namespace(adapter=None)
+    trained = argparse.Namespace(adapter="state/gguf/ask-round3-lora.gguf")
+    tag = hr.tag_of("ask", trained)
+    assert tag == "ask-ask-round3"
+    keep = [o for o in "ask-ask-round2,ask-ask-round3,ask,top:2".split(",") if o != tag and hr.tag_of(o, plain) != tag]
+    assert keep == ["ask-ask-round2", "ask", "top:2"]
+    plain_tag = hr.tag_of("ask", plain)
+    assert [o for o in "ask,top:2".split(",") if o != plain_tag and hr.tag_of(o, plain) != plain_tag] == ["top:2"]

@@ -22,7 +22,9 @@ def words(text: str) -> str:
 class LexicalIndex:
     """BM25 over `title` and `body`, the title weighted up; `nearest` returns store rows."""
 
-    def __init__(self, path: Path, title_boost: float = 2.0):
+    def __init__(self, path: Path, title_boost: float = 2.0, title_of=None, deep: int = 20):
+        self.title_of = title_of  # row -> title; given, a title named in the query is ranked first
+        self.deep = deep
         import tantivy
 
         self.path = Path(path)
@@ -74,9 +76,26 @@ class LexicalIndex:
             query = self.index.parse_query(q, ["title", "body"], field_boosts={"title": self.title_boost})
             want = k + len(exclude or ())
             picks = []
-            for _score, addr in self.searcher.search(query, want).hits:
+            for _score, addr in self.searcher.search(query, max(want, self.deep if self.title_of else 0)).hits:
                 row = int(self.searcher.doc(addr)["row"][0])
                 if row not in (exclude or ()):
                     picks.append(row)
+            if self.title_of:
+                picks = named_first(text, picks, self.title_of)
             out.append(picks[:k])
         return out
+
+
+def named_first(query: str, rows: list[int], title_of) -> list[int]:
+    """The rows whose title is named in the query, whole words, longest title first, ahead of
+    the rest in their given order: an asker's query "Ed Wood nationality" names Ed Wood, and the
+    index alone ranked "Ed Wood filmography" first (2026-11-02). No tuning: a title is named or not."""
+    q = " " + " ".join(words(query).lower().split()) + " "
+    named = []
+    for r in rows:
+        t = " " + " ".join(words(title_of(r)).lower().split()) + " "
+        if len(t) > 2 and t in q:
+            named.append((len(t), r))
+    named.sort(reverse=True)
+    first = [r for _, r in named]
+    return first + [r for r in rows if r not in first]

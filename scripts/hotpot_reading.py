@@ -70,11 +70,13 @@ def as_paragraph(store: WikiStore, i: int, gold: set[str]) -> dict:
 
 
 def sense_of(sense: str, store: WikiStore, embed, bm25: str):
-    """The full-form store's search as a function of queries, k and rows to skip. A rank fusion of
-    the two was read 2026-11-02 (`hotpot-20261102T130522Z`) and lost to BM25 alone, so it is gone."""
+    """The full-form store's search as a function of queries, k and rows to skip: `lexical` is BM25,
+    `named` is BM25 with a title named in the query ranked first, `dense` the MiniLM keys. A rank
+    fusion of dense and lexical was read 2026-11-02 (`hotpot-20261102T130522Z`), lost to BM25 alone
+    and is gone."""
     if sense == "dense":
         return lambda queries, k, exclude: store.nearest(embed(queries), k, exclude)
-    return LexicalIndex(bm25).nearest
+    return LexicalIndex(bm25, title_of=store.title if sense == "named" else None).nearest
 
 
 def chosen(spec: str, q: dict, index=None) -> list[dict]:
@@ -105,6 +107,8 @@ def tag_of(spec: str, args) -> str:
         tag += "-" + Path(args.adapter).stem.replace("-lora", "")
     if getattr(args, "think", False):
         tag += "-think"
+    if getattr(args, "per_search", 1) != 1 and spec in ASKING:
+        tag += f"-k{args.per_search}"
     return tag
 
 
@@ -141,7 +145,7 @@ def arm(spec: str, qs: list[dict], args, trunk, index) -> dict:
 
             def one(q):
                 if spec == "wiki:ask":
-                    tool = WikiSearch(index.wiki, index.embed, index.nearest)
+                    tool = WikiSearch(index.wiki, index.embed, index.nearest, per_search=args.per_search)
                     titles = tool.titles
                 else:
                     tool = Store()
@@ -236,7 +240,8 @@ def main() -> None:
                    help="the trunk's thinking mode on (the server must run without --reasoning-budget 0; raise --max-new)")
     p.add_argument("--wiki", default=str(ROOT / "data" / "wiki-abstracts" / "minilm"), help="the full-form store")
     p.add_argument("--bm25", default=str(ROOT / "data" / "wiki-abstracts" / "bm25"), help="its lexical index")
-    p.add_argument("--sense", default="lexical", choices=["lexical", "dense"], help="how the full-form store is searched")
+    p.add_argument("--sense", default="lexical", choices=["lexical", "named", "dense"], help="how the full-form store is searched")
+    p.add_argument("--per-search", type=int, default=1, help="rows the asker's search returns, nearest first")
     p.add_argument("--against", default="floor")
     p.add_argument("--min-n", type=int, default=100)
     p.add_argument("--clear", type=float, default=2.5)

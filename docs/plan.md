@@ -481,8 +481,8 @@ Each step says what it decides. A step is struck when it is done.
      top two, 0.235, 0.335, 0.307 (in the top ten: 0.385, 0.568, 0.578). So the lexical sense
      finds more at both hops on this store, and the asker's queries are names ("Scott Derrickson
      nationality"), the shape a title index answers where a sentence key returned "Bryan
-     Smithson". The asker's search with each sense (`--sense dense|lexical|hybrid`, read
-     2026-11-02, `hotpot-20261102T055343Z`, `-060233Z`, 200 questions): by BM25 the plain
+     Smithson". The asker's search with each sense (`--sense`, read 2026-11-02,
+     `hotpot-20261102T055343Z`, `-060233Z`, `-130522Z`, 200 questions): by BM25 the plain
      trunk with the two nearest abstracts 0.26 (0.20 by MiniLM), the untrained asker 0.255
      (0.205), and **round two's asker 0.39**, F1 0.471, 16 made right and 7 made wrong against
      itself by MiniLM (1.9 standard errors), 34 and 7 against the untrained asker by BM25, 34 and
@@ -491,9 +491,13 @@ Each step says what it decides. A step is struck when it is done.
      and scores 0.65 with both, 0.36 with one, 0.09 with none, so the finding is still where
      the loss is: by BM25 the gold article is found on about half the searches. The untrained
      asker gains nothing from the better sense (0.255 against top-2's 0.26 by BM25) where the
-     trained one gains 0.13: the asking is what turns a sense into a store. Next: asking rounds
-     on the full store searched by BM25, which the trainer can afford since BM25 needs none of
-     the card; the asker learns its queries against the store it will search.
+     trained one gains 0.13: the asking is what turns a sense into a store. The rank fusion of
+     the two senses, which won title recall at the first hop, loses as the asker's tool: 0.365,
+     15 made right and 20 made wrong against BM25 alone, both articles for 60 of 200 against 66,
+     so it is deleted (revive from `385e358d`, `fused` in `openplexus.lexical`) and BM25 is the
+     default sense. Next: asking rounds on the full store searched by BM25, which the trainer
+     can afford since BM25 needs none of the card; the asker learns its queries against the
+     store it will search (`ask.py --store wiki`).
 
 7. **Consolidation: the trunk learns slowly, by replay.** Complementary learning systems
    (McClelland, McNaughton and O'Reilly, 1995): the hippocampus learns in one shot and the

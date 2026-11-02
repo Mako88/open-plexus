@@ -97,5 +97,4 @@ def test_the_full_form_arms_read_store_rows_as_paragraphs_and_count_gold_by_titl
     assert hr.tag_of("wiki:top:2", types.SimpleNamespace(adapter=None)) == "wikitop2"
     assert hr.tag_of("wiki:ask", types.SimpleNamespace(adapter="state/gguf/ask-round2-lora.gguf")) == "wikiask-ask-round2"
     assert hr.tag_of("wiki:ask", types.SimpleNamespace(adapter="state/gguf/ask-round2-lora.gguf", sense="lexical")) == "wikiask-lexical-ask-round2"
-    assert hr.tag_of("wiki:top:2", types.SimpleNamespace(adapter=None, sense="hybrid")) == "wikitop2-hybrid"
     assert hr.tag_of("ask", types.SimpleNamespace(adapter=None, sense="lexical")) == "ask"  # the ten-paragraph store has one sense

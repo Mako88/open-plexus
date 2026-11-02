@@ -80,12 +80,3 @@ class LexicalIndex:
                     picks.append(row)
             out.append(picks[:k])
         return out
-
-
-def fused(ranked: list[list[int]], k: int, c: int = 60) -> list[int]:
-    """Reciprocal rank fusion of several ranked lists: the hybrid of two senses, no tuning."""
-    score: dict[int, float] = {}
-    for lst in ranked:
-        for rank, row in enumerate(lst):
-            score[row] = score.get(row, 0.0) + 1.0 / (c + rank + 1)
-    return sorted(score, key=lambda r: -score[r])[:k]

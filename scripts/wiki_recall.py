@@ -1,6 +1,6 @@
 """Title recall over the full-form store, no trunk: the cheapest reading that decides which sense
 the asker searches with. For the first `--n` HotpotQA validation questions, each sense (dense
-MiniLM keys, lexical BM25, and their rank fusion) ranks the 5.2 million abstracts, and the
+MiniLM keys and lexical BM25) ranks the 5.2 million abstracts, and the
 reading counts how often a supporting article is in the top k (the first hop, from the question
 alone) and how often the other supporting article is in the top k when the query is the question
 with one supporting abstract's text appended (the second hop, as an asker that quotes what it
@@ -25,7 +25,7 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "src"))
 
 from openplexus.hotpot import questions  # noqa: E402
-from openplexus.lexical import LexicalIndex, fused  # noqa: E402
+from openplexus.lexical import LexicalIndex  # noqa: E402
 from openplexus.wiki import WikiStore  # noqa: E402
 
 
@@ -97,8 +97,7 @@ def main() -> None:
             # the article already read is not a find
             dense = [[r for r in rows if store.title(r) != ex] for rows, ex in zip(dense, second_exclude)]
             lex = [[r for r in rows if store.title(r) != ex] for rows, ex in zip(lex, second_exclude)]
-        hybrid = [fused([d, x], deep) for d, x in zip(dense, lex)]
-        for name, ranked in (("dense", dense), ("lexical", lex), ("hybrid", hybrid)):
+        for name, ranked in (("dense", dense), ("lexical", lex)):
             reading["senses"].setdefault(name, {})[hop] = hits(ranked, gold_sets, store.title, ks)
     reading["timings"] = timings
     reading["second_hop_queries"] = len(second_queries)

@@ -7,7 +7,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "src"))
 
-from openplexus.lexical import LexicalIndex, fused, words  # noqa: E402
+from openplexus.lexical import LexicalIndex, words  # noqa: E402
 
 TITLES = ["Anarchism", "Autism", "Albedo", "Tim Burton", "Ed Wood (film)", "Woodson, Arkansas", "Alabama"]
 TEXTS = ["a political philosophy", "a neurodevelopmental disorder", "a measure of reflectance",
@@ -36,9 +36,3 @@ def test_the_index_answers_with_rows_sharing_the_query_words_and_the_title_count
     assert ix.nearest(["???"], 3) == [[]]
     reopened = LexicalIndex(tmp_path / "bm25")
     assert reopened.nearest(["Albedo reflectance"], 1) == [[2]]
-
-
-def test_fusion_ranks_by_reciprocal_rank_across_lists():
-    assert fused([[4, 3, 0], [3, 4, 5]], k=2) == [3, 4] or fused([[4, 3, 0], [3, 4, 5]], k=2) == [4, 3]
-    assert fused([[1, 2], [2, 9], [2]], k=3) == [2, 1, 9]
-    assert fused([[], []], k=2) == []

@@ -8,8 +8,9 @@ the ten, asking as it chooses, up to `--max-turns`; with `--adapter` the trained
 of the paragraph just recalled, K in all, shown with no action; John's memory-like form);
 `wiki:top:K` and `wiki:ask`, the same two over the full-form store, every Wikipedia abstract
 (`--wiki`, built by `wiki_build.py`), where the supporting paragraphs are two rows in 5.2 million
-and `gold_shown` counts them by title; `--sense dense|lexical|hybrid` is how that store is
-searched (MiniLM keys, BM25 from `--bm25`, or their rank fusion), named in the tag unless dense. Each
+and `gold_shown` counts them by title; `--sense lexical|dense` is how that store is searched
+(BM25 from `--bm25`, the default since it read better at both hops and as the asker's tool; or the
+MiniLM keys), named in the tag unless dense. Each
 arm is compared paired with `--against` on the same questions by exact match, and stops once
 clear of the first named; an entry is an arm read plain (`ask`, `top:2`) or a part file's tag
 (`ask-ask-round2`, a trained asker's reading). Rows are appended to state/ and a
@@ -41,7 +42,7 @@ from grpo_reading import paired  # noqa: E402
 from openplexus.asking import solve  # noqa: E402
 from openplexus.hotpot import answer_of, exact, f1, paragraph_text, questions, recall  # noqa: E402
 from openplexus.maths import rows_of  # noqa: E402
-from openplexus.lexical import LexicalIndex, fused  # noqa: E402
+from openplexus.lexical import LexicalIndex  # noqa: E402
 from openplexus.wiki import WikiSearch, WikiStore  # noqa: E402
 
 ASKING = ("ask", "wiki:ask")
@@ -69,19 +70,11 @@ def as_paragraph(store: WikiStore, i: int, gold: set[str]) -> dict:
 
 
 def sense_of(sense: str, store: WikiStore, embed, bm25: str):
-    """The full-form store's search as a function of queries, k and rows to skip."""
-    dense = lambda queries, k, exclude: store.nearest(embed(queries), k, exclude)  # noqa: E731
+    """The full-form store's search as a function of queries, k and rows to skip. A rank fusion of
+    the two was read 2026-11-02 (`hotpot-20261102T130522Z`) and lost to BM25 alone, so it is gone."""
     if sense == "dense":
-        return dense
-    lexical = LexicalIndex(bm25)
-    if sense == "lexical":
-        return lexical.nearest
-    deep = 20
-
-    def hybrid(queries, k, exclude):
-        return [fused([d, x], k) for d, x in zip(dense(queries, deep, exclude), lexical.nearest(queries, deep, exclude))]
-
-    return hybrid
+        return lambda queries, k, exclude: store.nearest(embed(queries), k, exclude)
+    return LexicalIndex(bm25).nearest
 
 
 def chosen(spec: str, q: dict, index=None) -> list[dict]:
@@ -239,7 +232,7 @@ def main() -> None:
     p.add_argument("--adapter", default=None, help="a GGUF LoRA file the server has loaded, applied at 1")
     p.add_argument("--wiki", default=str(ROOT / "data" / "wiki-abstracts" / "minilm"), help="the full-form store")
     p.add_argument("--bm25", default=str(ROOT / "data" / "wiki-abstracts" / "bm25"), help="its lexical index")
-    p.add_argument("--sense", default="dense", choices=["dense", "lexical", "hybrid"], help="how the full-form store is searched")
+    p.add_argument("--sense", default="lexical", choices=["lexical", "dense"], help="how the full-form store is searched")
     p.add_argument("--against", default="floor")
     p.add_argument("--min-n", type=int, default=100)
     p.add_argument("--clear", type=float, default=2.5)

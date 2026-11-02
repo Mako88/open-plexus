@@ -12,7 +12,7 @@ import pyarrow.parquet as pq
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "src"))
 
-from openplexus.wiki import DIM, WikiSearch, WikiStore, abstract_text, build  # noqa: E402
+from openplexus.wiki import DIM, WikiSearch, WikiStore, WikiTexts, abstract_text, build  # noqa: E402
 
 TITLES = ["Anarchism", "Autism", "Albedo", "Tim Burton", "Ed Wood (film)", "Woodson, Arkansas", "Alabama"]
 TEXTS = ["a political philosophy", "a neurodevelopmental disorder", "a measure of reflectance",
@@ -62,6 +62,8 @@ def test_the_store_finds_the_nearest_abstract_and_the_tool_never_repeats_one(tmp
     store = WikiStore(out, device="cpu", chunk=2)  # chunks smaller than the store, so the merge is exercised
     assert store.n == 7 and store.text(4) == "Ed Wood (film): a 1994 film directed by Tim Burton"
     assert store.title(5) == "Woodson, Arkansas"
+    texts = WikiTexts(out)  # the texts alone, no keys and nothing on the card
+    assert texts.text(4) == store.text(4) and texts.title(0) == "Anarchism" and not hasattr(texts, "keys")
     q = Words()(["who directed the film Ed Wood", "a town in Arkansas"])
     assert store.nearest(q, 2) == [[4, 3], [5, 0]] or store.nearest(q, 1) == [[4], [5]]
     assert store.nearest(q, 1, exclude={4, 5})[0][0] != 4 and store.nearest(q, 1, exclude={4, 5})[1][0] != 5

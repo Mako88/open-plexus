@@ -68,14 +68,11 @@ def build(parquet: Path, out: Path, embed, shard: int = 50_000, limit: int | Non
     return progress
 
 
-class WikiStore:
-    """The built store, searched by cosine over MiniLM keys. `nearest` takes normalised query
-    vectors and returns the top indices per query, skipping an excluded set."""
+class WikiTexts:
+    """The store's rows as text, by row number, from the memmapped texts file: what a lexical
+    search needs of the store, with nothing on the card."""
 
-    def __init__(self, path: Path, device: str | None = None, chunk: int = 524_288):
-        import torch
-
-        self.torch = torch
+    def __init__(self, path: Path):
         self.path = Path(path)
         progress = json.loads((self.path / "progress.json").read_text(encoding="utf-8"))
         self.n, self.dim = progress["n"], progress["dim"]
@@ -84,6 +81,23 @@ class WikiStore:
                                f"{(self.n + progress['shard'] - 1) // progress['shard']} shards built")
         self.offsets = np.load(self.path / "offsets.npy")
         self.bytes = np.memmap(self.path / "texts.txt", dtype=np.uint8, mode="r")
+
+    def text(self, i: int) -> str:
+        return bytes(self.bytes[self.offsets[i]:self.offsets[i + 1] - 1]).decode("utf-8")
+
+    def title(self, i: int) -> str:
+        return self.text(i).split(": ", 1)[0]
+
+
+class WikiStore(WikiTexts):
+    """The built store, searched by cosine over MiniLM keys. `nearest` takes normalised query
+    vectors and returns the top indices per query, skipping an excluded set."""
+
+    def __init__(self, path: Path, device: str | None = None, chunk: int = 524_288):
+        import torch
+
+        super().__init__(path)
+        self.torch = torch
         self.device = device or ("cuda" if torch.cuda.is_available() else "cpu")
         self.chunk = chunk
         keys = np.memmap(self.path / "keys.f16", dtype=np.float16, mode="r", shape=(self.n, self.dim))
@@ -93,12 +107,6 @@ class WikiStore:
             hi = min(self.n, lo + chunk)
             self.keys[lo:hi] = torch.from_numpy(np.array(keys[lo:hi])).to(self.device)  # a copy: the memmap is read-only
         del keys
-
-    def text(self, i: int) -> str:
-        return bytes(self.bytes[self.offsets[i]:self.offsets[i + 1] - 1]).decode("utf-8")
-
-    def title(self, i: int) -> str:
-        return self.text(i).split(": ", 1)[0]
 
     def nearest(self, queries: np.ndarray, k: int, exclude: set[int] | None = None) -> list[list[int]]:
         torch = self.torch
@@ -132,7 +140,7 @@ class WikiSearch:
     exclude)` is the sense, the store's own dense keys unless another is given (the lexical index,
     or a fusion of the two, `openplexus.lexical`)."""
 
-    def __init__(self, store: WikiStore, embed, nearest=None):
+    def __init__(self, store: WikiTexts, embed=None, nearest=None):
         self.store = store
         self.embed = embed
         self.nearest = nearest or (lambda queries, k, exclude: store.nearest(embed(queries), k, exclude))

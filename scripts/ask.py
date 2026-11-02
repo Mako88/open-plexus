@@ -1,13 +1,16 @@
 """Step 6's arm: the asking as the trunk's own action, trained by the key. TRL's GRPO with an
-environment a rollout: the question's ten HotpotQA paragraphs are the store for that episode,
-the trunk is given one tool, `search(query)`, which returns the paragraph nearest the query by
-MiniLM, and it is rewarded by the benchmark's exact match on its final answer. Nothing tells it
-when to search or what for; the reward does (Search-R1, 2025, is this shape). The control is the
-same trunk shown the two paragraphs nearest the question with no action (`hotpot_reading.py
---arms top:2`); the ceiling is the two supporting paragraphs.
+environment a rollout: the store for that episode is the question's ten HotpotQA paragraphs
+searched by MiniLM (`--store ten`) or every Wikipedia abstract searched by BM25 (`--store wiki`,
+the full form, `openplexus.wiki` and `openplexus.lexical`, nothing of it on the card); the trunk
+is given one tool, `search(query)`, which returns the row nearest the query not shown before, and
+it is rewarded by the benchmark's exact match on its final answer. Nothing tells it when to search
+or what for; the reward does (Search-R1, 2025, is this shape). The control is the same trunk
+shown the two rows nearest the question with no action (`hotpot_reading.py --arms top:2`,
+`wiki:top:2`); the ceiling is the two supporting paragraphs.
 
     .venv/Scripts/python scripts/ask.py --n 2 --max-steps 2 --out state/ask/smoke --micro 2
     .venv/Scripts/python scripts/ask.py --n 1000 --out state/ask/round1 --micro 2
+    .venv/Scripts/python scripts/ask.py --store wiki --n 480 --skip 840 --init-adapter state/ask/round2/adapter --out state/ask/wiki-round1
 
 Writes <out>/checkpoint-*/, <out>/adapter and <out>/ask.json. Needs the card.
 """
@@ -27,6 +30,8 @@ sys.path.insert(0, str(ROOT / "scripts"))
 
 from grpo import TARGETS, sha  # noqa: E402
 from openplexus.hotpot import answer_of, exact, f1, paragraph_text, questions  # noqa: E402
+from openplexus.lexical import LexicalIndex  # noqa: E402
+from openplexus.wiki import WikiSearch, WikiTexts  # noqa: E402
 
 SYSTEM = ("Answer the question. You have a tool, search(query), which returns the passage most relevant "
           "to your query from a small collection about this question; the facts you need are in that "
@@ -86,6 +91,27 @@ class Store:
         return self.paragraphs[pick]
 
 
+class WikiEnv(WikiSearch):
+    """One rollout's store when it is the whole of Wikipedia: the shared texts and BM25 index
+    (`WikiEnv.open` once, before the trainer), a fresh `shown` a rollout. `reset` takes the
+    dataset row and needs nothing from it."""
+
+    texts: WikiTexts | None = None
+    lexical: LexicalIndex | None = None
+
+    @classmethod
+    def open(cls, store: str, bm25: str) -> None:
+        cls.texts = WikiTexts(store)
+        cls.lexical = LexicalIndex(bm25)
+
+    def __init__(self):
+        super().__init__(self.texts, nearest=self.lexical.nearest)
+
+    def reset(self, **row) -> None:
+        self.searches, self.shown = [], []
+        return None
+
+
 def final_text(completion) -> str:
     """The trunk's last message in a completion, which with tool calls is a list of turns."""
     if isinstance(completion, str):
@@ -121,6 +147,9 @@ def main() -> None:
     p.add_argument("--init-adapter", default=None)
     p.add_argument("--f1-weight", type=float, default=0.0)
     p.add_argument("--seed", type=int, default=0)
+    p.add_argument("--store", default="ten", choices=["ten", "wiki"], help="the question's ten paragraphs, or every abstract")
+    p.add_argument("--wiki", default=str(ROOT / "data" / "wiki-abstracts" / "minilm"))
+    p.add_argument("--bm25", default=str(ROOT / "data" / "wiki-abstracts" / "bm25"))
     args = p.parse_args()
 
     import torch
@@ -135,8 +164,14 @@ def main() -> None:
     data = Dataset.from_list([{
         "prompt": [{"role": "system", "content": SYSTEM}, {"role": "user", "content": q["question"]}],
         "answer": q["answer"],
-        "paragraphs": [{"text": paragraph_text(x), "supporting": x["supporting"]} for x in q["paragraphs"]],
+        **({"paragraphs": [{"text": paragraph_text(x), "supporting": x["supporting"]} for x in q["paragraphs"]]}
+           if args.store == "ten" else {}),
     } for q in qs])
+    if args.store == "wiki":
+        WikiEnv.open(args.wiki, args.bm25)
+        env, tool = WikiEnv, "search(query): the Wikipedia abstract nearest the query by BM25 over title and text, not one shown before"
+    else:
+        env, tool = Store, "search(query): the paragraph of the question's ten nearest the query by MiniLM, not one shown before"
     micro = args.micro or args.generations
     per_step = args.generations * args.prompts_per_step
     if per_step % micro:
@@ -152,7 +187,8 @@ def main() -> None:
         chat_template_kwargs={"enable_thinking": False}, mask_truncated_completions=True,
         log_completions=False, bf16=False, fp16=False, torch_empty_cache_steps=1,
     )
-    embedder()  # loaded once here: a first import of transformers inside several threads at once fails
+    if args.store == "ten":
+        embedder()  # loaded once here: a first import of transformers inside several threads at once fails
     model = AutoModelForCausalLM.from_pretrained(args.model, dtype=torch.float32)
     tok = AutoTokenizer.from_pretrained(args.model)
     peft = LoraConfig(r=args.rank, lora_alpha=2 * args.rank, lora_dropout=0.0, target_modules=TARGETS,
@@ -163,7 +199,7 @@ def main() -> None:
         model = PeftModel.from_pretrained(model, args.init_adapter, is_trainable=True)
         peft = None
     trainer = GRPOTrainer(model=model, processing_class=tok, reward_funcs=[correct, overlap], args=config,
-                          train_dataset=data, peft_config=peft, environment_factory=Store)
+                          train_dataset=data, peft_config=peft, environment_factory=env)
     last = sorted(out.glob("checkpoint-*"), key=lambda d: int(d.name.split("-")[1]))
     started = time.perf_counter()
     trainer.train(resume_from_checkpoint=str(last[-1]) if last else None)
@@ -173,7 +209,7 @@ def main() -> None:
         "model": args.model, "n": len(qs), "skip": args.skip, "generations": args.generations,
         "prompts_per_step": args.prompts_per_step, "micro": micro, "max_completion": args.max_completion,
         "lr": args.lr, "max_steps": args.max_steps, "rank": args.rank, "init_adapter": args.init_adapter,
-        "system": SYSTEM, "tool": "search(query): the paragraph of the question's ten nearest the query by MiniLM, not one shown before",
+        "store": args.store, "system": SYSTEM, "tool": tool,
         "rewards": ["correct: 1.0 where the final answer is the key's by exact match",
                     f"overlap: token F1, weight {args.f1_weight}"],
         "log": log, "seconds": round(time.perf_counter() - started, 1),

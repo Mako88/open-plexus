@@ -29,6 +29,31 @@ def test_the_store_returns_the_nearest_paragraph_and_never_the_same_one_twice(mo
     assert store.searches == ["which duck", "another duck"]
 
 
+def test_the_wiki_environment_searches_the_whole_store_by_bm25_and_resets_per_rollout(tmp_path):
+    from test_lexical import store as lexical_store
+    from openplexus.lexical import LexicalIndex
+    s = lexical_store(tmp_path)
+    (s / "offsets.npy").write_bytes(b"")  # replaced below: WikiTexts wants offsets and progress beside the texts
+    import json as _json
+    import numpy as np
+    lines = (s / "texts.txt").read_bytes().split(b"\n")[:-1]
+    offsets = np.zeros(len(lines) + 1, dtype=np.int64)
+    for i, b in enumerate(lines):
+        offsets[i + 1] = offsets[i] + len(b) + 1
+    np.save(s / "offsets.npy", offsets)
+    (s / "progress.json").write_text(_json.dumps({"n": len(lines), "dim": 384, "shard": len(lines), "done": 1}), encoding="utf-8")
+    LexicalIndex.build(s / "bm25", s / "titles.txt", s / "texts.txt", log=lambda _: None, heap=64_000_000)
+    ask.WikiEnv.open(str(s), str(s / "bm25"))
+    env = ask.WikiEnv()
+    env.reset(answer="Tim Burton")
+    assert env.search("who directed the film Ed Wood").startswith("Ed Wood (film): ")
+    assert env.search("Tim Burton").startswith("Tim Burton: ")
+    assert env.searches == ["who directed the film Ed Wood", "Tim Burton"] and len(env.shown) == 2
+    env.reset()
+    assert env.shown == [] and env.search("Tim Burton").startswith("Tim Burton: ")  # shown again after a reset
+    assert ask.WikiEnv().shown == []  # each rollout its own
+
+
 def test_the_final_answer_is_the_last_assistant_turn_and_is_scored_by_exact_match():
     turns = [{"role": "assistant", "content": None, "tool_calls": [{"name": "search"}]},
              {"role": "tool", "content": "Ed Wood: American."},

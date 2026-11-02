@@ -71,7 +71,9 @@ def as_paragraph(store: WikiStore, i: int, gold: set[str]) -> dict:
 
 def sense_of(sense: str, store: WikiStore, embed, bm25: str):
     """The full-form store's search as a function of queries, k and rows to skip. A rank fusion of
-    the two was read 2026-11-02 (`hotpot-20261102T130522Z`) and lost to BM25 alone, so it is gone."""
+    the two was read 2026-11-02 (`hotpot-20261102T130522Z`) and lost to BM25 alone, so it is gone; so
+    are a title named in the query ranked first and two rows a search (`-200801Z`, `-201652Z`, level),
+    revivable from the commit the plan's step 6 names."""
     if sense == "dense":
         return lambda queries, k, exclude: store.nearest(embed(queries), k, exclude)
     return LexicalIndex(bm25).nearest

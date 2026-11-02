@@ -58,6 +58,15 @@ def test_the_wiki_environment_searches_the_whole_store_by_bm25_and_resets_per_ro
     assert public == ["reset", "search"], public
 
 
+def test_the_gold_prompt_is_the_reading_end_s_own_words():
+    from openplexus.hotpot import READ_SYSTEM, read_text
+    q = {"question": "Who directed Ed Wood?", "paragraphs": [{"title": "Ed Wood (film)", "sentences": ["A 1994 film by Tim Burton."], "supporting": True},
+                                                            {"title": "Albedo", "sentences": ["Reflectance."], "supporting": False}]}
+    text = read_text(q, [x for x in q["paragraphs"] if x["supporting"]])
+    assert text == "Passages:\n\nEd Wood (film): A 1994 film by Tim Burton.\n\nQuestion: Who directed Ed Wood?"
+    assert read_text(q, []) == "Who directed Ed Wood?" and READ_SYSTEM.startswith("Answer the question. Use the passages")
+
+
 def test_the_final_answer_is_the_last_assistant_turn_and_is_scored_by_exact_match():
     turns = [{"role": "assistant", "content": None, "tool_calls": [{"name": "search"}]},
              {"role": "tool", "content": "Ed Wood: American."},

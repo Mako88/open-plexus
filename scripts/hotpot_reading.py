@@ -40,23 +40,15 @@ from ask import SYSTEM as ASK_SYSTEM  # noqa: E402
 from ask import Store, embedder  # noqa: E402
 from grpo_reading import paired  # noqa: E402
 from openplexus.asking import solve  # noqa: E402
-from openplexus.hotpot import answer_of, exact, f1, paragraph_text, questions, recall  # noqa: E402
+from openplexus.hotpot import READ_SYSTEM, read_text, answer_of, exact, f1, paragraph_text, questions, recall  # noqa: E402
 from openplexus.maths import rows_of  # noqa: E402
 from openplexus.lexical import LexicalIndex  # noqa: E402
 from openplexus.wiki import WikiSearch, WikiStore  # noqa: E402
 
 ASKING = ("ask", "wiki:ask")
 
-SYSTEM = ("Answer the question. Use the passages where they are given; they may contain the facts needed. "
-          "Think briefly, then end with a last line of the form 'Answer: X' where X is the short answer "
-          "(a name, a number, a date, or yes or no), and nothing after it.")
-
-
-def ask_text(q: dict, paragraphs: list[dict]) -> str:
-    if not paragraphs:
-        return q["question"]
-    passages = "\n\n".join(paragraph_text(p) for p in paragraphs)
-    return f"Passages:\n\n{passages}\n\nQuestion: {q['question']}"
+SYSTEM = READ_SYSTEM
+ask_text = read_text
 
 
 def gold_titles(q: dict) -> set[str]:

@@ -89,6 +89,21 @@ def recall(paragraphs: list[str], question: str, embed, k: int = 2) -> list[int]
     return out
 
 
+READ_SYSTEM = ("Answer the question. Use the passages where they are given; they may contain the facts needed. "
+               "Think briefly, then end with a last line of the form 'Answer: X' where X is the short answer "
+               "(a name, a number, a date, or yes or no), and nothing after it.")
+
+
+def read_text(q: dict, paragraphs: list[dict]) -> str:
+    """The user turn of the reading end: the passages given, then the question. Shared by the
+    reading (`hotpot_reading.py`) and the answering's training (`ask.py --store gold`), so the
+    adapter trained on one is read on the same words."""
+    if not paragraphs:
+        return q["question"]
+    passages = "\n\n".join(paragraph_text(p) for p in paragraphs)
+    return f"Passages:\n\n{passages}\n\nQuestion: {q['question']}"
+
+
 def answer_of(reply: str) -> str | None:
     """The answer in the trunk's reply: the text after the last "Answer:" line, else the reply's
     last line; None where there is nothing."""

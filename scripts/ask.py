@@ -29,7 +29,7 @@ sys.path.insert(0, str(ROOT / "src"))
 sys.path.insert(0, str(ROOT / "scripts"))
 
 from grpo import TARGETS, sha  # noqa: E402
-from openplexus.hotpot import answer_of, exact, f1, paragraph_text, questions  # noqa: E402
+from openplexus.hotpot import READ_SYSTEM, answer_of, exact, f1, paragraph_text, questions, read_text  # noqa: E402
 from openplexus.lexical import LexicalIndex  # noqa: E402
 from openplexus.wiki import WikiSearch, WikiTexts  # noqa: E402
 
@@ -148,7 +148,9 @@ def main() -> None:
     p.add_argument("--init-adapter", default=None)
     p.add_argument("--f1-weight", type=float, default=0.0)
     p.add_argument("--seed", type=int, default=0)
-    p.add_argument("--store", default="ten", choices=["ten", "wiki"], help="the question's ten paragraphs, or every abstract")
+    p.add_argument("--store", default="ten", choices=["ten", "wiki", "gold"],
+                   help="the question's ten paragraphs, every abstract, or no store: the two supporting paragraphs "
+                        "given in the prompt and no tool, the reading end trained alone")
     p.add_argument("--wiki", default=str(ROOT / "data" / "wiki-abstracts" / "minilm"))
     p.add_argument("--bm25", default=str(ROOT / "data" / "wiki-abstracts" / "bm25"))
     args = p.parse_args()
@@ -163,12 +165,17 @@ def main() -> None:
     out.mkdir(parents=True, exist_ok=True)
     qs = questions(args.n, split="train", skip=args.skip)
     data = Dataset.from_list([{
-        "prompt": [{"role": "system", "content": SYSTEM}, {"role": "user", "content": q["question"]}],
+        "prompt": ([{"role": "system", "content": READ_SYSTEM},
+                    {"role": "user", "content": read_text(q, [x for x in q["paragraphs"] if x["supporting"]])}]
+                   if args.store == "gold" else
+                   [{"role": "system", "content": SYSTEM}, {"role": "user", "content": q["question"]}]),
         "answer": q["answer"],
         **({"paragraphs": [{"text": paragraph_text(x), "supporting": x["supporting"]} for x in q["paragraphs"]]}
            if args.store == "ten" else {}),
     } for q in qs])
-    if args.store == "wiki":
+    if args.store == "gold":
+        env, tool = None, None
+    elif args.store == "wiki":
         WikiEnv.open(args.wiki, args.bm25)
         env, tool = WikiEnv, "search(query): the Wikipedia abstract nearest the query by BM25 over title and text, not one shown before"
     else:
@@ -210,7 +217,7 @@ def main() -> None:
         "model": args.model, "n": len(qs), "skip": args.skip, "generations": args.generations,
         "prompts_per_step": args.prompts_per_step, "micro": micro, "max_completion": args.max_completion,
         "lr": args.lr, "max_steps": args.max_steps, "rank": args.rank, "init_adapter": args.init_adapter,
-        "store": args.store, "system": SYSTEM, "tool": tool,
+        "store": args.store, "system": READ_SYSTEM if args.store == "gold" else SYSTEM, "tool": tool,
         "rewards": ["correct: 1.0 where the final answer is the key's by exact match",
                     f"overlap: token F1, weight {args.f1_weight}"],
         "log": log, "seconds": round(time.perf_counter() - started, 1),

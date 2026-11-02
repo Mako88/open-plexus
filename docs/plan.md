@@ -350,10 +350,19 @@ Each step says what it decides. A step is struck when it is done.
      thought (the latent loop), no backing up (search in code, a backtrack as a rewarded
      action), no sense of how long to think (the stop and budget learnt from outcome).
 
-4. **Writing.** What goes in a row: the raw sentence, or the trunk's own restatement with
-   names resolved ("John is in the hallway", not "he went there"), one fact a row. Rows carry
-   time and are never deleted; the reader prefers the latest. Decides the row format and
-   whether the trunk should write its own rows.
+4. **Writing.** Settled 2026-11-02 (`store-minilm-20261102T143602Z`, `-145539Z`): a row is
+   the sentence as heard, one a sentence in the order heard, so its place in time is its place
+   in the store, and the trunk does not write its own rows. Read on bAbI tasks 1, 11, 12 and 13
+   (the pronoun tasks, 2,000 questions) with every pronoun sentence restated by the trunk and
+   checked by code (every other word kept, nothing added but names the story had used; 410 of
+   1,000 accepted; asked to restate every sentence unchecked it corrupted a quarter of 4,000
+   rows): the top-4 store arm 0.531 against 0.539 raw, the ceiling 0.603 against 0.617, the
+   trunk given exactly the right rows 0.875 against 0.907 and on task 11 0.758 against 0.882.
+   The accepted restatements name the wrong person often enough to cost more than a pronoun
+   does, and top-4 within the episode finds the pronoun rows anyway (recall 0.92 raw). The
+   restating writer is deleted (revive from `3a11fe79`, `openplexus.writing`). What else is shown
+   still costs more than what is missing (ceiling 0.617 against the oracle's 0.907), step 2's
+   finding again.
 
 5. **Continual state.** The conversation's working state saved to disk and reloaded, so a
    restart continues mid-conversation. First form built and read 2026-11-02 (`openplexus.state`,

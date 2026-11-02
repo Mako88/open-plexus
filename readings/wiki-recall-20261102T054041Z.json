@@ -1,0 +1,194 @@
+{
+ "kind": "wiki-recall",
+ "set": "HotpotQA distractor validation, first 200 questions",
+ "store_rows": 5233329,
+ "gold_pairs_in_store": 200,
+ "k": [
+  1,
+  2,
+  5,
+  10,
+  20
+ ],
+ "senses": {
+  "dense": {
+   "first": {
+    "1": {
+     "any": 0.545,
+     "all": 0.0,
+     "mean_found": 0.55
+    },
+    "2": {
+     "any": 0.63,
+     "all": 0.055,
+     "mean_found": 0.69
+    },
+    "5": {
+     "any": 0.695,
+     "all": 0.115,
+     "mean_found": 0.81
+    },
+    "10": {
+     "any": 0.755,
+     "all": 0.15,
+     "mean_found": 0.91
+    },
+    "20": {
+     "any": 0.815,
+     "all": 0.205,
+     "mean_found": 1.02
+    }
+   },
+   "second": {
+    "1": {
+     "any": 0.188,
+     "all": 0.188,
+     "mean_found": 0.19
+    },
+    "2": {
+     "any": 0.235,
+     "all": 0.235,
+     "mean_found": 0.23
+    },
+    "5": {
+     "any": 0.323,
+     "all": 0.323,
+     "mean_found": 0.32
+    },
+    "10": {
+     "any": 0.385,
+     "all": 0.385,
+     "mean_found": 0.39
+    },
+    "20": {
+     "any": 0.45,
+     "all": 0.45,
+     "mean_found": 0.45
+    }
+   }
+  },
+  "lexical": {
+   "first": {
+    "1": {
+     "any": 0.705,
+     "all": 0.0,
+     "mean_found": 0.7
+    },
+    "2": {
+     "any": 0.755,
+     "all": 0.14,
+     "mean_found": 0.9
+    },
+    "5": {
+     "any": 0.79,
+     "all": 0.22,
+     "mean_found": 1.01
+    },
+    "10": {
+     "any": 0.81,
+     "all": 0.275,
+     "mean_found": 1.08
+    },
+    "20": {
+     "any": 0.845,
+     "all": 0.295,
+     "mean_found": 1.14
+    }
+   },
+   "second": {
+    "1": {
+     "any": 0.24,
+     "all": 0.24,
+     "mean_found": 0.24
+    },
+    "2": {
+     "any": 0.335,
+     "all": 0.335,
+     "mean_found": 0.34
+    },
+    "5": {
+     "any": 0.48,
+     "all": 0.48,
+     "mean_found": 0.48
+    },
+    "10": {
+     "any": 0.568,
+     "all": 0.568,
+     "mean_found": 0.57
+    },
+    "20": {
+     "any": 0.64,
+     "all": 0.64,
+     "mean_found": 0.64
+    }
+   }
+  },
+  "hybrid": {
+   "first": {
+    "1": {
+     "any": 0.655,
+     "all": 0.0,
+     "mean_found": 0.66
+    },
+    "2": {
+     "any": 0.775,
+     "all": 0.1,
+     "mean_found": 0.88
+    },
+    "5": {
+     "any": 0.83,
+     "all": 0.22,
+     "mean_found": 1.05
+    },
+    "10": {
+     "any": 0.855,
+     "all": 0.28,
+     "mean_found": 1.14
+    },
+    "20": {
+     "any": 0.865,
+     "all": 0.35,
+     "mean_found": 1.22
+    }
+   },
+   "second": {
+    "1": {
+     "any": 0.235,
+     "all": 0.235,
+     "mean_found": 0.23
+    },
+    "2": {
+     "any": 0.307,
+     "all": 0.307,
+     "mean_found": 0.31
+    },
+    "5": {
+     "any": 0.48,
+     "all": 0.48,
+     "mean_found": 0.48
+    },
+    "10": {
+     "any": 0.578,
+     "all": 0.578,
+     "mean_found": 0.58
+    },
+    "20": {
+     "any": 0.655,
+     "all": 0.655,
+     "mean_found": 0.66
+    }
+   }
+  }
+ },
+ "timings": {
+  "dense_first_s": 2.5,
+  "lexical_first_s": 18.1,
+  "dense_second_s": 4.7,
+  "lexical_second_s": 76.2
+ },
+ "second_hop_queries": 400,
+ "command": "scripts/wiki_recall.py --n 200 --k 1,2,5,10,20 --note which sense the asker should search with: dense MiniLM keys against BM25 over titles and text, and their rank fusion, on title recall over the 5.2 million abstracts; the first hop from the question, the second from the question with one supporting abstract appended",
+ "sha": "4ba255f7",
+ "taken_at": "20261102T054041Z",
+ "note": "which sense the asker should search with: dense MiniLM keys against BM25 over titles and text, and their rank fusion, on title recall over the 5.2 million abstracts; the first hop from the question, the second from the question with one supporting abstract appended"
+}

@@ -472,11 +472,18 @@ Each step says what it decides. A step is struck when it is done.
    - Next in the step: the first hop is a name in the question found among 5.2 million titles,
      where a sentence key is weak and a lexical index is strong, and the multi-hop retrieval line
      (MDR 2020, IRCoT 2023) retrieves iteratively from a lexical or trained-dense first hop, which
-     is the asking with a better sense. Build a lexical index beside the dense one (on disk,
-     off the card), read it first with no trunk as recall of the supporting titles at k over the
-     200 questions against MiniLM's (the cheapest comparison that decides it), then as the
-     asker's search tool if it finds more; then asking rounds on the full store, which need the
-     store searched off the card since the trainer fills it, and the lexical index gives that.
+     is the asking with a better sense. Built and read 2026-11-01 (`openplexus.lexical`, BM25
+     over title and text by tantivy, two minutes to build, 655 MB on disk, nothing on the card;
+     `wiki-recall-20261102T054041Z`, 200 questions, every gold pair in the store, no trunk): the
+     first hop from the question alone, a supporting article in the top two, MiniLM **0.63**,
+     BM25 **0.755**, their rank fusion 0.775 (both articles there: 0.055, 0.14, 0.10); the
+     second hop with one supporting abstract appended to the question, the other article in the
+     top two, 0.235, 0.335, 0.307 (in the top ten: 0.385, 0.568, 0.578). So the lexical sense
+     finds more at both hops on this store, and the asker's queries are names ("Scott Derrickson
+     nationality"), the shape a title index answers where a sentence key returned "Bryan
+     Smithson". Next: the asker's search read with each sense (`--sense dense|lexical|hybrid`),
+     then asking rounds on the full store, which the lexical index makes possible since the
+     trainer fills the card and BM25 needs none of it.
 
 7. **Consolidation: the trunk learns slowly, by replay.** Complementary learning systems
    (McClelland, McNaughton and O'Reilly, 1995): the hippocampus learns in one shot and the

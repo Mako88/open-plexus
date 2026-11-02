@@ -12,6 +12,7 @@ dependencies = [
     "peft>=0.21.2",
     "pytest",
     "trl>=1.17.0",
+    "tantivy>=0.27.0",
 ]
 
 [build-system]

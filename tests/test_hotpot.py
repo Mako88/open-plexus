@@ -75,3 +75,23 @@ def test_a_trained_asker_is_compared_with_the_plain_asker_but_not_with_itself():
     assert keep == ["ask-ask-round2", "ask", "top:2"]
     plain_tag = hr.tag_of("ask", plain)
     assert [o for o in "ask,top:2".split(",") if o != plain_tag and hr.tag_of(o, plain) != plain_tag] == ["top:2"]
+
+
+def test_the_full_form_arms_read_store_rows_as_paragraphs_and_count_gold_by_title(tmp_path):
+    import types
+    from test_wiki import Words, corpus
+    from openplexus.wiki import WikiStore, build
+    sys.path.insert(0, str(ROOT / "scripts"))
+    import hotpot_reading as hr
+    build(corpus(tmp_path), tmp_path / "store", Words(), shard=3)
+    index = types.SimpleNamespace(wiki=WikiStore(tmp_path / "store", device="cpu", chunk=4), embed=Words())
+    q = {"question": "who directed the film Ed Wood",
+         "paragraphs": [{"title": "Ed Wood (film)", "supporting": True}, {"title": "Tim Burton", "supporting": True},
+                        {"title": "Albedo", "supporting": False}]}
+    assert hr.gold_titles(q) == {"Ed Wood (film)", "Tim Burton"}
+    shown = hr.chosen("wiki:top:2", q, index)
+    assert [p["title"] for p in shown] == ["Ed Wood (film)", "Tim Burton"] and all(p["supporting"] for p in shown)
+    assert paragraph_text(shown[0]) == "Ed Wood (film): a 1994 film directed by Tim Burton"
+    assert hr.chosen("wiki:ask", q, index) == [] and hr.chosen("floor", q, index) == []
+    assert hr.tag_of("wiki:top:2", types.SimpleNamespace(adapter=None)) == "wikitop2"
+    assert hr.tag_of("wiki:ask", types.SimpleNamespace(adapter="state/gguf/ask-round2-lora.gguf")) == "wikiask-ask-round2"

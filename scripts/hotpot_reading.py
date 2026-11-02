@@ -5,7 +5,10 @@ whole-episode ceiling), `top:K` (the K paragraphs nearest the question by MiniLM
 no learnt asking, the control for the asking arm), `ask` (the trunk given the search tool over
 the ten, asking as it chooses, up to `--max-turns`; with `--adapter` the trained asker);
 `recall:K` (automatic recall: the paragraph nearest the question, then the one nearest the text
-of the paragraph just recalled, K in all, shown with no action; John's memory-like form). Each
+of the paragraph just recalled, K in all, shown with no action; John's memory-like form);
+`wiki:top:K` and `wiki:ask`, the same two over the full-form store, every Wikipedia abstract
+(`--wiki`, built by `wiki_build.py`), where the supporting paragraphs are two rows in 5.2 million
+and `gold_shown` counts them by title. Each
 arm is compared paired with `--against` on the same questions by exact match, and stops once
 clear of the first named; an entry is an arm read plain (`ask`, `top:2`) or a part file's tag
 (`ask-ask-round2`, a trained asker's reading). Rows are appended to state/ and a
@@ -37,6 +40,9 @@ from grpo_reading import paired  # noqa: E402
 from openplexus.asking import solve  # noqa: E402
 from openplexus.hotpot import answer_of, exact, f1, paragraph_text, questions, recall  # noqa: E402
 from openplexus.maths import rows_of  # noqa: E402
+from openplexus.wiki import WikiSearch, WikiStore  # noqa: E402
+
+ASKING = ("ask", "wiki:ask")
 
 SYSTEM = ("Answer the question. Use the passages where they are given; they may contain the facts needed. "
           "Think briefly, then end with a last line of the form 'Answer: X' where X is the short answer "
@@ -50,9 +56,23 @@ def ask_text(q: dict, paragraphs: list[dict]) -> str:
     return f"Passages:\n\n{passages}\n\nQuestion: {q['question']}"
 
 
+def gold_titles(q: dict) -> set[str]:
+    return {p["title"] for p in q["paragraphs"] if p["supporting"]}
+
+
+def as_paragraph(store: WikiStore, i: int, gold: set[str]) -> dict:
+    """A store row in the shape of a question's paragraph, so the prompt and the counts read alike."""
+    title, text = store.text(i).split(": ", 1)
+    return {"title": title, "sentences": [text], "supporting": title in gold}
+
+
 def chosen(spec: str, q: dict, index=None) -> list[dict]:
-    if spec in ("floor", "ask"):
+    if spec == "floor" or spec in ASKING:
         return []
+    if spec.startswith("wiki:top:"):
+        k = int(spec.split(":")[2])
+        picks = index.wiki.nearest(index.embed([q["question"]]), k)[0]
+        return [as_paragraph(index.wiki, i, gold_titles(q)) for i in picks]
     if spec == "gold":
         return [p for p in q["paragraphs"] if p["supporting"]]
     if spec == "episode":
@@ -101,21 +121,26 @@ def arm(spec: str, qs: list[dict], args, trunk, index) -> dict:
         chunk = todo[at:at + args.batch]
         before_out = trunk.tokens_out
         asked: list[dict | None] = [None] * len(chunk)
-        if spec == "ask":
+        if spec in ASKING:
             embedder()  # once, before the threads: a first import inside several threads at once fails
 
             def one(q):
-                store = Store()
-                store.reset(paragraphs=[{"text": paragraph_text(p), "supporting": p["supporting"]} for p in q["paragraphs"]])
+                if spec == "wiki:ask":
+                    tool = WikiSearch(index.wiki, index.embed)
+                    titles = tool.titles
+                else:
+                    tool = Store()
+                    tool.reset(paragraphs=[{"text": paragraph_text(p), "supporting": p["supporting"]} for p in q["paragraphs"]])
+                    titles = lambda: [q["paragraphs"][j]["title"] for j in tool.shown]  # noqa: E731
                 try:
-                    out = solve(trunk.chat, ASK_SYSTEM, q["question"], store.search, max_turns=args.max_turns)
+                    out = solve(trunk.chat, ASK_SYSTEM, q["question"], tool.search, max_turns=args.max_turns)
                 except Exception as e:  # noqa: BLE001
                     # a turn the server refused (a tool call it could not parse): the question
                     # counts as unanswered, with the refusal on the row, and the arm goes on
-                    out = {"reply": "", "searches": list(store.searches), "turns": 1 + len(store.searches),
+                    out = {"reply": "", "searches": list(tool.searches), "turns": 1 + len(tool.searches),
                            "messages": [], "failed": str(e)[:200]}
-                out["shown"] = [q["paragraphs"][j]["title"] for j in store.shown]
-                out["gold_shown"] = sum(q["paragraphs"][j]["supporting"] for j in store.shown)
+                out["shown"] = titles()
+                out["gold_shown"] = sum(title in gold_titles(q) for title in out["shown"])
                 return out
 
             from concurrent.futures import ThreadPoolExecutor
@@ -170,8 +195,9 @@ def arm(spec: str, qs: list[dict], args, trunk, index) -> dict:
         "by_type": by_type, "n": n, "stopped_early": n < len(qs), "unanswered": sum(r["said"] is None for r in rows),
         "gold_shown_mean": round(sum(r["gold_shown"] for r in rows) / n, 2),
         "searches_mean": round(sum(len(r.get("searches", [])) for r in rows) / n, 2) if spec == "ask" else None,
-        "never_asked": sum(not r.get("searches") for r in rows) if spec == "ask" else None,
-        "failed_turns": sum(bool(r.get("failed")) for r in rows) if spec == "ask" else None,
+        "never_asked": sum(not r.get("searches") for r in rows) if spec in ASKING else None,
+        "failed_turns": sum(bool(r.get("failed")) for r in rows) if spec in ASKING else None,
+        "store_rows": index.wiki.n if spec.startswith("wiki:") else 10,
         "passes_per_question": round(sum(r["passes"] for r in rows) / n, 1),
         "paired": {o: paired({r["question"]: r for r in rows}, {r["question"]: r for r in rows_o.values()}, qs)
                    for o, rows_o in others.items()},
@@ -190,6 +216,7 @@ def main() -> None:
     p.add_argument("--max-turns", type=int, default=4, help="assistant turns an `ask` arm may take")
     p.add_argument("--served", default="http://127.0.0.1:8093")
     p.add_argument("--adapter", default=None, help="a GGUF LoRA file the server has loaded, applied at 1")
+    p.add_argument("--wiki", default=str(ROOT / "data" / "wiki-abstracts" / "minilm"), help="the full-form store")
     p.add_argument("--against", default="floor")
     p.add_argument("--min-n", type=int, default=100)
     p.add_argument("--clear", type=float, default=2.5)
@@ -207,7 +234,7 @@ def main() -> None:
     trunk.lora = [{"id": a["id"], "scale": 1.0 if args.adapter and Path(a["path"]).name == Path(args.adapter).name else 0.0}
                   for a in loaded]
     index = None
-    if any(s.startswith("top:") or s.startswith("recall:") for s in args.arms.split(",")):
+    if any(s.startswith(("top:", "recall:", "wiki:")) for s in args.arms.split(",")):
         import numpy as np
         from openplexus.embed import MiniLM
 
@@ -222,6 +249,9 @@ def main() -> None:
             return [q["paragraphs"][int(j)] for j in order]
 
         index.embed = embed
+        if any(s.startswith("wiki:") for s in args.arms.split(",")):
+            index.wiki = WikiStore(args.wiki)
+            print(f"the full-form store: {index.wiki.n} abstracts on {index.wiki.device}", flush=True)
     reading = {"kind": "hotpot-reading", "set": f"HotpotQA distractor {args.split}, data/hotpotqa/{args.split}.jsonl",
                "skip": args.skip, "n": len(qs), "scorer": "exact match and token F1 on the normalised answer, HotpotQA's own",
                "adapter": args.adapter, "arms": {}}

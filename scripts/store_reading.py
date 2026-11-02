@@ -22,7 +22,10 @@ the top-k by the question, then for each further hop re-queries with the stored 
 best row not yet followed and adds its top-k, so the trunk sees up to k*depth rows;
 `hops-random:<embedder>:<k>:<depth>` follows a random row of the episode instead, which is
 the hop with its choice disabled, and `store:<embedder>:<k*depth>` is the same number of rows
-with no hop at all. `walker:<k>:<depth>` is the trained hop: the query at each hop is the
+with no hop at all. Step 4's question, what goes in a row, is `hear --write restated`: every
+sentence is rewritten at hearing time by the served trunk with its pronouns replaced by the
+names they stand for (`openplexus.writing`), one row a sentence, and the same arms are read on
+that store against the raw one. `walker:<k>:<depth>` is the trained hop: the query at each hop is the
 walker's map of the trunk's hidden state after reading the question and the rows followed so
 far (`walker_fit.py`), which needs `--trunk local`, the trunk in PyTorch. Rows always stand
 in the story in the order they were heard. `select:<k>:<depth>` adds the evaluator
@@ -58,6 +61,7 @@ from ceiling import correct  # noqa: E402
 from openplexus.babi import Story, stories  # noqa: E402
 from openplexus.store import Hit, Store  # noqa: E402
 from openplexus.trunk import LocalTrunk, ServedTrunk, question_messages  # noqa: E402
+from openplexus.writing import restated  # noqa: E402
 from openplexus.heads import (LinearHead, hop_prompt, judge_prompt, load_head,  # noqa: E402
                               when_heard)
 
@@ -78,11 +82,20 @@ def hear(args) -> None:
     store = Store(args.store)
     if len(store):
         raise SystemExit(f"{args.store} already holds {len(store)} rows; hear into a fresh one")
-    sentences = [t for s in chosen_stories for t in s.sentences]
+    rows_of = {s.episode: s.sentences for s in chosen_stories}
+    stats: dict = {"write": args.write, "embedders": {}}
+    if args.write == "restated":
+        started = time.perf_counter()
+        rows_of = restated(chosen_stories, ServedTrunk(parallel=args.parallel, max_new=48))
+        stats["restate_seconds"] = round(time.perf_counter() - started, 1)
+        stats["rows_changed"] = sum(a != b for s in chosen_stories for a, b in zip(s.sentences, rows_of[s.episode]))
+        print(f"restated {sum(len(v) for v in rows_of.values())} rows, {stats['rows_changed']} changed, "
+              f"in {stats['restate_seconds']}s", flush=True)
+    sentences = [t for s in chosen_stories for t in rows_of[s.episode]]
     questions = [(query_key(s, i), q.text)
                  for s in chosen_stories for i, q in enumerate(s.questions)]
     vectors: dict[str, np.ndarray] = {}
-    stats: dict = {"rows": len(sentences), "embedders": {}}
+    stats["rows"] = len(sentences)
     for name in args.embedders.split(","):
         e = embed.make(name)
         e(sentences[:8])  # warm the kernels so the timing is the embedder's, not the load's
@@ -103,7 +116,7 @@ def hear(args) -> None:
     at = 0
     for s in chosen_stories:
         n = len(s.sentences)
-        store.append(s.sentences, s.episode, {k: v[at:at + n] for k, v in vectors.items()})
+        store.append(rows_of[s.episode], s.episode, {k: v[at:at + n] for k, v in vectors.items()})
         at += n
     stats["append_seconds"] = round(time.perf_counter() - started, 2)
     stats["bytes_on_disk"] = store.bytes_on_disk()
@@ -282,8 +295,10 @@ def ask(args) -> None:
         first_id.setdefault(r.episode, r.id)
     for s in chosen_stories:
         rows = store.in_episode(s.episode)
-        if [r.text for r in rows] != s.sentences:
+        if hear_stats.get("write", "raw") == "raw" and [r.text for r in rows] != s.sentences:
             raise SystemExit(f"{s.episode}: the store's rows are not the story's sentences")
+        if len(rows) != len(s.sentences):
+            raise SystemExit(f"{s.episode}: the store holds {len(rows)} rows for {len(s.sentences)} sentences")
     if args.trunk == "local":
         trunk = LocalTrunk(batch=args.parallel, max_new=args.max_new)
         Arm.trunk = trunk
@@ -427,6 +442,8 @@ def main() -> None:
     p.add_argument("--stories", type=int, default=100, help="stories per task, the first N")
     p.add_argument("--store", default="state/store-step1")
     p.add_argument("--embedders", default="minilm,trunk")
+    p.add_argument("--write", default="raw", choices=["raw", "restated"],
+                   help="hear: the sentence as heard, or the served trunk's restatement with names resolved")
     p.add_argument("--arms", default="floor,ceiling,oracle,store:minilm:4,store:minilm:8,"
                                      "store:trunk:4,random:4,unscoped:minilm:4")
     p.add_argument("--reask", type=int, default=20,

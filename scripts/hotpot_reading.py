@@ -103,6 +103,8 @@ def tag_of(spec: str, args) -> str:
         tag += "-" + args.sense
     if args.adapter:
         tag += "-" + Path(args.adapter).stem.replace("-lora", "")
+    if getattr(args, "think", False):
+        tag += "-think"
     return tag
 
 
@@ -230,6 +232,8 @@ def main() -> None:
     p.add_argument("--max-turns", type=int, default=4, help="assistant turns an `ask` arm may take")
     p.add_argument("--served", default="http://127.0.0.1:8093")
     p.add_argument("--adapter", default=None, help="a GGUF LoRA file the server has loaded, applied at 1")
+    p.add_argument("--think", action="store_true",
+                   help="the trunk's thinking mode on (the server must run without --reasoning-budget 0; raise --max-new)")
     p.add_argument("--wiki", default=str(ROOT / "data" / "wiki-abstracts" / "minilm"), help="the full-form store")
     p.add_argument("--bm25", default=str(ROOT / "data" / "wiki-abstracts" / "bm25"), help="its lexical index")
     p.add_argument("--sense", default="lexical", choices=["lexical", "dense"], help="how the full-form store is searched")
@@ -241,7 +245,7 @@ def main() -> None:
     from openplexus.trunk import ServedTrunk
 
     qs = questions(args.n, split=args.split, skip=args.skip)
-    trunk = ServedTrunk(url=args.served, max_new=args.max_new, parallel=args.batch)
+    trunk = ServedTrunk(url=args.served, max_new=args.max_new, parallel=args.batch, think=args.think)
     loaded = trunk.adapters()
     if args.adapter:
         want = Path(args.adapter).name

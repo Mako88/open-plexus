@@ -140,11 +140,10 @@ class WikiSearch:
     exclude)` is the sense, the store's own dense keys unless another is given (the lexical index,
     or a fusion of the two, `openplexus.lexical`)."""
 
-    def __init__(self, store: WikiTexts, embed=None, nearest=None, per_search: int = 1):
+    def __init__(self, store: WikiTexts, embed=None, nearest=None):
         self.store = store
         self.embed = embed
         self.nearest = nearest or (lambda queries, k, exclude: store.nearest(embed(queries), k, exclude))
-        self.per_search = per_search  # rows returned by one search, nearest first
         self.searches: list[str] = []
         self.shown: list[int] = []
 
@@ -158,9 +157,10 @@ class WikiSearch:
             The most relevant passage, with its title first.
         """
         self.searches.append(query)
-        picks = self.nearest([query], self.per_search, set(self.shown))[0] or [0]
-        self.shown.extend(picks)
-        return "\n\n".join(self.store.text(i) for i in picks)
+        pick = self.nearest([query], 1, set(self.shown))[0]
+        i = pick[0] if pick else 0
+        self.shown.append(i)
+        return self.store.text(i)
 
     def titles(self) -> list[str]:
         return [self.store.title(i) for i in self.shown]

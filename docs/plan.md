@@ -526,9 +526,14 @@ Each step says what it decides. A step is struck when it is done.
      filmography", "Androscoggin Bank Colisée seating capacity" gave "Seating capacity"); for
      143 no query named the title, the asker describing what it wanted ("science fantasy
      young adult series, first person, companion books") where a word index cannot follow.
-     Next, cheap on a free card (a reading is six minutes): a title named in the query is
-     found first (the sense, no tuning), and two rows a search instead of one; then recall
-     keyed on the trunk's state for the described hop.
+     Both cheap fixes read level and are deleted (revive from `aa7ab186`): a title named in the
+     query ranked first (`hotpot-20261102T200801Z`) 0.375, 14 made right and 17 made wrong
+     against plain BM25, both articles found for 71 of 200 against 66; two rows a search
+     (`-201652Z`) 0.385, 11 and 12, both found for 70. More finding did not become more
+     answering, and the asker given both articles scores 0.66, so the full-store asker sits at
+     0.39 against a reachable 0.64 with the finding at a third of questions. Next: recall keyed
+     on the trunk's state for the described hop, and before it the reading end (the ceiling
+     with thinking on), since that is the other half of the gap.
 
 7. **Consolidation: the trunk learns slowly, by replay.** Complementary learning systems
    (McClelland, McNaughton and O'Reilly, 1995): the hippocampus learns in one shot and the

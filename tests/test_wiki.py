@@ -72,10 +72,6 @@ def test_the_store_finds_the_nearest_abstract_and_the_tool_never_repeats_one(tmp
     second = tool.search("the film Ed Wood")
     assert first.startswith("Ed Wood (film): ") and second != first
     assert tool.titles()[0] == "Ed Wood (film)" and tool.searches == ["the film Ed Wood"] * 2
-    two = WikiSearch(store, Words(), per_search=2)
-    reply = two.search("the film Ed Wood")
-    assert reply.startswith("Ed Wood (film): ") and reply.count("\n\n") == 1 and len(two.shown) == 2
-    assert two.search("the film Ed Wood").split("\n\n")[0] not in reply  # the next two, none shown before
     # another sense: a function of queries, k and rows to skip, here one that always says row 6 then 0
     other = WikiSearch(store, Words(), nearest=lambda queries, k, exclude: [[i for i in (6, 0) if i not in exclude][:k] for _ in queries])
     assert other.search("anything") == "Alabama: a state" and other.search("anything") == "Anarchism: a political philosophy"

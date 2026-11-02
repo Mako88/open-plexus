@@ -36,12 +36,3 @@ def test_the_index_answers_with_rows_sharing_the_query_words_and_the_title_count
     assert ix.nearest(["???"], 3) == [[]]
     reopened = LexicalIndex(tmp_path / "bm25")
     assert reopened.nearest(["Albedo reflectance"], 1) == [[2]]
-
-
-def test_a_title_named_in_the_query_comes_first(tmp_path):
-    from openplexus.lexical import named_first
-    titles = {0: "Ed Wood", 1: "Ed Wood filmography", 2: "Ed Wood (film)", 3: "Seating capacity"}
-    assert named_first("Ed Wood nationality", [1, 2, 0, 3], titles.get) == [0, 1, 2, 3]
-    assert named_first("Ed Wood (film) director", [1, 0, 2], titles.get) == [2, 0, 1]  # the longer named title first
-    assert named_first("Androscoggin Bank Colisée seating capacity", [3, 1], titles.get) == [3, 1]
-    assert named_first("where is Edward", [0, 1], titles.get) == [0, 1]  # nothing named, the order kept

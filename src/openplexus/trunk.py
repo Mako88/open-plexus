@@ -22,8 +22,11 @@ SYSTEM = (
 
 class ServedTrunk:
     def __init__(self, model: str = "trunk", url: str | None = None, max_new: int = 8,
-                 parallel: int = 8, think: bool = False, lora: list[dict] | None = None):
+                 parallel: int = 8, think: bool = False, lora: list[dict] | None = None,
+                 temperature: float = 0.0, seed: int = 0):
         self.model = model
+        self.temperature = temperature  # readings are greedy; a writer of varied text samples
+        self.seed = seed
         self.lora = lora  # per-request adapter scales, [{"id": 0, "scale": 1.0}, ...]; None leaves the server's
         self.url = (url or os.environ.get("LOCAL_SERVER", "http://127.0.0.1:8093")) \
             + "/v1/chat/completions"
@@ -61,7 +64,7 @@ class ServedTrunk:
     def ask(self, messages: list[dict]) -> str:
         request = {
             "model": self.model, "messages": messages, "max_tokens": self.max_new,
-            "temperature": 0, "seed": 0,
+            "temperature": self.temperature, "seed": self.seed,
             "chat_template_kwargs": {"enable_thinking": self.think},
         }
         if self.lora is not None:

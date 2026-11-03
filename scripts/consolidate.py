@@ -41,36 +41,44 @@ from openplexus.hotpot import paragraph_text, questions  # noqa: E402
 REWRITE = ("Rewrite the passage below in your own words, keeping every fact, name, number and date exactly. "
            "Reply with the rewritten passage only.")
 ASK = ("Write one question that the passage below answers, with its short answer (a name, a number, a date, or yes or "
-       "no), as two lines: 'Question: ...' then 'Answer: ...'. Make it question {k} of several different ones, about a "
-       "different fact of the passage each time. Reply with the two lines only.")
+       "no), as two lines: 'Question: ...' then 'Answer: ...'. Ask about a fact the passage states; where earlier "
+       "questions are listed, ask about a different fact. Reply with the two lines only.")
 
 
-def augmented(texts: list[str], k: int, path: Path, trunk) -> list[str]:
+def augmented(texts: list[str], k: int, path: Path, trunk_for) -> list[str]:
     """K restatements and K question-and-answer lines a row from the served trunk, written to
-    `path` as they come so a run cut short carries on; the extra texts to replay."""
+    `path` as they come so a run cut short carries on; the extra texts to replay. `trunk_for(j)`
+    gives the trunk for the j-th pass, sampling with its own seed, since greedy decoding wrote the
+    same four restatements and the same four questions of every row (2026-11-03); and the j-th
+    question is asked with the row's earlier questions shown, to be about another fact."""
     done = {}
     if path.exists():
         for line in path.read_text(encoding="utf-8").splitlines():
             r = json.loads(line)
             done[(r["row"], r["kind"], r["k"])] = r["text"]
-    wanted = [(i, kind, j) for i in range(len(texts)) for kind in ("rewrite", "ask") for j in range(k)
-              if (i, kind, j) not in done]
-    print(f"augmenting: {len(done)} done, {len(wanted)} to write", flush=True)
     chunk = 64
     with open(path, "a", encoding="utf-8") as f:
-        for at in range(0, len(wanted), chunk):
-            batch = wanted[at:at + chunk]
-            prompts = [[{"role": "system", "content": REWRITE if kind == "rewrite" else ASK.format(k=j + 1)},
-                        {"role": "user", "content": texts[i]}] for i, kind, j in batch]
-            for (i, kind, j), reply in zip(batch, trunk.ask_many(prompts)):
-                text = reply.strip()
-                if kind == "ask" and not (text.startswith("Question:") and "\nAnswer:" in text):
-                    continue  # the lines the trunk did not write in the asked form are left out
-                if not text:
-                    continue
-                f.write(json.dumps({"row": i, "kind": kind, "k": j, "text": text}, ensure_ascii=False) + "\n")
-                done[(i, kind, j)] = text
-            print(f"  {min(at + chunk, len(wanted))}/{len(wanted)}", flush=True)
+        for j in range(k):
+            wanted = [(i, kind) for i in range(len(texts)) for kind in ("rewrite", "ask") if (i, kind, j) not in done]
+            print(f"pass {j + 1}/{k}: {len(wanted)} to write", flush=True)
+            for at in range(0, len(wanted), chunk):
+                batch = wanted[at:at + chunk]
+                prompts = []
+                for i, kind in batch:
+                    if kind == "rewrite":
+                        prompts.append([{"role": "system", "content": REWRITE}, {"role": "user", "content": texts[i]}])
+                    else:
+                        earlier = [done[(i, "ask", jj)] for jj in range(j) if (i, "ask", jj) in done]
+                        shown = ("\n\nQuestions already written about this passage, which the new one must not repeat "
+                                 "or paraphrase:\n" + "\n".join(q.splitlines()[0] for q in earlier)) if earlier else ""
+                        prompts.append([{"role": "system", "content": ASK}, {"role": "user", "content": texts[i] + shown}])
+                for (i, kind), reply in zip(batch, trunk_for(j).ask_many(prompts)):
+                    text = reply.strip()
+                    if not text or (kind == "ask" and not (text.startswith("Question:") and "\nAnswer:" in text)):
+                        continue  # a line the trunk did not write in the asked form is left out
+                    f.write(json.dumps({"row": i, "kind": kind, "k": j, "text": text}, ensure_ascii=False) + "\n")
+                    done[(i, kind, j)] = text
+                print(f"  {min(at + chunk, len(wanted))}/{len(wanted)}", flush=True)
     return list(done.values())
 
 
@@ -109,7 +117,8 @@ def main() -> None:
     if args.augment:
         from openplexus.trunk import ServedTrunk
 
-        extra = augmented(rows, args.augment, out / "augmented.jsonl", ServedTrunk(max_new=320, parallel=8))
+        trunks = {j: ServedTrunk(max_new=320, parallel=8, temperature=0.8, seed=j + 1) for j in range(args.augment)}
+        extra = augmented(rows, args.augment, out / "augmented.jsonl", trunks.__getitem__)
         texts += extra
         print(f"{len(rows)} rows and {len(extra)} augmentations", flush=True)
     tok = AutoTokenizer.from_pretrained(args.model)

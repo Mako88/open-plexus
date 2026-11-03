@@ -68,18 +68,18 @@ def augmented(texts: list[str], k: int, path: Path, trunk_for) -> list[str]:
                     if kind == "rewrite":
                         prompts.append([{"role": "system", "content": REWRITE}, {"role": "user", "content": texts[i]}])
                     else:
-                        earlier = [done[(i, "ask", jj)] for jj in range(j) if (i, "ask", jj) in done]
+                        earlier = [done[(i, "ask", jj)] for jj in range(j) if done.get((i, "ask", jj))]
                         shown = ("\n\nQuestions already written about this passage, which the new one must not repeat "
                                  "or paraphrase:\n" + "\n".join(q.splitlines()[0] for q in earlier)) if earlier else ""
                         prompts.append([{"role": "system", "content": ASK}, {"role": "user", "content": texts[i] + shown}])
                 for (i, kind), reply in zip(batch, trunk_for(j).ask_many(prompts)):
                     text = reply.strip()
-                    if not text or (kind == "ask" and not (text.startswith("Question:") and "\nAnswer:" in text)):
-                        continue  # a line the trunk did not write in the asked form is left out
+                    if kind == "ask" and not (text.startswith("Question:") and "\nAnswer:" in text):
+                        text = ""  # a line not in the asked form is left out, and recorded so it is not asked again
                     f.write(json.dumps({"row": i, "kind": kind, "k": j, "text": text}, ensure_ascii=False) + "\n")
                     done[(i, kind, j)] = text
                 print(f"  {min(at + chunk, len(wanted))}/{len(wanted)}", flush=True)
-    return list(done.values())
+    return [x for x in done.values() if x]
 
 
 def rows_of(qs: list[dict], which: str) -> list[str]:
@@ -101,6 +101,7 @@ def main() -> None:
     p.add_argument("--micro", type=int, default=2)
     p.add_argument("--max-tokens", type=int, default=384)
     p.add_argument("--augment", type=int, default=0, help="restatements and questions a row from the served trunk, replayed with it")
+    p.add_argument("--augment-only", action="store_true", help="write the augmentations (the server up) and stop; the training runs after, the server down")
     p.add_argument("--seed", type=int, default=0)
     p.add_argument("--note", default="")
     args = p.parse_args()
@@ -121,6 +122,8 @@ def main() -> None:
         extra = augmented(rows, args.augment, out / "augmented.jsonl", trunks.__getitem__)
         texts += extra
         print(f"{len(rows)} rows and {len(extra)} augmentations", flush=True)
+        if args.augment_only:
+            return
     tok = AutoTokenizer.from_pretrained(args.model)
     encoded = [tok(t + tok.eos_token, truncation=True, max_length=args.max_tokens)["input_ids"] for t in texts]
     print(f"{len(texts)} rows, {sum(map(len, encoded))} tokens, {max(map(len, encoded))} the longest", flush=True)

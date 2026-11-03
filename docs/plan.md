@@ -490,9 +490,23 @@ Each step says what it decides. A step is struck when it is done.
      13 made wrong): memorised rows are not answerable as questions. On the next 200 questions,
      whose rows it never saw, 0.075 against 0.115; the gold arm with it 0.60 against 0.61, so the
      cost to reading is small. The known shape (Allen-Zhu and Li, 2023): a fact is extractable
-     from weights only when it was seen in varied forms. Second form, running: each row replayed
-     with four restatements and four question-and-answer lines the trunk writes from it
-     (`--augment 4`), the replay as a sleep that rephrases, read the same way.
+     from weights only when it was seen in varied forms. Second form (`--augment 4`, read
+     2026-11-03, `hotpot-20261103T092537Z`, `-092641Z`, `-092827Z`): each row replayed with four
+     restatements and up to four question-and-answer lines the trunk writes from it (sampled, in
+     passes, 3,152 in all), four epochs in 73 minutes to a loss of 0.39. The two-hop floor with
+     it **0.105** against 0.15, the next 200 questions 0.03 against 0.115, and gold 0.52 against
+     0.61 (comparison questions 0.265 against 0.735): no better at the questions and worse at
+     reading. But single facts did move (`consolidate_recall.py`,
+     `consolidate-recall-20261103T094200Z`, no passage, the adapter on against off): the
+     replayed rows' own questions **0.38** exact against 0.055 (70 made right, 5 made wrong), F1
+     0.547 against 0.118; fresh single-fact questions the base trunk wrote from the same rows
+     **0.19** against 0.045 (33 and 4), F1 0.362 against 0.113. So knowledge moves from rows into
+     weights by rephrased replay on this trunk, and what the two-hop floor measured is the
+     composing of two consolidated facts, which a 2B does not do from its weights (the
+     compositionality gap, Press et al. 2022), at a cost to its reading of a passage. Decides:
+     consolidation works at the fact; the store stays the place facts are composed from. Next
+     here, when it earns card time: the cost to reading (fewer epochs, replay mixed with
+     ordinary text), and whether the consolidated fact serves the asking as a first hop.
 
 Where the system makes a choice (which row to follow, whether to fetch again, whether a
 sentence is worth writing, when to stop), it is a learner credited by outcome: a head over the

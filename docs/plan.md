@@ -450,9 +450,20 @@ Each step says what it decides. A step is struck when it is done.
      where the text query's is 0.525; the last-token state does not hold the next article's key
      as well as the text does. Refuted in this form; the script is deleted (revive from `2ff57cec`,
      `scripts/wiki_walker.py`, the states in `state/wiki-walker/`).
-   - **Next in the step:** GRPO on the answering from given paragraphs (`ask.py --store gold`),
-     the reading end trained as step 3 trained maths, read as the gold arm with the adapter. The
-     key-less learner stays a live line.
+   - **The reading end trained alone** (`ask.py --store gold`: the two supporting paragraphs in
+     the prompt, no tool, the key the reward; 480 questions, 240 steps in 3 hours, 101 with
+     gradient, training accuracy 0.70; read 2026-11-03, `hotpot-20261103T061906Z`, at the
+     training's 512-token budget since the adapter writes 230-token deductions): gold with the
+     adapter **0.615** against 0.61 without, 15 made right and 14 made wrong. One round of the
+     key on the answering moves nothing where step 3's moved maths; the round stops.
+   - **Where step 6 stands, 2026-11-03.** The finding gap is the system's and is half closed
+     (top-2 0.20, the trained asker 0.39, reachable 0.64) with the asking, the lexical sense and
+     their rounds all read to a plateau; what is left of it is the described second hop, which
+     no sense here follows. The reading gap is the trunk's: given the gold paragraphs it scores
+     0.61, with thinking 0.655, trained on the answering 0.615, against the frontier's 0.79, and
+     this is the reading John named as the one that could justify a bigger trunk. A decision
+     for John, not taken here. The key-less learner stays a live line. Next, unless John decides
+     otherwise: step 7.
 
 7. **Consolidation: the trunk learns slowly, by replay.** Complementary learning systems
    (McClelland, McNaughton and O'Reilly, 1995): the hippocampus learns in one shot and the

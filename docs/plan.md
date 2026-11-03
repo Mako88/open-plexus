@@ -483,6 +483,16 @@ Each step says what it decides. A step is struck when it is done.
    the same answers in fewer steps. The blocks stay as text even if the thinking goes latent:
    language compounded because its blocks were shareable and composable, and a concept that
    stays private cannot be stored, taught or built on.
+   - First form, read 2026-11-03 (`scripts/consolidate.py`, `hotpot-20261103T064815Z`, `-065004Z`,
+     `-065213Z`, `-065444Z`): the supporting paragraphs of the first 200 validation questions
+     replayed to a LoRA as plain text, eight epochs in 21 minutes to a loss of 0.20, nothing of
+     the questions shown. The floor with the adapter **0.14** against 0.15 without (11 made right,
+     13 made wrong): memorised rows are not answerable as questions. On the next 200 questions,
+     whose rows it never saw, 0.075 against 0.115; the gold arm with it 0.60 against 0.61, so the
+     cost to reading is small. The known shape (Allen-Zhu and Li, 2023): a fact is extractable
+     from weights only when it was seen in varied forms. Second form, running: each row replayed
+     with four restatements and four question-and-answer lines the trunk writes from it
+     (`--augment 4`), the replay as a sleep that rephrases, read the same way.
 
 Where the system makes a choice (which row to follow, whether to fetch again, whether a
 sentence is worth writing, when to stop), it is a learner credited by outcome: a head over the

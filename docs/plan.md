@@ -440,11 +440,19 @@ Each step says what it decides. A step is struck when it is done.
      buys about 0.04 of the reading gap for thirty times the compute, only when something ends
      the thinking. The asker with thinking leaves half unanswered (`-212850Z`): the forced close
      and the tool turns do not compose; not read further.
-   - **Next in the step:** recall keyed on the trunk's state for the described hop
-     (`wiki_walker.py`: the trunk's hidden state after the question and the first abstract,
-     mapped by a ridge-fitted head into MiniLM's key space, read teacher-forced on the second
-     hop against the two text senses); then GRPO on the answering from given paragraphs, the
-     reading end trained as step 3 trained maths. The key-less learner stays a live line.
+   - **Recall keyed on the trunk's state**, read 2026-11-03 over the full store
+     (`wiki-walker-20261103T010235Z`, `-025807Z`): the trunk's layer-20 state after the question
+     and the first abstract, mapped into MiniLM's key space by a ridge head fitted on HotpotQA
+     train pairs, finds the other article in the top two among 5.2 million on 1.8% of hops with
+     4,000 examples and 4.0% with 32,000 (top ten 10.7%), against MiniLM's 23.5% and BM25's 33.8%
+     from the question with the abstract appended. The head's cosine to the target key is 0.38,
+     then 0.45, gaining less with each doubling, and a small MLP on the same states stops at 0.46
+     where the text query's is 0.525; the last-token state does not hold the next article's key
+     as well as the text does. Refuted in this form; the script is deleted (revive from `2ff57cec`,
+     `scripts/wiki_walker.py`, the states in `state/wiki-walker/`).
+   - **Next in the step:** GRPO on the answering from given paragraphs (`ask.py --store gold`),
+     the reading end trained as step 3 trained maths, read as the gold arm with the adapter. The
+     key-less learner stays a live line.
 
 7. **Consolidation: the trunk learns slowly, by replay.** Complementary learning systems
    (McClelland, McNaughton and O'Reilly, 1995): the hippocampus learns in one shot and the

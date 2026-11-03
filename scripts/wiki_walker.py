@@ -108,7 +108,9 @@ def main() -> None:
         trunk.close()
 
     def states(name, n):
-        return {layer: np.fromfile(OUT / f"{name}.l{layer}.f32", dtype=np.float32).reshape(n, -1) for layer in layers}
+        # states_resumable names the files by with_suffix, so "train.part" becomes train.l12.f32
+        return {layer: np.fromfile((OUT / name).with_suffix(f".l{layer}.f32"), dtype=np.float32).reshape(n, -1)
+                for layer in layers}
 
     reading: dict = {"kind": "wiki-walker", "train_examples": len(train), "val_examples": len(val), "layers": layers,
                      "store_rows": texts.n, "k": ks}

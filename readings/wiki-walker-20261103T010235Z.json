@@ -1,0 +1,120 @@
+{
+ "kind": "wiki-walker",
+ "train_examples": 4000,
+ "val_examples": 400,
+ "layers": [
+  12,
+  16,
+  20
+ ],
+ "store_rows": 5233329,
+ "k": [
+  1,
+  2,
+  5,
+  10
+ ],
+ "fit": {
+  "held_out_cosine": {
+   "l12-lam10": 0.3039,
+   "l12-lam100": 0.2627,
+   "l12-lam1000": 0.2056,
+   "l12-lam10000": 0.186,
+   "l16-lam10": 0.3242,
+   "l16-lam100": 0.3109,
+   "l16-lam1000": 0.2441,
+   "l16-lam10000": 0.1946,
+   "l20-lam10": 0.3178,
+   "l20-lam100": 0.3713,
+   "l20-lam1000": 0.3656,
+   "l20-lam10000": 0.2673
+  },
+  "chosen": {
+   "layer": 20,
+   "lam": 100.0
+  }
+ },
+ "second_hop": {
+  "walker": {
+   "1": {
+    "any": 0.013,
+    "all": 0.013,
+    "mean_found": 0.01
+   },
+   "2": {
+    "any": 0.018,
+    "all": 0.018,
+    "mean_found": 0.02
+   },
+   "5": {
+    "any": 0.028,
+    "all": 0.028,
+    "mean_found": 0.03
+   },
+   "10": {
+    "any": 0.037,
+    "all": 0.037,
+    "mean_found": 0.04
+   }
+  },
+  "minilm": {
+   "1": {
+    "any": 0.188,
+    "all": 0.188,
+    "mean_found": 0.19
+   },
+   "2": {
+    "any": 0.235,
+    "all": 0.235,
+    "mean_found": 0.23
+   },
+   "5": {
+    "any": 0.323,
+    "all": 0.323,
+    "mean_found": 0.32
+   },
+   "10": {
+    "any": 0.385,
+    "all": 0.385,
+    "mean_found": 0.39
+   }
+  },
+  "bm25": {
+   "1": {
+    "any": 0.242,
+    "all": 0.242,
+    "mean_found": 0.24
+   },
+   "2": {
+    "any": 0.338,
+    "all": 0.338,
+    "mean_found": 0.34
+   },
+   "5": {
+    "any": 0.48,
+    "all": 0.48,
+    "mean_found": 0.48
+   },
+   "10": {
+    "any": 0.568,
+    "all": 0.568,
+    "mean_found": 0.57
+   }
+  }
+ },
+ "timings": {
+  "walker_s": 4.9,
+  "minilm_s": 5.7,
+  "bm25_s": 134.4
+ },
+ "walker": {
+  "layer": 20,
+  "lam": 100.0,
+  "prompt": "Question: <question>\nKnown: <abstract read>\nNext fact:"
+ },
+ "command": "scripts/wiki_walker.py --stage fit,read --n-train 2000 --note recall keyed on the trunk's state, second hop over 5.2 million abstracts, against MiniLM and BM25 of the question with the abstract appended",
+ "sha": "aa33a2ef",
+ "trunk": "Qwen/Qwen3.5-2B fp32 in process",
+ "taken_at": "20261103T010235Z",
+ "note": "recall keyed on the trunk's state, second hop over 5.2 million abstracts, against MiniLM and BM25 of the question with the abstract appended"
+}

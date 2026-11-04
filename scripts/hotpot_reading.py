@@ -40,6 +40,7 @@ from ask import SYSTEM as ASK_SYSTEM  # noqa: E402
 from ask import Store, embedder  # noqa: E402
 from grpo_reading import paired  # noqa: E402
 from openplexus.asking import solve  # noqa: E402
+from openplexus.decompose import solve_decomposed  # noqa: E402
 from openplexus.hotpot import READ_SYSTEM, read_text, answer_of, exact, f1, paragraph_text, questions, recall  # noqa: E402
 from openplexus.maths import rows_of  # noqa: E402
 from openplexus.lexical import LexicalIndex  # noqa: E402
@@ -71,7 +72,15 @@ def sense_of(sense: str, store: WikiStore, embed, bm25: str):
     return LexicalIndex(bm25).nearest
 
 
+def decomposed(spec: str) -> bool:
+    """`<arm>:decompose`: the arm's paragraphs shown, the question answered by the decomposing loop
+    (`openplexus.decompose`) instead of in one turn."""
+    return spec.endswith(":decompose")
+
+
 def chosen(spec: str, q: dict, index=None) -> list[dict]:
+    if decomposed(spec):
+        return chosen(spec[:-len(":decompose")], q, index)
     if spec == "floor" or spec in ASKING:
         return []
     if spec.startswith("wiki:top:"):
@@ -130,7 +139,20 @@ def arm(spec: str, qs: list[dict], args, trunk, index) -> dict:
         chunk = todo[at:at + args.batch]
         before_out = trunk.tokens_out
         asked: list[dict | None] = [None] * len(chunk)
-        if spec in ASKING:
+        if decomposed(spec):
+            def one_decomposed(q):
+                shown = chosen(spec, q, index)
+                out = solve_decomposed(trunk.ask, [paragraph_text(p) for p in shown], q["question"])
+                out["shown"] = [p["title"] for p in shown]
+                out["gold_shown"] = sum(p["supporting"] for p in shown)
+                out["searches"] = out["steps"]
+                return out
+
+            from concurrent.futures import ThreadPoolExecutor
+            with ThreadPoolExecutor(max_workers=args.batch) as pool:
+                asked = list(pool.map(one_decomposed, chunk))
+            replies = [a["reply"] for a in asked]
+        elif spec in ASKING:
             embedder()  # once, before the threads: a first import inside several threads at once fails
 
             def one(q):
@@ -173,6 +195,11 @@ def arm(spec: str, qs: list[dict], args, trunk, index) -> dict:
                        "passes": round(tokens_out / len(chunk) + (a["turns"] if a else 1), 1)}
                 if a:
                     row["searches"] = a["searches"]
+                if a and decomposed(spec):
+                    row["plan"] = a["plan"]
+                    row["answers"] = a["answers"]
+                    row["fallback"] = a["fallback"]
+                    row["retried"] = a["retried"]
                     row["turns"] = a["turns"]
                     if a.get("failed"):
                         row["failed"] = a["failed"]

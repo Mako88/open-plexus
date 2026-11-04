@@ -468,8 +468,23 @@ Each step says what it decides. A step is struck when it is done.
      no sense here follows. The reading gap is the trunk's: given the gold paragraphs it scores
      0.61, with thinking 0.655, trained on the answering 0.615, against the frontier's 0.79, and
      this is the reading John named as the one that could justify a bigger trunk. A decision
-     for John, not taken here. The key-less learner stays a live line. Next, unless John decides
-     otherwise: step 7.
+     for John, not taken here. John, 2026-11-04: the trunk stays; no 4B reading either, since
+     how much a bigger trunk buys does not matter while the gap is to be closed elsewhere so that
+     any trunk is improved by it.
+   - **Reasoning outside the trunk** (John, 2026-11-04). The gold arm's 78 misses read: 32 are
+     wording the scorer rejects (F1 0.72 against exact 0.61), about 30 answer the wrong slot of
+     the question (who the father is, asked what he was voted; "Yes" to a who), about 15 compose
+     two facts wrongly. The trunk translates a sentence well (step 7: single facts) and the
+     structure around it badly, so the structure moves into the loop: the trunk writes the kind
+     of the answer and the question as single-fact questions, code runs them with the passages
+     and substitutes answers forward, asks the question last with the facts found, and sends an
+     answer back once when it contradicts the system's own kind (`openplexus.decompose`,
+     `--arms gold:decompose`). The rule (John): nothing of the answer's kind is handed to the
+     system; code checks the system against itself, and the key teaches the kinds in training
+     and then drops away. Untrained, read 2026-11-04 (`hotpot-20261104T160600Z`): **0.56**
+     against 0.61 in one turn, 8 made right and 18 made wrong (2.0 standard errors), 16 retried,
+     2 fallbacks, 2.1 steps a question. The 2B's untrained plans misdirect more than they help.
+     Next: the decomposition trained by the key, the same recipe as the asking.
 
 7. **Consolidation: the trunk learns slowly, by replay.** Complementary learning systems
    (McClelland, McNaughton and O'Reilly, 1995): the hippocampus learns in one shot and the

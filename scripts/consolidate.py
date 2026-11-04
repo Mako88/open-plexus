@@ -105,6 +105,7 @@ def main() -> None:
                    help="the adapter replayed into: 'system' is the lineage's as it stands (none where there is no lineage), "
                         "'none' a fresh adapter, or a PEFT folder")
     p.add_argument("--augment", type=int, default=0, help="restatements and questions a row from the served trunk, replayed with it")
+    p.add_argument("--rehearse", default=None, help="a rehearsal file (`rehearsal.py`): the system's own right answers replayed with the rows")
     p.add_argument("--augment-only", action="store_true", help="write the augmentations (the server up) and stop; the training runs after, the server down")
     p.add_argument("--seed", type=int, default=0)
     p.add_argument("--note", default="")
@@ -130,7 +131,15 @@ def main() -> None:
             return
     tok = AutoTokenizer.from_pretrained(args.model)
     encoded = [tok(t + tok.eos_token, truncation=True, max_length=args.max_tokens)["input_ids"] for t in texts]
-    print(f"{len(texts)} rows, {sum(map(len, encoded))} tokens, {max(map(len, encoded))} the longest", flush=True)
+    rehearsed = 0
+    if args.rehearse:
+        # the system's own right answers, as the transcripts the trunk saw them in, interleaved with the rows
+        for line in Path(args.rehearse).read_text(encoding="utf-8").splitlines():
+            ids = tok.apply_chat_template(json.loads(line)["messages"], tokenize=True, enable_thinking=False)
+            ids = ids["input_ids"] if isinstance(ids, dict) else list(ids)
+            encoded.append(ids[:args.max_tokens * 4])
+            rehearsed += 1
+    print(f"{len(texts)} rows, {rehearsed} rehearsed transcripts, {sum(map(len, encoded))} tokens, {max(map(len, encoded))} the longest", flush=True)
 
     if args.init_adapter == "system":
         args.init_adapter = str(Lineage().current()) if Lineage().exists() else None
@@ -182,7 +191,7 @@ def main() -> None:
         "row_texts": len(rows),
         "tokens": sum(map(len, encoded)), "rank": args.rank, "lr": args.lr, "epochs": args.epochs, "batch": args.batch,
         "log": log, "peak_gib": round(torch.cuda.max_memory_allocated() / 2**30, 2), "note": args.note,
-        "init_adapter": args.init_adapter,
+        "init_adapter": args.init_adapter, "rehearse": args.rehearse, "rehearsed": rehearsed,
         "command": "scripts/consolidate.py " + " ".join(sys.argv[1:]),
         "sha": subprocess.run(["git", "rev-parse", "--short", "HEAD"], capture_output=True, text=True, cwd=ROOT).stdout.strip(),
     }, indent=1), encoding="utf-8")

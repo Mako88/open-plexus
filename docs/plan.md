@@ -539,9 +539,19 @@ Each step says what it decides. A step is struck when it is done.
      weights by rephrased replay on this trunk, and what the two-hop floor measured is the
      composing of two consolidated facts, which a 2B does not do from its weights (the
      compositionality gap, Press et al. 2022), at a cost to its reading of a passage. Decides:
-     consolidation works at the fact; the store stays the place facts are composed from. Next
-     here, when it earns card time: the cost to reading (fewer epochs, replay mixed with
-     ordinary text), and whether the consolidated fact serves the asking as a first hop.
+     consolidation works at the fact; the store stays the place facts are composed from.
+   - **The sleep** (John, 2026-11-04: dreaming is what continual learning needs against
+     forgetting). The pass becomes the system's habit: in downtime it replays the rows heard
+     since the last sleep, rephrased by the trunk, interleaved with a sample of what the system
+     already does, its own right answers on past training questions kept by the key
+     (`rehearsal.py`, `consolidate.py --rehearse`; self-distillation, nothing handed that it did
+     not produce), from the system's adapter into the system's adapter, and ends with the
+     regression set read before and after: a sleep that lost more than it taught is rolled
+     back, and every sleep is a ledger row, so forgetting has a number. Downtime is read from
+     the card itself, free memory and utilisation over a few minutes; nothing of this machine
+     (its games, its idle time) is in the code (John, 2026-11-04). First reading: the same rows
+     slept with and without rehearsal, both from the system's adapter, on whether gold stays at
+     0.61 while the single facts still land.
 
 Where the system makes a choice (which row to follow, whether to fetch again, whether a
 sentence is worth writing, when to stop), it is a learner credited by outcome: a head over the

@@ -118,6 +118,12 @@ Every reading has three lines: the floor (trunk given no story), the ceiling (tr
 whole story in context), and the arm. An arm is read against both. Every reading also carries
 its cost: tokens per second, VRAM, store bytes, lookup milliseconds.
 
+Rung five's number (John, 2026-11-04): every training round is priced in the questions it
+needed for each point its reading gained (`scripts/learning_speed.py`, a row a round,
+`learning-speed-20261104T151349Z`). A system learning to learn pays less a point each round.
+So far it pays more: the asking's round one 8.9 questions a point, round two 32, round three
+no gain; the full-store and answering rounds 960.
+
 Later measures, once tasks 1 to 3 are at the ceiling through the store: the other bAbI tasks;
 fresh synthetic stories with invented names, longer than any context; and then real knowledge
 at scale (a Wikipedia subset in the store), which is where "frontier knowledge on an 11 GB

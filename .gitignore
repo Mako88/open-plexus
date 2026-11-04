@@ -10,5 +10,9 @@ data/*
 !data/babi/
 models/
 out/
-# Stores and other run state live here; a store is rebuilt by hearing.
-state/
+# Stores and other run state live here; a store is rebuilt by hearing. The system's ledger, the
+# record of every round the lineage took, is the one thing in it that is versioned.
+state/*
+!state/system/
+state/system/*
+!state/system/ledger.json

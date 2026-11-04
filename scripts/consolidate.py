@@ -36,6 +36,7 @@ sys.path.insert(0, str(ROOT / "scripts"))
 
 from grpo import TARGETS  # noqa: E402
 from openplexus.hotpot import paragraph_text, questions  # noqa: E402
+from openplexus.lineage import Lineage  # noqa: E402
 
 
 REWRITE = ("Rewrite the passage below in your own words, keeping every fact, name, number and date exactly. "
@@ -100,6 +101,9 @@ def main() -> None:
     p.add_argument("--batch", type=int, default=8, help="rows an optimiser step, accumulated")
     p.add_argument("--micro", type=int, default=2)
     p.add_argument("--max-tokens", type=int, default=384)
+    p.add_argument("--init-adapter", default="system",
+                   help="the adapter replayed into: 'system' is the lineage's as it stands (none where there is no lineage), "
+                        "'none' a fresh adapter, or a PEFT folder")
     p.add_argument("--augment", type=int, default=0, help="restatements and questions a row from the served trunk, replayed with it")
     p.add_argument("--augment-only", action="store_true", help="write the augmentations (the server up) and stop; the training runs after, the server down")
     p.add_argument("--seed", type=int, default=0)
@@ -128,11 +132,21 @@ def main() -> None:
     encoded = [tok(t + tok.eos_token, truncation=True, max_length=args.max_tokens)["input_ids"] for t in texts]
     print(f"{len(texts)} rows, {sum(map(len, encoded))} tokens, {max(map(len, encoded))} the longest", flush=True)
 
+    if args.init_adapter == "system":
+        args.init_adapter = str(Lineage().current()) if Lineage().exists() else None
+    elif args.init_adapter == "none":
+        args.init_adapter = None
+    print(f"replaying into {args.init_adapter or 'a fresh adapter'}", flush=True)
     model = AutoModelForCausalLM.from_pretrained(args.model, dtype=torch.float32).cuda()
     model.gradient_checkpointing_enable(gradient_checkpointing_kwargs={"use_reentrant": False})
     model.enable_input_require_grads()
-    model = get_peft_model(model, LoraConfig(r=args.rank, lora_alpha=2 * args.rank, lora_dropout=0.0,
-                                             target_modules=TARGETS, task_type="CAUSAL_LM"))
+    if args.init_adapter:
+        from peft import PeftModel
+
+        model = PeftModel.from_pretrained(model, args.init_adapter, is_trainable=True)
+    else:
+        model = get_peft_model(model, LoraConfig(r=args.rank, lora_alpha=2 * args.rank, lora_dropout=0.0,
+                                                 target_modules=TARGETS, task_type="CAUSAL_LM"))
     model.print_trainable_parameters()
     opt = torch.optim.AdamW([q for q in model.parameters() if q.requires_grad], lr=args.lr, weight_decay=0.0)
     rng = random.Random(args.seed)
@@ -168,6 +182,7 @@ def main() -> None:
         "row_texts": len(rows),
         "tokens": sum(map(len, encoded)), "rank": args.rank, "lr": args.lr, "epochs": args.epochs, "batch": args.batch,
         "log": log, "peak_gib": round(torch.cuda.max_memory_allocated() / 2**30, 2), "note": args.note,
+        "init_adapter": args.init_adapter,
         "command": "scripts/consolidate.py " + " ".join(sys.argv[1:]),
         "sha": subprocess.run(["git", "rev-parse", "--short", "HEAD"], capture_output=True, text=True, cwd=ROOT).stdout.strip(),
     }, indent=1), encoding="utf-8")

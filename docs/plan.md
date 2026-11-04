@@ -129,6 +129,20 @@ fresh synthetic stories with invented names, longer than any context; and then r
 at scale (a Wikipedia subset in the store), which is where "frontier knowledge on an 11 GB
 card" gets read.
 
+## The system
+
+One lineage (John, 2026-11-04): the system keeps what it learns across runs. `state/system/`
+holds the adapter as it stands and the ledger of every round (`openplexus.lineage`,
+`scripts/lineage.py`; the ledger is versioned, the weights are not). Every training round
+starts from the system's adapter and, once its readings are taken, is committed back with
+them; the adapter before is kept and a round that loses more than it gains is rolled back.
+Readings never write; only training and living do. The 200 reading questions never enter
+training or the store, and the floor and gold lines are re-read against the plain trunk, so
+the trend is one system against a fixed ruler, and two runs need not agree. The regression
+set every round ends with: the asking on the ten paragraphs (`--arms ask --adapter system`)
+and GSM8K. The root is round two's asking adapter. The live loop, the system hearing, asking,
+writing and sleeping on its own, builds on this folder and is the step after.
+
 ## The plan of attack
 
 Each step says what it decides. A step is struck when it is done.

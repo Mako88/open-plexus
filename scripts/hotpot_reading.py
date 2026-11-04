@@ -41,6 +41,7 @@ from ask import Store, embedder  # noqa: E402
 from grpo_reading import paired  # noqa: E402
 from openplexus.asking import solve  # noqa: E402
 from openplexus.decompose import SELFASK_SYSTEM, solve_decomposed  # noqa: E402
+from openplexus.lineage import Lineage  # noqa: E402
 from openplexus.hotpot import READ_SYSTEM, read_text, answer_of, exact, f1, paragraph_text, questions, recall  # noqa: E402
 from openplexus.maths import rows_of  # noqa: E402
 from openplexus.lexical import LexicalIndex  # noqa: E402
@@ -104,7 +105,9 @@ def tag_of(spec: str, args) -> str:
     tag = spec.replace(":", "")
     if spec.startswith("wiki:") and getattr(args, "sense", "dense") != "dense":
         tag += "-" + args.sense
-    if args.adapter:
+    if args.adapter and Path(args.adapter).resolve() == Lineage().gguf.resolve():
+        tag += f"-system-r{len(Lineage().ledger()) - 1}"  # the lineage's adapter, by the round that made it
+    elif args.adapter:
         tag += "-" + Path(args.adapter).stem.replace("-lora", "")
     if getattr(args, "think", False):
         tag += "-think"
@@ -256,7 +259,8 @@ def main() -> None:
     p.add_argument("--max-new", type=int, default=160)
     p.add_argument("--max-turns", type=int, default=4, help="assistant turns an `ask` arm may take")
     p.add_argument("--served", default="http://127.0.0.1:8093")
-    p.add_argument("--adapter", default=None, help="a GGUF LoRA file the server has loaded, applied at 1")
+    p.add_argument("--adapter", default=None,
+                   help="a GGUF LoRA file the server has loaded, applied at 1; 'system' is the lineage's adapter.gguf")
     p.add_argument("--system", default="plain", choices=["plain", "selfask"],
                    help="the one-turn arms' prompt: answer, or write the kind, the single-fact questions and their answers first")
     p.add_argument("--think", action="store_true",
@@ -272,6 +276,8 @@ def main() -> None:
     from openplexus.trunk import ServedTrunk
 
     qs = questions(args.n, split=args.split, skip=args.skip)
+    if args.adapter == "system":
+        args.adapter = str(Lineage().current_gguf())
     trunk = ServedTrunk(url=args.served, max_new=args.max_new, parallel=args.batch, think=args.think)
     loaded = trunk.adapters()
     if args.adapter:

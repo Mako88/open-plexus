@@ -101,5 +101,7 @@ def test_the_full_form_arms_read_store_rows_as_paragraphs_and_count_gold_by_titl
     assert hr.tag_of("gold", types.SimpleNamespace(adapter=None, think=True)) == "gold-think"
     assert hr.tag_of("gold:decompose", types.SimpleNamespace(adapter=None)) == "golddecompose"
     assert hr.tag_of("gold", types.SimpleNamespace(adapter=None, system="selfask")) == "gold-selfask"
+    from openplexus.lineage import Lineage
+    assert hr.tag_of("gold", types.SimpleNamespace(adapter=str(Lineage().gguf))).startswith("gold-system-r")
     assert hr.decomposed("gold:decompose") and not hr.decomposed("gold")
     assert hr.chosen("gold:decompose", q, index) == hr.chosen("gold", q, index)

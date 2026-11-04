@@ -31,6 +31,7 @@ sys.path.insert(0, str(ROOT / "scripts"))
 from grpo import TARGETS, sha  # noqa: E402
 from openplexus.decompose import SELFASK_SYSTEM  # noqa: E402
 from openplexus.hotpot import READ_SYSTEM, answer_of, exact, f1, paragraph_text, questions, read_text  # noqa: E402
+from openplexus.lineage import Lineage  # noqa: E402
 from openplexus.lexical import LexicalIndex  # noqa: E402
 from openplexus.wiki import WikiSearch, WikiTexts  # noqa: E402
 
@@ -146,7 +147,9 @@ def main() -> None:
     p.add_argument("--max-steps", type=int, default=-1)
     p.add_argument("--save-steps", type=int, default=20)
     p.add_argument("--rank", type=int, default=16)
-    p.add_argument("--init-adapter", default=None)
+    p.add_argument("--init-adapter", default="system",
+                   help="the adapter trained from: 'system' is the lineage's as it stands (none where there is no lineage), "
+                        "'none' a fresh adapter, or a PEFT folder")
     p.add_argument("--f1-weight", type=float, default=0.0)
     p.add_argument("--seed", type=int, default=0)
     p.add_argument("--store", default="ten", choices=["ten", "wiki", "gold"],
@@ -166,6 +169,11 @@ def main() -> None:
 
     out = Path(args.out)
     out.mkdir(parents=True, exist_ok=True)
+    if args.init_adapter == "system":
+        args.init_adapter = str(Lineage().current()) if Lineage().exists() else None
+    elif args.init_adapter == "none":
+        args.init_adapter = None
+    print(f"training from {args.init_adapter or 'a fresh adapter'}", flush=True)
     qs = questions(args.n, split="train", skip=args.skip)
     data = Dataset.from_list([{
         "prompt": ([{"role": "system", "content": SELFASK_SYSTEM if args.system == "selfask" else READ_SYSTEM},

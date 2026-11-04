@@ -1,0 +1,87 @@
+{
+ "kind": "learning-speed",
+ "measure": "training questions a round needed for each point of exact match its reading gained",
+ "rounds": [
+  {
+   "round": "asking round one",
+   "trained": "the asking on the ten-paragraph store",
+   "before": "hotpot-20261101T033048Z",
+   "after": "hotpot-20261101T033732Z",
+   "arm": "ask",
+   "score_before": 0.33,
+   "score_after": 0.465,
+   "n": 200,
+   "questions": 120,
+   "points_gained": 13.5,
+   "questions_per_point": 8.9
+  },
+  {
+   "round": "asking round two",
+   "trained": "the asking on the ten-paragraph store",
+   "before": "hotpot-20261101T033732Z",
+   "after": "hotpot-20261102T034219Z",
+   "arm": "ask",
+   "score_before": 0.465,
+   "score_after": 0.54,
+   "n": 200,
+   "questions": 240,
+   "points_gained": 7.5,
+   "questions_per_point": 32.0
+  },
+  {
+   "round": "asking round three",
+   "trained": "the asking on the ten-paragraph store",
+   "before": "hotpot-20261102T034219Z",
+   "after": "hotpot-20261102T034225Z",
+   "arm": "ask",
+   "score_before": 0.54,
+   "score_after": 0.53,
+   "n": 200,
+   "questions": 480,
+   "points_gained": -1.0,
+   "questions_per_point": null
+  },
+  {
+   "round": "full-store round one",
+   "trained": "the asking on every Wikipedia abstract by BM25",
+   "before": "hotpot-20261102T060233Z",
+   "after": "hotpot-20261102T194748Z",
+   "arm": "wiki:ask",
+   "score_before": 0.39,
+   "score_after": 0.395,
+   "n": 200,
+   "questions": 480,
+   "points_gained": 0.5,
+   "questions_per_point": 960.0
+  },
+  {
+   "round": "answering round one",
+   "trained": "the answering from the gold paragraphs",
+   "before": "hotpot-20261102T213113Z",
+   "after": "hotpot-20261103T061906Z",
+   "arm": "gold",
+   "score_before": 0.61,
+   "score_after": 0.615,
+   "n": 200,
+   "questions": 480,
+   "points_gained": 0.5,
+   "questions_per_point": 960.0
+  },
+  {
+   "round": "self-ask round one",
+   "trained": "self-ask in one pass on the gold paragraphs",
+   "before": "hotpot-20261104T161134Z",
+   "after": "hotpot-20261104T183558Z",
+   "arm": "gold",
+   "score_before": 0.525,
+   "score_after": 0.615,
+   "n": 200,
+   "questions": 480,
+   "points_gained": 9.0,
+   "questions_per_point": 53.3
+  }
+ ],
+ "command": "scripts/learning_speed.py ",
+ "sha": "bf9f2933",
+ "taken_at": "20261104T183712Z"
+}

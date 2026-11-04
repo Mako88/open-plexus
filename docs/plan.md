@@ -498,7 +498,15 @@ Each step says what it decides. A step is struck when it is done.
      and then drops away. Untrained, read 2026-11-04 (`hotpot-20261104T160600Z`): **0.56**
      against 0.61 in one turn, 8 made right and 18 made wrong (2.0 standard errors), 16 retried,
      2 fallbacks, 2.1 steps a question. The 2B's untrained plans misdirect more than they help.
-     Next: the decomposition trained by the key, the same recipe as the asking.
+     The same structure in one pass, so the trainer as it stands can learn it (`--system
+     selfask`: kind, single-fact questions with their answers, then the answer line), untrained
+     0.525 (`-161134Z`); trained one round by the key (480 questions, 240 steps, 2.3 hours,
+     training accuracy 0.66; `-183558Z`) **0.615**, 20 made right and 19 made wrong against gold
+     in one turn, 18 and 18 against the direct answering trained the same way (0.615), 31 and 13
+     against itself untrained. So the key recovers the structure's cost and no more: on the
+     gold paragraphs the reading end sits at 0.61 whatever form it is asked in, after one round.
+     The structure's worth is to be read where the parts are run by code against a store, the
+     asking's own shape; held until the lineage's rounds reach it.
 
 7. **Consolidation: the trunk learns slowly, by replay.** Complementary learning systems
    (McClelland, McNaughton and O'Reilly, 1995): the hippocampus learns in one shot and the

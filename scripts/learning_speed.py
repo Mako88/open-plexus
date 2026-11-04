@@ -26,6 +26,7 @@ ROUNDS = [
     ("asking round three", "the asking on the ten-paragraph store", "hotpot-20261102T034219Z", "hotpot-20261102T034225Z", 480),
     ("full-store round one", "the asking on every Wikipedia abstract by BM25", "hotpot-20261102T060233Z", "hotpot-20261102T194748Z", 480),
     ("answering round one", "the answering from the gold paragraphs", "hotpot-20261102T213113Z", "hotpot-20261103T061906Z", 480),
+    ("self-ask round one", "self-ask in one pass on the gold paragraphs", "hotpot-20261104T161134Z", "hotpot-20261104T183558Z", 480),
 ]
 
 

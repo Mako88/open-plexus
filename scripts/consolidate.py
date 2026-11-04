@@ -108,6 +108,7 @@ def main() -> None:
     p.add_argument("--rehearse", default=None, help="a rehearsal file (`rehearsal.py`): the system's own right answers replayed with the rows")
     p.add_argument("--augment-only", action="store_true", help="write the augmentations (the server up) and stop; the training runs after, the server down")
     p.add_argument("--seed", type=int, default=0)
+    p.add_argument("--fresh", action="store_true", help="ignore a checkpoint in --out and start over")
     p.add_argument("--note", default="")
     args = p.parse_args()
 
@@ -148,20 +149,32 @@ def main() -> None:
     model = AutoModelForCausalLM.from_pretrained(args.model, dtype=torch.float32).cuda()
     model.gradient_checkpointing_enable(gradient_checkpointing_kwargs={"use_reentrant": False})
     model.enable_input_require_grads()
-    if args.init_adapter:
+    # a sleep paused for a game resumes at the epoch it reached: the adapter, the optimiser and the
+    # log are written after every epoch to <out>/checkpoint
+    ckpt = out / "checkpoint"
+    if args.fresh and ckpt.exists():
+        import shutil
+
+        shutil.rmtree(ckpt)
+    resumed = json.loads((ckpt / "progress.json").read_text(encoding="utf-8")) if (ckpt / "progress.json").exists() else None
+    if resumed or args.init_adapter:
         from peft import PeftModel
 
-        model = PeftModel.from_pretrained(model, args.init_adapter, is_trainable=True)
+        model = PeftModel.from_pretrained(model, str(ckpt) if resumed else args.init_adapter, is_trainable=True)
     else:
         model = get_peft_model(model, LoraConfig(r=args.rank, lora_alpha=2 * args.rank, lora_dropout=0.0,
                                                  target_modules=TARGETS, task_type="CAUSAL_LM"))
     model.print_trainable_parameters()
     opt = torch.optim.AdamW([q for q in model.parameters() if q.requires_grad], lr=args.lr, weight_decay=0.0)
-    rng = random.Random(args.seed)
     pad = tok.pad_token_id if tok.pad_token_id is not None else tok.eos_token_id
-    log, started, step = [], time.perf_counter(), 0
+    log, started, step, first_epoch = [], time.perf_counter(), 0, 0
+    if resumed:
+        opt.load_state_dict(torch.load(ckpt / "optimizer.pt", map_location="cuda"))
+        log, step, first_epoch = resumed["log"], resumed["steps"], resumed["epoch"]
+        print(f"resumed at epoch {first_epoch} of {args.epochs} from {ckpt}", flush=True)
     model.train()
-    for epoch in range(args.epochs):
+    for epoch in range(first_epoch, args.epochs):
+        rng = random.Random(args.seed + epoch)  # the epoch's own order, the same after a resume
         order = list(range(len(encoded)))
         rng.shuffle(order)
         losses = []
@@ -184,6 +197,9 @@ def main() -> None:
                  "seconds": round(time.perf_counter() - started)}
         log.append(entry)
         print(json.dumps(entry), flush=True)
+        model.save_pretrained(str(ckpt))
+        torch.save(opt.state_dict(), ckpt / "optimizer.pt")
+        (ckpt / "progress.json").write_text(json.dumps({"epoch": epoch + 1, "steps": step, "log": log}), encoding="utf-8")
     model.save_pretrained(str(out / "adapter"))
     (out / "consolidate.json").write_text(json.dumps({
         "model": args.model, "n": args.n, "skip": args.skip, "rows": args.rows, "texts": len(texts), "augment": args.augment,

@@ -135,9 +135,8 @@ def main() -> None:
     if args.rehearse:
         # the system's own right answers, as the transcripts the trunk saw them in, interleaved with the rows
         for line in Path(args.rehearse).read_text(encoding="utf-8").splitlines():
-            ids = tok.apply_chat_template(json.loads(line)["messages"], tokenize=True, enable_thinking=False)
-            ids = ids["input_ids"] if isinstance(ids, dict) else list(ids)
-            encoded.append(ids[:args.max_tokens * 4])
+            text = tok.apply_chat_template(json.loads(line)["messages"], tokenize=False, enable_thinking=False)
+            encoded.append(tok(text, add_special_tokens=False)["input_ids"][:args.max_tokens * 4])
             rehearsed += 1
     print(f"{len(texts)} rows, {rehearsed} rehearsed transcripts, {sum(map(len, encoded))} tokens, {max(map(len, encoded))} the longest", flush=True)
 

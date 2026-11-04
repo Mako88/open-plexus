@@ -109,6 +109,7 @@ def main() -> None:
     p.add_argument("--augment-only", action="store_true", help="write the augmentations (the server up) and stop; the training runs after, the server down")
     p.add_argument("--seed", type=int, default=0)
     p.add_argument("--fresh", action="store_true", help="ignore a checkpoint in --out and start over")
+    p.add_argument("--checkpoint-minutes", type=float, default=8.0, help="a checkpoint this often within an epoch, and at every epoch's end")
     p.add_argument("--note", default="")
     args = p.parse_args()
 
@@ -167,18 +168,30 @@ def main() -> None:
     model.print_trainable_parameters()
     opt = torch.optim.AdamW([q for q in model.parameters() if q.requires_grad], lr=args.lr, weight_decay=0.0)
     pad = tok.pad_token_id if tok.pad_token_id is not None else tok.eos_token_id
-    log, started, step, first_epoch = [], time.perf_counter(), 0, 0
+    log, started, step, first_epoch, skip_groups, losses = [], time.perf_counter(), 0, 0, 0, []
     if resumed:
         opt.load_state_dict(torch.load(ckpt / "optimizer.pt", map_location="cuda"))
         log, step, first_epoch = resumed["log"], resumed["steps"], resumed["epoch"]
-        print(f"resumed at epoch {first_epoch} of {args.epochs} from {ckpt}", flush=True)
+        skip_groups, losses = resumed.get("groups_done", 0), resumed.get("losses", [])
+        print(f"resumed at epoch {first_epoch + 1} of {args.epochs}, group {skip_groups}, from {ckpt}", flush=True)
+
+    def checkpoint(epoch_done: int, groups_done: int) -> None:
+        model.save_pretrained(str(ckpt))
+        torch.save(opt.state_dict(), ckpt / "optimizer.pt")
+        (ckpt / "progress.json").write_text(json.dumps({"epoch": epoch_done, "groups_done": groups_done, "steps": step,
+                                                        "log": log, "losses": losses}), encoding="utf-8")
+
     model.train()
+    saved = time.perf_counter()
     for epoch in range(first_epoch, args.epochs):
         rng = random.Random(args.seed + epoch)  # the epoch's own order, the same after a resume
         order = list(range(len(encoded)))
         rng.shuffle(order)
-        losses = []
-        for at in range(0, len(order), args.batch):
+        if epoch != first_epoch:
+            skip_groups, losses = 0, []
+        for g, at in enumerate(range(0, len(order), args.batch)):
+            if g < skip_groups:
+                continue
             group = order[at:at + args.batch]
             opt.zero_grad()
             for m in range(0, len(group), args.micro):
@@ -193,13 +206,15 @@ def main() -> None:
             torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
             opt.step()
             step += 1
+            if time.perf_counter() - saved > 60 * args.checkpoint_minutes:
+                checkpoint(epoch, g + 1)  # within the epoch: this many groups of it done
+                saved = time.perf_counter()
         entry = {"epoch": epoch + 1, "loss": round(sum(losses) / len(losses), 4), "steps": step,
                  "seconds": round(time.perf_counter() - started)}
         log.append(entry)
         print(json.dumps(entry), flush=True)
-        model.save_pretrained(str(ckpt))
-        torch.save(opt.state_dict(), ckpt / "optimizer.pt")
-        (ckpt / "progress.json").write_text(json.dumps({"epoch": epoch + 1, "steps": step, "log": log}), encoding="utf-8")
+        checkpoint(epoch + 1, 0)
+        saved = time.perf_counter()
     model.save_pretrained(str(out / "adapter"))
     (out / "consolidate.json").write_text(json.dumps({
         "model": args.model, "n": args.n, "skip": args.skip, "rows": args.rows, "texts": len(texts), "augment": args.augment,

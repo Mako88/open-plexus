@@ -40,7 +40,7 @@ from ask import SYSTEM as ASK_SYSTEM  # noqa: E402
 from ask import Store, embedder  # noqa: E402
 from grpo_reading import paired  # noqa: E402
 from openplexus.asking import solve  # noqa: E402
-from openplexus.decompose import solve_decomposed  # noqa: E402
+from openplexus.decompose import SELFASK_SYSTEM, solve_decomposed  # noqa: E402
 from openplexus.hotpot import READ_SYSTEM, read_text, answer_of, exact, f1, paragraph_text, questions, recall  # noqa: E402
 from openplexus.maths import rows_of  # noqa: E402
 from openplexus.lexical import LexicalIndex  # noqa: E402
@@ -108,6 +108,8 @@ def tag_of(spec: str, args) -> str:
         tag += "-" + Path(args.adapter).stem.replace("-lora", "")
     if getattr(args, "think", False):
         tag += "-think"
+    if getattr(args, "system", "plain") == "selfask":
+        tag += "-selfask"
     return tag
 
 
@@ -179,7 +181,8 @@ def arm(spec: str, qs: list[dict], args, trunk, index) -> dict:
                 asked = list(pool.map(one, chunk))
             replies = [a["reply"] for a in asked]
         else:
-            turns = [[{"role": "system", "content": SYSTEM}, {"role": "user", "content": ask_text(q, chosen(spec, q, index))}]
+            system = SELFASK_SYSTEM if args.system == "selfask" else SYSTEM
+            turns = [[{"role": "system", "content": system}, {"role": "user", "content": ask_text(q, chosen(spec, q, index))}]
                      for q in chunk]
             replies = trunk.ask_many(turns)
         tokens_out = trunk.tokens_out - before_out
@@ -223,7 +226,8 @@ def arm(spec: str, qs: list[dict], args, trunk, index) -> dict:
         if sub:
             by_type[t] = round(sum(r["correct"] for r in sub) / len(sub), 3)
     return {
-        "paragraphs": spec, "served_model": trunk.served_model(), "system_prompt": SYSTEM,
+        "paragraphs": spec, "served_model": trunk.served_model(),
+        "system_prompt": SELFASK_SYSTEM if args.system == "selfask" else SYSTEM,
         "inputs_the_deployed_system_has": {"floor": "the question", "gold": "NOT: the supporting paragraphs are the key's choice",
                                            "episode": "the question's ten paragraphs, the store's rows",
                                            }.get(spec, "the question and the store"),
@@ -253,6 +257,8 @@ def main() -> None:
     p.add_argument("--max-turns", type=int, default=4, help="assistant turns an `ask` arm may take")
     p.add_argument("--served", default="http://127.0.0.1:8093")
     p.add_argument("--adapter", default=None, help="a GGUF LoRA file the server has loaded, applied at 1")
+    p.add_argument("--system", default="plain", choices=["plain", "selfask"],
+                   help="the one-turn arms' prompt: answer, or write the kind, the single-fact questions and their answers first")
     p.add_argument("--think", action="store_true",
                    help="the trunk's thinking mode on (the server must run without --reasoning-budget 0; raise --max-new)")
     p.add_argument("--wiki", default=str(ROOT / "data" / "wiki-abstracts" / "minilm"), help="the full-form store")

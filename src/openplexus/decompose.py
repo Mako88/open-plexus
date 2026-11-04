@@ -30,6 +30,16 @@ PLAN_SYSTEM = (
 )
 YES_NO = {"yes", "no"}
 
+# The same structure in one pass, so the key can train it with the trainer as it stands: the trunk
+# writes the kind, each single-fact question with its answer from the passages, then the answer line.
+# Code parses only the last 'Answer:' line, as for every other arm; the kind check applies as above.
+SELFASK_SYSTEM = (
+    "Answer the question from the passages. Write first the kind of thing the final answer is, as 'Kind: ...'. "
+    "Then break the question into the smallest questions that each ask for one fact, and answer each from the "
+    "passages in turn, as 'Follow up: ...' and 'Intermediate answer: ...'. Then end with a last line of the form "
+    "'Answer: X' where X is the short answer (a name, a number, a date, or yes or no), and nothing after it."
+)
+
 
 def parse_plan(text: str) -> dict | None:
     """The kind and the numbered questions, or None where the trunk did not write the form."""

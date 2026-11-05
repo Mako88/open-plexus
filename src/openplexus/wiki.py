@@ -134,6 +134,23 @@ class WikiStore(WikiTexts):
         del self.keys
 
 
+HYDE_SYSTEM = (
+    "Write the opening two sentences of the encyclopedia article that would answer the search below, "
+    "naming its subject in the first words as an encyclopedia does. If you are not sure of a fact, write "
+    "your best guess. Reply with the two sentences only."
+)
+
+
+def hyde(nearest, write):
+    """The search by the passage the system expects to find (HyDE, Gao et al., 2022): `write(query)`
+    is the trunk writing that passage, and the store is searched with the query and the passage
+    together, so a thing described rather than named is looked for by the words its own article
+    would use. Nothing is handed to the system: the guess is its own."""
+    def search(queries, k, exclude):
+        return nearest([q + " " + write(q) for q in queries], k, exclude)
+    return search
+
+
 class WikiSearch:
     """The asker's tool over the whole store: the nearest abstract to the query not shown before.
     Built per question, so `shown` and `searches` are that question's. `nearest(queries, k,

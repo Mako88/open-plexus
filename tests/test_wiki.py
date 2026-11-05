@@ -77,6 +77,14 @@ def test_the_store_finds_the_nearest_abstract_and_the_tool_never_repeats_one(tmp
     assert other.search("anything") == "Alabama: a state" and other.search("anything") == "Anarchism: a political philosophy"
 
 
+def test_hyde_searches_by_the_query_with_the_passage_the_system_expects():
+    from openplexus.wiki import hyde
+    seen = []
+    search = hyde(lambda queries, k, exclude: seen.append(queries) or [[1]], lambda q: "Animorphs is a series.")
+    assert search(["the series with companion books"], 1, set()) == [[1]]
+    assert seen == [["the series with companion books Animorphs is a series."]]
+
+
 def test_an_unfinished_store_refuses_to_open(tmp_path):
     out = tmp_path / "store"
     progress = build(corpus(tmp_path), out, Words(), shard=3)

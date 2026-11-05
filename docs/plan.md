@@ -595,7 +595,7 @@ Each step says what it decides. A step is struck when it is done.
    - **The order from here** (John, 2026-11-05): (1) the score fixed, done; (2) the facts adapter
      apart from the skills (`consolidate.py --part facts`, the lineage's `facts` part), read as two
      arms, rows and restatements alone against the question lines with both skills rehearsed;
-     store-first consolidation beside it; (3) the finding: HyDE (the trunk writes the passage it
+     store-first consolidation beside it; (3) the finding: HyDE (read 2026-11-05, `hotpot-20261105T195725Z`: the query and the trunk's guessed passage searched together by BM25, **0.265** against 0.39, 7 made right and 32 made wrong, both articles found for 32 of 200 against 66: the 2B's guess carries wrong names that outweigh the query's right ones; a guess searched apart and fused with the query's own hits is the form left) (the trunk writes the passage it
      expects, the search looks for passages like it), a modern embedder served as a GGUF by a second
      llama.cpp server with `--embedding` (as Persistence does), and a cross-encoder reranker over
      BM25's top 50; (4) a life: conversations written to the store as rows, an agenda of open

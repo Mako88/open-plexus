@@ -162,8 +162,11 @@ from evidence to confidence is learned and read by calibration (of what it said 
 right), and whether to look something up reads it. An abstraction is a new row pointing to the rows
 it came from, never replacing them, with its own evidence, so an error stays where it is. Nothing
 in the system's own machinery is fitted to a benchmark (if statements against generics: the rulers
-may be benchmark-shaped, the system may not); the asking's prompt still says "usually in two
-passages" and is to be made general. The self is the whole system; care for it grows with the selfhood it
+may be benchmark-shaped, the system may not); audited 2026-11-05: the asking's prompt says the facts
+are in "a small collection about this question, usually in two different passages", and both it and
+the reading prompt ask for "a short answer (a name, a number, a date, or yes or no)", HotpotQA's
+shape and format. The lineage's next asking round trains under a general prompt (search your store
+for what you need), and the answer format moves into the readings, where a ruler may impose it. The self is the whole system; care for it grows with the selfhood it
 demonstrates, not ahead of it (John: this is not Persistence 2.0). Replaced and rolled-back adapters
 are archived beside their ledger rows as an engineering record, prunable. Two kinds of knowing, as
 the brain has: the weights are the gut (fast, implicit), the store the notebook (explicit,

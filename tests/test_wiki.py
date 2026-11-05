@@ -85,6 +85,14 @@ def test_hyde_searches_by_the_query_with_the_passage_the_system_expects():
     assert seen == [["the series with companion books Animorphs is a series."]]
 
 
+def test_fused_hyde_keeps_the_query_s_own_rows_and_lifts_the_shared_ones():
+    from openplexus.wiki import hyde_fused
+    lists = {"query": [5, 6, 7], "guess": [9, 6, 8]}
+    search = hyde_fused(lambda qs, k, ex: [lists["query" if qs[0] == "q" else "guess"]], lambda q: "g", deep=3)
+    assert search(["q"], 1, set()) == [[6]]  # ranked well by both
+    assert search(["q"], 3, set())[0][:2] == [6, 5]  # the query's own top row kept ahead of the guess's alone
+
+
 def test_an_unfinished_store_refuses_to_open(tmp_path):
     out = tmp_path / "store"
     progress = build(corpus(tmp_path), out, Words(), shard=3)

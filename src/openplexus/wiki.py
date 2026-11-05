@@ -151,6 +151,27 @@ def hyde(nearest, write):
     return search
 
 
+def hyde_fused(nearest, write, deep: int = 20, c: int = 60):
+    """HyDE's second form (2026-11-05): searched together with the query, the 2B's guess carried
+    wrong names that outweighed the query's right ones (0.265 against 0.39). Here the query and
+    the guess are searched apart and their rankings fused by reciprocal rank, so a row both rank
+    well rises, and a bad guess can add candidates but never removes the query's own."""
+    def search(queries, k, exclude):
+        out = []
+        for q in queries:
+            own = nearest([q], deep, exclude)[0]
+            guessed = nearest([write(q)], deep, exclude)[0]
+            score: dict[int, float] = {}
+            for ranked in (own, guessed):
+                for rank, row in enumerate(ranked):
+                    score[row] = score.get(row, 0.0) + 1.0 / (c + rank + 1)
+            # ties broken by the query's own order
+            order = {row: i for i, row in enumerate(own)}
+            out.append(sorted(score, key=lambda r: (-score[r], order.get(r, deep)))[:k])
+        return out
+    return search
+
+
 class WikiSearch:
     """The asker's tool over the whole store: the nearest abstract to the query not shown before.
     Built per question, so `shown` and `searches` are that question's. `nearest(queries, k,

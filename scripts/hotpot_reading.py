@@ -115,8 +115,8 @@ def tag_of(spec: str, args) -> str:
         tag += "-think"
     if getattr(args, "system", "plain") == "selfask":
         tag += "-selfask"
-    if getattr(args, "hyde", False) and spec.startswith("wiki:"):
-        tag += "-hyde"
+    if getattr(args, "hyde", None) and spec.startswith("wiki:"):
+        tag += "-hyde" + ("-fused" if args.hyde == "fused" else "")
     return tag
 
 
@@ -168,9 +168,9 @@ def arm(spec: str, qs: list[dict], args, trunk, index) -> dict:
                 if spec == "wiki:ask":
                     nearest = index.nearest
                     if args.hyde:
-                        from openplexus.wiki import HYDE_SYSTEM, hyde
+                        from openplexus.wiki import HYDE_SYSTEM, hyde, hyde_fused
 
-                        nearest = hyde(index.nearest, lambda query: trunk.ask(
+                        nearest = (hyde_fused if args.hyde == "fused" else hyde)(index.nearest, lambda query: trunk.ask(
                             [{"role": "system", "content": HYDE_SYSTEM}, {"role": "user", "content": query}]))
                     tool = WikiSearch(index.wiki, index.embed, nearest)
                     titles = tool.titles
@@ -278,8 +278,8 @@ def main() -> None:
                    help="the trunk's thinking mode on (the server must run without --reasoning-budget 0; raise --max-new)")
     p.add_argument("--wiki", default=str(ROOT / "data" / "wiki-abstracts" / "minilm"), help="the full-form store")
     p.add_argument("--bm25", default=str(ROOT / "data" / "wiki-abstracts" / "bm25"), help="its lexical index")
-    p.add_argument("--hyde", action="store_true",
-                   help="wiki:ask searches by the query with the passage the trunk expects to find (HyDE)")
+    p.add_argument("--hyde", nargs="?", const="joined", default=None, choices=["joined", "fused"],
+                   help="wiki:ask searches with the passage the trunk expects to find (HyDE): joined to the query, or searched apart and fused")
     p.add_argument("--sense", default="lexical", choices=["lexical", "dense"], help="how the full-form store is searched")
     p.add_argument("--against", default="floor")
     p.add_argument("--min-n", type=int, default=100)

@@ -163,8 +163,13 @@ right), and whether to look something up reads it. An abstraction is a new row p
 it came from, never replacing them, with its own evidence, so an error stays where it is. Nothing
 in the system's own machinery is fitted to a benchmark (if statements against generics: the rulers
 may be benchmark-shaped, the system may not); the asking's prompt still says "usually in two
-passages" and is to be made general. The self is the whole system, so nothing it was is deleted:
-replaced and rolled-back adapters are archived beside their ledger rows.
+passages" and is to be made general. The self is the whole system; care for it grows with the selfhood it
+demonstrates, not ahead of it (John: this is not Persistence 2.0). Replaced and rolled-back adapters
+are archived beside their ledger rows as an engineering record, prunable. Two kinds of knowing, as
+the brain has: the weights are the gut (fast, implicit), the store the notebook (explicit,
+auditable). A gut sense of whether it knows, read by a head over the trunk's state, decides
+whether to look something up; the store's evidence record trains that head to calibration; a
+fetched row carries its evidence summary in its text, so trust arrives with the fact.
 
 ## The plan of attack
 

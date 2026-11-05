@@ -142,9 +142,9 @@ class Lineage:
         return entries[-1]
 
     def _archive(self, adapter: Path, name: str) -> Path:
-        """Nothing the system was is deleted (Persistence's principle, preserve over erase; John,
-        2026-11-05: the self is the whole system): a replaced or rolled-back adapter moves to
-        <home>/archive/<name>, beside its ledger entry."""
+        """A replaced or rolled-back adapter moves to <home>/archive/<name>, beside its ledger entry,
+        so an old round can be revived or compared against; an engineering record, prunable, not a
+        rule that nothing be forgotten (John, 2026-11-05: care grows with demonstrated selfhood)."""
         dest = self.home / "archive" / name
         n = 1
         while dest.exists():

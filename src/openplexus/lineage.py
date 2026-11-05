@@ -34,14 +34,33 @@ def now() -> str:
 
 
 class Lineage:
-    def __init__(self, path: Path = SYSTEM):
+    """`part` is which adapter: "skills" (trained by the key: the asking, the answering) or "facts"
+    (written only by the sleep), held apart so a sleep cannot move a skill's weights (2026-11-05:
+    three sleeps into one shared adapter each cost the asking). Served together, the facts adapter
+    on top of the skills one. One ledger for both, each entry naming its part."""
+
+    def __init__(self, path: Path = SYSTEM, part: str = "skills"):
         self.path = Path(path)
-        self.adapter = self.path / "adapter"
-        self.gguf = self.path / "adapter.gguf"
+        self.part = part
+        home = self.path if part == "skills" else self.path / part
+        self.home = home
+        self.adapter = home / "adapter"
+        self.gguf = home / "adapter.gguf"
+        self.prev = home / "adapter.prev"
         self.ledger_path = self.path / "ledger.json"
 
     def exists(self) -> bool:
         return self.adapter.exists() and self.ledger_path.exists()
+
+    def round(self) -> int:
+        """The last round kept, whatever its part: what a reading of the system is a reading of."""
+        kept = [e["round"] for e in self.ledger() if not e.get("rolled_back")]
+        return kept[-1] if kept else -1
+
+    def ggufs(self) -> list[Path]:
+        """The system as served: the skills adapter, then the facts adapter where there is one."""
+        skills, facts = Lineage(self.path, "skills"), Lineage(self.path, "facts")
+        return [lin.gguf for lin in (skills, facts) if lin.adapter.exists() and lin.gguf.exists()]
 
     def ledger(self) -> list[dict]:
         return json.loads(self.ledger_path.read_text(encoding="utf-8")) if self.ledger_path.exists() else []
@@ -79,15 +98,19 @@ class Lineage:
         {"before": "hotpot-...", "after": "hotpot-...", "asking": "hotpot-...", "maths": "grpo-..."},
         with the scores where known; the price a point is written when before and after scores are given."""
         entries = self.ledger()
-        prev = self.path / "adapter.prev"
+        prev = self.prev
         if prev.exists():
             shutil.rmtree(prev)
+        self.home.mkdir(parents=True, exist_ok=True)
+        (self.home / "had_none").unlink(missing_ok=True)
         if self.adapter.exists():
             shutil.move(str(self.adapter), str(prev))
+        else:
+            (self.home / "had_none").write_text("", encoding="utf-8")  # a rollback leaves no adapter
         shutil.copytree(adapter, self.adapter)
         if convert:
             self.convert()
-        entry = {"round": len(entries), "what": what, "trained_on": trained_on, "questions": questions,
+        entry = {"round": len(entries), "part": self.part, "what": what, "trained_on": trained_on, "questions": questions,
                  "from": str(adapter), "readings": readings, "note": note, "sha": sha(), "at": now()}
         before, after = readings.get("score_before"), readings.get("score_after")
         if before is not None and after is not None:
@@ -101,11 +124,17 @@ class Lineage:
     def rollback(self, why: str, convert: bool = True) -> dict:
         """Put the adapter before the last round back, recording why; the round stays in the ledger as rolled back."""
         entries = self.ledger()
-        prev = self.path / "adapter.prev"
-        if not prev.exists() or not entries:
+        prev = self.prev
+        if (self.home / "had_none").exists():
+            shutil.rmtree(self.adapter)
+            self.gguf.unlink(missing_ok=True)
+            (self.home / "had_none").unlink()
+            convert = False
+        elif not prev.exists() or not entries:
             raise RuntimeError("nothing to roll back to")
-        shutil.rmtree(self.adapter)
-        shutil.move(str(prev), str(self.adapter))
+        else:
+            shutil.rmtree(self.adapter)
+            shutil.move(str(prev), str(self.adapter))
         if convert:
             self.convert()
         entries[-1]["rolled_back"] = {"why": why, "at": now()}

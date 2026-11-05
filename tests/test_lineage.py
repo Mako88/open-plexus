@@ -47,3 +47,16 @@ def test_init_commit_rollback_and_the_ledger(tmp_path):
     assert back["round"] == 2 and back["rolled_back"]["why"].startswith("lost")
     assert (lin.adapter / "adapter_model.bin").read_text(encoding="utf-8") == "self-ask"
     assert not (lin.path / "adapter.prev").exists() and len(lin.ledger()) == 3
+    assert lin.round() == 1  # the last round kept, not the last written
+
+
+def test_the_facts_adapter_is_kept_apart_and_a_first_rollback_leaves_none(tmp_path):
+    skills = Lineage(tmp_path / "system")
+    skills.init(adapter(tmp_path / "round2", "round two"), "the asking", convert=False)
+    facts = Lineage(tmp_path / "system", part="facts")
+    assert not facts.exists() and facts.adapter == tmp_path / "system" / "facts" / "adapter"
+    entry = facts.commit(adapter(tmp_path / "sleep", "facts one"), "a sleep", "rows", 0, {}, convert=False)
+    assert entry["part"] == "facts" and facts.exists() and len(skills.ledger()) == 2
+    assert (skills.adapter / "adapter_model.bin").read_text(encoding="utf-8") == "round two"  # the skills untouched
+    facts.rollback("lost the asking", convert=False)
+    assert not facts.adapter.exists() and skills.round() == 0

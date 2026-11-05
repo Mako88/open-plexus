@@ -105,10 +105,12 @@ def tag_of(spec: str, args) -> str:
     tag = spec.replace(":", "")
     if spec.startswith("wiki:") and getattr(args, "sense", "dense") != "dense":
         tag += "-" + args.sense
-    if args.adapter and Path(args.adapter).resolve() == Lineage().gguf.resolve():
-        tag += f"-system-r{len(Lineage().ledger()) - 1}"  # the lineage's adapter, by the round that made it
-    elif args.adapter:
-        tag += "-" + Path(args.adapter).stem.replace("-lora", "")
+    adapters = [Path(a) for a in str(args.adapter).split(",")] if args.adapter else []
+    system = {g.resolve() for g in Lineage().ggufs()}
+    if adapters and {a.resolve() for a in adapters} == system:
+        tag += f"-system-r{Lineage().round()}"  # the system as it stands, by the last round kept
+    elif adapters:
+        tag += "-" + "+".join(a.stem.replace("-lora", "") for a in adapters)
     if getattr(args, "think", False):
         tag += "-think"
     if getattr(args, "system", "plain") == "selfask":
@@ -278,15 +280,14 @@ def main() -> None:
 
     qs = questions(args.n, split=args.split, skip=args.skip)
     if args.adapter == "system":
-        args.adapter = str(Lineage().current_gguf())
+        args.adapter = ",".join(str(g) for g in Lineage().ggufs())  # the skills adapter, and the facts one over it
     trunk = ServedTrunk(url=args.served, max_new=args.max_new, parallel=args.batch, think=args.think)
     loaded = trunk.adapters()
-    if args.adapter:
-        want = Path(args.adapter).name
+    wanted = {Path(a).name for a in args.adapter.split(",")} if args.adapter else set()
+    for want in wanted:
         if not any(Path(a["path"]).name == want for a in loaded):
             raise SystemExit(f"the server has not loaded {want}: {[a['path'] for a in loaded]}")
-    trunk.lora = [{"id": a["id"], "scale": 1.0 if args.adapter and Path(a["path"]).name == Path(args.adapter).name else 0.0}
-                  for a in loaded]
+    trunk.lora = [{"id": a["id"], "scale": 1.0 if Path(a["path"]).name in wanted else 0.0} for a in loaded]
     index = None
     if any(s.startswith(("top:", "recall:", "wiki:")) for s in args.arms.split(",")):
         import numpy as np

@@ -106,6 +106,9 @@ def main() -> None:
                    help="the adapter replayed into: 'system' is the lineage's as it stands (none where there is no lineage), "
                         "'none' a fresh adapter, or a PEFT folder")
     p.add_argument("--augment", type=int, default=0, help="restatements and questions a row from the served trunk, replayed with it")
+    p.add_argument("--part", default="skills", choices=["skills", "facts"],
+                   help="facts: train the facts adapter over the system's skills, merged and frozen")
+    p.add_argument("--no-qa", action="store_true", help="replay the rows and their restatements only, not the question-and-answer lines")
     p.add_argument("--rehearse", action="append", default=[], help="a rehearsal file (`rehearsal.py`), one per skill: the system's own right transcripts replayed with the rows")
     p.add_argument("--augment-only", action="store_true", help="write the augmentations (the server up) and stop; the training runs after, the server down")
     p.add_argument("--seed", type=int, default=0)
@@ -128,6 +131,11 @@ def main() -> None:
 
         trunks = {j: ServedTrunk(max_new=320, parallel=8, temperature=0.8, seed=j + 1) for j in range(args.augment)}
         extra = augmented(rows, args.augment, out / "augmented.jsonl", trunks.__getitem__)
+        if args.no_qa:
+            # the question-and-answer lines teach answering without looking (2026-11-05); only restatements
+            kinds = {json.loads(line)["text"]: json.loads(line)["kind"]
+                     for line in (out / "augmented.jsonl").read_text(encoding="utf-8").splitlines()}
+            extra = [x for x in extra if kinds.get(x) == "rewrite"]
         texts += extra
         print(f"{len(rows)} rows and {len(extra)} augmentations", flush=True)
         if args.augment_only:
@@ -145,12 +153,25 @@ def main() -> None:
                 rehearsed += 1
     print(f"{len(texts)} rows, {rehearsed} rehearsed transcripts, {sum(map(len, encoded))} tokens, {max(map(len, encoded))} the longest", flush=True)
 
+    if args.part == "facts":
+        # the skills adapter is merged into the trunk in memory and frozen there; the sleep writes
+        # only the facts adapter, which the server applies on top of the skills one
+        skills = Lineage(part="skills").current()
+        facts = Lineage(part="facts")
+        if args.init_adapter == "system":
+            args.init_adapter = str(facts.current()) if facts.exists() else None
+    else:
+        skills = None
     if args.init_adapter == "system":
         args.init_adapter = str(Lineage().current()) if Lineage().exists() else None
     elif args.init_adapter == "none":
         args.init_adapter = None
-    print(f"replaying into {args.init_adapter or 'a fresh adapter'}", flush=True)
+    print(f"replaying into {args.init_adapter or 'a fresh adapter'}" + (f" over the skills of {skills}, frozen" if skills else ""), flush=True)
     model = AutoModelForCausalLM.from_pretrained(args.model, dtype=torch.float32).cuda()
+    if skills:
+        from peft import PeftModel
+
+        model = PeftModel.from_pretrained(model, str(skills)).merge_and_unload()
     model.gradient_checkpointing_enable(gradient_checkpointing_kwargs={"use_reentrant": False})
     model.enable_input_require_grads()
     # a sleep paused for a game resumes at the epoch it reached: the adapter, the optimiser and the

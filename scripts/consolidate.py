@@ -220,6 +220,8 @@ def main() -> None:
             torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
             opt.step()
             step += 1
+            # the system's own progress for the supervisor (`openplexus.downtime.Rate`)
+            (out / "heartbeat.json").write_text(json.dumps({"t": time.time(), "steps": step}), encoding="utf-8")
             if time.perf_counter() - saved > 60 * args.checkpoint_minutes:
                 checkpoint(epoch, g + 1)  # within the epoch: this many groups of it done
                 saved = time.perf_counter()

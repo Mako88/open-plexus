@@ -40,6 +40,7 @@ def main() -> None:
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument("--out", default="state/consolidate/first200-aug")
     p.add_argument("--adapter", required=True, help="the consolidation adapter's GGUF, loaded by the server")
+    p.add_argument("--under", default="", help="adapters applied in both arms, under it (the skills, for a facts adapter)")
     p.add_argument("--n", type=int, default=200, help="questions of each kind")
     p.add_argument("--seed", type=int, default=9)
     p.add_argument("--note", default="")
@@ -67,8 +68,10 @@ def main() -> None:
 
     loaded = base.adapters()
     name = Path(args.adapter).name
-    arms = {"off": [{"id": a["id"], "scale": 0.0} for a in loaded],
-            "on": [{"id": a["id"], "scale": 1.0 if Path(a["path"]).name == name else 0.0} for a in loaded]}
+    under = {Path(x).name for x in args.under.split(",")} if args.under else set()
+    # off: only what the adapter sits on (the skills, for a facts adapter); on: that and the adapter
+    arms = {"off": [{"id": a["id"], "scale": 1.0 if Path(a["path"]).name in under else 0.0} for a in loaded],
+            "on": [{"id": a["id"], "scale": 1.0 if Path(a["path"]).name == name or Path(a["path"]).name in under else 0.0} for a in loaded]}
     if not any(x["scale"] for x in arms["on"]):
         raise SystemExit(f"the server has not loaded {name}: {loaded}")
     reading = {"kind": "consolidate-recall", "rows_replayed": len(rows), "adapter": args.adapter, "system_prompt": READ_SYSTEM,

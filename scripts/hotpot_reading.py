@@ -272,7 +272,8 @@ def main() -> None:
                    help="the trunk's thinking mode on (the server must run without --reasoning-budget 0; raise --max-new)")
     p.add_argument("--wiki", default=str(ROOT / "data" / "wiki-abstracts" / "minilm"), help="the full-form store")
     p.add_argument("--bm25", default=str(ROOT / "data" / "wiki-abstracts" / "bm25"), help="its lexical index")
-    p.add_argument("--rerank", type=int, default=0, help="reorder the sense's top N rows by a cross-encoder (openplexus.rerank)")
+    p.add_argument("--rerank", type=int, default=50,
+                   help="reorder the sense's top N rows by a cross-encoder (openplexus.rerank); the default since it read +3.0 standard errors over BM25 alone, 0 for none")
     p.add_argument("--sense", default="lexical", choices=["lexical", "dense"], help="how the full-form store is searched")
     p.add_argument("--against", default="floor")
     p.add_argument("--min-n", type=int, default=100)

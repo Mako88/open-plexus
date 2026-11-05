@@ -69,6 +69,44 @@
   "sha": "8a494224",
   "at": "20261105T150642Z",
   "points_gained": -0.5,
-  "questions_per_point": null
+  "questions_per_point": null,
+  "rolled_back": {
+   "why": "the keep rule (openplexus.verdict): the asking fell 2.7 standard errors (0.56 to 0.495); the second sleep was kept by hand before the rule existed",
+   "at": "20261105T183042Z"
+  }
+ },
+ {
+  "round": 3,
+  "what": "the third sleep: the second sleep with the asking rehearsed twice as much (474 of the system's own right asking trajectories)",
+  "trained_on": "the supporting paragraphs of validation questions 0-200, four epochs",
+  "questions": 0,
+  "from": "state\\consolidate\\sleep3\\adapter",
+  "readings": {
+   "before": "hotpot-20261105T013917Z",
+   "score_before": 0.135,
+   "after": "hotpot-20261105T182241Z",
+   "score_after": 0.245,
+   "gold": {
+    "reading": "hotpot-20261105T182053Z",
+    "score": 0.63
+   },
+   "asking": {
+    "reading": "hotpot-20261105T181814Z",
+    "score": 0.505
+   },
+   "facts": {
+    "reading": "consolidate-recall-20261105T182743Z",
+    "score": 0.31
+   }
+  },
+  "note": "searching restored (1.92 a question) but answering from one fact found fell 0.53 to 0.47",
+  "sha": "866239dc",
+  "at": "20261105T183051Z",
+  "points_gained": 11.0,
+  "questions_per_point": 0.0,
+  "rolled_back": {
+   "why": "the keep rule: the asking fell 2.1 standard errors (0.56 to 0.505); more rehearsal does not close the cost, the fix is a fact adapter apart from the skill adapter",
+   "at": "20261105T183100Z"
+  }
  }
 ]

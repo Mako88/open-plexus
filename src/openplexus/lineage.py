@@ -100,7 +100,7 @@ class Lineage:
         entries = self.ledger()
         prev = self.prev
         if prev.exists():
-            shutil.rmtree(prev)
+            self._archive(prev, f"before-round{len(entries)}")
         self.home.mkdir(parents=True, exist_ok=True)
         (self.home / "had_none").unlink(missing_ok=True)
         if self.adapter.exists():
@@ -126,20 +126,33 @@ class Lineage:
         entries = self.ledger()
         prev = self.prev
         if (self.home / "had_none").exists():
-            shutil.rmtree(self.adapter)
+            self._archive(self.adapter, f"round{entries[-1]['round']}-rolled-back")
             self.gguf.unlink(missing_ok=True)
             (self.home / "had_none").unlink()
             convert = False
         elif not prev.exists() or not entries:
             raise RuntimeError("nothing to roll back to")
         else:
-            shutil.rmtree(self.adapter)
+            self._archive(self.adapter, f"round{entries[-1]['round']}-rolled-back")
             shutil.move(str(prev), str(self.adapter))
         if convert:
             self.convert()
         entries[-1]["rolled_back"] = {"why": why, "at": now()}
         self._write(entries)
         return entries[-1]
+
+    def _archive(self, adapter: Path, name: str) -> Path:
+        """Nothing the system was is deleted (Persistence's principle, preserve over erase; John,
+        2026-11-05: the self is the whole system): a replaced or rolled-back adapter moves to
+        <home>/archive/<name>, beside its ledger entry."""
+        dest = self.home / "archive" / name
+        n = 1
+        while dest.exists():
+            n += 1
+            dest = self.home / "archive" / f"{name}-{n}"
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        shutil.move(str(adapter), str(dest))
+        return dest
 
     def current(self) -> Path | None:
         return self.adapter if self.exists() else None

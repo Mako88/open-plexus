@@ -153,6 +153,19 @@ set every round ends with: the asking on the ten paragraphs (`--arms ask --adapt
 and GSM8K. The root is round two's asking adapter. The live loop, the system hearing, asking,
 writing and sleeping on its own, builds on this folder and is the step after.
 
+**What it trusts** (John, 2026-11-05). Confidence is not a number stored on a row but computed
+from the row's evidence when it is read: its source and when, the independent sources that agree,
+what contradicted it, and every use with how that turned out. A source's trust is its own track
+record, a new source starting low. No fixed list of truth categories: a condition ("true except
+when...") is learned from a counterexample and attached as text, the row itself kept. The function
+from evidence to confidence is learned and read by calibration (of what it said at 80%, was 80%
+right), and whether to look something up reads it. An abstraction is a new row pointing to the rows
+it came from, never replacing them, with its own evidence, so an error stays where it is. Nothing
+in the system's own machinery is fitted to a benchmark (if statements against generics: the rulers
+may be benchmark-shaped, the system may not); the asking's prompt still says "usually in two
+passages" and is to be made general. The self is the whole system, so nothing it was is deleted:
+replaced and rolled-back adapters are archived beside their ledger rows.
+
 ## The plan of attack
 
 Each step says what it decides. A step is struck when it is done.

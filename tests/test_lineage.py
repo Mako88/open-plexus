@@ -48,6 +48,9 @@ def test_init_commit_rollback_and_the_ledger(tmp_path):
     assert (lin.adapter / "adapter_model.bin").read_text(encoding="utf-8") == "self-ask"
     assert not (lin.path / "adapter.prev").exists() and len(lin.ledger()) == 3
     assert lin.round() == 1  # the last round kept, not the last written
+    archived = sorted(x.name for x in (lin.path / "archive").iterdir())
+    assert archived == ["before-round2", "round2-rolled-back"]  # nothing deleted
+    assert (lin.path / "archive" / "round2-rolled-back" / "adapter_model.bin").read_text(encoding="utf-8") == "flat"
 
 
 def test_the_facts_adapter_is_kept_apart_and_a_first_rollback_leaves_none(tmp_path):

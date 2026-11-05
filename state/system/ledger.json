@@ -40,5 +40,35 @@
    "why": "the asking fell from 0.56 to 0.46 (9 made right, 29 made wrong); the next sleep rehearses the asking's own trajectories too",
    "at": "20261105T053308Z"
   }
+ },
+ {
+  "round": 2,
+  "what": "the second sleep: the first 200 questions' rows with restatements and questions, interleaved with 315 right answers and 236 right asking trajectories of the system's own",
+  "trained_on": "the supporting paragraphs of validation questions 0-200 (never trained on as questions), four epochs",
+  "questions": 0,
+  "from": "state\\consolidate\\sleep2\\adapter",
+  "readings": {
+   "before": "hotpot-20261105T013916Z",
+   "score_before": 0.64,
+   "after": "hotpot-20261105T090357Z",
+   "score_after": 0.635,
+   "floor": {
+    "reading": "hotpot-20261105T090540Z",
+    "score": 0.225
+   },
+   "asking": {
+    "reading": "hotpot-20261105T091319Z",
+    "score": 0.495
+   },
+   "facts": {
+    "reading": "consolidate-recall-20261105T091840Z",
+    "score": 0.465
+   }
+  },
+  "note": "gold kept, floor 0.135 to 0.225 (3.2 SE), single facts 0.465 trained and 0.375 fresh, the asking 0.56 to 0.495 (-2.7 SE): committed since it gains more than it loses; the asking's cost is halved from the first sleep and is the next thing to close",
+  "sha": "8a494224",
+  "at": "20261105T150642Z",
+  "points_gained": -0.5,
+  "questions_per_point": null
  }
 ]

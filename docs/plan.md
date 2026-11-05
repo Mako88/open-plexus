@@ -568,8 +568,13 @@ Each step says what it decides. A step is struck when it is done.
      lost. Without rehearsal: gold 0.425, floor 0.075, asking 0.36, single facts 0.155 and 0.095,
      everything lost and less learnt. So rehearsal is what lets a sleep teach without costing,
      and a sleep must rehearse every skill the system has. The round is in the ledger and
-     rolled back for the asking's loss; the next sleep rehearses the asking's own right
-     trajectories beside the answering's.
+     rolled back for the asking's loss. **Second sleep** (2026-11-05, `hotpot-20261105T090357Z`,
+     `-090540Z`, `-091319Z`, `consolidate-recall-20261105T091840Z`), rehearsing the asking's own
+     236 right trajectories too: gold 0.635 (kept), floor **0.225** (25 made right, 7 made wrong,
+     3.2 standard errors), single facts 0.465 trained and **0.375 fresh**, the asking 0.495 (5 and
+     18): its cost halved, not gone. Committed as the lineage's round 1, since it gains more
+     than it loses. Next: close the asking's cost (more asking rehearsal, or fewer epochs), then
+     the live loop that sleeps on its own.
 
 Where the system makes a choice (which row to follow, whether to fetch again, whether a
 sentence is worth writing, when to stop), it is a learner credited by outcome: a head over the

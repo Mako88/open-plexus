@@ -100,15 +100,21 @@ class WikiEnv(WikiSearch):
 
     texts: WikiTexts | None = None
     lexical: LexicalIndex | None = None
+    sense = None  # the search a rollout uses: BM25, reranked by the cross-encoder unless --rerank 0
     titles = None  # TRL offers every public function of the environment to the trunk as a tool: search alone is the tool
 
     @classmethod
-    def open(cls, store: str, bm25: str) -> None:
+    def open(cls, store: str, bm25: str, rerank: int = 0) -> None:
         cls.texts = WikiTexts(store)
         cls.lexical = LexicalIndex(bm25)
+        cls.sense = cls.lexical.nearest
+        if rerank:
+            from openplexus.rerank import Reranker
+
+            cls.sense = Reranker(cls.texts.text).over(cls.lexical.nearest, deep=rerank)
 
     def __init__(self):
-        super().__init__(self.texts, nearest=self.lexical.nearest)
+        super().__init__(self.texts, nearest=self.sense)
 
     def reset(self, **row) -> None:
         self.searches, self.shown = [], []
@@ -159,6 +165,7 @@ def main() -> None:
     p.add_argument("--system", default="plain", choices=["plain", "selfask"],
                    help="with --store gold: answer in one turn, or write the kind, the single-fact questions and their answers first")
     p.add_argument("--bm25", default=str(ROOT / "data" / "wiki-abstracts" / "bm25"))
+    p.add_argument("--rerank", type=int, default=50, help="the full store's search reranked over BM25's top N, as the readings search it; 0 for none")
     args = p.parse_args()
 
     import torch
@@ -187,7 +194,7 @@ def main() -> None:
     if args.store == "gold":
         env, tool = None, None
     elif args.store == "wiki":
-        WikiEnv.open(args.wiki, args.bm25)
+        WikiEnv.open(args.wiki, args.bm25, args.rerank)
         env, tool = WikiEnv, "search(query): the Wikipedia abstract nearest the query by BM25 over title and text, not one shown before"
     else:
         env, tool = Store, "search(query): the paragraph of the question's ten nearest the query by MiniLM, not one shown before"

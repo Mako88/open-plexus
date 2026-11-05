@@ -99,7 +99,8 @@ def main() -> None:
     p.add_argument("--lr", type=float, default=1e-4)
     p.add_argument("--epochs", type=int, default=8)
     p.add_argument("--batch", type=int, default=8, help="rows an optimiser step, accumulated")
-    p.add_argument("--micro", type=int, default=2)
+    p.add_argument("--micro", type=int, default=2, help="rows a micro-batch at most")
+    p.add_argument("--micro-tokens", type=int, default=1100, help="padded tokens a micro-batch at most; a longer row goes alone")
     p.add_argument("--max-tokens", type=int, default=384)
     p.add_argument("--init-adapter", default="system",
                    help="the adapter replayed into: 'system' is the lineage's as it stands (none where there is no lineage), "
@@ -196,8 +197,19 @@ def main() -> None:
                 continue
             group = order[at:at + args.batch]
             opt.zero_grad()
-            for m in range(0, len(group), args.micro):
-                items = [encoded[i] for i in group[m:m + args.micro]]
+            # micro-batches by a token budget, longest first, so a 1,200-token asking transcript
+            # goes alone and two 380-token rows go together: the card's limit is tokens, not rows
+            # (the second sleep ran out of memory at two transcripts a micro-batch, 2026-11-05)
+            by_len = sorted(group, key=lambda i: -len(encoded[i]))
+            micros, cur = [], []
+            for i in by_len:
+                if cur and (len(cur) >= args.micro or (len(cur) + 1) * max(len(encoded[j]) for j in cur + [i]) > args.micro_tokens):
+                    micros.append(cur)
+                    cur = []
+                cur.append(i)
+            micros.append(cur)
+            for micro in micros:
+                items = [encoded[i] for i in micro]
                 width = max(map(len, items))
                 ids = torch.tensor([x + [pad] * (width - len(x)) for x in items]).cuda()
                 mask = torch.tensor([[1] * len(x) + [0] * (width - len(x)) for x in items]).cuda()

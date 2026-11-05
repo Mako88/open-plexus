@@ -105,7 +105,7 @@ def main() -> None:
                    help="the adapter replayed into: 'system' is the lineage's as it stands (none where there is no lineage), "
                         "'none' a fresh adapter, or a PEFT folder")
     p.add_argument("--augment", type=int, default=0, help="restatements and questions a row from the served trunk, replayed with it")
-    p.add_argument("--rehearse", default=None, help="a rehearsal file (`rehearsal.py`): the system's own right answers replayed with the rows")
+    p.add_argument("--rehearse", action="append", default=[], help="a rehearsal file (`rehearsal.py`), one per skill: the system's own right transcripts replayed with the rows")
     p.add_argument("--augment-only", action="store_true", help="write the augmentations (the server up) and stop; the training runs after, the server down")
     p.add_argument("--seed", type=int, default=0)
     p.add_argument("--fresh", action="store_true", help="ignore a checkpoint in --out and start over")
@@ -136,10 +136,12 @@ def main() -> None:
     rehearsed = 0
     if args.rehearse:
         # the system's own right answers, as the transcripts the trunk saw them in, interleaved with the rows
-        for line in Path(args.rehearse).read_text(encoding="utf-8").splitlines():
-            text = tok.apply_chat_template(json.loads(line)["messages"], tokenize=False, enable_thinking=False)
-            encoded.append(tok(text, add_special_tokens=False)["input_ids"][:args.max_tokens * 4])
-            rehearsed += 1
+        for path in args.rehearse:
+            for line in Path(path).read_text(encoding="utf-8").splitlines():
+                rec = json.loads(line)
+                text = tok.apply_chat_template(rec["messages"], tools=rec.get("tools"), tokenize=False, enable_thinking=False)
+                encoded.append(tok(text, add_special_tokens=False)["input_ids"][:args.max_tokens * 4])
+                rehearsed += 1
     print(f"{len(texts)} rows, {rehearsed} rehearsed transcripts, {sum(map(len, encoded))} tokens, {max(map(len, encoded))} the longest", flush=True)
 
     if args.init_adapter == "system":

@@ -7,6 +7,11 @@ in the reading's own form, and the answers the key marks right are kept as trans
 produce; the key only picks.
 
     .venv/Scripts/python scripts/rehearsal.py --n 400 --skip 2000 --adapter system --out state/rehearsal/system-r0.jsonl
+    .venv/Scripts/python scripts/rehearsal.py --kind ask --n 400 --skip 2400 --adapter system --out state/rehearsal/system-r0-ask.jsonl
+
+`--kind ask` rehearses the asking: the system's own trajectories on the ten-paragraph store, tool
+calls and all, kept where the final answer was right; the first sleep rehearsed the answering
+alone and lost 0.10 of the asking (2026-11-05), the one skill it had not rehearsed.
 """
 
 from __future__ import annotations
@@ -19,9 +24,33 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "src"))
 
-from openplexus.hotpot import READ_SYSTEM, answer_of, exact, questions, read_text  # noqa: E402
+sys.path.insert(0, str(ROOT / "scripts"))
+
+from openplexus.asking import SEARCH_TOOL, solve  # noqa: E402
+from openplexus.hotpot import READ_SYSTEM, answer_of, exact, paragraph_text, questions, read_text  # noqa: E402
 from openplexus.lineage import Lineage  # noqa: E402
 from openplexus.trunk import ServedTrunk  # noqa: E402
+
+
+def as_dict_args(messages: list[dict]) -> list[dict]:
+    """The trajectory as the chat template renders it: tool-call arguments as a mapping."""
+    out = []
+    for m in messages:
+        m = dict(m)
+        if m.get("tool_calls"):
+            calls = []
+            for c in m["tool_calls"]:
+                c = json.loads(json.dumps(c))
+                fn = c.get("function", c)
+                if isinstance(fn.get("arguments"), str):
+                    try:
+                        fn["arguments"] = json.loads(fn["arguments"])
+                    except json.JSONDecodeError:
+                        fn["arguments"] = {"query": fn["arguments"]}
+                calls.append(c)
+            m["tool_calls"] = calls
+        out.append(m)
+    return out
 
 
 def main() -> None:
@@ -31,6 +60,7 @@ def main() -> None:
     p.add_argument("--adapter", default="system", help="the GGUF the server has loaded to apply: 'system' is the lineage's")
     p.add_argument("--out", required=True)
     p.add_argument("--max-new", type=int, default=160)
+    p.add_argument("--kind", default="answer", choices=["answer", "ask"], help="the answering from the gold paragraphs, or the asking on the ten")
     args = p.parse_args()
     gguf = Path(Lineage().current_gguf()) if args.adapter == "system" else Path(args.adapter)
     trunk = ServedTrunk(max_new=args.max_new, parallel=8)
@@ -39,18 +69,41 @@ def main() -> None:
     if loaded and not any(x["scale"] for x in trunk.lora):
         raise SystemExit(f"the server has not loaded {gguf.name}: {loaded}")
     qs = questions(args.n, split="train", skip=args.skip)
-    prompts = [[{"role": "system", "content": READ_SYSTEM},
-                {"role": "user", "content": read_text(q, [x for x in q["paragraphs"] if x["supporting"]])}] for q in qs]
-    replies = trunk.ask_many(prompts)
-    kept = 0
     out = Path(args.out)
     out.parent.mkdir(parents=True, exist_ok=True)
-    with open(out, "w", encoding="utf-8") as f:
-        for q, prompt, reply in zip(qs, prompts, replies):
-            if exact(answer_of(reply), q["answer"]):
-                kept += 1
-                f.write(json.dumps({"id": q["id"], "messages": prompt + [{"role": "assistant", "content": reply}]}, ensure_ascii=False) + "\n")
-    print(f"{kept} of {len(qs)} answers right and kept as rehearsal in {out} (served {trunk.served_model()[-80:]})", flush=True)
+    kept = 0
+    if args.kind == "answer":
+        prompts = [[{"role": "system", "content": READ_SYSTEM},
+                    {"role": "user", "content": read_text(q, [x for x in q["paragraphs"] if x["supporting"]])}] for q in qs]
+        replies = trunk.ask_many(prompts)
+        with open(out, "w", encoding="utf-8") as f:
+            for q, prompt, reply in zip(qs, prompts, replies):
+                if exact(answer_of(reply), q["answer"]):
+                    kept += 1
+                    f.write(json.dumps({"id": q["id"], "messages": prompt + [{"role": "assistant", "content": reply}]}, ensure_ascii=False) + "\n")
+    else:
+        from concurrent.futures import ThreadPoolExecutor
+
+        from ask import SYSTEM as ASK_SYSTEM, Store, embedder
+
+        embedder()
+
+        def one(q):
+            tool = Store()
+            tool.reset(paragraphs=[{"text": paragraph_text(x), "supporting": x["supporting"]} for x in q["paragraphs"]])
+            try:
+                return solve(trunk.chat, ASK_SYSTEM, q["question"], tool.search, max_turns=4)
+            except Exception as e:  # noqa: BLE001
+                return {"reply": "", "messages": [], "failed": str(e)[:100]}
+
+        with ThreadPoolExecutor(max_workers=8) as pool:
+            outs = list(pool.map(one, qs))
+        with open(out, "w", encoding="utf-8") as f:
+            for q, o in zip(qs, outs):
+                if o["messages"] and exact(answer_of(o["reply"]), q["answer"]):
+                    kept += 1
+                    f.write(json.dumps({"id": q["id"], "messages": as_dict_args(o["messages"]), "tools": [SEARCH_TOOL]}, ensure_ascii=False) + "\n")
+    print(f"{kept} of {len(qs)} {args.kind} transcripts right and kept as rehearsal in {out} (served {trunk.served_model()[-80:]})", flush=True)
 
 
 if __name__ == "__main__":

@@ -6,5 +6,39 @@
   "note": "the root of the lineage: the best skill read so far (John, 2026-11-04: the system keeps what it learns across runs from here on)",
   "sha": "bb833791",
   "at": "20261104T165739Z"
+ },
+ {
+  "round": 1,
+  "what": "the first sleep, with rehearsal: the first 200 questions' rows and the trunk's restatements and questions, interleaved with 315 of the system's own right answers",
+  "trained_on": "the supporting paragraphs of validation questions 0-200 (read, never trained on as questions), four epochs",
+  "questions": 0,
+  "from": "state\\consolidate\\sleep1-rehearse\\adapter",
+  "readings": {
+   "before": "hotpot-20261105T013916Z",
+   "score_before": 0.64,
+   "after": "hotpot-20261105T045617Z",
+   "score_after": 0.635,
+   "floor": {
+    "reading": "hotpot-20261105T045815Z",
+    "score": 0.205
+   },
+   "asking": {
+    "reading": "hotpot-20261105T050550Z",
+    "score": 0.46
+   },
+   "facts": {
+    "reading": "consolidate-recall-20261105T051146Z",
+    "score": 0.36
+   }
+  },
+  "note": "gold kept, floor up 0.07, facts landed, the asking down 0.10: the skill not rehearsed was the one lost",
+  "sha": "9066ebf7",
+  "at": "20261105T053255Z",
+  "points_gained": -0.5,
+  "questions_per_point": null,
+  "rolled_back": {
+   "why": "the asking fell from 0.56 to 0.46 (9 made right, 29 made wrong); the next sleep rehearses the asking's own trajectories too",
+   "at": "20261105T053308Z"
+  }
  }
 ]

@@ -557,9 +557,19 @@ Each step says what it decides. A step is struck when it is done.
      regression set read before and after: a sleep that lost more than it taught is rolled
      back, and every sleep is a ledger row, so forgetting has a number. Downtime is read from
      the card itself, free memory and utilisation over a few minutes; nothing of this machine
-     (its games, its idle time) is in the code (John, 2026-11-04). First reading: the same rows
-     slept with and without rehearsal, both from the system's adapter, on whether gold stays at
-     0.61 while the single facts still land.
+     (its games, its idle time) is in the code (John, 2026-11-04). **First sleep, read
+     2026-11-05** (`hotpot-20261105T045617Z` to `-053105Z`; the lineage's round 0 before it:
+     gold 0.64, floor 0.135, the asking 0.56): the same rows and restatements slept from the
+     system's adapter with 315 of its own right answers interleaved, and without. With
+     rehearsal: gold **0.635** (11 made right, 12 made wrong: the reading kept), the two-hop
+     floor **0.205** (24 and 10, 2.4 standard errors: the first time consolidated facts show on
+     the floor), single facts 0.36 trained and 0.20 fresh against 0.055 and 0.03, and the
+     asking **0.46** against 0.56 (9 and 29): the one skill not in the rehearsal set was the one
+     lost. Without rehearsal: gold 0.425, floor 0.075, asking 0.36, single facts 0.155 and 0.095,
+     everything lost and less learnt. So rehearsal is what lets a sleep teach without costing,
+     and a sleep must rehearse every skill the system has. The round is in the ledger and
+     rolled back for the asking's loss; the next sleep rehearses the asking's own right
+     trajectories beside the answering's.
 
 Where the system makes a choice (which row to follow, whether to fetch again, whether a
 sentence is worth writing, when to stop), it is a learner credited by outcome: a head over the

@@ -1,0 +1,81 @@
+{
+ "kind": "rescore",
+ "scorer": "openplexus.hotpot.lenient beside exact match and token F1",
+ "lines": [
+  {
+   "line": "the frontier, with the ten paragraphs",
+   "reading": "frontier-hotpot-20261031T210036Z",
+   "arm": null,
+   "n": 100,
+   "exact": 0.79,
+   "lenient": 0.9,
+   "f1": 0.886
+  },
+  {
+   "line": "the frontier, from memory",
+   "reading": "frontier-hotpot-memory-20261101T003417Z",
+   "arm": null,
+   "n": 100,
+   "exact": 0.79,
+   "lenient": 0.87,
+   "f1": 0.882
+  },
+  {
+   "line": "floor, the trunk given nothing",
+   "reading": "hotpot-20261031T232647Z",
+   "arm": "floor",
+   "n": 200,
+   "exact": 0.15,
+   "lenient": 0.175,
+   "f1": 0.206
+  },
+  {
+   "line": "gold, the two supporting paragraphs",
+   "reading": "hotpot-20261102T213113Z",
+   "arm": "gold",
+   "n": 200,
+   "exact": 0.61,
+   "lenient": 0.725,
+   "f1": 0.723
+  },
+  {
+   "line": "gold with thinking",
+   "reading": "hotpot-20261102T215031Z",
+   "arm": "gold",
+   "n": 200,
+   "exact": 0.655,
+   "lenient": 0.795,
+   "f1": 0.771
+  },
+  {
+   "line": "the trained asker on the ten paragraphs",
+   "reading": "hotpot-20261102T034219Z",
+   "arm": "ask",
+   "n": 200,
+   "exact": 0.54,
+   "lenient": 0.64,
+   "f1": 0.628
+  },
+  {
+   "line": "top-2 over Wikipedia by BM25",
+   "reading": "hotpot-20261102T055343Z",
+   "arm": "wiki:top:2",
+   "n": 200,
+   "exact": 0.26,
+   "lenient": 0.3,
+   "f1": 0.308
+  },
+  {
+   "line": "the trained asker over Wikipedia by BM25",
+   "reading": "hotpot-20261102T060233Z",
+   "arm": "wiki:ask",
+   "n": 200,
+   "exact": 0.39,
+   "lenient": 0.47,
+   "f1": 0.471
+  }
+ ],
+ "command": "scripts/rescore.py",
+ "taken_at": "20261105T183227Z",
+ "sha": "08c16ce1"
+}

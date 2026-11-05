@@ -105,3 +105,13 @@ def test_the_full_form_arms_read_store_rows_as_paragraphs_and_count_gold_by_titl
     assert hr.tag_of("gold", types.SimpleNamespace(adapter=str(Lineage().gguf))).startswith("gold-system-r")
     assert hr.decomposed("gold:decompose") and not hr.decomposed("gold")
     assert hr.chosen("gold:decompose", q, index) == hr.chosen("gold", q, index)
+
+
+def test_the_lenient_score_takes_the_right_answer_in_other_words():
+    from openplexus.hotpot import lenient
+    assert lenient("Chief of Protocol of the United States", "Chief of Protocol")
+    assert lenient("Greenwich Village", "Greenwich Village, New York City")
+    assert not lenient("Village", "Greenwich Village, New York City")  # less than half of it
+    assert lenient("yes", "Yes") and not lenient("Yes, both were American", "yes")
+    assert not lenient("Peter Schmeichel", "World's Best Goalkeeper") and not lenient(None, "x")
+    assert not lenient("Ed", "Ed Wood (film)") and lenient("the Ed Wood", "Ed Wood")

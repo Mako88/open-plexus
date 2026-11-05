@@ -129,6 +129,16 @@ fresh synthetic stories with invented names, longer than any context; and then r
 at scale (a Wikipedia subset in the store), which is where "frontier knowledge on an 11 GB
 card" gets read.
 
+**The score** (John, 2026-11-05: fix it rather than caveat it): HotpotQA lines are read by
+the lenient match (`openplexus.hotpot.lenient`: the right answer in other words, yes and no only
+exactly), the same scorer for the frontier, exact match kept beside it for published work
+(`rescore-20261105T183227Z`). Lenient: the frontier 0.90 with the ten paragraphs and 0.87 from
+memory; our floor 0.175, gold 0.725, gold with thinking 0.795, the trained asker 0.64 on the
+ten paragraphs and **0.47 over Wikipedia**, where the frontier reads 0.90. Of gold's 55 misses
+by this score, 10 stop at the bridge (answer with a passage's title the answer is not), 5 say
+yes or no to a who or what, 3 pick the wrong one of two, and 36 name another fact of the
+passages; the misses are mostly reading, not slot-filling.
+
 ## The system
 
 One lineage (John, 2026-11-04): the system keeps what it learns across runs. `state/system/`

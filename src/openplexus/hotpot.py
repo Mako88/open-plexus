@@ -54,6 +54,27 @@ def exact(said: str | None, gold: str) -> bool:
     return said is not None and normalise(said) == normalise(gold)
 
 
+def lenient(said: str | None, gold: str) -> bool:
+    """The right answer in other words (John, 2026-11-05: fix the score rather than caveat it):
+    exact, or the gold answer whole inside what was said ("Chief of Protocol of the United
+    States" for "Chief of Protocol"), or what was said whole inside the gold answer, two words
+    of it or half of it ("Greenwich Village" for "Greenwich Village, New York City"); yes and no
+    only by exact match. The same scorer is applied to the frontier's answers."""
+    if said is None:
+        return False
+    s, g = normalise(said), normalise(gold)
+    if not s or not g:
+        return False
+    if s == g:
+        return True
+    if s in ("yes", "no") or g in ("yes", "no"):
+        return False
+    padded_s, padded_g = f" {s} ", f" {g} "
+    if padded_g in padded_s:
+        return True
+    return padded_s in padded_g and (len(s.split()) >= 2 or len(s.split()) * 2 >= len(g.split()))
+
+
 def f1(said: str | None, gold: str) -> float:
     if said is None:
         return 0.0

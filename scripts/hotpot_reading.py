@@ -42,7 +42,7 @@ from grpo_reading import paired  # noqa: E402
 from openplexus.asking import solve  # noqa: E402
 from openplexus.decompose import SELFASK_SYSTEM, solve_decomposed  # noqa: E402
 from openplexus.lineage import Lineage  # noqa: E402
-from openplexus.hotpot import READ_SYSTEM, read_text, answer_of, exact, f1, paragraph_text, questions, recall  # noqa: E402
+from openplexus.hotpot import READ_SYSTEM, read_text, answer_of, exact, f1, lenient, paragraph_text, questions, recall  # noqa: E402
 from openplexus.maths import rows_of  # noqa: E402
 from openplexus.lexical import LexicalIndex  # noqa: E402
 from openplexus.wiki import WikiSearch, WikiStore  # noqa: E402
@@ -194,7 +194,7 @@ def arm(spec: str, qs: list[dict], args, trunk, index) -> dict:
                 said = answer_of(reply)
                 shown = chosen(spec, q, index)
                 row = {"id": q["id"], "question": q["question"], "answer": q["answer"], "type": q["type"],
-                       "level": q["level"], "said": said, "correct": exact(said, q["answer"]),
+                       "level": q["level"], "said": said, "correct": exact(said, q["answer"]), "lenient": lenient(said, q["answer"]),
                        "f1": round(f1(said, q["answer"]), 3), "reply": reply,
                        "shown": a["shown"] if a else [p["title"] for p in shown],
                        "gold_shown": a["gold_shown"] if a else sum(p["supporting"] for p in shown),
@@ -235,6 +235,7 @@ def arm(spec: str, qs: list[dict], args, trunk, index) -> dict:
                                            "episode": "the question's ten paragraphs, the store's rows",
                                            }.get(spec, "the question and the store"),
         "exact": round(sum(r["correct"] for r in rows) / n, 3), "f1": round(sum(r["f1"] for r in rows) / n, 3),
+        "lenient": round(sum(lenient(r["said"], r["answer"]) for r in rows) / n, 3),
         "by_type": by_type, "n": n, "stopped_early": n < len(qs), "unanswered": sum(r["said"] is None for r in rows),
         "gold_shown_mean": round(sum(r["gold_shown"] for r in rows) / n, 2),
         "searches_mean": round(sum(len(r.get("searches", [])) for r in rows) / n, 2) if spec in ASKING else None,
@@ -312,7 +313,7 @@ def main() -> None:
     for spec in args.arms.split(","):
         a = arm(spec, qs, args, trunk, index)
         reading["arms"][spec] = a
-        print(f"== {spec}: exact {a['exact']} f1 {a['f1']} on {a['n']} at {a['passes_per_question']} passes, "
+        print(f"== {spec}: lenient {a['lenient']} exact {a['exact']} f1 {a['f1']} on {a['n']} at {a['passes_per_question']} passes, "
               f"{a['unanswered']} unanswered, by type {a['by_type']}, {a['seconds']}s", flush=True)
     reading.update({
         "command": "scripts/hotpot_reading.py " + " ".join(sys.argv[1:]),

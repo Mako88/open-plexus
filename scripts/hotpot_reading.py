@@ -113,6 +113,8 @@ def tag_of(spec: str, args) -> str:
         tag += "-" + "+".join(a.stem.replace("-lora", "") for a in adapters)
     if getattr(args, "think", False):
         tag += "-think"
+    if getattr(args, "rerank", 0) and spec.startswith("wiki:"):
+        tag += f"-rerank{args.rerank}"
     if getattr(args, "system", "plain") == "selfask":
         tag += "-selfask"
     return tag
@@ -270,6 +272,7 @@ def main() -> None:
                    help="the trunk's thinking mode on (the server must run without --reasoning-budget 0; raise --max-new)")
     p.add_argument("--wiki", default=str(ROOT / "data" / "wiki-abstracts" / "minilm"), help="the full-form store")
     p.add_argument("--bm25", default=str(ROOT / "data" / "wiki-abstracts" / "bm25"), help="its lexical index")
+    p.add_argument("--rerank", type=int, default=0, help="reorder the sense's top N rows by a cross-encoder (openplexus.rerank)")
     p.add_argument("--sense", default="lexical", choices=["lexical", "dense"], help="how the full-form store is searched")
     p.add_argument("--against", default="floor")
     p.add_argument("--min-n", type=int, default=100)
@@ -307,6 +310,10 @@ def main() -> None:
         if any(s.startswith("wiki:") for s in args.arms.split(",")):
             index.wiki = WikiStore(args.wiki)
             index.nearest = sense_of(args.sense, index.wiki, embed, args.bm25)
+            if args.rerank:
+                from openplexus.rerank import Reranker
+
+                index.nearest = Reranker(index.wiki.text).over(index.nearest, deep=args.rerank)
             print(f"the full-form store: {index.wiki.n} abstracts on {index.wiki.device}, searched {args.sense}", flush=True)
     reading = {"kind": "hotpot-reading", "set": f"HotpotQA distractor {args.split}, data/hotpotqa/{args.split}.jsonl",
                "skip": args.skip, "n": len(qs), "scorer": "exact match and token F1 on the normalised answer, HotpotQA's own",

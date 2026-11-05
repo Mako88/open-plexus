@@ -115,3 +115,11 @@ def test_the_lenient_score_takes_the_right_answer_in_other_words():
     assert lenient("yes", "Yes") and not lenient("Yes, both were American", "yes")
     assert not lenient("Peter Schmeichel", "World's Best Goalkeeper") and not lenient(None, "x")
     assert not lenient("Ed", "Ed Wood (film)") and lenient("the Ed Wood", "Ed Wood")
+
+
+def test_the_reranked_sense_is_tagged():
+    import types
+    sys.path.insert(0, str(ROOT / "scripts"))
+    import hotpot_reading as hr
+    assert hr.tag_of("wiki:ask", types.SimpleNamespace(adapter=None, sense="lexical", rerank=50)) == "wikiask-lexical-rerank50"
+    assert hr.tag_of("ask", types.SimpleNamespace(adapter=None, rerank=50)) == "ask"

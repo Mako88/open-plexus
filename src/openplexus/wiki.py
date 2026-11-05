@@ -134,44 +134,6 @@ class WikiStore(WikiTexts):
         del self.keys
 
 
-HYDE_SYSTEM = (
-    "Write the opening two sentences of the encyclopedia article that would answer the search below, "
-    "naming its subject in the first words as an encyclopedia does. If you are not sure of a fact, write "
-    "your best guess. Reply with the two sentences only."
-)
-
-
-def hyde(nearest, write):
-    """The search by the passage the system expects to find (HyDE, Gao et al., 2022): `write(query)`
-    is the trunk writing that passage, and the store is searched with the query and the passage
-    together, so a thing described rather than named is looked for by the words its own article
-    would use. Nothing is handed to the system: the guess is its own."""
-    def search(queries, k, exclude):
-        return nearest([q + " " + write(q) for q in queries], k, exclude)
-    return search
-
-
-def hyde_fused(nearest, write, deep: int = 20, c: int = 60):
-    """HyDE's second form (2026-11-05): searched together with the query, the 2B's guess carried
-    wrong names that outweighed the query's right ones (0.265 against 0.39). Here the query and
-    the guess are searched apart and their rankings fused by reciprocal rank, so a row both rank
-    well rises, and a bad guess can add candidates but never removes the query's own."""
-    def search(queries, k, exclude):
-        out = []
-        for q in queries:
-            own = nearest([q], deep, exclude)[0]
-            guessed = nearest([write(q)], deep, exclude)[0]
-            score: dict[int, float] = {}
-            for ranked in (own, guessed):
-                for rank, row in enumerate(ranked):
-                    score[row] = score.get(row, 0.0) + 1.0 / (c + rank + 1)
-            # ties broken by the query's own order
-            order = {row: i for i, row in enumerate(own)}
-            out.append(sorted(score, key=lambda r: (-score[r], order.get(r, deep)))[:k])
-        return out
-    return search
-
-
 class WikiSearch:
     """The asker's tool over the whole store: the nearest abstract to the query not shown before.
     Built per question, so `shown` and `searches` are that question's. `nearest(queries, k,

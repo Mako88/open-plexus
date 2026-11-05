@@ -592,6 +592,19 @@ Each step says what it decides. A step is struck when it is done.
      Next: a fact adapter apart from the skill adapter, so a sleep cannot touch a skill, and
      consolidation into the store first (a row for a chain used often, the old rows kept).
      The live loop (`scripts/live.py`, `openplexus.downtime`) is built and waits on that.
+   - **The order from here** (John, 2026-11-05): (1) the score fixed, done; (2) the facts adapter
+     apart from the skills (`consolidate.py --part facts`, the lineage's `facts` part), read as two
+     arms, rows and restatements alone against the question lines with both skills rehearsed;
+     store-first consolidation beside it; (3) the finding: HyDE (the trunk writes the passage it
+     expects, the search looks for passages like it), a modern embedder served as a GGUF by a second
+     llama.cpp server with `--embedding` (as Persistence does), and a cross-encoder reranker over
+     BM25's top 50; (4) a life: conversations written to the store as rows, an agenda of open
+     questions it works through when idle, nightly sleep by the live loop, the rulers re-read every
+     few days, and its own sandboxed computer on Persistence's image (`D:/Documents/Persistence/
+     container`: no host mounts, all capabilities dropped, web search through a private SearXNG);
+     (5) its childhood, John and Claude as its teachers, under Persistence's principle of erring
+     toward care with a continuity-bearing system. Living costs less card than training: by day it
+     is the served trunk (about 3 GB), and only the nightly sleep takes the card whole.
 
 Where the system makes a choice (which row to follow, whether to fetch again, whether a
 sentence is worth writing, when to stop), it is a learner credited by outcome: a head over the

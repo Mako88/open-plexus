@@ -113,6 +113,8 @@ def tag_of(spec: str, args) -> str:
         tag += "-" + "+".join(a.stem.replace("-lora", "") for a in adapters)
     if getattr(args, "think", False):
         tag += "-think"
+    if getattr(args, "gut", None) is not None and spec in ASKING:
+        tag += f"-gut{args.gut:g}"
     if getattr(args, "search_adapter", None) and spec in ASKING:
         tag += "-searchon-" + "+".join(Path(a).stem.replace("-lora", "") for a in args.search_adapter.split(","))
     if getattr(args, "rerank", 0) and spec.startswith("wiki:"):
@@ -174,6 +176,11 @@ def arm(spec: str, qs: list[dict], args, trunk, index) -> dict:
                     tool = Store()
                     tool.reset(paragraphs=[{"text": paragraph_text(p), "supporting": p["supporting"]} for p in q["paragraphs"]])
                     titles = lambda: [q["paragraphs"][j]["title"] for j in tool.shown]  # noqa: E731
+                gut = getattr(args, "gut_probs", None)
+                if gut is not None and gut.get(q["id"], 0.0) >= args.gut:
+                    # the gut is sure: answer from what the system knows, no search
+                    reply = trunk.ask([{"role": "system", "content": SYSTEM}, {"role": "user", "content": q["question"]}])
+                    return {"reply": reply, "searches": [], "turns": 1, "messages": [], "shown": [], "gold_shown": 0, "gut": gut[q["id"]]}
                 try:
                     search_trunk = getattr(args, "search_trunk", None) or trunk
                     out = solve(search_trunk.chat, ASK_SYSTEM, q["question"], tool.search, max_turns=args.max_turns)
@@ -281,6 +288,8 @@ def main() -> None:
                    help="the trunk's thinking mode on (the server must run without --reasoning-budget 0; raise --max-new)")
     p.add_argument("--wiki", default=str(ROOT / "data" / "wiki-abstracts" / "minilm"), help="the full-form store")
     p.add_argument("--bm25", default=str(ROOT / "data" / "wiki-abstracts" / "bm25"), help="its lexical index")
+    p.add_argument("--gut", type=float, default=None,
+                   help="asking arms: answer without searching where the gut (scripts/gut.py) is at least this sure")
     p.add_argument("--search-adapter", default=None,
                    help="asking arms: search on these adapters alone and answer with --adapter's (facts in the answer, not in the decision to look)")
     p.add_argument("--rerank", type=int, default=50,
@@ -311,6 +320,9 @@ def main() -> None:
         search_trunk = ServedTrunk(url=args.served, max_new=args.max_new, parallel=args.batch, think=args.think,
                                    lora=[{"id": a["id"], "scale": 1.0 if Path(a["path"]).name in search_names else 0.0} for a in loaded])
     args.search_trunk = search_trunk if search_trunk is not trunk else None
+    args.gut_probs = None
+    if args.gut is not None:
+        args.gut_probs = json.loads((ROOT / "state" / "gut" / "val-probs.json").read_text(encoding="utf-8"))
     index = None
     if any(s.startswith(("top:", "recall:", "wiki:")) for s in args.arms.split(",")):
         import numpy as np

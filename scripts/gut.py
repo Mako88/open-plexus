@@ -160,6 +160,8 @@ def main() -> None:
         np.savez(OUT / "gut.npz", w=w, b=b, mu=mu, sd=sd, layer=layer, lam=lam, **{f"platt_{k}": v for k, v in scale.items()})
         raw_va = ((hva[layer] - mu) / sd) @ w + b
         pva = 1 / (1 + np.exp(-(scale["a"] * (raw_va - scale["mean"]) / scale["std"] + scale["c"])))
+        # the gut's verdict on each reading question, for the asking to read (hotpot_reading.py --gut)
+        (OUT / "val-probs.json").write_text(json.dumps({q["id"]: round(float(x), 4) for q, x in zip(val_qs, pva)}), encoding="utf-8")
         reading.update({
             "base_rate": {"train": round(float(ytr.mean()), 3), "val": round(float(yva.mean()), 3)},
             "held_out_auroc": table, "chosen": {"layer": layer, "lam": lam},

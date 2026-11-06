@@ -613,6 +613,19 @@ Each step says what it decides. A step is struck when it is done.
      Next: a fact adapter apart from the skill adapter, so a sleep cannot touch a skill, and
      consolidation into the store first (a row for a chain used often, the old rows kept).
      The live loop (`scripts/live.py`, `openplexus.downtime`) is built and waits on that.
+   - **The facts adapter, read 2026-11-06** (`hotpot-20261106T095851Z` to `-110549Z`): a facts
+     adapter over the frozen skills, from rows and restatements alone, learns nothing (floor level,
+     fresh facts 0.077) and still costs the asking (-4.7 standard errors); with the question lines
+     and both skills rehearsed it gives the best floor yet, **0.26** exact (28 made right, 3 made
+     wrong), fresh facts 0.286, gold held, and the asking -2.1, as the shared adapter did. Searching
+     on the skills alone and answering with the facts adapter on restores the searching (1.9 a
+     question, both found 102 against 106) and still answers worse, 0.495 against 0.56 (-2.7),
+     worse even where both passages were found (0.636 against 0.657), and level on questions the
+     sleep never saw (-0.9). So facts in the weights compete with facts in the store: the trunk
+     given a passage and a memory of the same fact answers worse than given the passage alone.
+     Decides, with John's view that the store is the knowledge: consolidation goes into the store
+     (rows for chains used often, the old rows kept), the weights hold skills, trained by the key.
+     Every sleep and both facts arms are in the ledger, rolled back by the keep rule.
    - **The order from here** (John, 2026-11-05): (1) the score fixed, done; (2) the facts adapter
      apart from the skills (`consolidate.py --part facts`, the lineage's `facts` part), read as two
      arms, rows and restatements alone against the question lines with both skills rehearsed;

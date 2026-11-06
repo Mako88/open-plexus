@@ -113,6 +113,8 @@ def tag_of(spec: str, args) -> str:
         tag += "-" + "+".join(a.stem.replace("-lora", "") for a in adapters)
     if getattr(args, "think", False):
         tag += "-think"
+    if getattr(args, "search_adapter", None) and spec in ASKING:
+        tag += "-searchon-" + "+".join(Path(a).stem.replace("-lora", "") for a in args.search_adapter.split(","))
     if getattr(args, "rerank", 0) and spec.startswith("wiki:"):
         tag += f"-rerank{args.rerank}"
     if getattr(args, "system", "plain") == "selfask":
@@ -173,7 +175,14 @@ def arm(spec: str, qs: list[dict], args, trunk, index) -> dict:
                     tool.reset(paragraphs=[{"text": paragraph_text(p), "supporting": p["supporting"]} for p in q["paragraphs"]])
                     titles = lambda: [q["paragraphs"][j]["title"] for j in tool.shown]  # noqa: E731
                 try:
-                    out = solve(trunk.chat, ASK_SYSTEM, q["question"], tool.search, max_turns=args.max_turns)
+                    search_trunk = getattr(args, "search_trunk", None) or trunk
+                    out = solve(search_trunk.chat, ASK_SYSTEM, q["question"], tool.search, max_turns=args.max_turns)
+                    if search_trunk is not trunk and out["messages"]:
+                        # the searching was done on the skills alone; the answer is written again with
+                        # the facts adapter on, from the same conversation, no tool offered
+                        msg = trunk.chat(out["messages"][:-1], None)
+                        out["reply"] = (msg.get("content") or "").strip()
+                        out["messages"] = out["messages"][:-1] + [{"role": "assistant", "content": out["reply"]}]
                 except Exception as e:  # noqa: BLE001
                     # a turn the server refused (a tool call it could not parse): the question
                     # counts as unanswered, with the refusal on the row, and the arm goes on
@@ -272,6 +281,8 @@ def main() -> None:
                    help="the trunk's thinking mode on (the server must run without --reasoning-budget 0; raise --max-new)")
     p.add_argument("--wiki", default=str(ROOT / "data" / "wiki-abstracts" / "minilm"), help="the full-form store")
     p.add_argument("--bm25", default=str(ROOT / "data" / "wiki-abstracts" / "bm25"), help="its lexical index")
+    p.add_argument("--search-adapter", default=None,
+                   help="asking arms: search on these adapters alone and answer with --adapter's (facts in the answer, not in the decision to look)")
     p.add_argument("--rerank", type=int, default=50,
                    help="reorder the sense's top N rows by a cross-encoder (openplexus.rerank); the default since it read +3.0 standard errors over BM25 alone, 0 for none")
     p.add_argument("--sense", default="lexical", choices=["lexical", "dense"], help="how the full-form store is searched")
@@ -292,6 +303,14 @@ def main() -> None:
         if not any(Path(a["path"]).name == want for a in loaded):
             raise SystemExit(f"the server has not loaded {want}: {[a['path'] for a in loaded]}")
     trunk.lora = [{"id": a["id"], "scale": 1.0 if Path(a["path"]).name in wanted else 0.0} for a in loaded]
+    search_trunk = trunk
+    if args.search_adapter:
+        # the asking decides when to search and what for on these adapters alone (the skills), and
+        # the final answer is written with every adapter of --adapter on (the facts as well)
+        search_names = {Path(a).name for a in args.search_adapter.split(",")}
+        search_trunk = ServedTrunk(url=args.served, max_new=args.max_new, parallel=args.batch, think=args.think,
+                                   lora=[{"id": a["id"], "scale": 1.0 if Path(a["path"]).name in search_names else 0.0} for a in loaded])
+    args.search_trunk = search_trunk if search_trunk is not trunk else None
     index = None
     if any(s.startswith(("top:", "recall:", "wiki:")) for s in args.arms.split(",")):
         import numpy as np

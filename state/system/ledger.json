@@ -108,5 +108,57 @@
    "why": "the keep rule: the asking fell 2.1 standard errors (0.56 to 0.505); more rehearsal does not close the cost, the fix is a fact adapter apart from the skill adapter",
    "at": "20261105T183100Z"
   }
+ },
+ {
+  "round": 4,
+  "part": "facts",
+  "what": "the first facts adapter, arm plain",
+  "trained_on": "the supporting paragraphs of validation questions 0-200",
+  "questions": 0,
+  "from": "state\\consolidate\\facts1-plain\\adapter",
+  "readings": {
+   "verdict": {
+    "keep": false,
+    "why": "lost asking (-4.7 standard errors)",
+    "lines": {
+     "gold": -1.8,
+     "asking": -4.7,
+     "floor": 0.0
+    }
+   }
+  },
+  "note": "lost asking (-4.7 standard errors)",
+  "sha": "48c2b084",
+  "at": "20261106T103117Z",
+  "rolled_back": {
+   "why": "lost asking (-4.7 standard errors)",
+   "at": "20261106T103117Z"
+  }
+ },
+ {
+  "round": 5,
+  "part": "facts",
+  "what": "the first facts adapter, arm qa",
+  "trained_on": "the supporting paragraphs of validation questions 0-200",
+  "questions": 0,
+  "from": "state\\consolidate\\facts1-qa\\adapter",
+  "readings": {
+   "verdict": {
+    "keep": false,
+    "why": "lost asking (-2.1 standard errors)",
+    "lines": {
+     "gold": 0.2,
+     "asking": -2.1,
+     "floor": 4.5
+    }
+   }
+  },
+  "note": "lost asking (-2.1 standard errors)",
+  "sha": "48c2b084",
+  "at": "20261106T103118Z",
+  "rolled_back": {
+   "why": "lost asking (-2.1 standard errors)",
+   "at": "20261106T103118Z"
+  }
  }
 ]

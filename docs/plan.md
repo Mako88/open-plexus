@@ -632,8 +632,12 @@ Each step says what it decides. A step is struck when it is done.
      On the reading questions it ranks a right answer above a wrong one **0.85** of the time, and,
      its scores rescaled on held-out questions, it is calibrated: what it states at 0.07 is right
      0.06 of the time, at 0.29 0.26, at 0.86 0.86. The sense of knowing is in the trunk and a small
-     head reads it. Next: the asking reads it, answering alone where the gut is sure and searching
-     where it is not, so whether to look is a judgement about this question, not a habit.
+     head reads it. Read as a router (`hotpot-20261106T114440Z`): answering alone where the gut is at
+     least 0.5 sure (18 of 200) and searching elsewhere, 0.505 against always searching's 0.56;
+     on those 18, memory is right 11 times and searching 15. On a store that holds the answer,
+     looking beats knowing even where it knows; the router is deleted (revive from `2497d922`) and
+     the gut kept for the other direction, a search forced where the gut doubts and the habit
+     would not look, which is the sleeps' failure.
    - **The order from here** (John, 2026-11-05): (1) the score fixed, done; (2) the facts adapter
      apart from the skills (`consolidate.py --part facts`, the lineage's `facts` part), read as two
      arms, rows and restatements alone against the question lines with both skills rehearsed;

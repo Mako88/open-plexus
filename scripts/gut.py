@@ -149,10 +149,17 @@ def main() -> None:
                 if best is None or a > best[0]:
                     best = (a, layer, lam)
         _, layer, lam = best
-        mu, sd = htr[layer].mean(0), htr[layer].std(0) + 1e-6
-        w, b = fit_logistic((htr[layer] - mu) / sd, ytr, lam)
-        np.savez(OUT / "gut.npz", w=w, b=b, mu=mu, sd=sd, layer=layer, lam=lam)
-        pva = 1 / (1 + np.exp(-(((hva[layer] - mu) / sd) @ w + b)))
+        # the head on four fifths, and its raw scores rescaled on the held fifth (Platt: a and c fitted
+        # so the probability it states is the rate it is right), so the stated confidence is calibrated
+        mu, sd = htr[layer][:-held].mean(0), htr[layer][:-held].std(0) + 1e-6
+        w, b = fit_logistic((htr[layer][:-held] - mu) / sd, ytr[:-held], lam)
+        raw_held = ((htr[layer][-held:] - mu) / sd) @ w + b
+        z = (raw_held - raw_held.mean()) / (raw_held.std() + 1e-6)
+        aw, ab = fit_logistic(z[:, None], ytr[-held:], 0.0, steps=2000, lr=0.1)
+        scale = {"mean": float(raw_held.mean()), "std": float(raw_held.std() + 1e-6), "a": float(aw[0]), "c": float(ab)}
+        np.savez(OUT / "gut.npz", w=w, b=b, mu=mu, sd=sd, layer=layer, lam=lam, **{f"platt_{k}": v for k, v in scale.items()})
+        raw_va = ((hva[layer] - mu) / sd) @ w + b
+        pva = 1 / (1 + np.exp(-(scale["a"] * (raw_va - scale["mean"]) / scale["std"] + scale["c"])))
         reading.update({
             "base_rate": {"train": round(float(ytr.mean()), 3), "val": round(float(yva.mean()), 3)},
             "held_out_auroc": table, "chosen": {"layer": layer, "lam": lam},

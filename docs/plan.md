@@ -626,6 +626,14 @@ Each step says what it decides. A step is struck when it is done.
      Decides, with John's view that the store is the knowledge: consolidation goes into the store
      (rows for chains used often, the old rows kept), the weights hold skills, trained by the key.
      Every sleep and both facts arms are in the ledger, rolled back by the keep rule.
+   - **The gut, read 2026-11-06** (`scripts/gut.py`, `gut-20261106T111953Z` and the rescaled one
+     after it): a logistic head over the trunk's layer-12 state, the skills merged, labelled by
+     whether the system's no-passage answer came out right on 4,000 training questions (15% are).
+     On the reading questions it ranks a right answer above a wrong one **0.85** of the time, and,
+     its scores rescaled on held-out questions, it is calibrated: what it states at 0.07 is right
+     0.06 of the time, at 0.29 0.26, at 0.86 0.86. The sense of knowing is in the trunk and a small
+     head reads it. Next: the asking reads it, answering alone where the gut is sure and searching
+     where it is not, so whether to look is a judgement about this question, not a habit.
    - **The order from here** (John, 2026-11-05): (1) the score fixed, done; (2) the facts adapter
      apart from the skills (`consolidate.py --part facts`, the lineage's `facts` part), read as two
      arms, rows and restatements alone against the question lines with both skills rehearsed;

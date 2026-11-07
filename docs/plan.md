@@ -659,7 +659,17 @@ Each step says what it decides. A step is struck when it is done.
      made right), against 33 (13 made right) in the kept reading, whose rows came from the
      ten-paragraph asking, where the gold passages are among the ten. So the earlier lift was
      borrowed from the setting's finding, and a sleep that only remembers what it found adds
-     what it already knows. Next: a sleep that finds what the day missed.
+     what it already knows. Next (Fable, 2026-11-07): a sleep that finds what the day missed,
+     re-searching the day's questions wide (`scripts/wide_pairs.py`: three reranked first hops
+     from BM25's top 200, second hops from the titles each names and BM25 of the question with
+     its title), no key in the choosing. Read first by coverage, no trunk time: how many of the
+     day's wrong questions get their gold pair (17 from the histories); under about 25, finding
+     is not budget-bound and the first stage comes first. Read on round 6's day: of 88 wrong, the
+     gold pair is among the candidates for 62 and among the kept pairs for **36**, the second
+     hops scored against the question alone, five a first hop (against the question with the
+     first passage 33, two a first hop 26). Then the cycle as `live.py` reads it, on the same day.
+     Rows on keyed training questions cannot help (a row has never been shown on a question it
+     was not written for); the key belongs in training the pair chooser, a later form.
    - **The order from here** (John, 2026-11-05): (1) the score fixed, done; (2) the facts adapter
      apart from the skills (`consolidate.py --part facts`, the lineage's `facts` part), read as two
      arms, rows and restatements alone against the question lines with both skills rehearsed;

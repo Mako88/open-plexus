@@ -9,8 +9,9 @@ weights cost the asking and facts there compete with facts in the store):
    1000 + 200 a round on, never the 200 reading questions) over the full store with its own rows
    beside it. That pass is also the trend line: if earlier rounds' rows carry over to new questions,
    it rises round on round.
-2. The sleep: from the day's search histories the trunk writes a chain row for each pair of
-   passages read one after the other (`chains.py --wiki`), each row carrying both passages.
+2. The sleep: the day's questions searched again, wide (`wide_pairs.py`), since the day's own
+   histories hold a gold pair mostly where it already answered (round 6); the trunk writes a chain
+   row for each pair found (`chains.py --wiki --pairs`), each row carrying both passages.
 3. The reading: the day's questions asked again with the new rows (the gain line, remembering what
    it worked out) and the fixed first 200 asked with them (the regression line, the rows not getting
    in the way), each paired against the system before the sleep.
@@ -146,7 +147,11 @@ def main() -> None:
     try:
         day = reading(heard, "system", "floor", f"round {rnd}: the day, questions it has not heard, with its own rows", logfile, n=args.n)
         if not candidates.exists():
-            run([PY, "scripts/chains.py", "--wiki", "--from", day["reading"], "--out", str(candidates)], logfile)
+            # the sleep searches the day's questions again, wide, and writes a line for each pair it finds
+            run([PY, "scripts/wide_pairs.py", "--from", day["reading"], "--skip", str(heard), "--n", str(args.n),
+                 "--out", str(work / "pairs.jsonl")], logfile)
+            run([PY, "scripts/chains.py", "--wiki", "--from", day["reading"], "--pairs", str(work / "pairs.jsonl"),
+                 "--out", str(candidates)], logfile)
         written = [json.loads(l) for l in candidates.read_text(encoding="utf-8").splitlines() if l.strip()]
         log(f"the sleep wrote {len(written)} rows")
         merged = work / f"experience-{work.name}.jsonl"  # its stem tags the readings, so a smoke never shares them with a round
@@ -166,7 +171,7 @@ def main() -> None:
     if args.n != 200:
         log("a smoke: nothing committed")
         return
-    lin.commit_rows(written, f"the live loop's sleep, round {rnd}: chain rows from the day's search histories",
+    lin.commit_rows(written, f"the live loop's sleep, round {rnd}: chain rows from the day's questions searched again, wide",
                     f"validation questions {heard}-{heard + 200}", readings, note=v["why"])
     if not v["keep"]:
         lin.rollback_rows(v["why"])

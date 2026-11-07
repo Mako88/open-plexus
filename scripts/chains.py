@@ -55,6 +55,7 @@ def main() -> None:
     p.add_argument("--wiki", action="store_true",
                    help="the experience is a full-store asking (wiki:ask, its shown_rows): every row written is self-contained, "
                         "its line and both Wikipedia passages, for the lineage's store part (Lineage.commit_rows)")
+    p.add_argument("--pairs", help="with --wiki: the pairs to write lines for, from wide_pairs.py, in place of the histories")
     args = p.parse_args()
     reading = json.loads((ROOT / "readings" / f"{args.source}.json").read_text(encoding="utf-8"))
     pairs = []
@@ -63,13 +64,19 @@ def main() -> None:
 
         wiki = WikiTexts(ROOT / "data" / "wiki-abstracts" / "minilm")
         had = {(r["a"], r["b"]) for r in Lineage().experience()}
-        for r in reading["arms"]["wiki:ask"]["rows"]:
-            shown = [i for i in r.get("shown_rows", []) if i < wiki.n]  # the system's own rows are not chained again
-            for i, j in zip(shown, shown[1:]):
-                a, b = wiki.title(i), wiki.title(j)
-                if i != j and (a, b) not in had:
-                    had.add((a, b))
-                    pairs.append((r["id"], a, b, wiki.text(i), wiki.text(j)))
+        if args.pairs:  # the wide sleep's own search (wide_pairs.py), not the day's histories
+            found = [json.loads(l) for l in Path(args.pairs).read_text(encoding="utf-8").splitlines() if l.strip()]
+            seq = [(x["from"], x["a_row"], x["b_row"]) for x in found]
+        else:
+            seq = []
+            for r in reading["arms"]["wiki:ask"]["rows"]:
+                shown = [i for i in r.get("shown_rows", []) if i < wiki.n]  # the system's own rows are not chained again
+                seq += [(r["id"], i, j) for i, j in zip(shown, shown[1:])]
+        for qid, i, j in seq:
+            a, b = wiki.title(i), wiki.title(j)
+            if i != j and (a, b) not in had and (b, a) not in had:
+                had.add((a, b))
+                pairs.append((qid, a, b, wiki.text(i), wiki.text(j)))
         qs = reading["arms"]["wiki:ask"]["rows"]
     else:
         rows = reading["arms"]["ask"]["rows"]

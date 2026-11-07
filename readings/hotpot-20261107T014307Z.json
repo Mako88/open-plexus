@@ -1,0 +1,4285 @@
+{
+ "kind": "hotpot-reading",
+ "set": "HotpotQA distractor validation, data/hotpotqa/validation.jsonl",
+ "skip": 0,
+ "n": 200,
+ "scorer": "exact match and token F1 on the normalised answer, HotpotQA's own",
+ "adapter": "D:\\repos\\open-plexus\\state\\system\\adapter.gguf",
+ "arms": {
+  "wiki:ask": {
+   "paragraphs": "wiki:ask",
+   "served_model": "C:\\Users\\John\\.cache\\huggingface\\hub\\models--bartowski--Qwen_Qwen3.5-2B-GGUF\\snapshots\\7d26695454df6de5fbcce2e58681e62dae06ce43\\Qwen_Qwen3.5-2B-Q8_0.gguf with adapters adapter.gguf at 1.0",
+   "system_prompt": "Answer the question. Use the passages where they are given; they may contain the facts needed. Think briefly, then end with a last line of the form 'Answer: X' where X is the short answer (a name, a number, a date, or yes or no), and nothing after it.",
+   "inputs_the_deployed_system_has": "the question and the store",
+   "exact": 0.515,
+   "f1": 0.607,
+   "lenient": 0.62,
+   "by_type": {
+    "bridge": 0.5,
+    "comparison": 0.588
+   },
+   "n": 200,
+   "stopped_early": false,
+   "unanswered": 0,
+   "gold_shown_mean": 0.84,
+   "searches_mean": 1.58,
+   "never_asked": 0,
+   "failed_turns": 0,
+   "store_rows": 5233329,
+   "sense": "lexical",
+   "passes_per_question": 163.4,
+   "paired": {
+    "wikiask-lexical-system-r0-rerank50": {
+     "n": 200,
+     "score": 0.515,
+     "other_score": 0.475,
+     "made_right": 13,
+     "made_wrong": 5,
+     "gap": 0.04,
+     "standard_errors": 1.9
+    }
+   },
+   "seconds": 1198.8,
+   "rows": [
+    {
+     "id": "5a8b57f25542995d1e6f1371",
+     "question": "Were Scott Derrickson and Ed Wood of the same nationality?",
+     "answer": "yes",
+     "type": "comparison",
+     "level": "hard",
+     "said": "Yes",
+     "correct": true,
+     "lenient": true,
+     "f1": 1.0,
+     "reply": "Based on the search results:\n- Scott Derrickson is American\n- Ed Wood is American\n\nBoth Scott Derrickson and Ed Wood were American, so they were of the same nationality.\n\nAnswer: Yes",
+     "shown": [
+      "Scott Derrickson",
+      "Ed Wood"
+     ],
+     "gold_shown": 2,
+     "passes": 141.0,
+     "searches": [
+      "Scott Derrickson nationality",
+      "Ed Wood nationality"
+     ]
+    },
+    {
+     "id": "5a8c7595554299585d9e36b6",
+     "question": "What government position was held by the woman who portrayed Corliss Archer in the film Kiss and Tell?",
+     "answer": "Chief of Protocol",
+     "type": "bridge",
+     "level": "hard",
+     "said": "Minister for Foreign Affairs",
+     "correct": false,
+     "lenient": false,
+     "f1": 0.0,
+     "reply": "Based on the search results, the woman who portrayed Corliss Archer in the film \"Kiss and Tell\" was Shirley Temple. She later became a politician and served in several cabinet positions, including Minister for Foreign Affairs.\n\nAnswer: Minister for Foreign Affairs",
+     "shown": [
+      "Kiss and Tell (1945 film)",
+      "Shirley Gbujama"
+     ],
+     "gold_shown": 1,
+     "passes": 141.0,
+     "searches": [
+      "Kiss and Tell film Corliss Archer actress",
+      "Shirley Temple government position"
+     ]
+    },
+    {
+     "id": "5a85ea095542994775f606a8",
+     "question": "What science fantasy young adult series, told in first person, has a set of companion books narrating the stories of enslaved worlds and alien species?",
+     "answer": "Animorphs",
+     "type": "bridge",
+     "level": "hard",
+     "said": "Animorphs",
+     "correct": true,
+     "lenient": true,
+     "f1": 1.0,
+     "reply": "Based on the search results, the series is **Animorphs**. It is a science fantasy young adult series told in first person, with companion books narrating the stories of enslaved worlds (like the Hork-Bajir) and alien species (like the Andalites).\n\nAnswer: Animorphs",
+     "shown": [
+      "chain: Animorphs -> The Hork-Bajir Chronicles"
+     ],
+     "gold_shown": 0,
+     "passes": 140.0,
+     "searches": [
+      "science fantasy young adult series first person companion books enslaved worlds alien species"
+     ]
+    },
+    {
+     "id": "5adbf0a255429947ff17385a",
+     "question": "Are the Laleli Mosque and Esma Sultan Mansion located in the same neighborhood?",
+     "answer": "no",
+     "type": "comparison",
+     "level": "hard",
+     "said": "No",
+     "correct": true,
+     "lenient": true,
+     "f1": 1.0,
+     "reply": "Based on the search results:\n- The Laleli Mosque is located in Laleli, Fatih, Istanbul.\n- The Esma Sultan Mansion is located in Ortaköy neighborhood of Istanbul.\n\nThese are two different neighborhoods in Istanbul.\n\nAnswer: No",
+     "shown": [
+      "chain: Laleli Mosque -> Esma Sultan Mansion"
+     ],
+     "gold_shown": 0,
+     "passes": 140.0,
+     "searches": [
+      "Laleli Mosque location neighborhood"
+     ]
+    },
+    {
+     "id": "5a8e3ea95542995a26add48d",
+     "question": "The director of the romantic comedy \"Big Stone Gap\" is based in what New York city?",
+     "answer": "Greenwich Village, New York City",
+     "type": "bridge",
+     "level": "hard",
+     "said": "Greenwich Village",
+     "correct": false,
+     "lenient": true,
+     "f1": 0.571,
+     "reply": "Based on the search results, Adriana Trigiani, the director of the romantic comedy \"Big Stone Gap,\" is based in Greenwich Village, New York City.\n\nAnswer: Greenwich Village",
+     "shown": [
+      "Big Stone Gap (film)",
+      "Adriana Trigiani"
+     ],
+     "gold_shown": 2,
+     "passes": 141.0,
+     "searches": [
+      "Big Stone Gap romantic comedy director",
+      "Adriana Trigiani director based in New York city"
+     ]
+    },
+    {
+     "id": "5abd94525542992ac4f382d2",
+     "question": "2014 S/S is the debut album of a South Korean boy group that was formed by who?",
+     "answer": "YG Entertainment",
+     "type": "bridge",
+     "level": "hard",
+     "said": "YG Entertainment",
+     "correct": true,
+     "lenient": true,
+     "f1": 1.0,
+     "reply": "Based on the search results, the 2014 S/S album is the debut album of the South Korean boy group WINNER, which was formed by YG Entertainment.\n\nAnswer: YG Entertainment",
+     "shown": [
+      "2014 S/S",
+      "Winner (band)"
+     ],
+     "gold_shown": 2,
+     "passes": 141.0,
+     "searches": [
+      "2014 S/S debut album South Korean boy group",
+      "WINNER South Korean boy group formed by who"
+     ]
+    },
+    {
+     "id": "5a85b2d95542997b5ce40028",
+     "question": "Who was known by his stage name Aladin and helped organizations improve their performance as a consultant?",
+     "answer": "Eenasul Fateh",
+     "type": "bridge",
+     "level": "hard",
+     "said": "Alexis Theodorovich Aladin",
+     "correct": false,
+     "lenient": false,
+     "f1": 0.0,
+     "reply": "Based on the search results, the person known by his stage name Aladin who helped organizations improve their performance as a consultant was Alexis Theodorovich Aladin (also known as Alexey Aladyin).\n\nAnswer: Alexis Theodorovich Aladin",
+     "shown": [
+      "Alexis Theodorovich Aladin"
+     ],
+     "gold_shown": 0,
+     "passes": 140.0,
+     "searches": [
+      "Aladin stage name consultant"
+     ]
+    },
+    {
+     "id": "5a87ab905542996e4f3088c1",
+     "question": "The arena where the Lewiston Maineiacs played their home games can seat how many people?",
+     "answer": "3,677 seated",
+     "type": "bridge",
+     "level": "hard",
+     "said": "4,000",
+     "correct": false,
+     "lenient": false,
+     "f1": 0.0,
+     "reply": "Based on the search results, the Lewiston Maineiacs played their home games at the Androscoggin Bank Colisée, which is a 4,000 capacity (3,677 seated) multi-purpose arena.\n\nAnswer: 4,000",
+     "shown": [
+      "chain: Lewiston Maineiacs -> Androscoggin Bank Colisée"
+     ],
+     "gold_shown": 0,
+     "passes": 140.0,
+     "searches": [
+      "Lewiston Maineiacs home arena seating capacity"
+     ]
+    },
+    {
+     "id": "5a7bbb64554299042af8f7cc",
+     "question": "Who is older, Annie Morton or Terry Richardson?",
+     "answer": "Terry Richardson",
+     "type": "bridge",
+     "level": "hard",
+     "said": "Annie Morton",
+     "correct": false,
+     "lenient": false,
+     "f1": 0.0,
+     "reply": "Based on the search results:\n- Annie Morton was born on October 8, 1970\n- Terry Richardson was born on May 7, 1953\n\nSince 1970 is later than 1953, Annie Morton is older.\n\nAnswer: Annie Morton",
+     "shown": [
+      "Annie Morton",
+      "Terry Richardson (ice hockey)"
+     ],
+     "gold_shown": 1,
+     "passes": 210.1,
+     "searches": [
+      "Annie Morton birth date",
+      "Terry Richardson birth date"
+     ]
+    },
+    {
+     "id": "5a8db19d5542994ba4e3dd00",
+     "question": "Are Local H and For Against both from the United States?",
+     "answer": "yes",
+     "type": "comparison",
+     "level": "hard",
+     "said": "Yes",
+     "correct": true,
+     "lenient": true,
+     "f1": 1.0,
+     "reply": "Based on the search results:\n- Local H is an American rock band from Zion, Illinois\n- For Against is a United States post-punk/dream pop band from Lincoln, Nebraska\n\nBoth bands are from the United States.\n\nAnswer: Yes",
+     "shown": [
+      "Local H",
+      "For Against"
+     ],
+     "gold_shown": 2,
+     "passes": 210.1,
+     "searches": [
+      "Local H",
+      "For Against"
+     ]
+    },
+    {
+     "id": "5a7166395542994082a3e814",
+     "question": "What is the name of the fight song of the university whose main campus is in Lawrence, Kansas and whose branch campuses are in the Kansas City metropolitan area?",
+     "answer": "Kansas Song",
+     "type": "bridge",
+     "level": "hard",
+     "said": "Kansas Song",
+     "correct": true,
+     "lenient": true,
+     "f1": 1.0,
+     "reply": "Based on the search results, the fight song of the University of Kansas is called \"Kansas Song\" (also referred to as \"We're From Kansas\").\n\nAnswer: Kansas Song",
+     "shown": [
+      "University of Kansas",
+      "chain: University of Kansas -> Kansas Song"
+     ],
+     "gold_shown": 1,
+     "passes": 210.1,
+     "searches": [
+      "university main campus Lawrence Kansas branch campuses Kansas City metropolitan area",
+      "University of Kansas fight song"
+     ]
+    },
+    {
+     "id": "5a877e5d5542993e715abf7d",
+     "question": "What screenwriter with credits for \"Evolution\" co-wrote a film starring Nicolas Cage and Téa Leoni?",
+     "answer": "David Weissman",
+     "type": "bridge",
+     "level": "hard",
+     "said": "David Weissman",
+     "correct": true,
+     "lenient": true,
+     "f1": 1.0,
+     "reply": "Based on the search results, David Weissman is the screenwriter who co-wrote the film \"The Family Man\" starring Nicolas Cage and Téa Leoni. He also has credits for \"Evolution\" (2001).\n\nAnswer: David Weissman",
+     "shown": [
+      "Evolution (2001 film)",
+      "David Diamond (screenwriter)",
+      "chain: David Weissman -> The Family Man"
+     ],
+     "gold_shown": 0,
+     "passes": 211.1,
+     "searches": [
+      "Evolution film screenwriter",
+      "Evolution film screenwriter credits",
+      "Nicolas Cage Téa Leoni film"
+     ]
+    },
+    {
+     "id": "5ab3b0bf5542992ade7c6e39",
+     "question": "What year did Guns N Roses perform a promo for a movie starring Arnold Schwarzenegger as a former New York Police detective?",
+     "answer": "1999",
+     "type": "bridge",
+     "level": "hard",
+     "said": "Cannot be determined from the provided information",
+     "correct": false,
+     "lenient": false,
+     "f1": 0.0,
+     "reply": "The search results provide biographical information about Arnold Schwarzenegger but do not explicitly state the name of the movie he starred in as a former New York Police detective, nor do they mention a specific year when Guns N Roses performed a promo for it. The collection of facts provided does not contain enough information to answer this question directly.\n\nBased on the available information, I cannot determine the year Guns N Roses performed a promo for a movie starring Arnold Schwarzenegger as a former New York Police detective. The search results mention that he appeared in music videos for Guns N' Roses, but they don't specify the movie title or the year of the promo.\n\nAnswer: Cannot be determined from the provided information",
+     "shown": [
+      "Arnold Schwarzenegger filmography",
+      "Gustav Schwarzenegger",
+      "Arnold Schwarzenegger"
+     ],
+     "gold_shown": 0,
+     "passes": 211.1,
+     "searches": [
+      "Guns N Roses promo movie Arnold Schwarzenegger former New York Police detective",
+      "Arnold Schwarzenegger former New York Police detective movie",
+      "Arnold Schwarzenegger former New York Police detective movie name"
+     ]
+    },
+    {
+     "id": "5ab56e32554299637185c594",
+     "question": "Are Random House Tower and 888 7th Avenue both used for real estate?",
+     "answer": "no",
+     "type": "comparison",
+     "level": "hard",
+     "said": "Yes",
+     "correct": false,
+     "lenient": false,
+     "f1": 0.0,
+     "reply": "Based on the search results:\n\n1. The Random House Tower is described as a \"mixed-use tower\" that is used as the headquarters of book publisher Random House and a luxury apartment complex. This indicates it is used for real estate purposes.\n\n2. 888 7th Avenue is described as a \"modern-style office skyscraper\" that \"currently carries the Vornado Realty Trust corporate headquarters.\" This indicates it is used for real estate purposes.\n\nBoth buildings are used for real estate.\n\nAnswer: Yes",
+     "shown": [
+      "Random House Tower",
+      "888 7th Avenue"
+     ],
+     "gold_shown": 2,
+     "passes": 210.1,
+     "searches": [
+      "Random House Tower real estate",
+      "888 7th Avenue real estate"
+     ]
+    },
+    {
+     "id": "5ab6d09255429954757d337d",
+     "question": "The football manager who recruited David Beckham managed Manchester United during what timeframe?",
+     "answer": "from 1986 to 2013",
+     "type": "bridge",
+     "level": "hard",
+     "said": "1986 to 2013",
+     "correct": false,
+     "lenient": true,
+     "f1": 0.857,
+     "reply": "Based on the search results, the football manager who recruited David Beckham was Alex Ferguson. According to the passage, he managed Manchester United from 1986 to 2013.\n\nAnswer: 1986 to 2013",
+     "shown": [
+      "chain: David Beckham Academy -> Alex Ferguson"
+     ],
+     "gold_shown": 0,
+     "passes": 209.1,
+     "searches": [
+      "football manager recruited David Beckham"
+     ]
+    },
+    {
+     "id": "5a75e05c55429976ec32bc5f",
+     "question": "Brown State Fishing Lake is in a country that has a population of how many inhabitants ?",
+     "answer": "9,984",
+     "type": "bridge",
+     "level": "hard",
+     "said": "323,127,513",
+     "correct": false,
+     "lenient": false,
+     "f1": 0.0,
+     "reply": "Based on the search results, Brown State Fishing Lake is in the United States, which has a population of 323,127,513 inhabitants.\n\nAnswer: 323,127,513",
+     "shown": [
+      "Brown State Fishing Lake",
+      "Demography of the United States"
+     ],
+     "gold_shown": 1,
+     "passes": 210.1,
+     "searches": [
+      "Brown State Fishing Lake location country",
+      "United States population number of inhabitants"
+     ]
+    },
+    {
+     "id": "5ab3e45655429976abd1bcd4",
+     "question": "The Vermont Catamounts men's soccer team currently competes in a conference that was formerly known as what from 1988 to 1996?",
+     "answer": "the North Atlantic Conference",
+     "type": "bridge",
+     "level": "hard",
+     "said": "North Atlantic Conference",
+     "correct": true,
+     "lenient": true,
+     "f1": 1.0,
+     "reply": "Based on the search results, the Vermont Catamounts men's soccer team currently competes in the America East Conference. According to the passage, the America East Conference was known as the North Atlantic Conference from 1988 to 1996.\n\nAnswer: North Atlantic Conference",
+     "shown": [
+      "chain: Vermont Catamounts men's soccer -> America East Conference"
+     ],
+     "gold_shown": 0,
+     "passes": 190.6,
+     "searches": [
+      "Vermont Catamounts men's soccer team conference history 1988 to 1996"
+     ]
+    },
+    {
+     "id": "5ab29c24554299449642c932",
+     "question": "Are Giuseppe Verdi and Ambroise Thomas both Opera composers ?",
+     "answer": "yes",
+     "type": "comparison",
+     "level": "hard",
+     "said": "Yes",
+     "correct": true,
+     "lenient": true,
+     "f1": 1.0,
+     "reply": "Based on the search results:\n- Giuseppe Verdi was described as an \"Italian opera composer\"\n- Ambroise Thomas was described as a \"French composer, best known for his operas\"\n\nBoth Verdi and Thomas are confirmed to be opera composers.\n\nAnswer: Yes",
+     "shown": [
+      "Giuseppe Verdi",
+      "Ambroise Thomas"
+     ],
+     "gold_shown": 2,
+     "passes": 191.6,
+     "searches": [
+      "Giuseppe Verdi opera composer",
+      "Ambroise Thomas opera composer"
+     ]
+    },
+    {
+     "id": "5ae0d4c9554299603e418468",
+     "question": "Roger O. Egeberg was Assistant Secretary for Health and Scientific Affairs during the administration of a president that served during what years?",
+     "answer": "1969 until 1974",
+     "type": "bridge",
+     "level": "hard",
+     "said": "1969-1974",
+     "correct": false,
+     "lenient": false,
+     "f1": 0.0,
+     "reply": "Based on the search results, Roger O. Egeberg served as Assistant Secretary for Health and Scientific Affairs during the Nixon administration. Richard Nixon was the 37th President of the United States who served from 1969 until 1974.\n\nAnswer: 1969-1974",
+     "shown": [
+      "chain: Roger O. Egeberg -> Richard Nixon"
+     ],
+     "gold_shown": 0,
+     "passes": 190.6,
+     "searches": [
+      "Roger O. Egeberg Assistant Secretary for Health and Scientific Affairs"
+     ]
+    },
+    {
+     "id": "5a8133725542995ce29dcbdb",
+     "question": "Which writer was from England, Henry Roth or Robert Erskine Childers?",
+     "answer": "Robert Erskine Childers DSC",
+     "type": "comparison",
+     "level": "hard",
+     "said": "Wait, let me re-read the question. It asks \"Which writer was from England, Henry Roth or Robert Erskine Childers?\" - this is asking me to determine which one was from England. Based on",
+     "correct": false,
+     "lenient": false,
+     "f1": 0.171,
+     "reply": "Based on the search results:\n\n1. Henry Roth was an American novelist and short story writer (February 8, 1906 – October 13, 1995).\n2. Robert Erskine Childers was an Irish writer, BBC correspondent and United Nations senior civil servant.\n\nSince Henry Roth was American and Robert Erskine Childers was Irish, neither was from England. However, the question asks which writer was from England between these two. Since neither was from England, I need to check if there's any other information.\n\nWait, let me re-read the question. It asks \"Which writer was from England, Henry Roth or Robert Erskine Childers?\" - this is asking me to determine which one was from England. Based on",
+     "shown": [
+      "chain: Henry Roth -> Erskine Barton Childers"
+     ],
+     "gold_shown": 0,
+     "passes": 190.6,
+     "searches": [
+      "Henry Roth writer England"
+     ]
+    },
+    {
+     "id": "5ae7a8175542993210983ed8",
+     "question": "Which other Mexican Formula One race car driver has held the podium besides the Force India driver born in 1990?",
+     "answer": "Pedro Rodríguez",
+     "type": "bridge",
+     "level": "hard",
+     "said": "Sergio Pérez",
+     "correct": false,
+     "lenient": false,
+     "f1": 0.0,
+     "reply": "I now have all the information I need:\n1. Sergio Pérez is a Mexican Formula One driver\n2. He was born on January 26, 1990\n3. He is currently driving for Force India\n4. He is the only other Mexican to finish on the podium besides Pedro Rodríguez (who won a grand prix)\n\nThe question asks which other Mexican Formula One race car driver has held the podium besides the Force India driver born in 1990. The answer is Sergio Pérez.\n\nAnswer: Sergio Pérez",
+     "shown": [
+      "Formula One drivers from Mexico",
+      "Sergio Pérez"
+     ],
+     "gold_shown": 2,
+     "passes": 191.6,
+     "searches": [
+      "Mexican Formula One driver",
+      "Sergio Pérez born 1990 Force India"
+     ]
+    },
+    {
+     "id": "5ae6050f55429929b0807a5e",
+     "question": "This singer of A Rather Blustery Day also voiced what hedgehog?",
+     "answer": "Sonic",
+     "type": "bridge",
+     "level": "hard",
+     "said": "Winnie the Pooh",
+     "correct": false,
+     "lenient": false,
+     "f1": 0.0,
+     "reply": "Based on the search results, Jim Cummings voiced Winnie the Pooh, Tigger, and the Tasmanian Devil. The question asks what hedgehog he voiced. Winnie the Pooh is a hedgehog.\n\nAnswer: Winnie the Pooh",
+     "shown": [
+      "A Rather Blustery Day",
+      "Jim Cummings"
+     ],
+     "gold_shown": 2,
+     "passes": 191.6,
+     "searches": [
+      "singer of A Rather Blustery Day",
+      "Jim Cummings voiced hedgehog"
+     ]
+    },
+    {
+     "id": "5adddccd5542997dc7907069",
+     "question": "Aside from the Apple Remote, what other device can control the program Apple Remote was originally designed to interact with?",
+     "answer": "keyboard function keys",
+     "type": "bridge",
+     "level": "hard",
+     "said": "iSight iMac G5",
+     "correct": false,
+     "lenient": false,
+     "f1": 0.0,
+     "reply": "Based on the search results, the Apple Remote was originally designed to interact with the Front Row media program on the iSight iMac G5.\n\nAnswer: iSight iMac G5",
+     "shown": [
+      "Apple Remote"
+     ],
+     "gold_shown": 1,
+     "passes": 190.6,
+     "searches": [
+      "Apple Remote original device it was designed to interact with"
+     ]
+    },
+    {
+     "id": "5ae2070a5542994d89d5b313",
+     "question": "Which performance act has a higher instrument to person ratio, Badly Drawn Boy or Wolf Alice? ",
+     "answer": "Badly Drawn Boy",
+     "type": "comparison",
+     "level": "hard",
+     "said": "Since Badly Drawn Boy has 1 person and plays multiple instruments, while Wolf Alice has 4 people each playing at least",
+     "correct": false,
+     "lenient": true,
+     "f1": 0.25,
+     "reply": "Based on the search results:\n\n**Badly Drawn Boy:**\n- Damon Michael Gough is a multi-instrumentalist, meaning he plays multiple instruments.\n\n**Wolf Alice:**\n- They are a four-piece band with 4 members: Ellie Rowsell, Joff Oddie, Theo Ellis, and Joel Amey.\n- Each member plays at least one instrument (vocals, guitar, bass, drums).\n\nTo compare the instrument-to-person ratio:\n- Badly Drawn Boy: 1 person, multiple instruments (at least 1 instrument)\n- Wolf Alice: 4 people, each plays at least 1 instrument\n\nSince Badly Drawn Boy has 1 person and plays multiple instruments, while Wolf Alice has 4 people each playing at least",
+     "shown": [
+      "chain: Badly Drawn Boy -> Wolf Alice"
+     ],
+     "gold_shown": 0,
+     "passes": 190.6,
+     "searches": [
+      "Badly Drawn Boy performance act instrument to person ratio"
+     ]
+    },
+    {
+     "id": "5ae22b8d554299234fd0440f",
+     "question": "What was the father of Kasper Schmeichel voted to be by the IFFHS in 1992?",
+     "answer": "World's Best Goalkeeper",
+     "type": "bridge",
+     "level": "hard",
+     "said": "Peter Schmeichel",
+     "correct": false,
+     "lenient": false,
+     "f1": 0.0,
+     "reply": "Based on the search results, Peter Schmeichel was voted the IFFHS World's Best Goalkeeper in 1992. Peter Schmeichel is the father of Kasper Schmeichel.\n\nAnswer: Peter Schmeichel",
+     "shown": [
+      "chain: Kasper Schmeichel -> Peter Schmeichel"
+     ],
+     "gold_shown": 0,
+     "passes": 123.8,
+     "searches": [
+      "Kasper Schmeichel father IFFHS 1992"
+     ]
+    },
+    {
+     "id": "5a722b8655429971e9dc9329",
+     "question": "Who was the writer of These Boots Are Made for Walkin' and who died in 2007?",
+     "answer": "Barton Lee Hazlewood",
+     "type": "bridge",
+     "level": "hard",
+     "said": "Lee Hazlewood",
+     "correct": false,
+     "lenient": true,
+     "f1": 0.8,
+     "reply": "Based on the search results, Lee Hazlewood was the writer of \"These Boots Are Made for Walkin'\" and he died on August 4, 2007.\n\nAnswer: Lee Hazlewood",
+     "shown": [
+      "These Boots Are Made for Walkin'",
+      "Lee Hazlewood"
+     ],
+     "gold_shown": 2,
+     "passes": 124.8,
+     "searches": [
+      "These Boots Are Made for Walkin' writer",
+      "Lee Hazlewood died 2007"
+     ]
+    },
+    {
+     "id": "5adf37a95542995ec70e8f97",
+     "question": "The 2011–12 VCU Rams men's basketball team, led by third year head coach Shaka Smart, represented Virginia Commonwealth University which was founded in what year?",
+     "answer": "1838",
+     "type": "bridge",
+     "level": "hard",
+     "said": "1838",
+     "correct": true,
+     "lenient": true,
+     "f1": 1.0,
+     "reply": "Based on the search results, Virginia Commonwealth University was founded in 1838 as the medical department of Hampden–Sydney College.\n\nAnswer: 1838",
+     "shown": [
+      "Virginia Commonwealth University"
+     ],
+     "gold_shown": 1,
+     "passes": 123.8,
+     "searches": [
+      "Virginia Commonwealth University founded year"
+     ]
+    },
+    {
+     "id": "5abd259d55429924427fcf1a",
+     "question": "Are both Dictyosperma, and Huernia described as a genus?",
+     "answer": "yes",
+     "type": "comparison",
+     "level": "hard",
+     "said": "Yes",
+     "correct": true,
+     "lenient": true,
+     "f1": 1.0,
+     "reply": "Based on the search results:\n- Dictyosperma is described as a genus (specifically, a monotypic genus of flowering plant)\n- Huernia is also described as a genus (consisting of stem succulents from Eastern and Southern Africa)\n\nBoth are described as genera.\n\nAnswer: Yes",
+     "shown": [
+      "Dictyosperma",
+      "Huernia"
+     ],
+     "gold_shown": 2,
+     "passes": 124.8,
+     "searches": [
+      "Dictyosperma genus",
+      "Huernia genus"
+     ]
+    },
+    {
+     "id": "5a828c8355429966c78a6a50",
+     "question": "Kaiser Ventures corporation was founded by an American industrialist who became known as the father of modern American shipbuilding?",
+     "answer": "Henry J. Kaiser",
+     "type": "bridge",
+     "level": "hard",
+     "said": "Henry J. Kaiser",
+     "correct": true,
+     "lenient": true,
+     "f1": 1.0,
+     "reply": "Based on the search results, the Kaiser Ventures corporation was founded by Henry J. Kaiser, who was an American industrialist known as the father of modern American shipbuilding.\n\nAnswer: Henry J. Kaiser",
+     "shown": [
+      "Henry J. Kaiser"
+     ],
+     "gold_shown": 1,
+     "passes": 123.8,
+     "searches": [
+      "Kaiser Ventures corporation founded American industrialist father of modern American shipbuilding"
+     ]
+    },
+    {
+     "id": "5a8a3e745542996c9b8d5e70",
+     "question": "What is the name for the adventure in \"Tunnels and Trolls\", a game designed by Ken St. Andre?",
+     "answer": "Arena of Khazan",
+     "type": "bridge",
+     "level": "hard",
+     "said": "Tunnels & Trolls",
+     "correct": false,
+     "lenient": false,
+     "f1": 0.0,
+     "reply": "Based on the search results, the adventure in \"Tunnels and Trolls\" is called \"Tunnels & Trolls\" (abbreviated as \"T&T\").\n\nAnswer: Tunnels & Trolls",
+     "shown": [
+      "Tunnels &amp; Trolls"
+     ],
+     "gold_shown": 1,
+     "passes": 123.8,
+     "searches": [
+      "Tunnels and Trolls adventure game Ken St. Andre"
+     ]
+    },
+    {
+     "id": "5ac23ff0554299636651994d",
+     "question": "When was Poison's album \"Shut Up, Make Love\" released?",
+     "answer": "2000",
+     "type": "bridge",
+     "level": "hard",
+     "said": "2000",
+     "correct": true,
+     "lenient": true,
+     "f1": 1.0,
+     "reply": "Based on the search results, Poison's album \"Shut Up, Make Love\" was released in 2000.\n\nAnswer: 2000",
+     "shown": [
+      "Shut Up, Make Love"
+     ],
+     "gold_shown": 1,
+     "passes": 123.8,
+     "searches": [
+      "Poison album \"Shut Up, Make Love\" release date"
+     ]
+    },
+    {
+     "id": "5ae4a3265542995ad6573de5",
+     "question": "Hayden is a singer-songwriter from Canada, but where does Buck-Tick hail from?",
+     "answer": "Fujioka, Gunma",
+     "type": "comparison",
+     "level": "hard",
+     "said": "Fujioka, Gunma",
+     "correct": true,
+     "lenient": true,
+     "f1": 1.0,
+     "reply": "Based on the search results, Buck-Tick is a Japanese rock band formed in Fujioka, Gunma.\n\nAnswer: Fujioka, Gunma",
+     "shown": [
+      "Buck-Tick"
+     ],
+     "gold_shown": 1,
+     "passes": 123.8,
+     "searches": [
+      "Buck-Tick band origin location"
+     ]
+    },
+    {
+     "id": "5ae0361155429925eb1afc2c",
+     "question": "Which  French ace pilot and adventurer fly L'Oiseau Blanc",
+     "answer": "Charles Eugène",
+     "type": "bridge",
+     "level": "hard",
+     "said": "Charles Nungesser and François Coli",
+     "correct": false,
+     "lenient": false,
+     "f1": 0.286,
+     "reply": "Based on the search results, the French ace pilot and adventurer who flew the L'Oiseau Blanc are Charles Nungesser and François Coli.\n\nAnswer: Charles Nungesser and François Coli",
+     "shown": [
+      "L'Oiseau Blanc"
+     ],
+     "gold_shown": 1,
+     "passes": 149.0,
+     "searches": [
+      "French ace pilot and adventurer flies L'Oiseau Blanc"
+     ]
+    },
+    {
+     "id": "5abc0a5d5542993f40c73c64",
+     "question": "Are Freakonomics and In the Realm of the Hackers both American documentaries?",
+     "answer": "no",
+     "type": "comparison",
+     "level": "hard",
+     "said": "No",
+     "correct": true,
+     "lenient": true,
+     "f1": 1.0,
+     "reply": "Based on the search results:\n\n1. **Freakonomics** is a 2010 American documentary film.\n2. **In the Realm of the Hackers** is a 2003 Australian documentary.\n\nTherefore, Freakonomics is American, but In the Realm of the Hackers is Australian, not American.\n\nAnswer: No",
+     "shown": [
+      "Freakonomics (film)",
+      "chain: Freakonomics (film) -> In the Realm of the Hackers"
+     ],
+     "gold_shown": 1,
+     "passes": 150.0,
+     "searches": [
+      "Freakonomics documentary American",
+      "In the Realm of the Hackers documentary American"
+     ]
+    },
+    {
+     "id": "5a7cc50e554299452d57ba3e",
+     "question": "Which band, Letters to Cleo or Screaming Trees, had more members?",
+     "answer": "Letters to Cleo",
+     "type": "comparison",
+     "level": "hard",
+     "said": "Letters to Cleo",
+     "correct": true,
+     "lenient": true,
+     "f1": 1.0,
+     "reply": "Now I have the member counts for both bands:\n\n**Letters to Cleo:** Kay Hanley, Greg McKenna, Michael Eisenstein, Stacy Jones, Scott Riebling, and later Tom Polce (6 members total)\n\n**Screaming Trees:** Mark Lanegan, Gary Lee Conner, Van Conner, and Mark Pickerel (4 members total)\n\nLetters to Cleo had more members.\n\nAnswer: Letters to Cleo",
+     "shown": [
+      "Letters to Cleo",
+      "Screaming Trees"
+     ],
+     "gold_shown": 2,
+     "passes": 150.0,
+     "searches": [
+      "Letters to Cleo band members",
+      "Screaming Trees band members"
+     ]
+    },
+    {
+     "id": "5abf63f15542997ec76fd3ea",
+     "question": "Alexander Kerensky was defeated and destroyed by the Bolsheviks in the course of a civil war that ended when ?",
+     "answer": "October 1922",
+     "type": "bridge",
+     "level": "hard",
+     "said": "1923",
+     "correct": false,
+     "lenient": false,
+     "f1": 0.0,
+     "reply": "Based on the search results, the Russian Civil War ended in 1923. The passage states: \"The war ended in 1923 in the sense that Red control of the newly formed Soviet Union was now assured.\"\n\nAnswer: 1923",
+     "shown": [
+      "chain: Kerensky–Krasnov uprising -> Russian Civil War"
+     ],
+     "gold_shown": 0,
+     "passes": 149.0,
+     "searches": [
+      "Alexander Kerensky defeated Bolsheviks civil war"
+     ]
+    },
+    {
+     "id": "5a8ef2a75542995a26add583",
+     "question": "Seven Brief Lessons on Physics was written by an Italian physicist that has worked in France since what year?",
+     "answer": "2000",
+     "type": "bridge",
+     "level": "hard",
+     "said": "2000",
+     "correct": true,
+     "lenient": true,
+     "f1": 1.0,
+     "reply": "Based on the search results, Carlo Rovelli, the Italian physicist who wrote \"Seven Brief Lessons on Physics,\" has worked in France since 2000.\n\nAnswer: 2000",
+     "shown": [
+      "Seven Brief Lessons on Physics",
+      "Carlo Rovelli"
+     ],
+     "gold_shown": 2,
+     "passes": 150.0,
+     "searches": [
+      "Seven Brief Lessons on Physics Italian physicist",
+      "Carlo Rovelli worked in France year"
+     ]
+    },
+    {
+     "id": "5a80721b554299485f5985ef",
+     "question": "The Livesey Hal War Memorial commemorates the fallen of which war, that had over 60 million casualties?",
+     "answer": "World War II",
+     "type": "bridge",
+     "level": "hard",
+     "said": "World War II",
+     "correct": true,
+     "lenient": true,
+     "f1": 1.0,
+     "reply": "Based on the search results, the Livesey Hall War Memorial commemorates fallen soldiers from World War II. The search results also confirm that World War II had over 60 million casualties (specifically, over 60 million people were killed).\n\nAnswer: World War II",
+     "shown": [
+      "chain: Livesey Hall War Memorial -> World War II casualties"
+     ],
+     "gold_shown": 0,
+     "passes": 149.0,
+     "searches": [
+      "Livesey Hal War Memorial war casualties"
+     ]
+    },
+    {
+     "id": "5ab51dae5542991779162d82",
+     "question": "Are both Elko Regional Airport and Gerald R. Ford International Airport located in Michigan?",
+     "answer": "no",
+     "type": "comparison",
+     "level": "hard",
+     "said": "no",
+     "correct": true,
+     "lenient": true,
+     "f1": 1.0,
+     "reply": "Based on the search results:\n- Elko Regional Airport is located in Elko County, Nevada (not Michigan)\n- Gerald R. Ford International Airport is located in Cascade Township, Michigan\n\nSince Elko Regional Airport is in Nevada, not Michigan, the answer is no.\n\nAnswer: no",
+     "shown": [
+      "Elko Regional Airport",
+      "Gerald R. Ford International Airport"
+     ],
+     "gold_shown": 2,
+     "passes": 150.0,
+     "searches": [
+      "Elko Regional Airport location",
+      "Gerald R. Ford International Airport location"
+     ]
+    },
+    {
+     "id": "5a7571135542992d0ec05f98",
+     "question": "Ralph Hefferline was a psychology professor at a university that is located in what city?",
+     "answer": "New York City",
+     "type": "bridge",
+     "level": "hard",
+     "said": "New York City",
+     "correct": true,
+     "lenient": true,
+     "f1": 1.0,
+     "reply": "Based on the search results, Ralph Hefferline was a psychology professor at Columbia University, which is located in New York City.\n\nAnswer: New York City",
+     "shown": [
+      "chain: Ralph Hefferline -> Columbia University"
+     ],
+     "gold_shown": 0,
+     "passes": 149.0,
+     "searches": [
+      "Ralph Hefferline psychology professor university"
+     ]
+    },
+    {
+     "id": "5a7a0e1e5542990783324e1a",
+     "question": "Which dog's ancestors include Gordon and Irish Setters: the Manchester Terrier or the Scotch Collie?",
+     "answer": "Scotch Collie",
+     "type": "comparison",
+     "level": "hard",
+     "said": "- The Scotch Collie's ancestors explicitly include Gordon and Irish",
+     "correct": false,
+     "lenient": false,
+     "f1": 0.2,
+     "reply": "Based on the search results:\n\n1. The Manchester Terrier's ancestors include the English Setter, which is part of the Setter family that includes the red Irish Setters, Irish Red and White Setters, and black-and-tan Gordon Setters.\n\n2. The Scotch Collie's ancestors include the Gordon and Irish Setters.\n\nBoth breeds have ancestors that include Gordon and Irish Setters. However, the question asks which dog's ancestors include Gordon and Irish Setters, implying one specific answer. Since both breeds have this connection, I need to determine which one is the correct answer.\n\nLooking at the search results again:\n- The Manchester Terrier's ancestors are English Setters (which include Gordon Setters)\n- The Scotch Collie's ancestors explicitly include Gordon and Irish",
+     "shown": [
+      "chain: Manchester Terrier -> English Setter",
+      "Scotch Collie"
+     ],
+     "gold_shown": 1,
+     "passes": 213.4,
+     "searches": [
+      "Manchester Terrier ancestors Gordon Irish Setters",
+      "Scotch Collie ancestors Gordon Irish Setters"
+     ]
+    },
+    {
+     "id": "5a74106b55429979e288289e",
+     "question": "Where is the company that Sachin Warrier worked for as a software engineer headquartered? ",
+     "answer": "Mumbai",
+     "type": "bridge",
+     "level": "hard",
+     "said": "Mumbai",
+     "correct": true,
+     "lenient": true,
+     "f1": 1.0,
+     "reply": "Sachin Warrier worked as a software engineer at Tata Consultancy Services, which is headquartered in Mumbai, Maharashtra.\n\nAnswer: Mumbai",
+     "shown": [
+      "chain: Sachin Bansal -> Sachin Warrier",
+      "Tata Consultancy Services"
+     ],
+     "gold_shown": 1,
+     "passes": 213.4,
+     "searches": [
+      "Sachin Warrier software engineer company",
+      "Tata Consultancy Services headquarters location"
+     ]
+    },
+    {
+     "id": "5a79311755429970f5fffe67",
+     "question": "A Japanese manga series based on a 16 year old high school student Ichitaka Seto, is written and illustrated by someone born in what year?",
+     "answer": "1962",
+     "type": "bridge",
+     "level": "hard",
+     "said": "</tool_call>",
+     "correct": false,
+     "lenient": false,
+     "f1": 0.0,
+     "reply": "That's not the right manga either. Let me search for \"Asaka Seto\" specifically since that's the pen name of the creator.\n\n<tool_call>\n<function=search>\n<parameter=query>\nAsaka Seto manga creator born year\n</parameter>\n</function>\n</tool_call>",
+     "shown": [
+      "Ouran High School Host Club",
+      "Asaka Seto",
+      "Megumi (manga)"
+     ],
+     "gold_shown": 0,
+     "passes": 214.4,
+     "searches": [
+      "Japanese manga series Ichitaka Seto high school student",
+      "Ichitaka Seto manga",
+      "Megumi Ieda manga creator"
+     ]
+    },
+    {
+     "id": "5ab2d3df554299194fa9352c",
+     "question": "The battle in which Giuseppe Arimondi lost his life secured what for Ethiopia?",
+     "answer": "sovereignty",
+     "type": "bridge",
+     "level": "hard",
+     "said": "independence",
+     "correct": false,
+     "lenient": false,
+     "f1": 0.0,
+     "reply": "Based on the search results, Giuseppe Arimondi died in combat at the Battle of Adwa in 1893. This battle secured Ethiopia's independence from Italian colonial rule.\n\nAnswer: independence",
+     "shown": [
+      "Giuseppe Arimondi"
+     ],
+     "gold_shown": 1,
+     "passes": 212.4,
+     "searches": [
+      "Giuseppe Arimondi battle death Ethiopia"
+     ]
+    },
+    {
+     "id": "5a760ab65542994ccc918697",
+     "question": "Alfred Balk served as the secretary of the Committee on the Employment of Minority Groups in the News Media under which United States Vice President?",
+     "answer": "Nelson Rockefeller",
+     "type": "bridge",
+     "level": "hard",
+     "said": "Nelson Rockefeller",
+     "correct": true,
+     "lenient": true,
+     "f1": 1.0,
+     "reply": "Based on the search results, Alfred Balk served as secretary of New York Governor Nelson Rockefeller's Committee on the Employment of Minority Groups in the News Media.\n\nAnswer: Nelson Rockefeller",
+     "shown": [
+      "Alfred Balk"
+     ],
+     "gold_shown": 1,
+     "passes": 212.4,
+     "searches": [
+      "Alfred Balk secretary Committee on the Employment of Minority Groups in the News Media"
+     ]
+    },
+    {
+     "id": "5a7d54165542995f4f402256",
+     "question": "A medieval fortress in Dirleton, East Lothian, Scotland borders on the south side of what coastal area?",
+     "answer": "Yellowcraig",
+     "type": "bridge",
+     "level": "hard",
+     "said": "Firth of Forth",
+     "correct": false,
+     "lenient": false,
+     "f1": 0.0,
+     "reply": "Based on the search results, Dirleton Castle is located in the village of Dirleton, East Lothian, Scotland. The passage states that \"Dirleton village lies on the south shore of the Firth of Forth.\" Therefore, the medieval fortress borders on the south side of the Firth of Forth.\n\nAnswer: Firth of Forth",
+     "shown": [
+      "Dirleton Castle",
+      "chain: Dirleton Castle -> Dirleton Kirk"
+     ],
+     "gold_shown": 1,
+     "passes": 213.4,
+     "searches": [
+      "medieval fortress Dirleton East Lothian Scotland borders south side coastal area",
+      "Dirleton Castle East Lothian Scotland south side coastal area"
+     ]
+    },
+    {
+     "id": "5ab859a955429934fafe6d7b",
+     "question": "Who is the writer of this song that was inspired by words on a tombstone and was the first track on the box set Back to Mono?",
+     "answer": "Phil Spector",
+     "type": "bridge",
+     "level": "hard",
+     "said": "Phil Spector",
+     "correct": true,
+     "lenient": true,
+     "f1": 1.0,
+     "reply": "Based on the search results, the song \"To Know Him Is to Love Him\" was written by Phil Spector. The song was inspired by words on his father's tombstone, \"To Know Him Was To Love Him.\" It was the first track on the box set Back to Mono.\n\nAnswer: Phil Spector",
+     "shown": [
+      "chain: Back to Mono (1958–1969) -> To Know Him Is to Love Him"
+     ],
+     "gold_shown": 0,
+     "passes": 212.4,
+     "searches": [
+      "song inspired by words on a tombstone Back to Mono box set"
+     ]
+    },
+    {
+     "id": "5add61d65542995b365fab21",
+     "question": "What type of forum did a former Soviet statesman initiate?",
+     "answer": "Organizations could come together to address global issues",
+     "type": "bridge",
+     "level": "hard",
+     "said": "No",
+     "correct": false,
+     "lenient": false,
+     "f1": 0.0,
+     "reply": "I've searched multiple times for information about a forum initiated by a former Soviet statesman, but the search results consistently show that the only forum mentioned is the Katowice Forum, which was a group of Polish United Workers Party members, not initiated by a Soviet statesman. The search results do not contain any information about a forum that a former Soviet statesman initiated.\n\nBased on the information available in the search results, there is no forum initiated by a former Soviet statesman.\n\nAnswer: No",
+     "shown": [
+      "chain: Ephraim Sklyansky -> Andrei Kirilenko (politician)",
+      "Katowice Forum",
+      "chain: Mikhail Suslov -> Ephraim Sklyansky"
+     ],
+     "gold_shown": 0,
+     "passes": 214.4,
+     "searches": [
+      "former Soviet statesman initiated forum",
+      "forum initiated by Soviet statesman",
+      "forum initiated by Soviet statesman"
+     ]
+    },
+    {
+     "id": "5a8e068b5542995085b37384",
+     "question": "Are Ferocactus and Silene both types of plant?",
+     "answer": "yes",
+     "type": "comparison",
+     "level": "hard",
+     "said": "Yes",
+     "correct": true,
+     "lenient": true,
+     "f1": 1.0,
+     "reply": "Based on the search results:\n- Ferocactus fordii is described as a \"species of flowering plant\" in the family Cactaceae\n- Silene hicesiae is described as a \"species of plant\" in the family Caryophyllaceae\n\nBoth are explicitly identified as types of plants.\n\nAnswer: Yes",
+     "shown": [
+      "Ferocactus fordii",
+      "Silene hicesiae"
+     ],
+     "gold_shown": 0,
+     "passes": 171.2,
+     "searches": [
+      "Ferocactus plant type",
+      "Silene plant type"
+     ]
+    },
+    {
+     "id": "5abbf698554299114383a0b5",
+     "question": "Which British first-generation jet-powered medium bomber was used in the South West Pacific theatre of World War II?",
+     "answer": "English Electric Canberra",
+     "type": "bridge",
+     "level": "hard",
+     "said": "English Electric Canberra",
+     "correct": true,
+     "lenient": true,
+     "f1": 1.0,
+     "reply": "Based on the search results, the British first-generation jet-powered medium bomber used in the South West Pacific theatre of World War II was the **English Electric Canberra**.\n\nAnswer: English Electric Canberra",
+     "shown": [
+      "chain: South West Pacific theatre of World War II -> English Electric Canberra"
+     ],
+     "gold_shown": 0,
+     "passes": 170.2,
+     "searches": [
+      "British first-generation jet-powered medium bomber South West Pacific theatre World War II"
+     ]
+    },
+    {
+     "id": "5a8e1027554299653c1aa15f",
+     "question": "Which year and which conference was the 14th season for this conference as part of the NCAA Division that the Colorado Buffaloes played in with a record of 2-6 in conference play?",
+     "answer": "2009 Big 12 Conference",
+     "type": "bridge",
+     "level": "hard",
+     "said": "1976 Big Eight Conference",
+     "correct": false,
+     "lenient": false,
+     "f1": 0.5,
+     "reply": "Based on the search results, the Colorado Buffaloes played in the Big Eight Conference during the 1976 NCAA Division I football season. The 1976 season was their 14th season in the Big Eight Conference.\n\nThe conference was the Big Eight Conference, and the year was 1976.\n\nAnswer: 1976 Big Eight Conference",
+     "shown": [
+      "1976 Colorado Buffaloes football team"
+     ],
+     "gold_shown": 0,
+     "passes": 170.2,
+     "searches": [
+      "Colorado Buffaloes 14th season conference NCAA Division record 2-6"
+     ]
+    },
+    {
+     "id": "5ab84bf555429916710eb01f",
+     "question": "In 1991 Euromarché was bought by a chain that operated how any hypermarkets at the end of 2016?",
+     "answer": "1,462",
+     "type": "bridge",
+     "level": "hard",
+     "said": "Carrefour",
+     "correct": false,
+     "lenient": false,
+     "f1": 0.0,
+     "reply": "Based on the search results, Euromarché was bought by Carrefour in June 1991. The search results also state that Carrefour had 1,462 hypermarkets at the end of 2016.\n\nAnswer: Carrefour",
+     "shown": [
+      "chain: Euromarché -> Carrefour"
+     ],
+     "gold_shown": 0,
+     "passes": 170.2,
+     "searches": [
+      "Euromarché bought by chain in 1991"
+     ]
+    },
+    {
+     "id": "5a77724455429972597f153e",
+     "question": "What race track in the midwest hosts a 500 mile race eavery May?",
+     "answer": "Indianapolis Motor Speedway",
+     "type": "bridge",
+     "level": "hard",
+     "said": "Indianapolis Motor Speedway",
+     "correct": true,
+     "lenient": true,
+     "f1": 1.0,
+     "reply": "Based on the search results, the race is the Indianapolis 500, which is held at the Indianapolis Motor Speedway in Speedway, Indiana.\n\nAnswer: Indianapolis Motor Speedway",
+     "shown": [
+      "1966 Indianapolis 500"
+     ],
+     "gold_shown": 0,
+     "passes": 170.2,
+     "searches": [
+      "500 mile race every May Midwest"
+     ]
+    },
+    {
+     "id": "5a87c13f5542996e4f30890c",
+     "question": "In what city did the \"Prince of tenors\" star in a film based on an opera by Giacomo Puccini?",
+     "answer": "Rome",
+     "type": "bridge",
+     "level": "hard",
+     "said": "Rome",
+     "correct": true,
+     "lenient": true,
+     "f1": 1.0,
+     "reply": "I found that Franco Corelli starred in the 1956 film \"Tosca\" which is based on the opera \"Tosca\" by Giacomo Puccini. The search results also mention that the film was made at Cinecittà in Rome.\n\nAnswer: Rome",
+     "shown": [
+      "chain: Festival Puccini -> Franco Corelli",
+      "chain: Franco Corelli -> Tosca (1956 film)"
+     ],
+     "gold_shown": 0,
+     "passes": 171.2,
+     "searches": [
+      "Prince of tenors film Giacomo Puccini opera",
+      "Franco Corelli film Puccini opera"
+     ]
+    },
+    {
+     "id": "5ab96ab755429970cfb8eacd",
+     "question": "Ellie Goulding worked with what other writers on her third studio album, Delirium?",
+     "answer": "Max Martin, Savan Kotecha and Ilya Salmanzadeh",
+     "type": "bridge",
+     "level": "hard",
+     "said": "</tool_call>",
+     "correct": false,
+     "lenient": false,
+     "f1": 0.0,
+     "reply": "I found that \"On My Mind\" was written by Ellie Goulding, Max Martin, Savan Kotecha, and Ilya Salmanzadeh. However, I need to find out who else wrote on the album as a whole. Let me search for more details about the album's writers.\n\n<tool_call>\n<function=search>\n<parameter=query>\nDelirium album writers Savan Kotecha Max Martin\n</parameter>\n</function>\n</tool_call>",
+     "shown": [
+      "Delirium (Ellie Goulding album)",
+      "chain: Delirium (Ellie Goulding album) -> Delirium World Tour",
+      "On My Mind (Ellie Goulding song)"
+     ],
+     "gold_shown": 2,
+     "passes": 172.2,
+     "searches": [
+      "Ellie Goulding Delirium third studio album writers",
+      "Ellie Goulding Delirium album writers credits",
+      "Delirium album writers Ellie Goulding"
+     ]
+    },
+    {
+     "id": "5a8a43eb5542996c9b8d5e82",
+     "question": "Which Australian city founded in 1838 contains a boarding school opened by a Prime Minister of Australia and named after a school in London of the same name.",
+     "answer": "Marion, South Australia",
+     "type": "bridge",
+     "level": "hard",
+     "said": "Marion",
+     "correct": false,
+     "lenient": false,
+     "f1": 0.5,
+     "reply": "Based on the search results, I found the answer. The city is **Marion**, South Australia. It was founded in 1838 and contains Westminster School, which was opened by Prime Minister Robert Menzies and is named after Westminster School in London.\n\nAnswer: Marion",
+     "shown": [
+      "chain: Marion, South Australia -> Westminster School, Adelaide"
+     ],
+     "gold_shown": 0,
+     "passes": 170.2,
+     "searches": [
+      "Australian city founded in 1838 boarding school Prime Minister London"
+     ]
+    },
+    {
+     "id": "5ae73acb5542991e8301cc07",
+     "question": "D1NZ is a series based on what oversteering technique?",
+     "answer": "Drifting",
+     "type": "bridge",
+     "level": "hard",
+     "said": "drifting",
+     "correct": true,
+     "lenient": true,
+     "f1": 1.0,
+     "reply": "Based on the search results, D1NZ is a series based on the oversteering technique called **drifting**.\n\nAnswer: drifting",
+     "shown": [
+      "chain: D1NZ -> Drifting (motorsport)"
+     ],
+     "gold_shown": 0,
+     "passes": 179.6,
+     "searches": [
+      "D1NZ series oversteering technique"
+     ]
+    },
+    {
+     "id": "5a7320565542991f9a20c61d",
+     "question": "who is younger Keith Bostic or Jerry Glanville ?",
+     "answer": "Keith Bostic",
+     "type": "bridge",
+     "level": "hard",
+     "said": "Jerry Glanville",
+     "correct": false,
+     "lenient": false,
+     "f1": 0.0,
+     "reply": "Based on the search results:\n- Keith Bostic was born January 17, 1961\n- Jerry Glanville was born October 14, 1941\n\nJerry Glanville was born in 1941, which is 20 years before Keith Bostic's birth in 1961. Therefore, Jerry Glanville is younger.\n\nAnswer: Jerry Glanville",
+     "shown": [
+      "Keith Bostic (American football)",
+      "Jerry Glanville"
+     ],
+     "gold_shown": 2,
+     "passes": 180.6,
+     "searches": [
+      "Keith Bostic birth date",
+      "Jerry Glanville birth date"
+     ]
+    },
+    {
+     "id": "5ae32e125542991a06ce9946",
+     "question": "According to the 2001 census, what was the population of the city in which Kirton End is located?",
+     "answer": "35,124",
+     "type": "bridge",
+     "level": "hard",
+     "said": "35,124",
+     "correct": true,
+     "lenient": true,
+     "f1": 1.0,
+     "reply": "According to the 2001 census, the population of Boston was 35,124.\n\nAnswer: 35,124",
+     "shown": [
+      "Kirton End",
+      "Boston, Lincolnshire"
+     ],
+     "gold_shown": 2,
+     "passes": 180.6,
+     "searches": [
+      "Kirton End city location",
+      "Boston population 2001 census"
+     ]
+    },
+    {
+     "id": "5adc53f75542996e6852530a",
+     "question": "Are both Cypress and Ajuga genera?",
+     "answer": "no",
+     "type": "comparison",
+     "level": "hard",
+     "said": "Yes",
+     "correct": false,
+     "lenient": false,
+     "f1": 0.0,
+     "reply": "Based on the search results:\n1. Cypress is a botanical term referring to a genus of conifer trees/shrubs in the family Cupressaceae.\n2. Ajuga is also a botanical term referring to a genus of herbaceous flowering plants in the family Lamiaceae.\n\nBoth Cypress and Ajuga are genera.\n\nAnswer: Yes",
+     "shown": [
+      "chain: Cypress -> Ajugeae",
+      "Ajuga"
+     ],
+     "gold_shown": 1,
+     "passes": 180.6,
+     "searches": [
+      "Cypress genus",
+      "Ajuga genus"
+     ]
+    },
+    {
+     "id": "5a8b20335542996c9b8d5fb3",
+     "question": "What distinction is held by the former NBA player who was a member of the Charlotte Hornets during their 1992-93 season and was head coach for the WNBA team Charlotte Sting?",
+     "answer": "shortest player ever to play in the National Basketball Association",
+     "type": "bridge",
+     "level": "hard",
+     "said": "Muggsy Bogues",
+     "correct": false,
+     "lenient": false,
+     "f1": 0.0,
+     "reply": "Based on the search results, I found that Muggsy Bogues served as head coach of the Charlotte Sting. He was born in 1965 and played for the Charlotte Hornets during his 14-season career, which includes the 1992-93 season. The search results indicate he is known for his ten seasons with the Charlotte Hornets.\n\nThe distinction held by Muggsy Bogues is that he is the shortest player ever to play in the National Basketball Association.\n\nAnswer: Muggsy Bogues",
+     "shown": [
+      "1991–92 Charlotte Hornets season",
+      "Charlotte Smith (basketball)",
+      "chain: 2003 WNBA season -> Muggsy Bogues"
+     ],
+     "gold_shown": 0,
+     "passes": 181.6,
+     "searches": [
+      "former NBA player member of Charlotte Hornets 1992-93 head coach Charlotte Sting",
+      "head coach Charlotte Sting WNBA former NBA player Larry Johnson",
+      "Larry Johnson Charlotte Sting head coach WNBA"
+     ]
+    },
+    {
+     "id": "5a85fb085542994775f606de",
+     "question": "What is the name of the executive producer of the film that has a score composed by Jerry Goldsmith?",
+     "answer": "Ronald Shusett",
+     "type": "bridge",
+     "level": "hard",
+     "said": "Steven Spielberg",
+     "correct": false,
+     "lenient": false,
+     "f1": 0.0,
+     "reply": "Based on the search results, the film with a score composed by Jerry Goldsmith is \"Innerspace: Innerspace\". The passage states that Steven Spielberg served as executive producer for this film.\n\nAnswer: Steven Spielberg",
+     "shown": [
+      "chain: Legend (film score) -> Innerspace"
+     ],
+     "gold_shown": 0,
+     "passes": 179.6,
+     "searches": [
+      "film score composed by Jerry Goldsmith"
+     ]
+    },
+    {
+     "id": "5a7be2595542997c3ec972ac",
+     "question": "Who was born earlier, Emma Bull or Virginia Woolf?",
+     "answer": "Adeline Virginia Woolf",
+     "type": "comparison",
+     "level": "hard",
+     "said": "Virginia Woolf",
+     "correct": false,
+     "lenient": true,
+     "f1": 0.8,
+     "reply": "Based on the search results:\n- Emma Bull was born on December 13, 1954\n- Virginia Woolf was born on January 25, 1882\n\nVirginia Woolf was born earlier than Emma Bull.\n\nAnswer: Virginia Woolf",
+     "shown": [
+      "Emma Bull",
+      "Virginia Woolf"
+     ],
+     "gold_shown": 2,
+     "passes": 180.6,
+     "searches": [
+      "Emma Bull birth date",
+      "Virginia Woolf birth date"
+     ]
+    },
+    {
+     "id": "5a77152355429966f1a36c2e",
+     "question": "What was the Roud Folk Song Index of the nursery rhyme inspiring What Are Little Girls Made Of?",
+     "answer": "821",
+     "type": "bridge",
+     "level": "hard",
+     "said": "821",
+     "correct": true,
+     "lenient": true,
+     "f1": 1.0,
+     "reply": "The Roud Folk Song Index number for the nursery rhyme \"What Are Little Boys Made Of?\" is 821.\n\nAnswer: 821",
+     "shown": [
+      "What Are Little Girls Made Of?",
+      "What Are Little Boys Made Of?"
+     ],
+     "gold_shown": 2,
+     "passes": 180.6,
+     "searches": [
+      "What Are Little Girls Made Of nursery rhyme",
+      "What Are Little Boys Made Of Roud Folk Song Index"
+     ]
+    },
+    {
+     "id": "5a8f4c8d554299458435d5a3",
+     "question": "Scott Parkin has been a vocal critic of Exxonmobil and another corporation that has operations in how many countries ?",
+     "answer": "more than 70 countries",
+     "type": "bridge",
+     "level": "hard",
+     "said": "</tool_call>",
+     "correct": false,
+     "lenient": false,
+     "f1": 0.0,
+     "reply": "The search results still don't give me the specific number of countries. Let me try a different search approach to find the exact number.\n\n<tool_call>\n<function=search>\n<parameter=query>\nExxonMobil operations in how many countries\n</parameter>\n</function>\n</tool_call>",
+     "shown": [
+      "chain: Scott Parkin -> Exxon",
+      "ExxonMobil",
+      "ExxonMobil Tower"
+     ],
+     "gold_shown": 0,
+     "passes": 183.5,
+     "searches": [
+      "Scott Parkin critic ExxonMobil",
+      "ExxonMobil operations countries",
+      "ExxonMobil number of countries operations"
+     ]
+    },
+    {
+     "id": "5a80840f554299485f59863b",
+     "question": "What WB supernatrual drama series was Jawbreaker star Rose Mcgowan best known for being in?",
+     "answer": "Charmed",
+     "type": "bridge",
+     "level": "hard",
+     "said": "Charmed",
+     "correct": true,
+     "lenient": true,
+     "f1": 1.0,
+     "reply": "Based on the search results, Rose McGowan was best known for playing Paige Matthews in the WB supernatural drama series \"Charmed\".\n\nAnswer: Charmed",
+     "shown": [
+      "Rose McGowan"
+     ],
+     "gold_shown": 1,
+     "passes": 181.5,
+     "searches": [
+      "Rose McGowan WB supernatural drama series"
+     ]
+    },
+    {
+     "id": "5a8361b65542992ef85e22a0",
+     "question": "Vince Phillips held a junior welterweight title by an organization recognized by what larger Hall of Fame?",
+     "answer": "International Boxing Hall of Fame",
+     "type": "bridge",
+     "level": "hard",
+     "said": "International Boxing Hall of Fame",
+     "correct": true,
+     "lenient": true,
+     "f1": 1.0,
+     "reply": "Based on the search results, Vince Phillips held the IBF junior welterweight title, and the IBF is recognized by the International Boxing Hall of Fame.\n\nAnswer: International Boxing Hall of Fame",
+     "shown": [
+      "Vince Phillips",
+      "International Boxing Hall of Fame"
+     ],
+     "gold_shown": 1,
+     "passes": 182.5,
+     "searches": [
+      "Vince Phillips junior welterweight title",
+      "IBF Hall of Fame"
+     ]
+    },
+    {
+     "id": "5ae7ba7a5542993210983f12",
+     "question": "What is the name of the singer who's song was released as the lead single from the album \"Confessions\", and that had popular song stuck behind for eight consecutive weeks?",
+     "answer": "Usher",
+     "type": "bridge",
+     "level": "hard",
+     "said": "</tool_call>",
+     "correct": false,
+     "lenient": false,
+     "f1": 0.0,
+     "reply": "The lead single from Usher's album \"Confessions\" is \"Caught Up\". However, the search results indicate it peaked at number eight and did not top the Hot 100, but they don't mention it being stuck behind for eight consecutive weeks. Let me search more specifically for the \"stuck behind\" statistic.\n\n<tool_call>\n<function=search>\n<parameter=query>\nUsher Caught Up stuck behind eight weeks\n</parameter>\n</function>\n</tool_call>",
+     "shown": [
+      "Confession (band)",
+      "Confessions (Usher album)",
+      "Caught Up (Usher song)"
+     ],
+     "gold_shown": 0,
+     "passes": 183.5,
+     "searches": [
+      "album Confessions lead single singer",
+      "Confessions album lead single singer",
+      "Usher Confessions lead single stuck behind eight weeks"
+     ]
+    },
+    {
+     "id": "5ac2acff55429921a00ab02b",
+     "question": "who is the younger brother of The episode guest stars of The Hard Easy ",
+     "answer": "Bill Murray",
+     "type": "bridge",
+     "level": "hard",
+     "said": "Bill Murray",
+     "correct": true,
+     "lenient": true,
+     "f1": 1.0,
+     "reply": "Based on the search results, Brian Doyle-Murray is the older brother of Bill Murray. Jonathan Katz is the brother of Peter Katz, not Bill Murray. Therefore, the younger brother of the guest stars (Brian Doyle-Murray and Jonathan Katz) is Bill Murray.\n\nAnswer: Bill Murray",
+     "shown": [
+      "The Hard Easy (Adventure Time)",
+      "Brian Doyle-Murray",
+      "E. L. Katz"
+     ],
+     "gold_shown": 2,
+     "passes": 183.5,
+     "searches": [
+      "The Hard Easy episode guest stars",
+      "Brian Doyle-Murray younger brother",
+      "Jonathan Katz younger brother"
+     ]
+    },
+    {
+     "id": "5aba7cfe554299232ef4a2fd",
+     "question": "The 2017–18 Wigan Athletic F.C. season will be a year in which the team competes in the league cup known as what for sponsorship reasons?",
+     "answer": "Carabao Cup",
+     "type": "bridge",
+     "level": "hard",
+     "said": "Carabao Cup",
+     "correct": true,
+     "lenient": true,
+     "f1": 1.0,
+     "reply": "Based on the search results, the 2017–18 Wigan Athletic F.C. season involved competing in the FA Cup, EFL Cup, and EFL Trophy. The question specifically asks about the league cup known for sponsorship reasons. The FA Cup is the most well-known league cup in English football, and it is commonly known as the \"Carabao Cup\" due to sponsorship reasons.\n\nAnswer: Carabao Cup",
+     "shown": [
+      "2017–18 Wigan Athletic F.C. season"
+     ],
+     "gold_shown": 1,
+     "passes": 181.5,
+     "searches": [
+      "2017–18 Wigan Athletic F.C. season league cup"
+     ]
+    },
+    {
+     "id": "5ae5aba0554299546bf82f17",
+     "question": "Which of Tara Strong major voice role in animated series is an American animated television series based on the DC Comics fictional superhero team, the \"Teen Titans\"?",
+     "answer": "Teen Titans Go!",
+     "type": "bridge",
+     "level": "hard",
+     "said": "Teen Titans",
+     "correct": false,
+     "lenient": true,
+     "f1": 0.8,
+     "reply": "Based on the search results, Tara Strong has a major voice role in the animated series \"Teen Titans\".\n\nAnswer: Teen Titans",
+     "shown": [
+      "Tara Strong"
+     ],
+     "gold_shown": 1,
+     "passes": 181.5,
+     "searches": [
+      "Tara Strong major voice role animated series Teen Titans"
+     ]
+    },
+    {
+     "id": "5ae1f4cb554299234fd0436d",
+     "question": "What is the inhabitant of the city where  122nd SS-Standarte was formed in2014",
+     "answer": "276,170 inhabitants",
+     "type": "bridge",
+     "level": "hard",
+     "said": "276,170",
+     "correct": false,
+     "lenient": true,
+     "f1": 0.667,
+     "reply": "Based on the search results, the 122nd SS-Standarte was formed in the city of Strasbourg. The passage also provides information about the inhabitants of Strasbourg, stating that in 2014, the city proper had 276,170 inhabitants.\n\nAnswer: 276,170",
+     "shown": [
+      "chain: 122nd SS-Standarte -> Strasbourg"
+     ],
+     "gold_shown": 0,
+     "passes": 181.5,
+     "searches": [
+      "122nd SS-Standarte formed 2014"
+     ]
+    },
+    {
+     "id": "5ae7e1fc55429952e35ea9cc",
+     "question": "What color clothing do people of the Netherlands wear during Oranjegekte or to celebrate the national holiday Koningsdag? ",
+     "answer": "orange",
+     "type": "bridge",
+     "level": "hard",
+     "said": "orange",
+     "correct": true,
+     "lenient": true,
+     "f1": 1.0,
+     "reply": "Based on the search results, during Koningsdag (King's Day) and the associated Oranjegekte phenomenon, people of the Netherlands wear orange clothing. This includes T-shirts, caps, scarves, and other items. The orange color is also the traditional color of the Dutch royal family, the House of Orange-Nassau.\n\nAnswer: orange",
+     "shown": [
+      "chain: Koningsdag -> Oranjegekte"
+     ],
+     "gold_shown": 0,
+     "passes": 129.9,
+     "searches": [
+      "Netherlands national holiday Koningsdag clothing"
+     ]
+    },
+    {
+     "id": "5ae37c765542992f92d822d4",
+     "question": "What was the name of the 1996 loose adaptation of William Shakespeare's \"Romeo & Juliet\" written by James Gunn?",
+     "answer": "Tromeo and Juliet",
+     "type": "bridge",
+     "level": "hard",
+     "said": "Tromeo and Juliet",
+     "correct": true,
+     "lenient": true,
+     "f1": 1.0,
+     "reply": "Based on the search results, the name of the 1996 loose adaptation of \"Romeo & Juliet\" written by James Gunn is **Tromeo and Juliet**.\n\nAnswer: Tromeo and Juliet",
+     "shown": [
+      "Tromeo and Juliet"
+     ],
+     "gold_shown": 1,
+     "passes": 129.9,
+     "searches": [
+      "1996 loose adaptation Romeo & Juliet James Gunn"
+     ]
+    },
+    {
+     "id": "5ae33c4d5542992f92d82262",
+     "question": "Robert Suettinger was the national intelligence officer under which former Governor of Arkansas?",
+     "answer": "William Jefferson Clinton",
+     "type": "bridge",
+     "level": "hard",
+     "said": "Bill Clinton",
+     "correct": false,
+     "lenient": false,
+     "f1": 0.4,
+     "reply": "Based on the search results, Robert Suettinger was the national intelligence officer under President Bill Clinton.\n\nAnswer: Bill Clinton",
+     "shown": [
+      "Robert Suettinger"
+     ],
+     "gold_shown": 1,
+     "passes": 129.9,
+     "searches": [
+      "Robert Suettinger national intelligence officer former Governor of Arkansas"
+     ]
+    },
+    {
+     "id": "5a77cb335542997042120b3a",
+     "question": "What American professional Hawaiian surfer born 18 October 1992 won the Rip Curl Pro Portugal?",
+     "answer": "John John Florence",
+     "type": "bridge",
+     "level": "hard",
+     "said": "John John Florence",
+     "correct": true,
+     "lenient": true,
+     "f1": 1.0,
+     "reply": "Based on the search results, John John Florence is the American professional Hawaiian surfer born on October 18, 1992, who won the Rip Curl Pro Portugal.\n\nAnswer: John John Florence",
+     "shown": [
+      "chain: MEO Rip Curl Pro Portugal -> John John Florence"
+     ],
+     "gold_shown": 0,
+     "passes": 129.9,
+     "searches": [
+      "American professional Hawaiian surfer born 18 October 1992 Rip Curl Pro Portugal"
+     ]
+    },
+    {
+     "id": "5a8979f4554299669944a52e",
+     "question": "What is the middle name of the actress who plays Bobbi Bacha in Suburban Madness?",
+     "answer": "Ann",
+     "type": "bridge",
+     "level": "hard",
+     "said": "Ann",
+     "correct": true,
+     "lenient": true,
+     "f1": 1.0,
+     "reply": "Based on the search results, the actress who plays Bobbi Bacha in Suburban Madness is Sela Ward, and her middle name is Ann.\n\nAnswer: Ann",
+     "shown": [
+      "chain: Bobbi Bacha -> Sela Ward",
+      "Sela Ward"
+     ],
+     "gold_shown": 1,
+     "passes": 130.9,
+     "searches": [
+      "actress who plays Bobbi Bacha in Suburban Madness",
+      "Sela Ward middle name"
+     ]
+    },
+    {
+     "id": "5a713ea95542994082a3e6e4",
+     "question": "Alvaro Mexia had a diplomatic mission with which tribe of indigenous people?",
+     "answer": "Apalachees",
+     "type": "bridge",
+     "level": "hard",
+     "said": "Ais",
+     "correct": false,
+     "lenient": false,
+     "f1": 0.0,
+     "reply": "Based on the search results, Alvaro Mexia had a diplomatic mission to the Ais native population.\n\nAnswer: Ais",
+     "shown": [
+      "Alvaro Mexia"
+     ],
+     "gold_shown": 1,
+     "passes": 129.9,
+     "searches": [
+      "Alvaro Mexia diplomatic mission tribe"
+     ]
+    },
+    {
+     "id": "5a78bd9b554299078472774a",
+     "question": "What nationality were social anthropologists Alfred Gell and Edmund Leach?",
+     "answer": "British",
+     "type": "bridge",
+     "level": "hard",
+     "said": "British",
+     "correct": true,
+     "lenient": true,
+     "f1": 1.0,
+     "reply": "Based on the search results:\n\n1. Alfred Gell was a British social anthropologist.\n2. Edmund Leach was a British social anthropologist.\n\nBoth were British.\n\nAnswer: British",
+     "shown": [
+      "Alfred Gell",
+      "Edmund Leach"
+     ],
+     "gold_shown": 2,
+     "passes": 130.9,
+     "searches": [
+      "Alfred Gell nationality",
+      "Edmund Leach nationality"
+     ]
+    },
+    {
+     "id": "5a7625e8554299109176e66a",
+     "question": "In which year was the King who made the 1925 Birthday Honours born?",
+     "answer": "1865",
+     "type": "bridge",
+     "level": "hard",
+     "said": "1865",
+     "correct": true,
+     "lenient": true,
+     "f1": 1.0,
+     "reply": "King George V was born on 3 June 1865. The answer is 1865.\n\nAnswer: 1865",
+     "shown": [
+      "1925 Birthday Honours",
+      "George V"
+     ],
+     "gold_shown": 2,
+     "passes": 130.9,
+     "searches": [
+      "1925 Birthday Honours King",
+      "King George V birth year"
+     ]
+    },
+    {
+     "id": "5ae2dd2055429928c423950d",
+     "question": "What is the county seat of the county where East Lempster, New Hampshire is located?",
+     "answer": "Newport",
+     "type": "bridge",
+     "level": "hard",
+     "said": "Newport",
+     "correct": true,
+     "lenient": true,
+     "f1": 1.0,
+     "reply": "Based on the search results, East Lempster, New Hampshire is located in Sullivan County, New Hampshire. The search results also state that the county seat of Sullivan County is Newport.\n\nAnswer: Newport",
+     "shown": [
+      "chain: East Lempster, New Hampshire -> Sullivan County, New Hampshire"
+     ],
+     "gold_shown": 0,
+     "passes": 147.0,
+     "searches": [
+      "East Lempster, New Hampshire location county"
+     ]
+    },
+    {
+     "id": "5abdf12255429976d4830a2f",
+     "question": "The Album Against the Wind was the 11th Album of a Rock singer Robert C Seger born may 6 1945. What was the Rock singers stage name ?",
+     "answer": "Bob Seger",
+     "type": "bridge",
+     "level": "hard",
+     "said": "Bob Seger",
+     "correct": true,
+     "lenient": true,
+     "f1": 1.0,
+     "reply": "Based on the search results, Robert C Seger's stage name was Bob Seger.\n\nAnswer: Bob Seger",
+     "shown": [
+      "Bob Seger"
+     ],
+     "gold_shown": 1,
+     "passes": 147.0,
+     "searches": [
+      "Robert C Seger stage name"
+     ]
+    },
+    {
+     "id": "5a88658955429938390d3f47",
+     "question": "Rostker v. Goldberg held that the practice of what way of filling armed forces vacancies was consitutional?",
+     "answer": "Conscription",
+     "type": "bridge",
+     "level": "hard",
+     "said": "requiring only men to register for the draft",
+     "correct": false,
+     "lenient": false,
+     "f1": 0.0,
+     "reply": "Based on the search results, the practice of requiring only men to register for the draft was held constitutional by the Supreme Court in *Rostker v. Goldberg*.\n\nAnswer: requiring only men to register for the draft",
+     "shown": [
+      "Rostker v. Goldberg"
+     ],
+     "gold_shown": 1,
+     "passes": 147.0,
+     "searches": [
+      "Rostker v. Goldberg practice filling armed forces vacancies constitutional"
+     ]
+    },
+    {
+     "id": "5a86ebac55429960ec39b6d6",
+     "question": "Handi-Snacks are a snack food product line sold by what American multinational confectionery, food, and beverage company that is based in Illinois?",
+     "answer": "Mondelez International, Inc.",
+     "type": "bridge",
+     "level": "hard",
+     "said": "Mondelez International",
+     "correct": false,
+     "lenient": true,
+     "f1": 0.8,
+     "reply": "Based on the search results, Handi-Snacks are a snack food product line sold by Mondelez International, which is an American multinational confectionery, food, and beverage company based in Illinois.\n\nAnswer: Mondelez International",
+     "shown": [
+      "Handi-Snacks",
+      "Mondelez International"
+     ],
+     "gold_shown": 2,
+     "passes": 148.0,
+     "searches": [
+      "Handi-Snacks snack food product line company",
+      "Mondelez International company location Illinois"
+     ]
+    },
+    {
+     "id": "5aba5d2e55429901930fa799",
+     "question": "What was the name of a woman from the book titled \"Their Lives: The Women Targeted by the Clinton Machine \" and was also a former white house intern?",
+     "answer": "Monica Lewinsky",
+     "type": "bridge",
+     "level": "hard",
+     "said": "Monica Lewinsky",
+     "correct": true,
+     "lenient": true,
+     "f1": 1.0,
+     "reply": "I found the information. Monica Lewinsky is a woman from the book \"Their Lives: The Women Targeted by the Clinton Machine\" and was also a former white house intern.\n\nAnswer: Monica Lewinsky",
+     "shown": [
+      "Their Lives",
+      "Monica Lewinsky"
+     ],
+     "gold_shown": 2,
+     "passes": 148.0,
+     "searches": [
+      "Their Lives: The Women Targeted by the Clinton Machine book",
+      "Monica Lewinsky former white house intern"
+     ]
+    },
+    {
+     "id": "5ae5736e5542990ba0bbb2b3",
+     "question": "When was the American lawyer, lobbyist and political consultant who was a senior member of the presidential campaign of Donald Trump born?",
+     "answer": "April 1, 1949",
+     "type": "bridge",
+     "level": "hard",
+     "said": "April 1, 1949",
+     "correct": true,
+     "lenient": true,
+     "f1": 1.0,
+     "reply": "I found the information I needed. Paul Manafort was born on April 1, 1949.\n\nAnswer: April 1, 1949",
+     "shown": [
+      "Trump campaign–Russian meeting",
+      "Paul Manafort"
+     ],
+     "gold_shown": 2,
+     "passes": 148.0,
+     "searches": [
+      "American lawyer lobbyist political consultant senior member Donald Trump presidential campaign",
+      "Paul Manafort birth date"
+     ]
+    },
+    {
+     "id": "5ae005b555429942ec259bec",
+     "question": "In what year was the novel that Lourenço Mutarelli based \"Nina\" on based first published?",
+     "answer": "1866",
+     "type": "bridge",
+     "level": "hard",
+     "said": "1866",
+     "correct": true,
+     "lenient": true,
+     "f1": 1.0,
+     "reply": "Based on the search results, the novel \"Nina\" that Lourenço Mutarelli based his work on is \"Crime and Punishment\" by Fyodor Dostoyevsky. According to the passage, this novel was first published in the literary journal \"The Russian Messenger\" in twelve monthly installments during 1866.\n\nAnswer: 1866",
+     "shown": [
+      "chain: Lourenço Mutarelli -> Crime and Punishment"
+     ],
+     "gold_shown": 0,
+     "passes": 147.0,
+     "searches": [
+      "Lourenço Mutarelli Nina novel"
+     ]
+    },
+    {
+     "id": "5a7759fc5542993569682d60",
+     "question": "Where are Teide National Park and Garajonay National Park located?",
+     "answer": "Canary Islands, Spain",
+     "type": "comparison",
+     "level": "hard",
+     "said": "Tenerife (Canary Islands, Spain) and La Gomera (Canary Islands, Spain)",
+     "correct": false,
+     "lenient": true,
+     "f1": 0.462,
+     "reply": "Based on the search results:\n- Teide National Park is located in Tenerife (Canary Islands, Spain)\n- Garajonay National Park is located in the center and north of the island of La Gomera, one of the Canary Islands (Spain)\n\nAnswer: Tenerife (Canary Islands, Spain) and La Gomera (Canary Islands, Spain)",
+     "shown": [
+      "Teide National Park",
+      "Garajonay National Park"
+     ],
+     "gold_shown": 2,
+     "passes": 148.0,
+     "searches": [
+      "Teide National Park location",
+      "Garajonay National Park location"
+     ]
+    },
+    {
+     "id": "5a835478554299123d8c20ed",
+     "question": "How many copies of Roald Dahl's variation on a popular anecdote sold?",
+     "answer": "250 million",
+     "type": "bridge",
+     "level": "hard",
+     "said": "more than 250 million copies",
+     "correct": false,
+     "lenient": true,
+     "f1": 0.571,
+     "reply": "Based on the search results, Roald Dahl's books have sold more than 250 million copies worldwide. This refers to his books in general, which include his variation on the popular anecdote.\n\nAnswer: more than 250 million copies",
+     "shown": [
+      "Roald Dahl"
+     ],
+     "gold_shown": 1,
+     "passes": 133.5,
+     "searches": [
+      "Roald Dahl variation on popular anecdote sales"
+     ]
+    },
+    {
+     "id": "5aba749055429901930fa7d8",
+     "question": "What occupation do Chris Menges and Aram Avakian share?",
+     "answer": "director",
+     "type": "comparison",
+     "level": "hard",
+     "said": "film director",
+     "correct": false,
+     "lenient": true,
+     "f1": 0.667,
+     "reply": "Based on the search results, Chris Menges is an English cinematographer and film director, and Aram Avakian is an Armenian-American film editor and director. Both share the occupation of being a **film director**.\n\nAnswer: film director",
+     "shown": [
+      "Chris Menges",
+      "Aram Avakian"
+     ],
+     "gold_shown": 2,
+     "passes": 134.5,
+     "searches": [
+      "Chris Menges occupation",
+      "Aram Avakian occupation"
+     ]
+    },
+    {
+     "id": "5abfb3425542990832d3a1c0",
+     "question": "Andrew Jaspan was the co-founder of what not-for-profit media outlet?",
+     "answer": "The Conversation",
+     "type": "bridge",
+     "level": "hard",
+     "said": "The Conversation",
+     "correct": true,
+     "lenient": true,
+     "f1": 1.0,
+     "reply": "Based on the search results, Andrew Jaspan was the co-founder of \"The Conversation\", which is an independent not-for-profit website of analysis and news from the university and research sector.\n\nAnswer: The Conversation",
+     "shown": [
+      "Andrew Jaspan"
+     ],
+     "gold_shown": 1,
+     "passes": 133.5,
+     "searches": [
+      "Andrew Jaspan co-founder not-for-profit media outlet"
+     ]
+    },
+    {
+     "id": "5ac3165c5542995ef918c10a",
+     "question": "Which American film director hosted the 18th Independent Spirit Awards in 2002?",
+     "answer": "John Waters",
+     "type": "bridge",
+     "level": "hard",
+     "said": "John Waters",
+     "correct": true,
+     "lenient": true,
+     "f1": 1.0,
+     "reply": "Based on the search results, the 18th Independent Spirit Awards in 2002 were hosted by John Waters.\n\nAnswer: John Waters",
+     "shown": [
+      "18th Independent Spirit Awards"
+     ],
+     "gold_shown": 1,
+     "passes": 133.5,
+     "searches": [
+      "18th Independent Spirit Awards 2002 host director"
+     ]
+    },
+    {
+     "id": "5ae53b545542990ba0bbb23c",
+     "question": "Where does the hotel and casino located in which Bill Cosby's third album was recorded?",
+     "answer": "Las Vegas Strip in Paradise",
+     "type": "bridge",
+     "level": "hard",
+     "said": "Stateline, Nevada",
+     "correct": false,
+     "lenient": false,
+     "f1": 0.0,
+     "reply": "Based on the search results, Bill Cosby's third album \"Revenge\" was recorded at Harrah's, Lake Tahoe, Nevada. Harrah's Lake Tahoe is a hotel and casino located in Stateline, Nevada.\n\nAnswer: Stateline, Nevada",
+     "shown": [
+      "Revenge (Bill Cosby album)",
+      "Harrah's Lake Tahoe"
+     ],
+     "gold_shown": 0,
+     "passes": 134.5,
+     "searches": [
+      "Bill Cosby third album",
+      "Harrah's Lake Tahoe Nevada hotel casino"
+     ]
+    },
+    {
+     "id": "5ae224da554299234fd043ee",
+     "question": "Do the drinks Gibson and Zurracapote both contain gin?",
+     "answer": "no",
+     "type": "comparison",
+     "level": "hard",
+     "said": "No",
+     "correct": true,
+     "lenient": true,
+     "f1": 1.0,
+     "reply": "Based on the search results:\n- The Gibson is a mixed drink made with gin and vermouth.\n- Zurracapote is a Spanish alcoholic mixed drink similar to sangría, which consists of red wine mixed with fruit, sugar, and cinnamon. It does not contain gin.\n\nTherefore, only the Gibson contains gin, not Zurracapote.\n\nAnswer: No",
+     "shown": [
+      "Gibson (cocktail)",
+      "chain: Gibson (cocktail) -> Zurracapote"
+     ],
+     "gold_shown": 1,
+     "passes": 134.5,
+     "searches": [
+      "Gibson drink gin",
+      "Zurracapote drink gin"
+     ]
+    },
+    {
+     "id": "5ae2b770554299495565db0f",
+     "question": "In what month is the annual documentary film festival, that is presented by the fortnightly published British journal of literary essays, held? ",
+     "answer": "March and April",
+     "type": "bridge",
+     "level": "hard",
+     "said": "March and April",
+     "correct": true,
+     "lenient": true,
+     "f1": 1.0,
+     "reply": "The festival is the London International Documentary Festival (LIDF), which is presented in association with the London Review of Books. The search results indicate that the festival takes place in the months of March and April every year.\n\nAnswer: March and April",
+     "shown": [
+      "London International Documentary Festival"
+     ],
+     "gold_shown": 1,
+     "passes": 133.5,
+     "searches": [
+      "annual documentary film festival presented by fortnightly published British journal of literary essays"
+     ]
+    },
+    {
+     "id": "5a80b3a9554299485f5986cc",
+     "question": "Tysons Galleria is located in what county?",
+     "answer": "Fairfax County",
+     "type": "bridge",
+     "level": "hard",
+     "said": "Fairfax County",
+     "correct": true,
+     "lenient": true,
+     "f1": 1.0,
+     "reply": "Based on the search results, Tysons Galleria is located in Fairfax County, Virginia.\n\nAnswer: Fairfax County",
+     "shown": [
+      "Tysons, Virginia"
+     ],
+     "gold_shown": 0,
+     "passes": 133.5,
+     "searches": [
+      "Tysons Galleria location county"
+     ]
+    },
+    {
+     "id": "5a8e0a005542995085b373a1",
+     "question": "Bordan Tkachuk was the CEO of a company that provides what sort of products?",
+     "answer": "IT products and services",
+     "type": "bridge",
+     "level": "hard",
+     "said": "IT products and services",
+     "correct": true,
+     "lenient": true,
+     "f1": 1.0,
+     "reply": "Based on the search results, Bordan Tkachuk was the former CEO of Viglen, which provides IT products and services including storage systems, servers, workstations, and data/voice communications equipment and services.\n\nAnswer: IT products and services",
+     "shown": [
+      "Bordan Tkachuk",
+      "Viglen"
+     ],
+     "gold_shown": 2,
+     "passes": 155.4,
+     "searches": [
+      "Bordan Tkachuk CEO company",
+      "Viglen company products"
+     ]
+    },
+    {
+     "id": "5ac1b8ee5542994d76dccedc",
+     "question": "Which filmmaker was known for animation, Lev Yilmaz or Pamela B. Green?",
+     "answer": "Levni Yilmaz",
+     "type": "comparison",
+     "level": "hard",
+     "said": "Lev Yilmaz",
+     "correct": false,
+     "lenient": false,
+     "f1": 0.5,
+     "reply": "Based on the search results:\n- Lev Yilmaz is known for his \"Tales of Mere Existence\" animated comic series, making him a filmmaker known for animation.\n- Pamela B. Green is a film producer and director known for feature films and motion graphics, but not specifically known for animation.\n\nAnswer: Lev Yilmaz",
+     "shown": [
+      "Lev Yilmaz",
+      "Pamela B. Green"
+     ],
+     "gold_shown": 2,
+     "passes": 155.4,
+     "searches": [
+      "Lev Yilmaz filmmaker animation",
+      "Pamela B. Green filmmaker animation"
+     ]
+    },
+    {
+     "id": "5adccd795542990d50227d2c",
+     "question": "In which city is the ambassador of the Rabat-Salé-Kénitra administrative region to China based?",
+     "answer": "Beijing",
+     "type": "bridge",
+     "level": "hard",
+     "said": "Beijing",
+     "correct": true,
+     "lenient": true,
+     "f1": 1.0,
+     "reply": "Based on the search results, the Moroccan ambassador in Beijing is the official representative of the Government in Rabat to the Government of the People's Republic of China. This indicates that the ambassador is based in Beijing.\n\nAnswer: Beijing",
+     "shown": [
+      "Moroccan Ambassador to China"
+     ],
+     "gold_shown": 1,
+     "passes": 154.4,
+     "searches": [
+      "ambassador of Rabat-Salé-Kénitra administrative region to China"
+     ]
+    },
+    {
+     "id": "5a84c4135542994c784dda31",
+     "question": "Are Yingkou and Fuding the same level of city?",
+     "answer": "no",
+     "type": "comparison",
+     "level": "hard",
+     "said": "No",
+     "correct": true,
+     "lenient": true,
+     "f1": 1.0,
+     "reply": "Based on the search results:\n- Yingkou is a prefecture-level city\n- Fuding is a county-level city\n\nSince prefecture-level and county-level are different administrative levels, Yingkou and Fuding are not the same level of city.\n\nAnswer: No",
+     "shown": [
+      "Yingkou",
+      "Fuding"
+     ],
+     "gold_shown": 2,
+     "passes": 155.4,
+     "searches": [
+      "Yingkou city level administrative",
+      "Fuding city level administrative"
+     ]
+    },
+    {
+     "id": "5a85eed75542996432c5713b",
+     "question": "Where did the descendants of the group of black Indians associated with the Seminole people settle?",
+     "answer": "Coahuila, Mexico",
+     "type": "bridge",
+     "level": "hard",
+     "said": "Florida and Oklahoma",
+     "correct": false,
+     "lenient": false,
+     "f1": 0.0,
+     "reply": "Based on the search results, the Black Seminoles are the descendants of free blacks and escaped slaves who allied with Seminole groups in Spanish Florida. They lived mostly in distinct bands near the Native American Seminole.\n\nThe search results don't explicitly state where they settled, but they are associated with the Seminole people in Florida and Oklahoma. The Black Seminoles are the descendants of free blacks and escaped slaves who allied with Seminole groups in Spanish Florida.\n\nAnswer: Florida and Oklahoma",
+     "shown": [
+      "Black Seminoles"
+     ],
+     "gold_shown": 1,
+     "passes": 154.4,
+     "searches": [
+      "descendants of the Seminole people settled"
+     ]
+    },
+    {
+     "id": "5a774e9c55429972597f14f3",
+     "question": "David Huntsinger has worked with this gospel singer born in the month of July?",
+     "answer": "Larnelle Harris",
+     "type": "bridge",
+     "level": "hard",
+     "said": "Larnelle Harris",
+     "correct": true,
+     "lenient": true,
+     "f1": 1.0,
+     "reply": "Based on the search results, David Huntsinger worked with Larnelle Harris, who is an American gospel singer born in July 6, 1947.\n\nAnswer: Larnelle Harris",
+     "shown": [
+      "chain: David Huntsinger -> Larnelle Harris"
+     ],
+     "gold_shown": 0,
+     "passes": 154.4,
+     "searches": [
+      "David Huntsinger gospel singer"
+     ]
+    },
+    {
+     "id": "5ae738f75542991bbc9761c4",
+     "question": "What year was the brother of this first round draft pick by the Washington Redskins drafted?",
+     "answer": "2003",
+     "type": "bridge",
+     "level": "hard",
+     "said": "</tool_call>",
+     "correct": false,
+     "lenient": false,
+     "f1": 0.0,
+     "reply": "Let me try searching for the specific player or draft year.\n\n<tool_call>\n<function=search>\n<parameter=query>\nWashington Redskins first round draft pick 2002\n</parameter>\n</function>\n</tool_call>",
+     "shown": [
+      "List of Washington Redskins first-round draft picks",
+      "Washington Redskins draft history",
+      "List of Washington Nationals first-round draft picks"
+     ],
+     "gold_shown": 0,
+     "passes": 156.4,
+     "searches": [
+      "first round draft pick Washington Redskins",
+      "Washington Redskins first round draft pick 2000",
+      "Washington Redskins first round draft pick 2001"
+     ]
+    },
+    {
+     "id": "5ac32b565542995ef918c154",
+     "question": "Where is the stadium at which 1964 Georgia Tech Yellow Jackets football team played their home game located? ",
+     "answer": "North Avenue at Techwood Drive",
+     "type": "bridge",
+     "level": "hard",
+     "said": "Atlanta, Georgia",
+     "correct": false,
+     "lenient": false,
+     "f1": 0.0,
+     "reply": "Based on the search results, the 1964 Georgia Tech Yellow Jackets football team played their home games at Grant Field in Atlanta, Georgia.\n\nAnswer: Atlanta, Georgia",
+     "shown": [
+      "1964 Georgia Tech Yellow Jackets football team"
+     ],
+     "gold_shown": 1,
+     "passes": 154.4,
+     "searches": [
+      "1964 Georgia Tech Yellow Jackets football team stadium home game location"
+     ]
+    },
+    {
+     "id": "5abc8d75554299700f9d7900",
+     "question": "Since 2 June 2017, The Leader of Fine Gael had been held by which Irish Fine Gael politician who has served as Taoiseach and Minister for Defence?",
+     "answer": "Leo Varadkar",
+     "type": "bridge",
+     "level": "hard",
+     "said": "Leo Varadkar",
+     "correct": true,
+     "lenient": true,
+     "f1": 1.0,
+     "reply": "Based on the search results, since June 2017, the Leader of Fine Gael had been held by Leo Varadkar. The search results confirm that Leo Varadkar served as Taoiseach and Minister for Defence.\n\nAnswer: Leo Varadkar",
+     "shown": [
+      "chain: Leader of Fine Gael -> Leo Varadkar"
+     ],
+     "gold_shown": 0,
+     "passes": 178.2,
+     "searches": [
+      "The Leader of Fine Gael since 2 June 2017"
+     ]
+    },
+    {
+     "id": "5a8bb29b554299240d9c2089",
+     "question": "Which American film actor and dancer starred in the 1945 film Johnny Angel?",
+     "answer": "George Raft",
+     "type": "bridge",
+     "level": "hard",
+     "said": "George Raft",
+     "correct": true,
+     "lenient": true,
+     "f1": 1.0,
+     "reply": "Based on the search results, the American film actor and dancer who starred in the 1945 film \"Johnny Angel\" is George Raft.\n\nAnswer: George Raft",
+     "shown": [
+      "Johnny Angel"
+     ],
+     "gold_shown": 1,
+     "passes": 178.2,
+     "searches": [
+      "American film actor and dancer starred in the 1945 film Johnny Angel"
+     ]
+    },
+    {
+     "id": "5ab659e355429954757d324e",
+     "question": "hree Men on a Horse is a play by a playwright born in which year ?",
+     "answer": "1887",
+     "type": "bridge",
+     "level": "hard",
+     "said": "1887",
+     "correct": true,
+     "lenient": true,
+     "f1": 1.0,
+     "reply": "Both playwrights, George Abbott and John Cecil Holm, were born in 1887 and 1904 respectively. However, the question asks for the birth year of the playwright born in which year, implying a single answer. Since George Abbott is the primary author often associated with this play in literary contexts, and he was born in 1887, that is the answer.\n\nAnswer: 1887",
+     "shown": [
+      "Three Men on a Horse",
+      "George Abbott",
+      "John Cecil Holm"
+     ],
+     "gold_shown": 2,
+     "passes": 180.2,
+     "searches": [
+      "Three Men on a Horse play",
+      "George Abbott playwright birth year",
+      "John Cecil Holm playwright birth year"
+     ]
+    },
+    {
+     "id": "5a8b8b3155429949d91db5d7",
+     "question": "What type of activity does Owner earnings and Warren Buffett have in common?",
+     "answer": "business",
+     "type": "bridge",
+     "level": "hard",
+     "said": "investing",
+     "correct": false,
+     "lenient": false,
+     "f1": 0.0,
+     "reply": "Based on the search results, both Owner earnings and Warren Buffett are related to investing. Owner earnings is a valuation method used in investing, and Warren Buffett is described as an investor and business magnate. The common activity is investing.\n\nAnswer: investing",
+     "shown": [
+      "Owner earnings",
+      "Warren Buffett"
+     ],
+     "gold_shown": 2,
+     "passes": 179.2,
+     "searches": [
+      "Owner earnings",
+      "Warren Buffett"
+     ]
+    },
+    {
+     "id": "5ae7eaf65542994a481bbe1d",
+     "question": "When was the  former Indian cricketer who made his ODI debuts during the 2000 ICC KnockOut Trophy born? ",
+     "answer": "7 October 1978",
+     "type": "bridge",
+     "level": "hard",
+     "said": "7 October 1978",
+     "correct": true,
+     "lenient": true,
+     "f1": 1.0,
+     "reply": "Based on the search results, the former Indian cricketer who made his ODI debuts during the 2000 ICC KnockOut Trophy is **Zaheer Khan**. According to the passage, he was born on **7 October 1978**.\n\nAnswer: 7 October 1978",
+     "shown": [
+      "chain: 2000 ICC KnockOut Trophy -> Zaheer Khan"
+     ],
+     "gold_shown": 0,
+     "passes": 178.2,
+     "searches": [
+      "former Indian cricketer ODI debuts 2000 ICC KnockOut Trophy"
+     ]
+    },
+    {
+     "id": "5a8c4c625542995e66a475a1",
+     "question": "Which airplane was this Major test-flying after whom the base, that 514th Flight Test Squadron is stated at, is named?",
+     "answer": "B-17 Flying Fortress bomber",
+     "type": "bridge",
+     "level": "hard",
+     "said": "B-17 Flying Fortress",
+     "correct": false,
+     "lenient": true,
+     "f1": 0.857,
+     "reply": "Based on the search results, the 514th Flight Test Squadron is stationed at Hill Air Force Base, which is named after Major Ployer Peter Hill who died test-flying a prototype of the B-17 Flying Fortress bomber.\n\nAnswer: B-17 Flying Fortress",
+     "shown": [
+      "514th Flight Test Squadron",
+      "Hill Air Force Base"
+     ],
+     "gold_shown": 2,
+     "passes": 179.2,
+     "searches": [
+      "514th Flight Test Squadron base name",
+      "Hill Air Force base named after airplane"
+     ]
+    },
+    {
+     "id": "5a818387554299260e20a291",
+     "question": "Based on a True Story... is an album by which country music star, with the single My Eyes?",
+     "answer": "Blake Shelton",
+     "type": "bridge",
+     "level": "hard",
+     "said": "Blake Shelton",
+     "correct": true,
+     "lenient": true,
+     "f1": 1.0,
+     "reply": "Based on the search results, the album \"Based on a True Story...\" with the single \"My Eyes\" was released by Blake Shelton, an American country music artist.\n\nAnswer: Blake Shelton",
+     "shown": [
+      "My Eyes (Blake Shelton song)"
+     ],
+     "gold_shown": 1,
+     "passes": 178.2,
+     "searches": [
+      "Based on a True Story album My Eyes country music star"
+     ]
+    },
+    {
+     "id": "5ab978855542996be2020512",
+     "question": "Over how many centuries were the \"dwelling place of the dead\" built?",
+     "answer": "three centuries",
+     "type": "bridge",
+     "level": "hard",
+     "said": "</tool_call>",
+     "correct": false,
+     "lenient": false,
+     "f1": 0.0,
+     "reply": "I found information about Gurdwara Toka Sahib, but it doesn't specify how many centuries it was built over. Let me try one more search to see if there's more specific information about the construction timeline.\n\n<tool_call>\n<function=search>\n<parameter=query>\nGurdwara Toka Sahib built over centuries\n</parameter>\n</function>\n</tool_call>",
+     "shown": [
+      "Market place of dead",
+      "Anandpur Sahib",
+      "Gurdwara Toka Sahib"
+     ],
+     "gold_shown": 0,
+     "passes": 180.2,
+     "searches": [
+      "dwelling place of the dead built",
+      "dwelling place of the dead Anandpur Sahib",
+      "dwelling place of the dead Anandpur Sahib history"
+     ]
+    },
+    {
+     "id": "5ae63dad55429929b0807afe",
+     "question": "When was the British author who wrote the novel on which \"Here We Go Round the Mulberry Bush\" was based born? ",
+     "answer": "7 January 1936",
+     "type": "bridge",
+     "level": "hard",
+     "said": "7 January 1936",
+     "correct": true,
+     "lenient": true,
+     "f1": 1.0,
+     "reply": "Based on the search results, the British author Hunter Davies was born on 7 January 1936.\n\nAnswer: 7 January 1936",
+     "shown": [
+      "Here We Go Round the Mulberry Bush (film)",
+      "Hunter Davies"
+     ],
+     "gold_shown": 2,
+     "passes": 139.0,
+     "searches": [
+      "Here We Go Round the Mulberry Bush novel",
+      "Hunter Davies author birth date"
+     ]
+    },
+    {
+     "id": "5a7a455c5542994f819ef1a7",
+     "question": "Who died first, George Archainbaud or Ralph Murphy?",
+     "answer": "George Archainbaud",
+     "type": "comparison",
+     "level": "hard",
+     "said": "George Archainbaud",
+     "correct": true,
+     "lenient": true,
+     "f1": 1.0,
+     "reply": "Based on the search results:\n- George Archainbaud died on February 20, 1959\n- Ralph Murphy died on February 10, 1967\n\nGeorge Archainbaud died first.\n\nAnswer: George Archainbaud",
+     "shown": [
+      "George Archainbaud",
+      "Ralph Murphy"
+     ],
+     "gold_shown": 2,
+     "passes": 139.0,
+     "searches": [
+      "George Archainbaud death date",
+      "Ralph Murphy death date"
+     ]
+    },
+    {
+     "id": "5a7dcc775542990b8f503ab5",
+     "question": "Which component of shellite has the formula (ON)CHOH?",
+     "answer": "picric acid",
+     "type": "bridge",
+     "level": "hard",
+     "said": "Picric acid",
+     "correct": true,
+     "lenient": true,
+     "f1": 1.0,
+     "reply": "Based on the search results, Shellite is an explosive mixture of Picric acid and Dinitrophenol (or Picric acid and Hexanitrodiphenylamine). The formula (ON)CHOH corresponds to the structure of Picric acid.\n\nAnswer: Picric acid",
+     "shown": [
+      "Shellite (explosive)"
+     ],
+     "gold_shown": 1,
+     "passes": 138.0,
+     "searches": [
+      "shellite component formula (ON)CHOH"
+     ]
+    },
+    {
+     "id": "5a887bc0554299206df2b2b6",
+     "question": "The Argentine PGA Championship record holder has won how many tournaments worldwide?",
+     "answer": "230",
+     "type": "bridge",
+     "level": "hard",
+     "said": "more than 230",
+     "correct": false,
+     "lenient": true,
+     "f1": 0.5,
+     "reply": "Based on the search results, the Argentine PGA Championship record holder is Roberto De Vicenzo. The passage states that he won more than 230 tournaments worldwide in his career.\n\nAnswer: more than 230",
+     "shown": [
+      "chain: Argentine PGA Championship -> Roberto De Vicenzo"
+     ],
+     "gold_shown": 0,
+     "passes": 138.0,
+     "searches": [
+      "Argentine PGA Championship record holder"
+     ]
+    },
+    {
+     "id": "5a83880e554299123d8c214e",
+     "question": "Suicide's 1977 released album features a song based on what brand's comic character?",
+     "answer": "Marvel",
+     "type": "bridge",
+     "level": "hard",
+     "said": "Marvel",
+     "correct": true,
+     "lenient": true,
+     "f1": 1.0,
+     "reply": "Based on the search results, the song \"Ghost Rider\" from the 1977 album \"Suicide\" is based on the Marvel Comics character.\n\nAnswer: Marvel",
+     "shown": [
+      "chain: Suicide (1977 album) -> Ghost Rider (Suicide song)"
+     ],
+     "gold_shown": 0,
+     "passes": 138.0,
+     "searches": [
+      "Suicide 1977 album song comic character"
+     ]
+    },
+    {
+     "id": "5a879adb5542996e4f30887f",
+     "question": "What other political position did the person who introduced the DISCLOSE Act hold?",
+     "answer": "United States Senator",
+     "type": "bridge",
+     "level": "hard",
+     "said": "U.S. Representative for Maryland's 8th congressional district",
+     "correct": false,
+     "lenient": false,
+     "f1": 0.0,
+     "reply": "Based on the search results, the DISCLOSE Act was introduced by Chris Van Hollen. According to the information, he served as the U.S. Representative for Maryland's 8th congressional district from 2003 to 2017, and he is currently a junior United States Senator from Maryland.\n\nAnswer: U.S. Representative for Maryland's 8th congressional district",
+     "shown": [
+      "chain: DISCLOSE Act -> Chris Van Hollen"
+     ],
+     "gold_shown": 0,
+     "passes": 138.0,
+     "searches": [
+      "DISCLOSE Act introduced person"
+     ]
+    },
+    {
+     "id": "5add11935542994734353827",
+     "question": "Were the bands Skin Yard and Ostava from the U.S.?",
+     "answer": "no",
+     "type": "comparison",
+     "level": "hard",
+     "said": "Yes",
+     "correct": false,
+     "lenient": false,
+     "f1": 0.0,
+     "reply": "Based on the search results:\n- Skin Yard was an American grunge band from Seattle, Washington.\n- Ostava is an alternative rock band from Bulgaria.\n\nSo Skin Yard was from the U.S., but Ostava was not.\n\nAnswer: Yes",
+     "shown": [
+      "Skin Yard",
+      "Ostava"
+     ],
+     "gold_shown": 2,
+     "passes": 139.0,
+     "searches": [
+      "Skin Yard band origin country",
+      "Ostava band origin country"
+     ]
+    },
+    {
+     "id": "5a8c5569554299240d9c2126",
+     "question": "Are Daryl Hall and Gerry Marsden both musicians?",
+     "answer": "yes",
+     "type": "comparison",
+     "level": "hard",
+     "said": "Yes",
+     "correct": true,
+     "lenient": true,
+     "f1": 1.0,
+     "reply": "Based on the search results, both Daryl Hall and Gerry Marsden are musicians. Daryl Hall is an American rock, R&B, and soul singer, keyboardist, guitarist, songwriter, and producer, and Gerry Marsden is an English musician and television personality, best known as the leader of the British Merseybeat band Gerry and the Pacemakers.\n\nAnswer: Yes",
+     "shown": [
+      "chain: Daryl Hall -> Gerry Marsden"
+     ],
+     "gold_shown": 0,
+     "passes": 138.0,
+     "searches": [
+      "Daryl Hall musician"
+     ]
+    },
+    {
+     "id": "5a75f0ea5542994ccc91866c",
+     "question": "What major truck road is located in Backford Cross?",
+     "answer": "The A41",
+     "type": "bridge",
+     "level": "hard",
+     "said": "A41",
+     "correct": true,
+     "lenient": true,
+     "f1": 1.0,
+     "reply": "Based on the search results, Backford Cross is located around the A41/A5117 junction. The A41 is a major road in the Wirral Peninsula.\n\nAnswer: A41",
+     "shown": [
+      "Backford Cross"
+     ],
+     "gold_shown": 1,
+     "passes": 132.4,
+     "searches": [
+      "Backford Cross major truck road"
+     ]
+    },
+    {
+     "id": "5a89f5815542993b751ca9c5",
+     "question": "In which role did Caroline Carver played in a 1999 Hallmark Entertainment made-for-TV fantasy movie?",
+     "answer": "Princess Jessica",
+     "type": "bridge",
+     "level": "hard",
+     "said": "Princess Jessica",
+     "correct": true,
+     "lenient": true,
+     "f1": 1.0,
+     "reply": "Based on the search results, Caroline Carver played the role of Princess Jessica in the 1999 Hallmark Entertainment made-for-TV fantasy movie \"The Magical Legend of the Leprechauns\".\n\nAnswer: Princess Jessica",
+     "shown": [
+      "Caroline Carver (actress)"
+     ],
+     "gold_shown": 1,
+     "passes": 132.4,
+     "searches": [
+      "Caroline Carver 1999 Hallmark Entertainment made-for-TV fantasy movie role"
+     ]
+    },
+    {
+     "id": "5a8d5fc6554299585d9e37c6",
+     "question": "What's the name of the fantasy film starring Sarah Bolger, featuring a New England family who discover magical creatures around their estate?",
+     "answer": "The Spiderwick Chronicles",
+     "type": "bridge",
+     "level": "hard",
+     "said": "The Spiderwick Chronicles",
+     "correct": true,
+     "lenient": true,
+     "f1": 1.0,
+     "reply": "Based on the search results, the fantasy film starring Sarah Bolger featuring a New England family who discover magical creatures is The Spiderwick Chronicles.\n\nAnswer: The Spiderwick Chronicles",
+     "shown": [
+      "The Spiderwick Chronicles (film)"
+     ],
+     "gold_shown": 1,
+     "passes": 132.4,
+     "searches": [
+      "Sarah Bolger fantasy film New England family magical creatures"
+     ]
+    },
+    {
+     "id": "5ac120c55542992a796dedfc",
+     "question": "Maxeda has been owned since 2004 by which American multinational equity firm?",
+     "answer": "KKR & Co",
+     "type": "bridge",
+     "level": "hard",
+     "said": "Kohlberg Kravis Roberts",
+     "correct": false,
+     "lenient": false,
+     "f1": 0.0,
+     "reply": "Based on the search results, Maxeda has been owned since 2004 by a consortium of investors led by the American private equity firm Kohlberg Kravis Roberts.\n\nAnswer: Kohlberg Kravis Roberts",
+     "shown": [
+      "Maxeda"
+     ],
+     "gold_shown": 1,
+     "passes": 132.4,
+     "searches": [
+      "Maxeda owned since 2004 American multinational equity firm"
+     ]
+    },
+    {
+     "id": "5ab7c1a955429928e1fe38c8",
+     "question": "The youngest daughter of Lady Mary-Gaye Curzon stars with Douglas Smith and Lucien Laviscount  in what 2017 film?",
+     "answer": "The Bye Bye Man",
+     "type": "bridge",
+     "level": "hard",
+     "said": "The Bye Bye Man",
+     "correct": true,
+     "lenient": true,
+     "f1": 1.0,
+     "reply": "Based on the search results, the 2017 film that Cressida Bonas starred with Douglas Smith and Lucien Laviscount is \"The Bye Bye Man\".\n\nAnswer: The Bye Bye Man",
+     "shown": [
+      "Cressida Bonas",
+      "chain: Cressida Bonas -> The Bye Bye Man"
+     ],
+     "gold_shown": 1,
+     "passes": 133.4,
+     "searches": [
+      "youngest daughter of Lady Mary-Gaye Curzon",
+      "Cressida Bonas Douglas Smith Lucien Lavencourt 2017 film"
+     ]
+    },
+    {
+     "id": "5abd01205542992ac4f3819b",
+     "question": "Mummulgum is a stop on the Bruxner Highway before reaching the town on the banks of which river?",
+     "answer": "Richmond",
+     "type": "bridge",
+     "level": "hard",
+     "said": "Casino",
+     "correct": false,
+     "lenient": false,
+     "f1": 0.0,
+     "reply": "The search results tell me that Mummulgum is located on Shannon Brook between Tenterfield and Casino on the Bruxner Highway. The town on the banks of Shannon Brook is Casino.\n\nAnswer: Casino",
+     "shown": [
+      "Mummulgum"
+     ],
+     "gold_shown": 1,
+     "passes": 132.4,
+     "searches": [
+      "Mummulgum stop Bruxner Highway town river"
+     ]
+    },
+    {
+     "id": "5ab69c25554299110f219a39",
+     "question": "Which American audio engineer and clandestine chemist, who was a key figure in the San Francisco Bay Area hippie movement during the 1960s recorded the album \"Old and in the Way?\"",
+     "answer": "Owsley Stanley",
+     "type": "bridge",
+     "level": "hard",
+     "said": "Owsley Stanley",
+     "correct": true,
+     "lenient": true,
+     "f1": 1.0,
+     "reply": "Based on the search results, the album \"Old and in the Way\" was recorded by Owsley Stanley and Vickie Babcock. Owsley Stanley is the American audio engineer and clandestine chemist who was a key figure in the San Francisco Bay Area hippie movement during the 1960s.\n\nAnswer: Owsley Stanley",
+     "shown": [
+      "Old and in the Way (album)"
+     ],
+     "gold_shown": 1,
+     "passes": 132.4,
+     "searches": [
+      "American audio engineer clandestine chemist San Francisco Bay Area hippie movement 1960s album Old and in the Way?"
+     ]
+    },
+    {
+     "id": "5a7b12a355429927d897bf2a",
+     "question": "When was the palace founded at which Columba de Dunbar died in 1435?",
+     "answer": "the late 12th Century",
+     "type": "bridge",
+     "level": "hard",
+     "said": "late 12th Century",
+     "correct": true,
+     "lenient": true,
+     "f1": 1.0,
+     "reply": "Based on the search results, Spynie Palace was founded in the late 12th Century.\n\nAnswer: late 12th Century",
+     "shown": [
+      "Columba de Dunbar",
+      "Spynie Palace"
+     ],
+     "gold_shown": 2,
+     "passes": 133.4,
+     "searches": [
+      "Columba de Dunbar died 1435 palace",
+      "Spynie Palace founded"
+     ]
+    },
+    {
+     "id": "5ae0006755429925eb1afbd3",
+     "question": "Where is the Bubblegum Alley, that is similar to Gum Wall, located in California?",
+     "answer": "San Luis Obispo, California",
+     "type": "bridge",
+     "level": "hard",
+     "said": "San Luis Obispo",
+     "correct": false,
+     "lenient": true,
+     "f1": 0.857,
+     "reply": "Based on the search results, Bubblegum Alley is located in downtown San Luis Obispo, California.\n\nAnswer: San Luis Obispo",
+     "shown": [
+      "Bubblegum Alley"
+     ],
+     "gold_shown": 0,
+     "passes": 160.8,
+     "searches": [
+      "Bubblegum Alley location California"
+     ]
+    },
+    {
+     "id": "5ae305df5542992decbdcdc3",
+     "question": "At what venue was the January 2, 2012 game featured the University of Louisville team?",
+     "answer": "Mercedes-Benz Superdome",
+     "type": "bridge",
+     "level": "hard",
+     "said": "Papa John's Cardinal Stadium",
+     "correct": false,
+     "lenient": false,
+     "f1": 0.0,
+     "reply": "Based on the search results, the University of Louisville team played their home games at Papa John's Cardinal Stadium.\n\nAnswer: Papa John's Cardinal Stadium",
+     "shown": [
+      "2012 Louisville Cardinals football team"
+     ],
+     "gold_shown": 1,
+     "passes": 160.8,
+     "searches": [
+      "January 2, 2012 game University of Louisville team venue"
+     ]
+    },
+    {
+     "id": "5a8574945542997b5ce3fffb",
+     "question": "Which film was Oscar nominated, LaLee's Kin: The Legacy of Cotton or Gimme Shelter, the 1970 Rolling Stones documentary?",
+     "answer": "LaLee's Kin: The Legacy of Cotton",
+     "type": "comparison",
+     "level": "hard",
+     "said": "LaLee's Kin: The Legacy of Cotton",
+     "correct": true,
+     "lenient": true,
+     "f1": 1.0,
+     "reply": "Based on the search results:\n\n1. **LaLee's Kin: The Legacy of Cotton** was nominated for Best Documentary Feature at the 74th Academy Awards.\n\n2. **Gimme Shelter** was a 1970 documentary film directed by Albert and David Maysles, but it was not entered into the main competition at the Cannes Film Festival.\n\nTherefore, the Oscar-nominated film is **LaLee's Kin: The Legacy of Cotton**.\n\nAnswer: LaLee's Kin: The Legacy of Cotton",
+     "shown": [
+      "LaLee's Kin",
+      "chain: LaLee's Kin: The Legacy of Cotton -> Gimme Shelter (1970 film)"
+     ],
+     "gold_shown": 0,
+     "passes": 160.8,
+     "searches": [
+      "LaLee's Kin: The Legacy of Cotton Oscar nomination",
+      "Gimme Shelter 1970 Rolling Stones documentary Oscar nomination"
+     ]
+    },
+    {
+     "id": "5a7332935542991f9a20c67d",
+     "question": "Which board game was published most recently, Pirate's Cove or Catan?",
+     "answer": "Pirate's Cove",
+     "type": "comparison",
+     "level": "hard",
+     "said": "Catan",
+     "correct": false,
+     "lenient": false,
+     "f1": 0.0,
+     "reply": "Based on the search results:\n- Pirate's Cove was originally published in 2002 and republished in 2003\n- Catan was released on May 2, 2007\n\nCatan was published most recently.\n\nAnswer: Catan",
+     "shown": [
+      "Pirate's Cove",
+      "Catan (2007 video game)"
+     ],
+     "gold_shown": 1,
+     "passes": 161.8,
+     "searches": [
+      "Pirate's Cove board game publisher release date",
+      "Catan board game publisher release date"
+     ]
+    },
+    {
+     "id": "5a80071f5542992bc0c4a684",
+     "question": "Alice David is the voice of Lara Croft in a video game developed by which company ?",
+     "answer": "Crystal Dynamics",
+     "type": "bridge",
+     "level": "hard",
+     "said": "Core Design",
+     "correct": false,
+     "lenient": false,
+     "f1": 0.0,
+     "reply": "Based on the search results, Alice David voices Lara Croft in the video game \"Tomb Raider\". The game was created by the British gaming company Core Design.\n\nAnswer: Core Design",
+     "shown": [
+      "chain: Alice David -> Tomb Raider"
+     ],
+     "gold_shown": 0,
+     "passes": 160.8,
+     "searches": [
+      "Alice David voice Lara Croft video game"
+     ]
+    },
+    {
+     "id": "5ae73c065542991e8301cc18",
+     "question": "Which Eminem album included vocals from a singer who had an album titled \"Unapologetic\"?",
+     "answer": "\"The Marshall Mathers LP 2\"",
+     "type": "bridge",
+     "level": "hard",
+     "said": "Numb",
+     "correct": false,
+     "lenient": false,
+     "f1": 0.0,
+     "reply": "Based on the search results, the song \"Numb\" by Rihanna from her album \"Unapologetic\" features guest vocals by Eminem. Therefore, the Eminem album that included vocals from a singer who had an album titled \"Unapologetic\" is \"Numb\".\n\nAnswer: Numb",
+     "shown": [
+      "Recovery (Eminem album)",
+      "Unapologetic",
+      "Numb (Rihanna song)"
+     ],
+     "gold_shown": 1,
+     "passes": 162.8,
+     "searches": [
+      "Eminem album",
+      "Unapologetic album singer",
+      "Eminem album Rihanna vocals"
+     ]
+    },
+    {
+     "id": "5a87d8215542994775f60800",
+     "question": "This American crime film set in South Los Angeles was written and directed by the same director and writer of screenwriter of \"Street Kings\", \"End of Watch\", \"Sabotage\", \"Fury\" and what other film? ",
+     "answer": "Suicide Squad",
+     "type": "bridge",
+     "level": "hard",
+     "said": "Suicide Squad",
+     "correct": true,
+     "lenient": true,
+     "f1": 1.0,
+     "reply": "Based on the search results, David Ayer is also known for \"Suicide Squad\" (2016). The question asks for the other film he wrote and directed besides the ones already mentioned.\n\nAnswer: Suicide Squad",
+     "shown": [
+      "chain: David Ayer -> End of Watch",
+      "David Ayer"
+     ],
+     "gold_shown": 1,
+     "passes": 161.8,
+     "searches": [
+      "director of Street Kings End of Watch Sabotage Fury",
+      "David Ayer other film besides Street Kings End of Watch Sabotage Fury"
+     ]
+    },
+    {
+     "id": "5ac2ffbd554299677310267b",
+     "question": "SuperMansion starred the actress who had a recurring role as whom on Workaholics?",
+     "answer": "Jillian Belk",
+     "type": "bridge",
+     "level": "hard",
+     "said": "Jillian Belk",
+     "correct": true,
+     "lenient": true,
+     "f1": 1.0,
+     "reply": "Based on the search results, the actress who starred in \"SuperMansion\" is Jillian Bell. She had a recurring role as Jillian Belk on the show \"Workaholics\".\n\nAnswer: Jillian Belk",
+     "shown": [
+      "chain: SuperMansion -> Jillian Bell"
+     ],
+     "gold_shown": 0,
+     "passes": 160.8,
+     "searches": [
+      "SuperMansion actress"
+     ]
+    },
+    {
+     "id": "5a7c960655429935c91b5244",
+     "question": "The 1974 Texas Tech Raiders football team represented what public research university in Lubbock, Texas?",
+     "answer": "Texas Tech University",
+     "type": "bridge",
+     "level": "hard",
+     "said": "Texas Tech University",
+     "correct": true,
+     "lenient": true,
+     "f1": 1.0,
+     "reply": "Based on the search results, the 1974 Texas Tech Raiders football team represented Texas Tech University.\n\nAnswer: Texas Tech University",
+     "shown": [
+      "1974 Texas Tech Red Raiders football team"
+     ],
+     "gold_shown": 1,
+     "passes": 172.2,
+     "searches": [
+      "1974 Texas Tech Raiders football team public research university Lubbock Texas"
+     ]
+    },
+    {
+     "id": "5a7d61775542991319bc93b9",
+     "question": "During Siege of Bharatpur, which Commander-in-Chief of Ireland and Commander-in-Chief of India contributed to the storming of the castle?",
+     "answer": "Lord Combermere",
+     "type": "bridge",
+     "level": "hard",
+     "said": "Lord Combermere",
+     "correct": true,
+     "lenient": true,
+     "f1": 1.0,
+     "reply": "The search results indicate that British troops under Lord Combermere stormed the fortress of Bharatpur on 18 January 1826. Lord Combermere was the Commander-in-Chief of India at that time. The passage doesn't explicitly state his title as Commander-in-Chief of Ireland, but he was the Commander-in-Chief of India during the Siege of Bharatpur.\n\nBased on the information available, the Commander-in-Chief of India who contributed to the storming of the castle during the Siege of Bharatpur was Lord Combermere.\n\nAnswer: Lord Combermere",
+     "shown": [
+      "chain: Siege of Bharatpur -> Commander-in-Chief, India",
+      "Siege of Bharatpur"
+     ],
+     "gold_shown": 1,
+     "passes": 173.2,
+     "searches": [
+      "Siege of Bharatpur Commander-in-Chief Ireland India storming castle",
+      "Commander-in-Chief India storming castle Bharatpur 1826"
+     ]
+    },
+    {
+     "id": "5ac1c6805542994ab5c67e11",
+     "question": "For what type of work is the production company for The Year Without a Santa Claus best known?",
+     "answer": "seasonal television specials, particularly its work in stop motion animation",
+     "type": "bridge",
+     "level": "hard",
+     "said": "stop motion animation",
+     "correct": false,
+     "lenient": true,
+     "f1": 0.462,
+     "reply": "Based on the search results, the production company for \"The Year Without a Santa Claus\" is Rankin/Bass Productions. According to the information, this company is best known for its seasonal television specials, particularly its work in stop motion animation.\n\nAnswer: stop motion animation",
+     "shown": [
+      "chain: The Year Without a Santa Claus -> Rankin/Bass Productions"
+     ],
+     "gold_shown": 0,
+     "passes": 172.2,
+     "searches": [
+      "The Year Without a Santa Claus production company"
+     ]
+    },
+    {
+     "id": "5a7a230e5542996a35c170ee",
+     "question": "What year was the film that starred the composer for \"The Naked Brothers Band\"?",
+     "answer": "2014",
+     "type": "bridge",
+     "level": "hard",
+     "said": "</tool_call>",
+     "correct": false,
+     "lenient": false,
+     "f1": 0.0,
+     "reply": "The search results mention that \"The Naked Brothers Band\" is a soundtrack album by The Naked Brothers Band for the TV series, and there's also a soundtrack EP for the movie. However, I haven't found the specific composer's name yet. Let me try a different search to find the composer.\n\n<tool_call>\n<function=search>\n<parameter=query>\nThe Naked Brothers Band film composer name\n</parameter>\n</function>\n</tool_call>",
+     "shown": [
+      "The Naked Brothers Band (album)",
+      "The Naked Brothers Band",
+      "chain: The Naked Brothers Band (album) -> The Naked Brothers Band: Music from the Movie"
+     ],
+     "gold_shown": 0,
+     "passes": 174.2,
+     "searches": [
+      "The Naked Brothers Band composer",
+      "The Naked Brothers Band film",
+      "The Naked Brothers Band film composer"
+     ]
+    },
+    {
+     "id": "5ae4627d5542991a06ce9a4d",
+     "question": "The author of Sexual Politics attended which British University?",
+     "answer": "Oxford",
+     "type": "bridge",
+     "level": "hard",
+     "said": "Oxford University",
+     "correct": false,
+     "lenient": true,
+     "f1": 0.667,
+     "reply": "Based on the search results, Kate Millett, the author of \"Sexual Politics\", attended Oxford University.\n\nAnswer: Oxford University",
+     "shown": [
+      "Sexual Politics",
+      "Kate Millett"
+     ],
+     "gold_shown": 2,
+     "passes": 173.2,
+     "searches": [
+      "Sexual Politics author",
+      "Kate Millett British University education"
+     ]
+    },
+    {
+     "id": "5ac2d1d755429921a00ab053",
+     "question": "Who had the best singles ranking, Roberta Vinci or Jorge Lozano?",
+     "answer": "Roberta Vinci",
+     "type": "comparison",
+     "level": "hard",
+     "said": "Roberta Vinci",
+     "correct": true,
+     "lenient": true,
+     "f1": 1.0,
+     "reply": "Based on the search results:\n\n- **Roberta Vinci** reached a career-high singles ranking of World No. 7 in May 2016.\n- **Jorge Lozano** reached his highest singles ranking of World No. 51.\n\nComparing the two, Roberta Vinci had the better singles ranking (No. 7 vs No. 51).\n\nAnswer: Roberta Vinci",
+     "shown": [
+      "chain: Roberta Vinci -> Jorge Lozano"
+     ],
+     "gold_shown": 0,
+     "passes": 172.2,
+     "searches": [
+      "Roberta Vinci singles ranking"
+     ]
+    },
+    {
+     "id": "5ab4e3065542990594ba9cb4",
+     "question": "Both Truth in Science and Discovery embrace what campaign?",
+     "answer": "\"Teach the Controversy\" campaign",
+     "type": "bridge",
+     "level": "hard",
+     "said": "Teach the Controversy",
+     "correct": false,
+     "lenient": true,
+     "f1": 0.8,
+     "reply": "Based on the search results, both Truth in Science and Discovery embrace the \"Teach the Controversy\" campaign.\n\nAnswer: Teach the Controversy",
+     "shown": [
+      "Truth in Science",
+      "Discovery Institute intelligent design campaigns"
+     ],
+     "gold_shown": 1,
+     "passes": 173.2,
+     "searches": [
+      "Truth in Science campaign",
+      "Discovery campaign"
+     ]
+    },
+    {
+     "id": "5ac298f9554299657fa28fc9",
+     "question": "Josey Scott and Ian Watkins were both promising musicians. Which of these talented men was incarcerated, impacting his career with a rock band?",
+     "answer": "Lostprophets disbanded in 2013 after Watkins was charged with sexual offences in late 2012.",
+     "type": "comparison",
+     "level": "hard",
+     "said": "Ian Watkins",
+     "correct": false,
+     "lenient": false,
+     "f1": 0.125,
+     "reply": "Based on the search results, I found that both Josey Scott and Ian Watkins were musicians, but only Ian Watkins was incarcerated.\n\nIan Watkins was convicted of sexual offences and was jailed for 29 years. This incarceration impacted his career with the rock band Lostprophets, which disbanded after he was charged with sexual offences in late 2012.\n\nAnswer: Ian Watkins",
+     "shown": [
+      "chain: Josey Scott -> Ian Watkins (Lostprophets)"
+     ],
+     "gold_shown": 0,
+     "passes": 172.2,
+     "searches": [
+      "Josey Scott musician incarcerated"
+     ]
+    },
+    {
+     "id": "5ab6a2be554299710c8d1f08",
+     "question": "The movies Queen of Blood and Battle Beyond the Sun both contained scenes from what 1959 Soviet feature?",
+     "answer": "Nebo Zovyot",
+     "type": "bridge",
+     "level": "hard",
+     "said": "Nebo Zovyot",
+     "correct": true,
+     "lenient": true,
+     "f1": 1.0,
+     "reply": "Based on the search results, both \"Queen of Blood\" and \"Battle Beyond the Sun\" contained scenes from the 1959 Soviet feature \"Nebo Zovyot\".\n\nAnswer: Nebo Zovyot",
+     "shown": [
+      "Queen of Blood",
+      "Battle Beyond the Sun"
+     ],
+     "gold_shown": 2,
+     "passes": 159.5,
+     "searches": [
+      "Queen of Blood movie",
+      "Battle Beyond the Sun movie"
+     ]
+    },
+    {
+     "id": "5a738d27554299623ed4abf3",
+     "question": "Who was born first, Erika Jayne or Marco Da Silva",
+     "answer": "Erika Jayne",
+     "type": "bridge",
+     "level": "hard",
+     "said": "Erika Jayne",
+     "correct": true,
+     "lenient": true,
+     "f1": 1.0,
+     "reply": "Based on the search results:\n- Erika Jayne was born on July 10, 1971\n- Marco Da Silva was born on May 8, 1982\n\nErika Jayne was born first.\n\nAnswer: Erika Jayne",
+     "shown": [
+      "Erika Jayne",
+      "Marco Da Silva (footballer, born 1982)"
+     ],
+     "gold_shown": 1,
+     "passes": 159.5,
+     "searches": [
+      "Erika Jayne birth date",
+      "Marco Da Silva birth date"
+     ]
+    },
+    {
+     "id": "5ab2a186554299295394677b",
+     "question": "When did the English local newspaper, featuring the sculpture and war memorial in the Forbury gardens, change names?",
+     "answer": "2009",
+     "type": "bridge",
+     "level": "hard",
+     "said": "2009",
+     "correct": true,
+     "lenient": true,
+     "f1": 1.0,
+     "reply": "Based on the search results, the newspaper is the Reading Post (which was renamed the Reading Evening Post in 2009). The text states that \"The Reading Post (until 2009, the Reading Evening Post)\". This indicates the newspaper changed its name in 2009.\n\nAnswer: 2009",
+     "shown": [
+      "chain: York City War Memorial -> Reading Post"
+     ],
+     "gold_shown": 0,
+     "passes": 158.5,
+     "searches": [
+      "English local newspaper featuring sculpture and war memorial in Forbury gardens"
+     ]
+    },
+    {
+     "id": "5a8704f8554299211dda2ba4",
+     "question": "What is the name of the Isles who were led by Aonghus Mór and covered a total land area of over 8300 km2?",
+     "answer": "Kingdom of the Isles",
+     "type": "bridge",
+     "level": "hard",
+     "said": "Kingdom of the Isles",
+     "correct": true,
+     "lenient": true,
+     "f1": 1.0,
+     "reply": "Based on the search results, the Isles led by Aonghus Mór are the Kingdom of the Isles. The text confirms that the islands involved have a total land area of over 8300 km2.\n\nAnswer: Kingdom of the Isles",
+     "shown": [
+      "chain: Aonghus Mór -> Kingdom of the Isles"
+     ],
+     "gold_shown": 0,
+     "passes": 158.5,
+     "searches": [
+      "Aonghus Mór Isles"
+     ]
+    },
+    {
+     "id": "5ab5ed505542997d4ad1f255",
+     "question": "Who is Bruce Spizer an expert on, known as the most influential act of the rock era?",
+     "answer": "The Beatles",
+     "type": "bridge",
+     "level": "hard",
+     "said": "The Beatles",
+     "correct": true,
+     "lenient": true,
+     "f1": 1.0,
+     "reply": "Based on the search results, Bruce Spizer is an expert on The Beatles.\n\nAnswer: The Beatles",
+     "shown": [
+      "Bruce Spizer"
+     ],
+     "gold_shown": 1,
+     "passes": 158.5,
+     "searches": [
+      "Bruce Spizer expert on"
+     ]
+    },
+    {
+     "id": "5a77c1505542997042120b1b",
+     "question": "Which song was behind the third single on the album  \"A Lot About Livin' (And a Little 'bout Love)\" for two weeks on the country charts?",
+     "answer": "\"We'll Burn That Bridge\"",
+     "type": "bridge",
+     "level": "hard",
+     "said": "Tonight I Clim",
+     "correct": false,
+     "lenient": false,
+     "f1": 0.0,
+     "reply": "Based on the search results, I found that \"Tonight I Climbed the Wall\" was the second single from the album. The album had four singles: \"Chattahoochee\", \"She's Got the Rhythm (And I Got the Blues)\", \"Tonight I Climbed the Wall\", \"(Who Says) You Can't Have It All\", and \"Mercury Blues\". Since \"Chattahoochee\" and \"She's Got the Rhythm\" were the first two singles, \"Tonight I Climbed the Wall\" would be the third single.\n\nThe search results confirm that \"Tonight I Climbed the Wall\" was the third single and peaked at number 4 on the country charts, which means it was on the charts for two weeks.\n\nAnswer: Tonight I Clim",
+     "shown": [
+      "A Lot About Livin' (And a Little 'bout Love)",
+      "Tonight I Climbed the Wall"
+     ],
+     "gold_shown": 0,
+     "passes": 159.5,
+     "searches": [
+      "A Lot About Livin' (And a Little 'bout Love) album third single",
+      "Tonight I Climbed the Wall song country charts two weeks"
+     ]
+    },
+    {
+     "id": "5a88d745554299206df2b378",
+     "question": "What occupation was shared by David Yates and Pietro Germi?",
+     "answer": "director",
+     "type": "comparison",
+     "level": "hard",
+     "said": "solicitor",
+     "correct": false,
+     "lenient": false,
+     "f1": 0.0,
+     "reply": "Based on the search results:\n- David Yates was a solicitor and academic\n- Pietro Germi was an actor, screenwriter, and director\n\nBoth were involved in the legal profession. David Yates was a solicitor, and Pietro Germi was an actor who briefly attended nautical school before deciding on a career in acting, but the shared occupation is solicitor.\n\nAnswer: solicitor",
+     "shown": [
+      "David Yates (academic)",
+      "Pietro Germi"
+     ],
+     "gold_shown": 1,
+     "passes": 159.5,
+     "searches": [
+      "David Yates occupation",
+      "Pietro Germi occupation"
+     ]
+    },
+    {
+     "id": "5ae748d1554299572ea547b0",
+     "question": "Marcus Wayne Garland spent nine seasons with an American professional baseball team that is based in Baltimore, Maryland, and was one of the AMerican League's original eight charter franchises when the league was established in what year?",
+     "answer": "1901",
+     "type": "bridge",
+     "level": "hard",
+     "said": "1901",
+     "correct": true,
+     "lenient": true,
+     "f1": 1.0,
+     "reply": "The team is the Baltimore Orioles. According to the search results, the American League was established in 1901.\n\nAnswer: 1901",
+     "shown": [
+      "Baltimore Orioles"
+     ],
+     "gold_shown": 1,
+     "passes": 158.5,
+     "searches": [
+      "American professional baseball team based in Baltimore Maryland"
+     ]
+    },
+    {
+     "id": "5a7a8a9c554299042af8f666",
+     "question": "The lamp used in many lighthouses is similiar to this type of lamp patented in 1780 by Aimé Argand?",
+     "answer": "Argand lamp",
+     "type": "bridge",
+     "level": "hard",
+     "said": "Yes",
+     "correct": false,
+     "lenient": false,
+     "f1": 0.0,
+     "reply": "Based on the search results:\n\n1. The lamp used in many lighthouses is the **Lewis lamp**, which was invented by Winslow Lewis and patented in 1810.\n\n2. The lamp patented in 1780 by Aimé Argand is the **Argand lamp**.\n\nThe search results explicitly state that the Lewis lamp \"used a similar design to an Argand lamp.\"\n\nAnswer: Yes",
+     "shown": [
+      "Lewis lamp",
+      "Argand lamp"
+     ],
+     "gold_shown": 2,
+     "passes": 161.2,
+     "searches": [
+      "lamp used in lighthouses",
+      "lamp patented 1780 Aimé Argand"
+     ]
+    },
+    {
+     "id": "5adffe7155429906c02daa9e",
+     "question": "The songs from the sountrack to \"When Harry Met Sally\" are performed by a singer that has had how many top 20 US albums?",
+     "answer": "seven",
+     "type": "bridge",
+     "level": "hard",
+     "said": "7",
+     "correct": false,
+     "lenient": false,
+     "f1": 0.0,
+     "reply": "Based on the search results, the songs from the soundtrack to \"When Harry Met Sally\" are performed by Harry Connick Jr. The search results also state that he has had seven top 20 US albums.\n\nAnswer: 7",
+     "shown": [
+      "chain: When Harry Met Sally... (soundtrack) -> Harry Connick Jr."
+     ],
+     "gold_shown": 0,
+     "passes": 161.2,
+     "searches": [
+      "When Harry Met Sally soundtrack songs singer"
+     ]
+    },
+    {
+     "id": "5ab642845542995eadeeff8e",
+     "question": "Are Broughtonia and Laeliocattleya both orchids?",
+     "answer": "yes",
+     "type": "comparison",
+     "level": "hard",
+     "said": "Yes",
+     "correct": true,
+     "lenient": true,
+     "f1": 1.0,
+     "reply": "Based on the search results:\n- Broughtonia is a genus of orchids\n- Laeliocattleya is a nothogenus of intergeneric orchid hybrids\n\nBoth are types of orchids.\n\nAnswer: Yes",
+     "shown": [
+      "Broughtonia",
+      "Laeliocattleya"
+     ],
+     "gold_shown": 2,
+     "passes": 162.2,
+     "searches": [
+      "Broughtonia orchid",
+      "Laeliocattleya orchid"
+     ]
+    },
+    {
+     "id": "5a906a685542990a9849362e",
+     "question": "Where was the world cup hosted that Algeria qualified for the first time into the round of 16?",
+     "answer": "Brazil",
+     "type": "bridge",
+     "level": "hard",
+     "said": "South Africa",
+     "correct": false,
+     "lenient": false,
+     "f1": 0.0,
+     "reply": "Based on the search results, Algeria qualified for the first time into the round of 16 at the 2014 FIFA World Cup. The World Cup was hosted in South Africa.\n\nAnswer: South Africa",
+     "shown": [
+      "Algeria at the FIFA World Cup"
+     ],
+     "gold_shown": 1,
+     "passes": 161.2,
+     "searches": [
+      "Algeria qualified for World Cup round of 16 first time"
+     ]
+    },
+    {
+     "id": "5a7633ad5542992db9473741",
+     "question": "Which was fought earlier in our nation's history, the Seven Days Battles or the Battle of Manila?",
+     "answer": "The Seven Days Battles",
+     "type": "comparison",
+     "level": "hard",
+     "said": "Seven Days Battles",
+     "correct": true,
+     "lenient": true,
+     "f1": 1.0,
+     "reply": "Based on the search results:\n- The Seven Days Battles were fought from June 25 to July 1, 1862\n- The Battle of Manila was fought from February 3 to March 3, 1945\n\nThe Seven Days Battles (1862) were fought earlier than the Battle of Manila (1945).\n\nAnswer: Seven Days Battles",
+     "shown": [
+      "Seven Days Battles",
+      "Battle of Manila (1945)"
+     ],
+     "gold_shown": 2,
+     "passes": 162.2,
+     "searches": [
+      "Seven Days Battles date",
+      "Battle of Manila date"
+     ]
+    },
+    {
+     "id": "5a74ce9655429974ef308c6c",
+     "question": "What retailer in ABQ Uptown is headquarted in Poole, Dorset, United Kingdom?",
+     "answer": "Lush Ltd.",
+     "type": "bridge",
+     "level": "hard",
+     "said": "Lush",
+     "correct": false,
+     "lenient": true,
+     "f1": 0.667,
+     "reply": "Based on the search results, Lush is the retailer headquartered in Poole, Dorset, United Kingdom. Lush owns the anchor tenant J.Crew at ABQ Uptown.\n\nAnswer: Lush",
+     "shown": [
+      "chain: ABQ Uptown -> Lush (company)"
+     ],
+     "gold_shown": 0,
+     "passes": 161.2,
+     "searches": [
+      "retailer headquarted in Poole, Dorset, United Kingdom ABQ Uptown"
+     ]
+    },
+    {
+     "id": "5a713a5a5542994082a3e6a9",
+     "question": "What football club plays in the area between the old tool gates: Brook Bar and Trafford bar?",
+     "answer": "Manchester United",
+     "type": "bridge",
+     "level": "hard",
+     "said": "Manchester United",
+     "correct": true,
+     "lenient": true,
+     "f1": 1.0,
+     "reply": "Based on the search results, the area between the old tool gates (Brooks's Bar and Trafford Bar) is Old Trafford. The passage doesn't explicitly name the football club, but Old Trafford is the home of Manchester United Football Club.\n\nAnswer: Manchester United",
+     "shown": [
+      "Old Trafford, Greater Manchester"
+     ],
+     "gold_shown": 1,
+     "passes": 161.2,
+     "searches": [
+      "football club area between old tool gates Brook Bar and Trafford bar"
+     ]
+    },
+    {
+     "id": "5ab341f755429969a97a8114",
+     "question": "The song \"Chim Chim Cher-ee\" can be heard  in the \"Mary Poppins\" scene of a Disney ride that debuted in what year?",
+     "answer": "1989",
+     "type": "bridge",
+     "level": "hard",
+     "said": "1989",
+     "correct": true,
+     "lenient": true,
+     "f1": 1.0,
+     "reply": "Based on the search results, the song \"Chim Chim Cher-ee\" can be heard in the \"Mary Poppins\" scene of The Great Movie Ride, which debuted on May 1, 1989.\n\nAnswer: 1989",
+     "shown": [
+      "Chim Chim Cher-ee",
+      "The Great Movie Ride"
+     ],
+     "gold_shown": 2,
+     "passes": 162.2,
+     "searches": [
+      "song \"Chim Chim Cher-ee\" Mary Poppins Disney ride",
+      "The Great Movie Ride Disney Hollywood Studios debut year"
+     ]
+    },
+    {
+     "id": "5a8325b35542990548d0b18f",
+     "question": "Who held the record for the longest service in the Australian Parliament for a woman, and was surpassed by  a former Australian politician who was the 29th Speaker of the House of Representatives?",
+     "answer": "Kathryn Jean Martin",
+     "type": "bridge",
+     "level": "hard",
+     "said": "Bronwyn Bishop",
+     "correct": false,
+     "lenient": false,
+     "f1": 0.0,
+     "reply": "Based on the search results:\n\n1. The record for the longest service in the Australian Parliament for a woman was held by **Kathy Sullivan**.\n2. This record was surpassed by **Bronwyn Bishop**, who was the 29th Speaker of the House of Representatives.\n\nAnswer: Bronwyn Bishop",
+     "shown": [
+      "chain: Kathy Sullivan (Australian politician) -> Bronwyn Bishop"
+     ],
+     "gold_shown": 0,
+     "passes": 158.9,
+     "searches": [
+      "longest service in Australian Parliament for a woman record"
+     ]
+    },
+    {
+     "id": "5ab9374b554299131ca422c6",
+     "question": "Which man who presented the Australia 2022 FIFA World Cup bid was born on October 22, 1930?",
+     "answer": "Frank Lowy",
+     "type": "bridge",
+     "level": "hard",
+     "said": "Frank Lowy",
+     "correct": true,
+     "lenient": true,
+     "f1": 1.0,
+     "reply": "Based on the search results, the man who presented the Australia 2022 FIFA World Cup bid and was born on October 22, 1930, is Frank Lowy.\n\nAnswer: Frank Lowy",
+     "shown": [
+      "chain: Australia 2022 FIFA World Cup bid -> Frank Lowy"
+     ],
+     "gold_shown": 0,
+     "passes": 158.9,
+     "searches": [
+      "Australia 2022 FIFA World Cup bid presenter born October 22 1930"
+     ]
+    },
+    {
+     "id": "5ae52c0f5542992663a4f12e",
+     "question": "What major city is the Faith Lutheran Middle School and High School located by?",
+     "answer": "Las Vegas",
+     "type": "bridge",
+     "level": "hard",
+     "said": "Las Vegas",
+     "correct": true,
+     "lenient": true,
+     "f1": 1.0,
+     "reply": "Based on the search results, Faith Lutheran Middle School and High School is located in Summerlin, Clark County, Nevada, serving the Las Vegas Valley. The major city it is located by is Las Vegas.\n\nAnswer: Las Vegas",
+     "shown": [
+      "Faith Lutheran Middle School &amp; High School"
+     ],
+     "gold_shown": 1,
+     "passes": 158.9,
+     "searches": [
+      "Faith Lutheran Middle School and High School location"
+     ]
+    },
+    {
+     "id": "5adbfbd555429947ff173893",
+     "question": "What British singer-songwriter hosted the 16th Annual Young Hollywood Awards?",
+     "answer": "Kelly Lee Osbourne",
+     "type": "bridge",
+     "level": "hard",
+     "said": "Kelly Osbourne",
+     "correct": false,
+     "lenient": false,
+     "f1": 0.8,
+     "reply": "Based on the search results, the 16th Annual Young Hollywood Awards were hosted by Kelly Osbourne.\n\nAnswer: Kelly Osbourne",
+     "shown": [
+      "2014 Young Hollywood Awards"
+     ],
+     "gold_shown": 1,
+     "passes": 158.9,
+     "searches": [
+      "16th Annual Young Hollywood Awards host"
+     ]
+    },
+    {
+     "id": "5ab7f0015542992aa3b8c88b",
+     "question": "Who did the Star and Dagger bass player marry?",
+     "answer": "Sean Yseult.",
+     "type": "bridge",
+     "level": "hard",
+     "said": "Chris Lee",
+     "correct": false,
+     "lenient": false,
+     "f1": 0.0,
+     "reply": "Based on the search results, Sean Yseult is the bass player in the band Star & Dagger. The passage states that Sean Yseult is married to Chris Lee.\n\nAnswer: Chris Lee",
+     "shown": [
+      "chain: Sean Yseult -> Supagroup"
+     ],
+     "gold_shown": 0,
+     "passes": 158.9,
+     "searches": [
+      "Star and Dagger bass player"
+     ]
+    },
+    {
+     "id": "5ac547525542993e66e822a3",
+     "question": "In 2017, what was 3/4th of the organization that also has a Center for Veterinary Medicine as well as part of the U.S. Department of Health and Human Services, spent on?",
+     "answer": "Prescription Drug User Fee Act",
+     "type": "bridge",
+     "level": "hard",
+     "said": "</tool_call>",
+     "correct": false,
+     "lenient": false,
+     "f1": 0.0,
+     "reply": "Let me search for the specific organization that has a Center for Veterinary Medicine within the U.S. Department of Health and Human Services.\n\n<tool_call>\n<function=search>\n<parameter=query>\nCenter for Veterinary Medicine U.S. Department of Health and Human Services organization name\n</parameter>\n</function>\n</tool_call>",
+     "shown": [
+      "Center for Veterinary Medicine",
+      "Veterinary Medicines Directorate",
+      "United States Department of Health and Human Services"
+     ],
+     "gold_shown": 0,
+     "passes": 160.9,
+     "searches": [
+      "organization Center for Veterinary Medicine U.S. Department of Health and Human Services",
+      "Center for Veterinary Medicine part of U.S. Department of Health and Human Services",
+      "U.S. Department of Health and Human Services organization"
+     ]
+    },
+    {
+     "id": "5a7cbf8c554299452d57b9f4",
+     "question": "Which came out first, Dinosaur or McFarland, USA",
+     "answer": "Dinosaur",
+     "type": "comparison",
+     "level": "hard",
+     "said": "McFarland, USA",
+     "correct": false,
+     "lenient": false,
+     "f1": 0.0,
+     "reply": "Based on the search results:\n- The Humongous Book of Dinosaurs was published in 1997\n- McFarland & Company was founded in 1979\n\nSince 1979 is earlier than 1997, McFarland, USA came out first.\n\nAnswer: McFarland, USA",
+     "shown": [
+      "The Humongous Book of Dinosaurs",
+      "McFarland &amp; Company"
+     ],
+     "gold_shown": 0,
+     "passes": 159.9,
+     "searches": [
+      "Dinosaur book publication date",
+      "McFarland, USA book publication date"
+     ]
+    },
+    {
+     "id": "5a7ddc5a5542995f4f4022da",
+     "question": "Both Bishop Carroll Catholic High School and Kapaun Mt. Carmel Catholic High School are located in which city in Kansas?",
+     "answer": "Wichita",
+     "type": "bridge",
+     "level": "hard",
+     "said": "Wichita",
+     "correct": true,
+     "lenient": true,
+     "f1": 1.0,
+     "reply": "Based on the search results, both Bishop Carroll Catholic High School and Kapaun Mt. Carmel Catholic High School are located in Wichita, Kansas.\n\nAnswer: Wichita",
+     "shown": [
+      "Bishop Carroll Catholic High School",
+      "Kapaun Mt. Carmel Catholic High School"
+     ],
+     "gold_shown": 2,
+     "passes": 159.9,
+     "searches": [
+      "Bishop Carroll Catholic High School location city Kansas",
+      "Kapaun Mt. Carmel Catholic High School location city Kansas"
+     ]
+    },
+    {
+     "id": "5a7a1cd85542990783324e65",
+     "question": "What was the 58th quadrennial American presidential election held after the 2016 Michigan Democratic primary?",
+     "answer": "United States presidential election of 2016",
+     "type": "bridge",
+     "level": "hard",
+     "said": "2044",
+     "correct": false,
+     "lenient": false,
+     "f1": 0.0,
+     "reply": "Based on the search results, the 2016 Michigan Democratic primary was held in March 2016. The next quadrennial American presidential election would be the 2044 election, which is the 65th quadrennial U.S. presidential election.\n\nAnswer: 2044",
+     "shown": [
+      "chain: Michigan Democratic primary, 2016 -> 2044 election"
+     ],
+     "gold_shown": 0,
+     "passes": 179.2,
+     "searches": [
+      "2016 Michigan Democratic primary"
+     ]
+    },
+    {
+     "id": "5ae0a59a55429945ae9593e2",
+     "question": "This Celtic ruler who was born in AD 43 ruled southeastern Britain prior to conquest by which empire?",
+     "answer": "Roman",
+     "type": "bridge",
+     "level": "hard",
+     "said": "Roman Empire",
+     "correct": false,
+     "lenient": true,
+     "f1": 0.667,
+     "reply": "Based on the information gathered, the Celtic ruler born in AD 43 who ruled southeastern Britain prior to conquest by the Roman Empire was **Vercingetorix** (or possibly **Vercovicus**). The Roman conquest of Britain began effectively in AD 43 under Emperor Claudius.\n\nAnswer: Roman Empire",
+     "shown": [
+      "AD 43",
+      "Prehistoric Britain",
+      "Roman conquest of Britain"
+     ],
+     "gold_shown": 0,
+     "passes": 181.2,
+     "searches": [
+      "Celtic ruler born AD 43 ruled southeastern Britain",
+      "Celtic ruler born AD 43 southeastern Britain",
+      "Celtic ruler AD 43 southeastern Britain conquered by empire"
+     ]
+    },
+    {
+     "id": "5a8b987f5542997f31a41d7a",
+     "question": "What is the name of the detective novelist parent of the author of '\"Q\" Is for Quarry'?",
+     "answer": "C. W. Grafton",
+     "type": "bridge",
+     "level": "hard",
+     "said": "C. W. Grafton",
+     "correct": true,
+     "lenient": true,
+     "f1": 1.0,
+     "reply": "Based on the search results, Sue Grafton's parent is C. W. Grafton, who is a detective novelist.\n\nAnswer: C. W. Grafton",
+     "shown": [
+      "&quot;Q&quot; Is for Quarry",
+      "Sue Grafton"
+     ],
+     "gold_shown": 2,
+     "passes": 180.2,
+     "searches": [
+      "Q Is for Quarry author",
+      "Sue Grafton parent detective novelist"
+     ]
+    },
+    {
+     "id": "5a8739a05542994775f607ab",
+     "question": "What is the birthplace of the Senator who represents the first of 62 districts in the State Senate?",
+     "answer": "Brooklyn, New York",
+     "type": "bridge",
+     "level": "hard",
+     "said": "Brooklyn, New York",
+     "correct": true,
+     "lenient": true,
+     "f1": 1.0,
+     "reply": "Based on the search results, Senator Kenneth LaValle represents the first of 62 districts in the New York State Senate. His birthplace is Brooklyn, New York.\n\nAnswer: Brooklyn, New York",
+     "shown": [
+      "New York's 1st State Senate district",
+      "Kenneth LaValle"
+     ],
+     "gold_shown": 2,
+     "passes": 180.2,
+     "searches": [
+      "State Senate first of 62 districts",
+      "Senator Kenneth LaValle birthplace"
+     ]
+    },
+    {
+     "id": "5ae67dba55429908198fa5f0",
+     "question": "The Memphis Hustle are based in a suburb of a city with a population of what in 2010?",
+     "answer": "48,982",
+     "type": "bridge",
+     "level": "hard",
+     "said": "48,982",
+     "correct": true,
+     "lenient": true,
+     "f1": 1.0,
+     "reply": "Based on the search results, the Memphis Hustle are based in Southaven, which is a suburb of Memphis. The search results state that the 2010 census reported a population of 48,982 for Southaven.\n\nAnswer: 48,982",
+     "shown": [
+      "chain: Memphis Hustle -> Southaven, Mississippi"
+     ],
+     "gold_shown": 0,
+     "passes": 179.2,
+     "searches": [
+      "Memphis Hustle location suburb city"
+     ]
+    },
+    {
+     "id": "5a7b3f4d5542992d025e67bb",
+     "question": "Which songwriting duo composed music for \"La La Land\", and created lyrics for \"A Christmas Story: The Musical\"? ",
+     "answer": "Pasek & Paul",
+     "type": "bridge",
+     "level": "hard",
+     "said": "Cajmere",
+     "correct": false,
+     "lenient": false,
+     "f1": 0.0,
+     "reply": "Based on the search results, the songwriting duo that composed music for \"La La Land\" and created lyrics for \"A Christmas Story: The Musical\" is **Cajmere** (specifically Cajmere, which is the name of the duo).\n\nAnswer: Cajmere",
+     "shown": [
+      "La La Land (Green Velvet song)",
+      "A Christmas Story"
+     ],
+     "gold_shown": 0,
+     "passes": 180.2,
+     "searches": [
+      "songwriting duo La La Land music composer",
+      "A Christmas Story: The Musical songwriters lyrics"
+     ]
+    },
+    {
+     "id": "5ae2dfd155429928c423951b",
+     "question": "Which of the city at the south of Shelly Beach, New South Wales is a local government area in the Hunter region of New South Wales, Australia?",
+     "answer": "City of Newcastle",
+     "type": "bridge",
+     "level": "hard",
+     "said": "Taylors Beach",
+     "correct": false,
+     "lenient": false,
+     "f1": 0.0,
+     "reply": "Based on the search results, Taylors Beach is a suburb of the Port Stephens local government area in the Hunter Region of New South Wales. The question asks for the city at the south of Shelly Beach that is a local government area in the Hunter region. Taylors Beach fits this description as it is a suburb of Port Stephens in the Hunter region.\n\nAnswer: Taylors Beach",
+     "shown": [
+      "Shelly Beach, New South Wales",
+      "Taylors Beach, New South Wales"
+     ],
+     "gold_shown": 1,
+     "passes": 180.2,
+     "searches": [
+      "Shelly Beach New South Wales local government area Hunter region",
+      "city south of Shelly Beach local government area Hunter region NSW"
+     ]
+    },
+    {
+     "id": "5ab6ba245542995eadef007f",
+     "question": "Are Bamboo Mañalac and Danny Jones both musicians?",
+     "answer": "yes",
+     "type": "comparison",
+     "level": "hard",
+     "said": "Yes",
+     "correct": true,
+     "lenient": true,
+     "f1": 1.0,
+     "reply": "Based on the search results:\n- Bamboo Mañalac is described as a \"Filipino American musician and singer-songwriter\"\n- Danny Jones is described as a \"British musician\"\n\nBoth are confirmed to be musicians.\n\nAnswer: Yes",
+     "shown": [
+      "Bamboo Mañalac",
+      "Danny Jones"
+     ],
+     "gold_shown": 2,
+     "passes": 180.2,
+     "searches": [
+      "Bamboo Mañalac musician",
+      "Danny Jones musician"
+     ]
+    },
+    {
+     "id": "5ab8854555429934fafe6e0c",
+     "question": "Works by Hanna Leena Kristiina Varis are part of a collection in a museum that houses approximately 65,000 what?",
+     "answer": "drawings",
+     "type": "bridge",
+     "level": "hard",
+     "said": "drawings",
+     "correct": true,
+     "lenient": true,
+     "f1": 1.0,
+     "reply": "Based on the search results, Hanna Leena Kristiina Varis' works are part of the Albertina Museum in Vienna, Austria. The Albertina houses approximately 65,000 drawings.\n\nAnswer: drawings",
+     "shown": [
+      "chain: Hanna Varis -> Albertina"
+     ],
+     "gold_shown": 0,
+     "passes": 150.9,
+     "searches": [
+      "Hanna Leena Kristiina Varis museum collection"
+     ]
+    },
+    {
+     "id": "5a8eea4a5542990e94052bb7",
+     "question": "When was the Western Germanic language spoken from which the small settlement situated on the river Leda opposite Leer derives its name?",
+     "answer": "between the 8th and 16th centuries",
+     "type": "bridge",
+     "level": "hard",
+     "said": "</tool_call>",
+     "correct": false,
+     "lenient": false,
+     "f1": 0.0,
+     "reply": "The search results provide information about the West Germanic languages but not the specific time period when they were spoken. Let me try a different search to find the origin date or time period.\n\n<tool_call>\n<function=search>\n<parameter=query>\nWest Germanic language origin date\n</parameter>\n</function>\n</tool_call>",
+     "shown": [
+      "Leda (river)",
+      "West Germanic languages",
+      "Low German"
+     ],
+     "gold_shown": 1,
+     "passes": 152.9,
+     "searches": [
+      "small settlement on the river Leda opposite Leer",
+      "Western Germanic language origin",
+      "West Germanic language spoken from when"
+     ]
+    },
+    {
+     "id": "5a74c85055429916b0164218",
+     "question": "Born on 6 March 1937, this man was also a citizen of the United Kingdom.",
+     "answer": "Alistair Grant",
+     "type": "bridge",
+     "level": "hard",
+     "said": "George VI",
+     "correct": false,
+     "lenient": false,
+     "f1": 0.0,
+     "reply": "Based on the search results, the man born on 6 March 1937 who was also a citizen of the United Kingdom is George VI.\n\nAnswer: George VI",
+     "shown": [
+      "1937 in the United Kingdom"
+     ],
+     "gold_shown": 0,
+     "passes": 150.9,
+     "searches": [
+      "born 6 March 1937 citizen of the United Kingdom"
+     ]
+    },
+    {
+     "id": "5a88dcf9554299206df2b383",
+     "question": "What country does Hatton Hill and Hatton Castle, Angus have in common?",
+     "answer": "Scotland",
+     "type": "bridge",
+     "level": "hard",
+     "said": "Scotland",
+     "correct": true,
+     "lenient": true,
+     "f1": 1.0,
+     "reply": "Both Hatton Hill and Hatton Castle, Angus are located in Scotland. Therefore, the country they have in common is Scotland.\n\nAnswer: Scotland",
+     "shown": [
+      "Hatton Castle, Angus",
+      "Hatton Hill"
+     ],
+     "gold_shown": 2,
+     "passes": 151.9,
+     "searches": [
+      "Hatton Hill and Hatton Castle, Angus",
+      "Hatton Hill"
+     ]
+    },
+    {
+     "id": "5a7625c7554299109176e668",
+     "question": "What podcast was the cheif executive officer of Nerdist Industries a guest on?",
+     "answer": "Comedy Film Nerds",
+     "type": "bridge",
+     "level": "hard",
+     "said": "The Drop-In",
+     "correct": false,
+     "lenient": false,
+     "f1": 0.0,
+     "reply": "Based on the search results, Peter Levin, the chief executive officer of Nerdist Industries, was a guest on the podcast called \"The Drop-In\".\n\nAnswer: The Drop-In",
+     "shown": [
+      "Nerdist News",
+      "chain: Nerdist News -> The Drop-In (podcast)"
+     ],
+     "gold_shown": 0,
+     "passes": 151.9,
+     "searches": [
+      "chief executive officer of Nerdist Industries",
+      "Peter Levin podcast guest appearances"
+     ]
+    },
+    {
+     "id": "5ac0d83a554299294b219038",
+     "question": "Randall Cunningham II was a multi-sport athlete at the high school located in what Nevada city?",
+     "answer": "Summerlin",
+     "type": "bridge",
+     "level": "hard",
+     "said": "Summerlin",
+     "correct": true,
+     "lenient": true,
+     "f1": 1.0,
+     "reply": "Based on the search results, Randall Cunningham II attended Bishop Gorman High School, which is located in Summerlin, Nevada.\n\nAnswer: Summerlin",
+     "shown": [
+      "chain: Randall Cunningham II -> Bishop Gorman High School"
+     ],
+     "gold_shown": 0,
+     "passes": 150.9,
+     "searches": [
+      "Randall Cunningham II high school Nevada city"
+     ]
+    },
+    {
+     "id": "5a790d8f554299029c4b5eec",
+     "question": "Which English musician is known for both the songs \"See Yourself\" and \"Withing You Without You\"?",
+     "answer": "George Harrison",
+     "type": "bridge",
+     "level": "hard",
+     "said": "George Harrison",
+     "correct": true,
+     "lenient": true,
+     "f1": 1.0,
+     "reply": "Based on the search results, the English musician known for both the songs \"See Yourself\" and \"Withing You Without You\" is George Harrison.\n\nAnswer: George Harrison",
+     "shown": [
+      "See Yourself"
+     ],
+     "gold_shown": 1,
+     "passes": 150.9,
+     "searches": [
+      "English musician See Yourself Withing You Without You"
+     ]
+    },
+    {
+     "id": "5ab2c5e255429916697740ba",
+     "question": "Which professional ice hockey position does the Captain of the National Hockey League All-Star Game \"Away Team\" play?",
+     "answer": "Canadian professional ice hockey centre",
+     "type": "bridge",
+     "level": "hard",
+     "said": "Centre",
+     "correct": false,
+     "lenient": false,
+     "f1": 0.333,
+     "reply": "The search results confirm that Jonathan Toews is a Canadian professional ice hockey centre.\n\nAnswer: Centre",
+     "shown": [
+      "60th National Hockey League All-Star Game",
+      "Jonathan Toews"
+     ],
+     "gold_shown": 2,
+     "passes": 151.9,
+     "searches": [
+      "National Hockey League All-Star Game Away Team Captain position",
+      "Jonathan Toews professional ice hockey position"
+     ]
+    },
+    {
+     "id": "5abcfc365542993a06baf9d6",
+     "question": "What year did the series on CBS, starring the actor who known for his role in \"Rebel Without a Cause,\" air?",
+     "answer": "1952",
+     "type": "bridge",
+     "level": "hard",
+     "said": "1960",
+     "correct": false,
+     "lenient": false,
+     "f1": 0.0,
+     "reply": "Based on the search results, Jack Grinnage starred in \"CBS Television Workshop\" (also known as \"CBS Repertoire Workshop\"), which aired on CBS. The search results indicate this series aired in 1960.\n\nAnswer: 1960",
+     "shown": [
+      "chain: Jack Grinnage -> CBS Television Workshop",
+      "CBS Workshop"
+     ],
+     "gold_shown": 0,
+     "passes": 198.1,
+     "searches": [
+      "actor known for his role in Rebel Without a Cause",
+      "Jack Grinnage CBS Television Workshop series"
+     ]
+    },
+    {
+     "id": "5a8ee6915542990e94052bad",
+     "question": "What season was the character introduced that becomes the main antagonist in the  following season, from the animated television series created by Bryan Konietzko and Michael Dante DiMartino as a sequel to \"\", which aired from 2005 to 2008? ",
+     "answer": "third",
+     "type": "bridge",
+     "level": "hard",
+     "said": "Third",
+     "correct": true,
+     "lenient": true,
+     "f1": 1.0,
+     "reply": "Based on the search results, Kuvira is the character introduced in the third season who becomes the main antagonist in the fourth season. The question asks for the season the character was introduced that becomes the main antagonist in the following season.\n\nThe character was introduced in the third season (Book Three: Earth), and she becomes the main antagonist in the fourth season (Book Four: Fire).\n\nAnswer: Third",
+     "shown": [
+      "The Legend of Korra",
+      "The Legend of Korra (season 1)",
+      "chain: The Legend of Korra -> Kuvira"
+     ],
+     "gold_shown": 1,
+     "passes": 199.1,
+     "searches": [
+      "animated television series created by Bryan Konietzko and Michael Dante DiMartino sequel aired 2005 to 2008",
+      "The Legend of Korra main antagonist introduced in first season",
+      "The Legend of Korra season 1 antagonist character name"
+     ]
+    },
+    {
+     "id": "5abba4855542993f40c73b68",
+     "question": "Who were the directors of the 2009 American science fiction film starring the actor who played Dexter Morgan in the Showtime TV Network series \"Dexter\"?",
+     "answer": "Mark Neveldine and Brian Taylor",
+     "type": "bridge",
+     "level": "hard",
+     "said": "Mark Neveldine and Brian Taylor",
+     "correct": true,
+     "lenient": true,
+     "f1": 1.0,
+     "reply": "The 2009 American science fiction film is \"Gamer\", and it was directed by Mark Neveldine and Brian Taylor.\n\nAnswer: Mark Neveldine and Brian Taylor",
+     "shown": [
+      "Michael C. Hall",
+      "chain: Michael C. Hall -> Gamer (film)"
+     ],
+     "gold_shown": 1,
+     "passes": 198.1,
+     "searches": [
+      "actor who played Dexter Morgan in Showtime TV Network series",
+      "2009 American science fiction film starring Michael C. Hall"
+     ]
+    },
+    {
+     "id": "5ae0bae555429906c02dab08",
+     "question": "Which travel parody series featured American actor, comedian, and radio host best known as the host of \"The Joe Schmo Show\"?",
+     "answer": "Hidden America with Jonah Ray",
+     "type": "bridge",
+     "level": "hard",
+     "said": "Hidden America with Jonah Ray",
+     "correct": true,
+     "lenient": true,
+     "f1": 1.0,
+     "reply": "Based on the search results, the travel parody series that featured Paul Wernick (the host of \"The Joe Schmo Show\") is \"Hidden America with Jonah Ray\".\n\nAnswer: Hidden America with Jonah Ray",
+     "shown": [
+      "The Joe Schmo Show",
+      "chain: The Joe Schmo Show -> Hidden America with Jonah Ray"
+     ],
+     "gold_shown": 0,
+     "passes": 198.1,
+     "searches": [
+      "The Joe Schmo Show host",
+      "Paul Wernick travel parody series"
+     ]
+    },
+    {
+     "id": "5ab271fe554299449642c8a6",
+     "question": "Do The Importance of Being Icelandic and The Five Obstructions belong to different film genres ?",
+     "answer": "no",
+     "type": "comparison",
+     "level": "hard",
+     "said": "No",
+     "correct": true,
+     "lenient": true,
+     "f1": 1.0,
+     "reply": "Based on the search results:\n- \"The Importance of Being Icelandic\" is a documentary film\n- \"The Five Obstructions\" is also a documentary film\n\nBoth films belong to the same genre (documentary), so they do not belong to different film genres.\n\nAnswer: No",
+     "shown": [
+      "The Importance of Being Icelandic",
+      "The Five Obstructions"
+     ],
+     "gold_shown": 2,
+     "passes": 198.1,
+     "searches": [
+      "The Importance of Being Icelandic film genre",
+      "The Five Obstructions film genre"
+     ]
+    },
+    {
+     "id": "5a7997a2554299029c4b5f59",
+     "question": "Tefik Selim Mborja was a part of a party that held power in Albania until what year? ",
+     "answer": "1943",
+     "type": "bridge",
+     "level": "hard",
+     "said": "1943",
+     "correct": true,
+     "lenient": true,
+     "f1": 1.0,
+     "reply": "Based on the search results, Tefik Selim Mborja was the general secretary of the Albanian Fascist Party, which held power in Albania from 1939 until 1943.\n\nAnswer: 1943",
+     "shown": [
+      "chain: Tefik Mborja -> Albanian Fascist Party"
+     ],
+     "gold_shown": 0,
+     "passes": 197.1,
+     "searches": [
+      "Tefik Selim Mborja party Albania power"
+     ]
+    },
+    {
+     "id": "5add673e5542992ae4cec54d",
+     "question": "Joe Walker played for which team that ends their regular season with the Civil War rivalry game?",
+     "answer": "Oregon Ducks football",
+     "type": "bridge",
+     "level": "hard",
+     "said": "Philadelphia Eagles",
+     "correct": false,
+     "lenient": false,
+     "f1": 0.0,
+     "reply": "Based on the search results, Joe Walker played for the Philadelphia Eagles of the National Football League (NFL). The search results confirm that Joe Walker played college football at Oregon, but the specific team he played for in the NFL is the Philadelphia Eagles.\n\nAnswer: Philadelphia Eagles",
+     "shown": [
+      "chain: Joe Walker (American football) -> Civil War (college football game)"
+     ],
+     "gold_shown": 0,
+     "passes": 197.1,
+     "searches": [
+      "Joe Walker team regular season ends Civil War rivalry game"
+     ]
+    },
+    {
+     "id": "5ae819ac55429952e35eaa16",
+     "question": "What station broadcast the episode \"Marry Me a Little, Marry Me a Little More\" , of the series created by Max Mutchnick and David Kohan?",
+     "answer": "National Broadcasting Company",
+     "type": "bridge",
+     "level": "hard",
+     "said": "NBC",
+     "correct": false,
+     "lenient": false,
+     "f1": 0.0,
+     "reply": "Based on the search results, the series created by Max Mutchnick and David Kohan is \"Boston Common\". The episode \"Marry Me a Little, Marry Me a Little More\" is from the TV series \"Will & Grace\" (which is not the series created by Mutchnick and Kohan, but the episode is from that show). The episode originally aired on the National Broadcasting Company (NBC).\n\nAnswer: NBC",
+     "shown": [
+      "Boston Common (TV series)",
+      "Marry Me a Little, Marry Me a Little More"
+     ],
+     "gold_shown": 1,
+     "passes": 198.1,
+     "searches": [
+      "series created by Max Mutchnick and David Kohan",
+      "episode \"Marry Me a Little, Marry Me a Little More\" broadcast station"
+     ]
+    },
+    {
+     "id": "5aba65a055429939ce03dcd2",
+     "question": "Georges-Henri Bousquet translated the work of a historian who is of what heritage?",
+     "answer": "North African Arab",
+     "type": "bridge",
+     "level": "hard",
+     "said": "Tunisian",
+     "correct": false,
+     "lenient": false,
+     "f1": 0.0,
+     "reply": "Based on the search results, Georges-Henri Bousquet translated the work of Tunisian historian Ibn Khaldun. The passage states that he was a specialist in the sociology of North Africa (Berbers, Islam) and translated the work of Tunisian historian Ibn Khaldun.\n\nThe historian is Tunisian.\n\nAnswer: Tunisian",
+     "shown": [
+      "Georges-Henri Bousquet"
+     ],
+     "gold_shown": 1,
+     "passes": 161.5,
+     "searches": [
+      "Georges-Henri Bousquet translated historian heritage"
+     ]
+    },
+    {
+     "id": "5a87bada5542994846c1cddc",
+     "question": "In which city are the headquarters of the American research and scientific development company where Ravi Sethi worked as computer scientist located?",
+     "answer": "Murray Hill",
+     "type": "bridge",
+     "level": "hard",
+     "said": "Murray Hill, New Jersey",
+     "correct": false,
+     "lenient": true,
+     "f1": 0.667,
+     "reply": "Based on the search results, Ravi Sethi worked at Nokia Bell Labs, which is an American research and scientific development company. The headquarters of Nokia Bell Labs are located in Murray Hill, New Jersey.\n\nAnswer: Murray Hill, New Jersey",
+     "shown": [
+      "chain: Ravi Sethi -> Bell Labs"
+     ],
+     "gold_shown": 0,
+     "passes": 161.5,
+     "searches": [
+      "Ravi Sethi computer scientist company"
+     ]
+    },
+    {
+     "id": "5ae74fc45542997b22f6a6b4",
+     "question": "What is the full name of the viral respiratory disease in which Yi Guan's research helped to prevent the outbreak of?",
+     "answer": "severe acute respiratory syndrome",
+     "type": "bridge",
+     "level": "hard",
+     "said": "SARS",
+     "correct": false,
+     "lenient": false,
+     "f1": 0.0,
+     "reply": "Based on the search results, Yi Guan's research on the viral respiratory disease SARS allowed the Chinese government to successfully avert the 2004 outbreak of this disease.\n\nAnswer: SARS",
+     "shown": [
+      "Yi Guan"
+     ],
+     "gold_shown": 1,
+     "passes": 161.5,
+     "searches": [
+      "Yi Guan research viral respiratory disease outbreak prevention"
+     ]
+    },
+    {
+     "id": "5adf65555542992d7e9f9334",
+     "question": "Which Kentucky Writers Hall of Fame author has had works published by Dim Gray Bar Press?",
+     "answer": "Wendell Berry",
+     "type": "bridge",
+     "level": "hard",
+     "said": "Wendell Berry",
+     "correct": true,
+     "lenient": true,
+     "f1": 1.0,
+     "reply": "Based on the search results, the Kentucky Writers Hall of Fame author whose works have been published by Dim Gray Bar Press is Wendell Berry. The search results confirm that Dim Gray Bar Press published works by Wendell Berry, and Wendell Berry is also noted as the first living writer to be inducted into the Kentucky Writers Hall of Fame.\n\nAnswer: Wendell Berry",
+     "shown": [
+      "chain: Dim Gray Bar Press -> Wendell Berry"
+     ],
+     "gold_shown": 0,
+     "passes": 161.5,
+     "searches": [
+      "Dim Gray Bar Press Kentucky Writers Hall of Fame author"
+     ]
+    },
+    {
+     "id": "5ade69e455429975fa854ec5",
+     "question": "What director worked with Vikram Bhatt on a film starring actors Rajneesh Duggal and Adah Sharma?",
+     "answer": "Tinu Suresh Desai",
+     "type": "bridge",
+     "level": "hard",
+     "said": "Vikram Bhatt",
+     "correct": false,
+     "lenient": false,
+     "f1": 0.0,
+     "reply": "Based on the search results, the film is \"1920\" (2008), which was written and directed by Vikram Bhatt. The film stars Rajneesh Duggal and Adah Sharma. Therefore, the director who worked with Vikram Bhatt on this film is Vikram Bhatt himself.\n\nAnswer: Vikram Bhatt",
+     "shown": [
+      "1920 (film)"
+     ],
+     "gold_shown": 1,
+     "passes": 161.5,
+     "searches": [
+      "Vikram Bhatt Rajneesh Duggal Adah Sharma film director"
+     ]
+    },
+    {
+     "id": "5ae057fd55429945ae959328",
+     "question": " Robert Smith founded the multinational company headquartered in what city?",
+     "answer": "Golden Valley, Minnesota,",
+     "type": "bridge",
+     "level": "hard",
+     "said": "Golden Valley",
+     "correct": false,
+     "lenient": true,
+     "f1": 0.8,
+     "reply": "Based on the search results, Robert Smith founded General Mills in 1856. General Mills is an American multinational manufacturer and marketer of branded consumer foods, and it is headquartered in Golden Valley, Minnesota.\n\nAnswer: Golden Valley",
+     "shown": [
+      "chain: Robert Smith (Illinois politician) -> General Mills"
+     ],
+     "gold_shown": 0,
+     "passes": 161.5,
+     "searches": [
+      "Robert Smith founded multinational company"
+     ]
+    },
+    {
+     "id": "5ab28019554299722f9b4d51",
+     "question": "What amount was the settlement that the character from the Son of al Quada got in 2017?",
+     "answer": "$10.5 million",
+     "type": "bridge",
+     "level": "hard",
+     "said": "No",
+     "correct": false,
+     "lenient": false,
+     "f1": 0.0,
+     "reply": "The search results are not providing the specific settlement amount for the character from \"Son of al Quada\". The search results show information about pharmaceutical settlements and a list of Hollyoaks characters, but neither contains the specific settlement amount for a character from \"Son of al Quada\" in 2017.\n\nBased on my searches, I cannot find information about a settlement amount that a character from \"Son of al Quada\" received in 2017. The search results mention pharmaceutical settlements but not the specific character from the show.\n\nAnswer: No",
+     "shown": [
+      "Son of Zorn",
+      "chain: Al Utouriya -> List of largest pharmaceutical settlements",
+      "List of Hollyoaks characters (2017)"
+     ],
+     "gold_shown": 0,
+     "passes": 163.5,
+     "searches": [
+      "Son of al Quada character settlement 2017",
+      "Son of al Quada settlement amount 2017",
+      "Son of al Quada character settlement 2017 amount"
+     ]
+    },
+    {
+     "id": "5a75f79555429976ec32bcca",
+     "question": "Considered the strongest recorded tropical cyclone, which cyclone had a film made about it in 2007?",
+     "answer": "1999 Odisha cyclone",
+     "type": "bridge",
+     "level": "hard",
+     "said": "Cyclone Gonu",
+     "correct": false,
+     "lenient": false,
+     "f1": 0.4,
+     "reply": "Based on the search results, Cyclone Gonu is considered the strongest recorded tropical cyclone on record, and there was a film made about it in 2007 called \"Kathantara.\"\n\nAnswer: Cyclone Gonu",
+     "shown": [
+      "Cyclone Gonu",
+      "chain: Cyclone Gonu -> Kathantara"
+     ],
+     "gold_shown": 0,
+     "passes": 162.5,
+     "searches": [
+      "strongest recorded tropical cyclone",
+      "Cyclone Gonu film 2007"
+     ]
+    }
+   ]
+  }
+ },
+ "command": "scripts/hotpot_reading.py --arms wiki:ask --sense lexical --n 200 --min-n 200 --adapter system --chains state/chains/r0-first200.jsonl --against wikiask-lexical-system-r0-rerank50 --note store-first consolidation over the full store: Wikipedia with the 151 chain rows the system wrote from its own first pass beside it, each bringing its two passages, searched by BM25 and the reranker together; the second time through, against the reranked store alone",
+ "sha": "f48c21e5",
+ "taken_at": "20261107T014307Z",
+ "note": "store-first consolidation over the full store: Wikipedia with the 151 chain rows the system wrote from its own first pass beside it, each bringing its two passages, searched by BM25 and the reranker together; the second time through, against the reranked store alone"
+}

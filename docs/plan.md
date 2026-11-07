@@ -638,6 +638,18 @@ Each step says what it decides. A step is struck when it is done.
      looking beats knowing even where it knows; the router is deleted (revive from `2497d922`) and
      the gut kept for the other direction, a search forced where the gut doubts and the habit
      would not look, which is the sleeps' failure.
+   - **Store-first consolidation, read 2026-11-07** (`scripts/chains.py`, `openplexus.experience`,
+     `hotpot_reading.py --chains`): from the first asking's search histories the trunk wrote a chain
+     row for each pair of passages read one after the other (151 of 182 kept: the line names both
+     subjects), each bringing its two passages, numbered after Wikipedia's rows, found by shared
+     words and ordered by the reranker with BM25's top 50. Asked the same 200 questions again over
+     the full store (`hotpot-20261107T014307Z`): lenient **0.62** against 0.55, 20 made right and 6
+     made wrong (+2.7 standard errors), exact 0.515 against 0.475 (+1.9); a chain row was shown on 77.
+     On 200 questions the rows were not written from (`-020955Z`): level, 0.505 and 0.505, 5 and 5,
+     and no chain row shown on any, so the rows neither intrude nor yet transfer. The system
+     remembers what it worked out, in the store, at no cost to the asking: kept. Next: the chain
+     rows become the lineage's own store part, written by the live loop's sleep, so every round
+     adds to them; transfer waits on rows more general than one question's pair.
    - **The order from here** (John, 2026-11-05): (1) the score fixed, done; (2) the facts adapter
      apart from the skills (`consolidate.py --part facts`, the lineage's `facts` part), read as two
      arms, rows and restatements alone against the question lines with both skills rehearsed;

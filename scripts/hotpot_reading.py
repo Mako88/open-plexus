@@ -114,7 +114,7 @@ def tag_of(spec: str, args) -> str:
     if getattr(args, "think", False):
         tag += "-think"
     if getattr(args, "chains", None) and spec == "ask":
-        tag += "-chains-" + Path(args.chains).stem
+        tag += "-chainsfull-" + Path(args.chains).stem
     if getattr(args, "search_adapter", None) and spec in ASKING:
         tag += "-searchon-" + "+".join(Path(a).stem.replace("-lora", "") for a in args.search_adapter.split(","))
     if getattr(args, "rerank", 0) and spec.startswith("wiki:"):
@@ -175,8 +175,11 @@ def arm(spec: str, qs: list[dict], args, trunk, index) -> dict:
                 else:
                     tool = Store()
                     chain_rows = [c for c in getattr(args, "chain_rows", {}).get(q["id"], [])]
+                    by_title = {p["title"]: paragraph_text(p) for p in q["paragraphs"]}
+                    # a chain row points to the rows it came from and brings them: one search, the link and both passages
                     tool.reset(paragraphs=[{"text": paragraph_text(p), "supporting": p["supporting"]} for p in q["paragraphs"]]
-                               + [{"text": c["text"], "supporting": False} for c in chain_rows])
+                               + [{"text": "\n\n".join([c["text"], by_title.get(c["a"], ""), by_title.get(c["b"], "")]),
+                                   "supporting": False} for c in chain_rows])
                     names = [p["title"] for p in q["paragraphs"]] + [f"chain: {c['a']} -> {c['b']}" for c in chain_rows]
                     titles = lambda: [names[j] for j in tool.shown]  # noqa: E731
                 try:

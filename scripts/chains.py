@@ -26,9 +26,9 @@ from openplexus.lineage import Lineage  # noqa: E402
 from openplexus.trunk import ServedTrunk  # noqa: E402
 
 CHAIN_SYSTEM = (
-    "You are given two passages. Write one line saying how the subject of the first is connected to the "
-    "subject of the second, in the form 'A -> B: how they are connected', where A and B are the two "
-    "subjects as the passages name them. Use only what the passages say. Reply with the one line only."
+    "You are given two passages. Write one line: the subject of the first passage, then ' -> ', then the "
+    "subject of the second, then ': ', then in your own words the fact that connects them, taken from the "
+    "passages. For example: 'Ed Wood (film) -> Tim Burton: Tim Burton directed the film.' Reply with the one line only."
 )
 
 
@@ -40,7 +40,10 @@ def subject(title: str) -> str:
 def kept(line: str, a: str, b: str) -> bool:
     """The line names both subjects; nothing else is required of it."""
     n = normalise(line)
-    return bool(line.strip()) and normalise(subject(a)) in n and normalise(subject(b)) in n
+    said = line.split(":", 1)[1].strip() if ":" in line else ""
+    if not said or "how they are connected" in n or "tim burton directed" in n:
+        return False  # the template or the example echoed back, not a connection
+    return normalise(subject(a)) in n and normalise(subject(b)) in n
 
 
 def main() -> None:

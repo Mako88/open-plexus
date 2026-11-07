@@ -132,3 +132,5 @@ def test_a_chain_row_is_kept_only_when_it_names_both_subjects():
     assert chains.kept("Kiss and Tell -> Shirley Temple: she played Corliss Archer in it", "Kiss and Tell (1945 film)", "Shirley Temple")
     assert not chains.kept("Shirley Temple was an actress", "Kiss and Tell (1945 film)", "Shirley Temple")
     assert not chains.kept("", "A", "B")
+    assert not chains.kept("Kiss and Tell -> Shirley Temple: how they are connected", "Kiss and Tell (1945 film)", "Shirley Temple")
+    assert not chains.kept("Kiss and Tell -> Shirley Temple:", "Kiss and Tell (1945 film)", "Shirley Temple")

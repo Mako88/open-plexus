@@ -63,3 +63,18 @@ def test_the_facts_adapter_is_kept_apart_and_a_first_rollback_leaves_none(tmp_pa
     assert (skills.adapter / "adapter_model.bin").read_text(encoding="utf-8") == "round two"  # the skills untouched
     facts.rollback("lost the asking", convert=False)
     assert not facts.adapter.exists() and skills.round() == 0
+
+
+def test_experience_rows_are_a_round_kept_or_cut_back(tmp_path):
+    lin = Lineage(tmp_path / "system")
+    lin.init(adapter(tmp_path / "root", "root"), "root", convert=False)
+    first = [{"title": "chain: A -> B", "text": "A -> B: linked\n\nA: ...\n\nB: ...", "a": "A", "b": "B"}]
+    entry = lin.commit_rows(first, "a day's sleep", "questions 1000-1200", {"score_before": 0.5, "score_after": 0.6})
+    assert entry["part"] == "experience" and entry["rows_before"] == 0 and entry["rows_after"] == 1
+    assert entry["points_gained"] == 10.0 and lin.round() == 1
+    assert [r["title"] for r in lin.experience()] == ["chain: A -> B"] and lin.experience()[0]["round"] == 1
+    lin.commit_rows([{"title": "chain: C -> D", "text": "...", "a": "C", "b": "D"}], "the next day", "questions 1200-1400", {})
+    assert len(lin.experience()) == 2
+    lin.rollback_rows("lost the first 200")
+    assert [r["title"] for r in lin.experience()] == ["chain: A -> B"]
+    assert lin.ledger()[-1]["rolled_back"]["why"] == "lost the first 200" and lin.round() == 1

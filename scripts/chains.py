@@ -52,17 +52,35 @@ def main() -> None:
     p.add_argument("--out", required=True)
     p.add_argument("--n", type=int, default=200)
     p.add_argument("--skip", type=int, default=0)
+    p.add_argument("--wiki", action="store_true",
+                   help="the experience is a full-store asking (wiki:ask, its shown_rows): every row written is self-contained, "
+                        "its line and both Wikipedia passages, for the lineage's store part (Lineage.commit_rows)")
     args = p.parse_args()
-    rows = json.loads((ROOT / "readings" / f"{args.source}.json").read_text(encoding="utf-8"))["arms"]["ask"]["rows"]
-    by_id = {r["id"]: r for r in rows}
-    qs = [q for q in questions(args.n, skip=args.skip) if q["id"] in by_id]
+    reading = json.loads((ROOT / "readings" / f"{args.source}.json").read_text(encoding="utf-8"))
     pairs = []
-    for q in qs:
-        text = {p_["title"]: paragraph_text(p_) for p_ in q["paragraphs"]}
-        shown = [t for t in by_id[q["id"]]["shown"] if t in text]
-        for a, b in zip(shown, shown[1:]):
-            if a != b:
-                pairs.append((q["id"], a, b, text[a], text[b]))
+    if args.wiki:
+        from openplexus.wiki import WikiTexts
+
+        wiki = WikiTexts(ROOT / "data" / "wiki-abstracts" / "minilm")
+        had = {(r["a"], r["b"]) for r in Lineage().experience()}
+        for r in reading["arms"]["wiki:ask"]["rows"]:
+            shown = [i for i in r.get("shown_rows", []) if i < wiki.n]  # the system's own rows are not chained again
+            for i, j in zip(shown, shown[1:]):
+                a, b = wiki.title(i), wiki.title(j)
+                if i != j and (a, b) not in had:
+                    had.add((a, b))
+                    pairs.append((r["id"], a, b, wiki.text(i), wiki.text(j)))
+        qs = reading["arms"]["wiki:ask"]["rows"]
+    else:
+        rows = reading["arms"]["ask"]["rows"]
+        by_id = {r["id"]: r for r in rows}
+        qs = [q for q in questions(args.n, skip=args.skip) if q["id"] in by_id]
+        for q in qs:
+            text = {p_["title"]: paragraph_text(p_) for p_ in q["paragraphs"]}
+            shown = [t for t in by_id[q["id"]]["shown"] if t in text]
+            for a, b in zip(shown, shown[1:]):
+                if a != b:
+                    pairs.append((q["id"], a, b, text[a], text[b]))
     trunk = ServedTrunk(max_new=80, parallel=8)
     names = {g.name for g in Lineage().ggufs()}
     trunk.lora = [{"id": x["id"], "scale": 1.0 if Path(x["path"]).name in names else 0.0} for x in trunk.adapters()]
@@ -72,10 +90,15 @@ def main() -> None:
     out.parent.mkdir(parents=True, exist_ok=True)
     n_kept = 0
     with open(out, "w", encoding="utf-8") as f:
-        for (qid, a, b, _, _), reply in zip(pairs, replies):
+        for (qid, a, b, ta, tb), reply in zip(pairs, replies):
             line = reply.strip().splitlines()[0].strip() if reply.strip() else ""
             ok = kept(line, a, b)
             n_kept += ok
+            if args.wiki:
+                if ok:  # only kept rows, each carrying what it came from
+                    f.write(json.dumps({"title": f"chain: {a} -> {b}", "text": "\n\n".join([line, ta, tb]), "a": a, "b": b,
+                                        "line": line, "from": qid, "source": args.source}, ensure_ascii=False) + "\n")
+                continue
             f.write(json.dumps({"id": qid, "a": a, "b": b, "text": line, "kept": ok, "source": args.source}, ensure_ascii=False) + "\n")
     print(f"{len(pairs)} pairs read in sequence on {len(qs)} questions, {n_kept} chain rows kept, written to {out}", flush=True)
 

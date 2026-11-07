@@ -154,6 +154,50 @@ class Lineage:
         shutil.move(str(adapter), str(dest))
         return dest
 
+    # The experience part (2026-11-07, store-first consolidation kept): rows the system's sleeps wrote
+    # into its store, each self-contained (the chain line and the passages it came from), appended a
+    # round at a time. A round of rows is committed or rolled back as an adapter round is; rolling back
+    # cuts the file back to the rows before it. Kept beside the ledger in state/system/experience.jsonl.
+
+    @property
+    def experience_path(self) -> Path:
+        return self.path / "experience.jsonl"
+
+    def experience(self) -> list[dict]:
+        p = self.experience_path
+        return [json.loads(l) for l in p.read_text(encoding="utf-8").splitlines() if l.strip()] if p.exists() else []
+
+    def commit_rows(self, rows: list[dict], what: str, heard: str, readings: dict, note: str = "") -> dict:
+        """Append a sleep's rows to the system's store as a round of the ledger."""
+        had = self.experience()
+        self.path.mkdir(parents=True, exist_ok=True)
+        rnd = len(self.ledger())
+        with open(self.experience_path, "a", encoding="utf-8") as f:
+            for r in rows:
+                f.write(json.dumps({**r, "round": rnd}, ensure_ascii=False) + "\n")
+        entries = self.ledger()
+        entry = {"round": rnd, "part": "experience", "what": what, "trained_on": heard, "questions": 0,
+                 "rows_before": len(had), "rows_after": len(had) + len(rows), "readings": readings, "note": note,
+                 "sha": sha(), "at": now()}
+        before, after = readings.get("score_before"), readings.get("score_after")
+        if before is not None and after is not None:
+            entry["points_gained"] = round(100 * (after - before), 1)
+        entries.append(entry)
+        self._write(entries)
+        return entry
+
+    def rollback_rows(self, why: str) -> dict:
+        """Cut the store back to the rows before the last round, which stays in the ledger as rolled back."""
+        entries = self.ledger()
+        last = entries[-1]
+        if last.get("part") != "experience":
+            raise RuntimeError("the last round is not an experience round")
+        rows = self.experience()[:last["rows_before"]]
+        self.experience_path.write_text("".join(json.dumps(r, ensure_ascii=False) + "\n" for r in rows), encoding="utf-8")
+        last["rolled_back"] = {"why": why, "at": now()}
+        self._write(entries)
+        return last
+
     def current(self) -> Path | None:
         return self.adapter if self.exists() else None
 

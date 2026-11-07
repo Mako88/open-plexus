@@ -115,6 +115,11 @@ def tag_of(spec: str, args) -> str:
         tag += "-think"
     if getattr(args, "chains", None) and spec in ASKING:
         tag += "-chainsfull-" + Path(args.chains).stem
+    exp = getattr(args, "experience", None)
+    if spec == "wiki:ask" and exp not in (None, "system", "none"):
+        tag += "-exp-" + Path(exp).stem  # rows not yet the system's: a sleep's candidates
+    elif spec == "wiki:ask" and exp == "none" and adapters and {a.resolve() for a in adapters} == system and Lineage().experience():
+        tag += "-noexp"  # the system's adapters without its own store part
     if getattr(args, "search_adapter", None) and spec in ASKING:
         tag += "-searchon-" + "+".join(Path(a).stem.replace("-lora", "") for a in args.search_adapter.split(","))
     if getattr(args, "rerank", 0) and spec.startswith("wiki:"):
@@ -198,6 +203,8 @@ def arm(spec: str, qs: list[dict], args, trunk, index) -> dict:
                            "messages": [], "failed": str(e)[:200]}
                 out["shown"] = titles()
                 out["gold_shown"] = sum(title in gold_titles(q) for title in out["shown"])
+                if spec == "wiki:ask":
+                    out["shown_rows"] = list(tool.shown)  # the store's row numbers, so a sleep can bring the passages themselves
                 return out
 
             from concurrent.futures import ThreadPoolExecutor
@@ -222,6 +229,8 @@ def arm(spec: str, qs: list[dict], args, trunk, index) -> dict:
                        "passes": round(tokens_out / len(chunk) + (a["turns"] if a else 1), 1)}
                 if a:
                     row["searches"] = a["searches"]
+                if a and "shown_rows" in a:
+                    row["shown_rows"] = a["shown_rows"]
                 if a and decomposed(spec):
                     row["plan"] = a["plan"]
                     row["answers"] = a["answers"]
@@ -291,6 +300,9 @@ def main() -> None:
     p.add_argument("--bm25", default=str(ROOT / "data" / "wiki-abstracts" / "bm25"), help="its lexical index")
     p.add_argument("--chains", default=None,
                    help="the ask arm's store holds the chain rows (scripts/chains.py) written between its own passages, beside them")
+    p.add_argument("--experience", default=None,
+                   help="the full-store asking's own rows beside Wikipedia: 'system' (the lineage's, the default with --adapter system), "
+                        "'none', or a JSONL of self-contained rows (scripts/chains.py --wiki)")
     p.add_argument("--search-adapter", default=None,
                    help="asking arms: search on these adapters alone and answer with --adapter's (facts in the answer, not in the decision to look)")
     p.add_argument("--rerank", type=int, default=50,
@@ -304,7 +316,8 @@ def main() -> None:
     from openplexus.trunk import ServedTrunk
 
     qs = questions(args.n, split=args.split, skip=args.skip)
-    if args.adapter == "system":
+    reading_the_system = args.adapter == "system"
+    if reading_the_system:
         args.adapter = ",".join(str(g) for g in Lineage().ggufs())  # the skills adapter, and the facts one over it
     trunk = ServedTrunk(url=args.served, max_new=args.max_new, parallel=args.batch, think=args.think)
     loaded = trunk.adapters()
@@ -321,6 +334,11 @@ def main() -> None:
         search_trunk = ServedTrunk(url=args.served, max_new=args.max_new, parallel=args.batch, think=args.think,
                                    lora=[{"id": a["id"], "scale": 1.0 if Path(a["path"]).name in search_names else 0.0} for a in loaded])
     args.search_trunk = search_trunk if search_trunk is not trunk else None
+    # The system is its adapters and its own store part: a reading of the system (--adapter system)
+    # searches the experience rows its sleeps kept, unless --experience names other rows or none.
+    exp = args.experience or ("system" if reading_the_system else "none")
+    args.experience_rows = (Lineage().experience() if exp == "system" else [] if exp == "none"
+                            else [json.loads(l) for l in Path(exp).read_text(encoding="utf-8").splitlines() if l.strip()])
     args.chain_rows = {}
     if args.chains:
         for line in Path(args.chains).read_text(encoding="utf-8").splitlines():
@@ -347,7 +365,14 @@ def main() -> None:
             index.wiki = WikiStore(args.wiki)
             index.nearest = sense_of(args.sense, index.wiki, embed, args.bm25)
             index.store = index.wiki
-            if args.chains:
+            if args.experience_rows:
+                # the system's own store part: rows its sleeps wrote, each self-contained
+                from openplexus.experience import Experience
+
+                index.store = Experience(index.wiki, args.experience_rows)
+                index.nearest = index.store.over(index.nearest)
+                print(f"experience: {len(args.experience_rows)} rows of the system's own beside the store", flush=True)
+            elif args.chains:
                 # the store with the system's experience in it: its chain rows, each bringing its two passages
                 from openplexus.experience import Experience
 

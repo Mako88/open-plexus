@@ -123,3 +123,12 @@ def test_the_reranked_sense_is_tagged():
     import hotpot_reading as hr
     assert hr.tag_of("wiki:ask", types.SimpleNamespace(adapter=None, sense="lexical", rerank=50)) == "wikiask-lexical-rerank50"
     assert hr.tag_of("ask", types.SimpleNamespace(adapter=None, rerank=50)) == "ask"
+
+
+def test_a_chain_row_is_kept_only_when_it_names_both_subjects():
+    sys.path.insert(0, str(ROOT / "scripts"))
+    import chains
+    assert chains.subject("Kiss and Tell (1945 film)") == "Kiss and Tell"
+    assert chains.kept("Kiss and Tell -> Shirley Temple: she played Corliss Archer in it", "Kiss and Tell (1945 film)", "Shirley Temple")
+    assert not chains.kept("Shirley Temple was an actress", "Kiss and Tell (1945 film)", "Shirley Temple")
+    assert not chains.kept("", "A", "B")

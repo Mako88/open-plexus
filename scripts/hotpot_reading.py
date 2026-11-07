@@ -113,6 +113,8 @@ def tag_of(spec: str, args) -> str:
         tag += "-" + "+".join(a.stem.replace("-lora", "") for a in adapters)
     if getattr(args, "think", False):
         tag += "-think"
+    if getattr(args, "chains", None) and spec == "ask":
+        tag += "-chains-" + Path(args.chains).stem
     if getattr(args, "search_adapter", None) and spec in ASKING:
         tag += "-searchon-" + "+".join(Path(a).stem.replace("-lora", "") for a in args.search_adapter.split(","))
     if getattr(args, "rerank", 0) and spec.startswith("wiki:"):
@@ -172,8 +174,11 @@ def arm(spec: str, qs: list[dict], args, trunk, index) -> dict:
                     titles = tool.titles
                 else:
                     tool = Store()
-                    tool.reset(paragraphs=[{"text": paragraph_text(p), "supporting": p["supporting"]} for p in q["paragraphs"]])
-                    titles = lambda: [q["paragraphs"][j]["title"] for j in tool.shown]  # noqa: E731
+                    chain_rows = [c for c in getattr(args, "chain_rows", {}).get(q["id"], [])]
+                    tool.reset(paragraphs=[{"text": paragraph_text(p), "supporting": p["supporting"]} for p in q["paragraphs"]]
+                               + [{"text": c["text"], "supporting": False} for c in chain_rows])
+                    names = [p["title"] for p in q["paragraphs"]] + [f"chain: {c['a']} -> {c['b']}" for c in chain_rows]
+                    titles = lambda: [names[j] for j in tool.shown]  # noqa: E731
                 try:
                     search_trunk = getattr(args, "search_trunk", None) or trunk
                     out = solve(search_trunk.chat, ASK_SYSTEM, q["question"], tool.search, max_turns=args.max_turns)
@@ -281,6 +286,8 @@ def main() -> None:
                    help="the trunk's thinking mode on (the server must run without --reasoning-budget 0; raise --max-new)")
     p.add_argument("--wiki", default=str(ROOT / "data" / "wiki-abstracts" / "minilm"), help="the full-form store")
     p.add_argument("--bm25", default=str(ROOT / "data" / "wiki-abstracts" / "bm25"), help="its lexical index")
+    p.add_argument("--chains", default=None,
+                   help="the ask arm's store holds the chain rows (scripts/chains.py) written between its own passages, beside them")
     p.add_argument("--search-adapter", default=None,
                    help="asking arms: search on these adapters alone and answer with --adapter's (facts in the answer, not in the decision to look)")
     p.add_argument("--rerank", type=int, default=50,
@@ -311,6 +318,12 @@ def main() -> None:
         search_trunk = ServedTrunk(url=args.served, max_new=args.max_new, parallel=args.batch, think=args.think,
                                    lora=[{"id": a["id"], "scale": 1.0 if Path(a["path"]).name in search_names else 0.0} for a in loaded])
     args.search_trunk = search_trunk if search_trunk is not trunk else None
+    args.chain_rows = {}
+    if args.chains:
+        for line in Path(args.chains).read_text(encoding="utf-8").splitlines():
+            c = json.loads(line)
+            if c["kept"]:
+                args.chain_rows.setdefault(c["id"], []).append(c)
     index = None
     if any(s.startswith(("top:", "recall:", "wiki:")) for s in args.arms.split(",")):
         import numpy as np

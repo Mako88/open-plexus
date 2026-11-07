@@ -113,7 +113,7 @@ def tag_of(spec: str, args) -> str:
         tag += "-" + "+".join(a.stem.replace("-lora", "") for a in adapters)
     if getattr(args, "think", False):
         tag += "-think"
-    if getattr(args, "chains", None) and spec == "ask":
+    if getattr(args, "chains", None) and spec in ASKING:
         tag += "-chainsfull-" + Path(args.chains).stem
     if getattr(args, "search_adapter", None) and spec in ASKING:
         tag += "-searchon-" + "+".join(Path(a).stem.replace("-lora", "") for a in args.search_adapter.split(","))
@@ -170,7 +170,7 @@ def arm(spec: str, qs: list[dict], args, trunk, index) -> dict:
 
             def one(q):
                 if spec == "wiki:ask":
-                    tool = WikiSearch(index.wiki, index.embed, index.nearest)
+                    tool = WikiSearch(getattr(index, "store", index.wiki), index.embed, index.nearest)
                     titles = tool.titles
                 else:
                     tool = Store()
@@ -346,10 +346,22 @@ def main() -> None:
         if any(s.startswith("wiki:") for s in args.arms.split(",")):
             index.wiki = WikiStore(args.wiki)
             index.nearest = sense_of(args.sense, index.wiki, embed, args.bm25)
+            index.store = index.wiki
+            if args.chains:
+                # the store with the system's experience in it: its chain rows, each bringing its two passages
+                from openplexus.experience import Experience
+
+                para = {(q["id"], p_["title"]): paragraph_text(p_) for q in questions(args.n + args.skip) for p_ in q["paragraphs"]}
+                rows = [{"title": f"chain: {c['a']} -> {c['b']}",
+                         "text": "\n\n".join([c["text"], para.get((c["id"], c["a"]), ""), para.get((c["id"], c["b"]), "")])}
+                        for cs in args.chain_rows.values() for c in cs]
+                index.store = Experience(index.wiki, rows)
+                index.nearest = index.store.over(index.nearest)
+                print(f"experience: {len(rows)} chain rows beside the store", flush=True)
             if args.rerank:
                 from openplexus.rerank import Reranker
 
-                index.nearest = Reranker(index.wiki.text).over(index.nearest, deep=args.rerank)
+                index.nearest = Reranker(index.store.text).over(index.nearest, deep=args.rerank)
             print(f"the full-form store: {index.wiki.n} abstracts on {index.wiki.device}, searched {args.sense}", flush=True)
     reading = {"kind": "hotpot-reading", "set": f"HotpotQA distractor {args.split}, data/hotpotqa/{args.split}.jsonl",
                "skip": args.skip, "n": len(qs), "scorer": "exact match and token F1 on the normalised answer, HotpotQA's own",

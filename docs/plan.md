@@ -647,9 +647,19 @@ Each step says what it decides. A step is struck when it is done.
      made wrong (+2.7 standard errors), exact 0.515 against 0.475 (+1.9); a chain row was shown on 77.
      On 200 questions the rows were not written from (`-020955Z`): level, 0.505 and 0.505, 5 and 5,
      and no chain row shown on any, so the rows neither intrude nor yet transfer. The system
-     remembers what it worked out, in the store, at no cost to the asking: kept. Next: the chain
-     rows become the lineage's own store part, written by the live loop's sleep, so every round
-     adds to them; transfer waits on rows more general than one question's pair.
+     remembers what it worked out, in the store, at no cost to the asking: kept. The chain rows
+     are now the lineage's own store part (`Lineage.commit_rows`), written by the live loop's
+     sleep (`chains.py --wiki`). **First row sleep, live round 6, read 2026-11-07**
+     (`hotpot-20261107T063014Z` to `-070855Z`): a day on validation 1000-1200 over the full store
+     (0.56), 135 rows from its search histories, the day asked again **0.56** (6 made right, 6
+     made wrong; a row shown on 69, so the wiring holds), the first 200 0.545 against 0.55 (4 and
+     6, one row shown): not kept, rolled back. The rows are as sound as the kept ones (73 of 135
+     link both gold passages, against 93 of 151), but full-store experience holds a gold pair
+     mostly where the system already answered right: 17 questions wrong on the day had one (1
+     made right), against 33 (13 made right) in the kept reading, whose rows came from the
+     ten-paragraph asking, where the gold passages are among the ten. So the earlier lift was
+     borrowed from the setting's finding, and a sleep that only remembers what it found adds
+     what it already knows. Next: a sleep that finds what the day missed.
    - **The order from here** (John, 2026-11-05): (1) the score fixed, done; (2) the facts adapter
      apart from the skills (`consolidate.py --part facts`, the lineage's `facts` part), read as two
      arms, rows and restatements alone against the question lines with both skills rehearsed;

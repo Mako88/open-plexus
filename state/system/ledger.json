@@ -160,5 +160,68 @@
    "why": "lost asking (-2.1 standard errors)",
    "at": "20261106T103118Z"
   }
+ },
+ {
+  "round": 6,
+  "part": "experience",
+  "what": "the live loop's sleep, round 6: chain rows from the day's search histories",
+  "trained_on": "validation questions 1000-1200",
+  "questions": 0,
+  "rows_before": 0,
+  "rows_after": 135,
+  "readings": {
+   "day": {
+    "reading": "hotpot-20261107T063014Z",
+    "exact": 0.45,
+    "lenient": 0.56,
+    "n": 200
+   },
+   "again": {
+    "reading": "hotpot-20261107T065016Z",
+    "exact": 0.455,
+    "lenient": 0.56,
+    "n": 200
+   },
+   "regression_before": {
+    "reading": "hotpot-20261107T063337Z",
+    "exact": 0.475,
+    "lenient": 0.55,
+    "n": 200
+   },
+   "regression_after": {
+    "reading": "hotpot-20261107T070855Z",
+    "exact": 0.465,
+    "lenient": 0.545,
+    "n": 200
+   },
+   "score_before": 0.56,
+   "score_after": 0.56,
+   "paired": {
+    "gain": [
+     6,
+     6
+    ],
+    "regression": [
+     6,
+     7
+    ]
+   },
+   "verdict": {
+    "keep": false,
+    "why": "held everything and gained nothing clear",
+    "lines": {
+     "the first 200": -0.3,
+     "the day again": 0.0
+    }
+   }
+  },
+  "note": "held everything and gained nothing clear",
+  "sha": "a5675bb9",
+  "at": "20261107T070904Z",
+  "points_gained": 0.0,
+  "rolled_back": {
+   "why": "held everything and gained nothing clear",
+   "at": "20261107T070904Z"
+  }
  }
 ]

@@ -53,6 +53,10 @@ def as_dict_args(messages: list[dict]) -> list[dict]:
     return out
 
 
+HINT = ("\n\n(For your explanation: the answer is {answer}. Work out from the passages how they lead to it, "
+        "step by step, then end with the line 'Answer: {answer}'. Do not mention that you were told.)")
+
+
 def main() -> None:
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument("--n", type=int, default=400, help="training questions asked")
@@ -60,7 +64,8 @@ def main() -> None:
     p.add_argument("--adapter", default="system", help="the GGUF the server has loaded to apply: 'system' is the lineage's")
     p.add_argument("--out", required=True)
     p.add_argument("--max-new", type=int, default=160)
-    p.add_argument("--kind", default="answer", choices=["answer", "ask"], help="the answering from the gold paragraphs, or the asking on the ten")
+    p.add_argument("--kind", default="answer", choices=["answer", "ask", "correct"],
+                   help="the answering from the gold paragraphs, the asking on the ten, or corrections where the answering was wrong")
     args = p.parse_args()
     gguf = Path(Lineage().current_gguf()) if args.adapter == "system" else Path(args.adapter)
     trunk = ServedTrunk(max_new=args.max_new, parallel=8)
@@ -72,7 +77,24 @@ def main() -> None:
     out = Path(args.out)
     out.parent.mkdir(parents=True, exist_ok=True)
     kept = 0
-    if args.kind == "answer":
+    if args.kind == "correct":
+        # STaR's rationalisation (Zelikman et al., 2022): where the reading came out wrong, the key is shown
+        # as a hint and the trunk explains from the passages how they lead to it; kept without the hint, the
+        # explanation teaches the reading what it never got right, which self-distillation cannot (Fable,
+        # 2026-11-08: a gold row comes right a third of the time, the reader's own rate)
+        prompts = [[{"role": "system", "content": READ_SYSTEM},
+                    {"role": "user", "content": read_text(q, [x for x in q["paragraphs"] if x["supporting"]])}] for q in qs]
+        replies = trunk.ask_many(prompts)
+        wrong = [(q, p_) for q, p_, r in zip(qs, prompts, replies) if not exact(answer_of(r), q["answer"])]
+        hinted = trunk.ask_many([[p_[0], {"role": "user", "content": p_[1]["content"] + HINT.format(answer=q["answer"])}]
+                                 for q, p_ in wrong])
+        with open(out, "w", encoding="utf-8") as f:
+            for (q, prompt), reply in zip(wrong, hinted):
+                if exact(answer_of(reply), q["answer"]) and "hint" not in reply.lower():
+                    kept += 1
+                    f.write(json.dumps({"id": q["id"], "messages": prompt + [{"role": "assistant", "content": reply}]}, ensure_ascii=False) + "\n")
+        print(f"{len(wrong)} of {len(qs)} read wrong; {kept} explained to the key and kept as corrections", flush=True)
+    elif args.kind == "answer":
         prompts = [[{"role": "system", "content": READ_SYSTEM},
                     {"role": "user", "content": read_text(q, [x for x in q["paragraphs"] if x["supporting"]])}] for q in qs]
         replies = trunk.ask_many(prompts)

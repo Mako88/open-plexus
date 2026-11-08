@@ -157,10 +157,9 @@ class WikiSearch:
             The most relevant passage, with its title first.
         """
         self.searches.append(query)
-        pick = self.nearest([query], 1, set(self.shown))[0]
-        i = pick[0] if pick else 0
-        self.shown.append(i)
-        return self.store.text(i)
+        pick = self.nearest([query], 1, set(self.shown))[0] or [0]
+        self.shown.extend(pick)  # one row, or a sense that shows a row beside it (Experience.beside)
+        return "\n\n".join(self.store.text(i) for i in pick)
 
     def titles(self) -> list[str]:
         return [self.store.title(i) for i in self.shown]

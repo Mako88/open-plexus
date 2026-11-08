@@ -40,3 +40,18 @@ class Experience:
         def search(queries, k, exclude):
             return [nearest([q], k, exclude)[0] + self.candidates(q, m, exclude) for q in queries]
         return search
+
+    def beside(self, nearest, extra: int = 5):
+        """Over the reranked search: the store's best rows as asked, and beside them the best experience
+        row when it ranks above the last of them, never in place of one. In one slot (round 8, 2026-11-08)
+        a wrong chain displaced the passage the asker needed: Wikipedia's gold shown fell from 1.3 a
+        question to 0.69 and the day asked again lost 21 for 13."""
+        def search(queries, k, exclude):
+            out = []
+            for q in queries:
+                ranked = nearest([q], k + extra, exclude)[0]
+                own = [r for r in ranked if r < self.base.n][:k]
+                cut = ranked.index(own[-1]) if own else len(ranked)
+                out.append(own + [r for r in ranked[:cut] if r >= self.base.n][:1])
+            return out
+        return search

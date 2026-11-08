@@ -120,6 +120,8 @@ def tag_of(spec: str, args) -> str:
         tag += "-exp-" + Path(exp).stem  # rows not yet the system's: a sleep's candidates
     elif spec == "wiki:ask" and exp == "none" and adapters and {a.resolve() for a in adapters} == system and Lineage().experience():
         tag += "-noexp"  # the system's adapters without its own store part
+    if getattr(args, "rows_beside", False) and spec == "wiki:ask":
+        tag += "-beside"
     if getattr(args, "search_adapter", None) and spec in ASKING:
         tag += "-searchon-" + "+".join(Path(a).stem.replace("-lora", "") for a in args.search_adapter.split(","))
     if getattr(args, "rerank", 0) and spec.startswith("wiki:"):
@@ -303,6 +305,8 @@ def main() -> None:
     p.add_argument("--experience", default=None,
                    help="the full-store asking's own rows beside Wikipedia: 'system' (the lineage's, the default with --adapter system), "
                         "'none', or a JSONL of self-contained rows (scripts/chains.py --wiki)")
+    p.add_argument("--rows-beside", action="store_true",
+                   help="an experience row is shown beside the search's best Wikipedia passage, never in its place (Experience.beside)")
     p.add_argument("--search-adapter", default=None,
                    help="asking arms: search on these adapters alone and answer with --adapter's (facts in the answer, not in the decision to look)")
     p.add_argument("--rerank", type=int, default=50,
@@ -387,6 +391,8 @@ def main() -> None:
                 from openplexus.rerank import Reranker
 
                 index.nearest = Reranker(index.store.text).over(index.nearest, deep=args.rerank)
+            if args.rows_beside and args.experience_rows:
+                index.nearest = index.store.beside(index.nearest)
             print(f"the full-form store: {index.wiki.n} abstracts on {index.wiki.device}, searched {args.sense}", flush=True)
     reading = {"kind": "hotpot-reading", "set": f"HotpotQA distractor {args.split}, data/hotpotqa/{args.split}.jsonl",
                "skip": args.skip, "n": len(qs), "scorer": "exact match and token F1 on the normalised answer, HotpotQA's own",

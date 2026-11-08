@@ -685,6 +685,18 @@ Each step says what it decides. A step is struck when it is done.
      reading's own spread). Of 26 wrong questions given a gold row, 9 came right, as in place; the
      loss is elsewhere, and searches fell from 1.85 a question to 1.61: a chain row shown, right or
      wrong, ends the looking early. So a remembered pair is not what this asker lacks.
+     **The row branch is read** (Fable, 2026-11-08): a gold row on a wrong question comes right
+     about a third of the time in every reading (9 of 26, 8 of 34, 13 of 33), the gold arm's own
+     rate on hard questions, so the ceiling is the reader, not the row; even a perfect gate (28
+     gold rows on 88 wrong) would land near 2 standard errors, at the bar, and no row ever reached
+     a question it was not written for. The sleep writes no rows; `Experience.beside` is the form
+     if rows are shown again. Next: the sleep trains the reading skill by the key. Days on the
+     training split; the wrong questions whose gold passages are in the store become (question,
+     both passages, gold answer) in the asking's own format, trained into the skills adapter with
+     the usual rehearsal. Read on the fixed first 200, gold first: up 2 standard errors (0.64 to
+     about 0.71) with the asking not down 2, at most three sleeps. Gold level after three says the
+     2B's reading is at its ceiling; the asking down while gold rises says the correction set
+     needs search histories in it.
      Rows on keyed training questions cannot help (a row has never been shown on a question it
      was not written for); the key belongs in training the pair chooser, a later form.
    - **The order from here** (John, 2026-11-05): (1) the score fixed, done; (2) the facts adapter

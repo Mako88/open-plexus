@@ -675,7 +675,12 @@ Each step says what it decides. A step is struck when it is done.
      row was gold), and of 34 wrong questions given a gold row only 8 came right. The pair score
      cannot cut them: kept to the best one a question, 11 of the wrong have their gold pair, three
      20. The cross-encoder over the question and both passages together does: 18 at one, **28** at
-     three. Next: the sleep keeps three pairs a question by that joint score.
+     three. **Round 8** (`hotpot-20261108T150434Z` to `-154956Z`), three pairs a question by that
+     score, 418 rows: the day again **0.52** (13 made right, 21 made wrong), the first 200 level
+     (4 and 4): not kept. A search shows one row, so a chain row takes that slot, and a wrong pair
+     displaces the passage the asker needed (Wikipedia's gold shown 1.3 a question to 0.69).
+     Reading now: the same rows shown beside the search's best passage, never in its place
+     (`--rows-beside`).
      Rows on keyed training questions cannot help (a row has never been shown on a question it
      was not written for); the key belongs in training the pair chooser, a later form.
    - **The order from here** (John, 2026-11-05): (1) the score fixed, done; (2) the facts adapter

@@ -679,8 +679,12 @@ Each step says what it decides. A step is struck when it is done.
      score, 418 rows: the day again **0.52** (13 made right, 21 made wrong), the first 200 level
      (4 and 4): not kept. A search shows one row, so a chain row takes that slot, and a wrong pair
      displaces the passage the asker needed (Wikipedia's gold shown 1.3 a question to 0.69).
-     Reading now: the same rows shown beside the search's best passage, never in its place
-     (`--rows-beside`).
+     The same rows shown beside the search's best passage, never in its place (`--rows-beside`,
+     `hotpot-20261108T161241Z`, `-163407Z`): the crowding goes (gold shown 1.2), the day again
+     **0.545** (13 made right, 16 made wrong), the first 200 level (2 and 5, no row shown: the
+     reading's own spread). Of 26 wrong questions given a gold row, 9 came right, as in place; the
+     loss is elsewhere, and searches fell from 1.85 a question to 1.61: a chain row shown, right or
+     wrong, ends the looking early. So a remembered pair is not what this asker lacks.
      Rows on keyed training questions cannot help (a row has never been shown on a question it
      was not written for); the key belongs in training the pair chooser, a later form.
    - **The order from here** (John, 2026-11-05): (1) the score fixed, done; (2) the facts adapter

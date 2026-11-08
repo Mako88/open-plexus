@@ -4,11 +4,14 @@ find what the day missed. Offline, budget is free: for each of the day's questio
 reordered by the cross-encoder gives three first hops; from each, the second hops are the store
 titles named verbatim in its text (the bridge is almost always the second passage's title,
 mentioned in the first) and BM25 of the question with the first hop's title, reordered by the
-cross-encoder against the question, five kept per first hop. No key is used to choose; the key only
+cross-encoder against the question, five kept per first hop; of those fifteen, the three that the
+cross-encoder scores best over the question and both passages together are kept. No key is used to choose; the key only
 counts, after, how many of the day's wrong questions have their gold pair among the kept pairs.
 Read on round 6's day (88 wrong): 17 from the histories, 36 here, 62 anywhere in the pool. Scored
 against the question with the first passage 33, with the first title 30; two kept a first hop 26,
-24 and 21 (`state/wide/round6-choosers.log`; the comparison's code was not kept).
+24 and 21 (`state/wide/round6-choosers.log`; the comparison's code was not kept). All fifteen
+written as rows (round 7) crowded the day's own passages out (0.515 against 0.56); three a
+question by the joint score keep the gold pair for 28 of the wrong (by the pair score 20).
 
     .venv/Scripts/python scripts/wide_pairs.py --from hotpot-20261107T063014Z --skip 1000
 """
@@ -69,6 +72,7 @@ def main() -> None:
     p.add_argument("--deep", type=int, default=200, help="BM25 rows the cross-encoder reorders for the first hop")
     p.add_argument("--first", type=int, default=3)
     p.add_argument("--second", type=int, default=5, help="second hops kept a first hop")
+    p.add_argument("--keep", type=int, default=3, help="pairs kept a question, by the cross-encoder over the question and both passages")
     p.add_argument("--wiki", default=str(ROOT / "data" / "wiki-abstracts" / "minilm"))
     p.add_argument("--bm25", default=str(ROOT / "data" / "wiki-abstracts" / "bm25"))
     p.add_argument("--out", help="the candidate pairs as jsonl, for the sleep to write lines from")
@@ -79,6 +83,7 @@ def main() -> None:
     wiki = WikiTexts(Path(args.wiki))
     bm25 = LexicalIndex(Path(args.bm25))
     rr = Reranker(wiki.text)
+    joint = Reranker(lambda ab: f"{wiki.text(ab[0])}\n{wiki.text(ab[1])}", max_length=512)
     titles = title_rows(wiki)
     print(f"{len(titles)} titles; {len(qs)} questions, {sum(not day[q['id']]['lenient'] for q in qs)} wrong on the day", flush=True)
 
@@ -98,6 +103,9 @@ def main() -> None:
             pool.update((f, c) for c in cands)
             cs = rr.scores(q["question"], cands) if cands else []
             pairs.extend((f, c, score) for score, c in sorted(zip(cs, cands), key=lambda x: -x[0])[:args.second])
+        if pairs:  # each pair read whole against the question, the best few kept
+            js = joint.scores(q["question"], [(a, b) for a, b, _ in pairs])
+            pairs = [(a, b, j) for j, (a, b, _) in sorted(zip(js, pairs), key=lambda x: -x[0])[:args.keep]]
         # the key only counts, after the choosing
         gold = {p_["title"] for p_ in q["paragraphs"] if p_["supporting"]}
         has = lambda ps: any({wiki.title(a), wiki.title(b)} == gold for a, b, *_ in ps)

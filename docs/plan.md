@@ -667,7 +667,15 @@ Each step says what it decides. A step is struck when it is done.
      is not budget-bound and the first stage comes first. Read on round 6's day: of 88 wrong, the
      gold pair is among the candidates for 62 and among the kept pairs for **36**, the second
      hops scored against the question alone, five a first hop (against the question with the
-     first passage 33, two a first hop 26). Then the cycle as `live.py` reads it, on the same day.
+     first passage 33, two a first hop 26). **Round 7, read 2026-11-07** (`hotpot-20261107T102015Z`
+     to `-121017Z`), the same day slept wide: 2,169 rows (about 11 a question), the day again
+     **0.515** against 0.56 (12 made right, 21 made wrong, -1.6), the first 200 level (4 and 5):
+     not kept. Rows do not intrude on other questions, but on their own question the wrong pairs
+     crowd the passages out (Wikipedia's gold shown 1.3 a question to 0.58; 13 made wrong where no
+     row was gold), and of 34 wrong questions given a gold row only 8 came right. The pair score
+     cannot cut them: kept to the best one a question, 11 of the wrong have their gold pair, three
+     20. The cross-encoder over the question and both passages together does: 18 at one, **28** at
+     three. Next: the sleep keeps three pairs a question by that joint score.
      Rows on keyed training questions cannot help (a row has never been shown on a question it
      was not written for); the key belongs in training the pair chooser, a later form.
    - **The order from here** (John, 2026-11-05): (1) the score fixed, done; (2) the facts adapter

@@ -697,6 +697,10 @@ Each step says what it decides. A step is struck when it is done.
      about 0.71) with the asking not down 2, at most three sleeps. Gold level after three says the
      2B's reading is at its ceiling; the asking down while gold rises says the correction set
      needs search histories in it.
+     **Sleep one, read** (`hotpot-20261108T183234Z` before, `-20261109T053100Z` after): 223
+     corrections beside the rehearsal, 3 epochs, loss 0.83 to 0.68; gold exact **0.635** against
+     0.64 (15 made right, 16 made wrong), lenient 0.77 against 0.755, comparison 0.71 against
+     0.77, bridge level. Gold did not move, so the asking was not read and nothing was committed.
      Rows on keyed training questions cannot help (a row has never been shown on a question it
      was not written for); the key belongs in training the pair chooser, a later form.
    - **The order from here** (John, 2026-11-05): (1) the score fixed, done; (2) the facts adapter
